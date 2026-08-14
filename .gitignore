@@ -48,4 +48,5 @@ next-env.d.ts
 # Local temp files
 temp/
 output/playwright/
+.playwright-cli/
 dev-server*.log

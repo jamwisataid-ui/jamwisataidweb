@@ -8,7 +8,7 @@ Website paket umrah dan wisata halal yang responsif, informatif, dan berorientas
 
 </div>
 
-![Tampilan desktop Jam Wisata](docs/design-references/jamwisata-com-2868cc8a/root-8a5edab2/phase2-desktop-1440.png)
+![Tampilan terbaru website Jam Wisata](docs/design-references/jamwisata-final-desktop.png)
 
 ## Tentang Proyek
 
