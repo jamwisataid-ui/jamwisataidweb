@@ -13,6 +13,6 @@
 # design
 - Do not keep the navy & gold premium rebrand (Montserrat/Cormorant, #0A1D3A + #B8860B/#D4AF37); the user rejected it as ugly and wants the prior visual design restored. Confidence: 0.65
 - When applying gold and silver brand colors, use proper metallic gradients — not flattened solid single-color fills. Confidence: 0.65
-- Keep the floating WhatsApp Concierge CTA with its green gradient — do not recolor it to gold/silver ("biarin aja pake warna ijo"). Confidence: 0.70
+- Keep the floating WhatsApp Concierge CTA with its green gradient — do not recolor it to gold/silver; user insists it stays plain green, no gold accents. Confidence: 0.80
 - Prioritize smooth transitions, hover effects, and animations across the site; refine and polish them for a more premium feel. Confidence: 0.65
 

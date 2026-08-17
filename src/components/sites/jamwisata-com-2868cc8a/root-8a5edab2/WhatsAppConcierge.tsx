@@ -111,10 +111,10 @@ export function WhatsAppConcierge() {
         aria-controls="whatsapp-concierge"
         aria-label={open ? "Tutup bantuan Jam Wisata" : "Buka bantuan Jam Wisata"}
         onClick={() => setOpen((value) => !value)}
-        className={`concierge-trigger fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[85] isolate grid size-16 place-items-center rounded-full border-2 border-white/85 bg-gradient-to-br from-[#22a496] via-[#D4AF37] to-[#0d5e57] text-white shadow-[0_18px_44px_rgba(8,55,51,.38),0_0_0_5px_rgba(213,183,122,.20)] transition duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-[0_24px_54px_rgba(8,55,51,.50),0_0_0_7px_rgba(213,183,122,.26)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0A1D3A] sm:right-6 sm:bottom-6 sm:flex sm:h-[68px] sm:w-auto sm:min-w-[238px] sm:justify-start sm:gap-3 sm:rounded-full sm:px-4 ${open ? "concierge-trigger-open" : ""}`}
+        className={`concierge-trigger fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[85] isolate grid size-16 place-items-center rounded-full border-2 border-white/85 bg-gradient-to-br from-[#22a496] via-[#147D73] to-[#0d5e57] text-white shadow-[0_18px_44px_rgba(8,55,51,.38),0_0_0_5px_rgba(34,164,150,.22)] transition duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-[0_24px_54px_rgba(8,55,51,.50),0_0_0_7px_rgba(34,164,150,.28)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0A1D3A] sm:right-6 sm:bottom-6 sm:flex sm:h-[68px] sm:w-auto sm:min-w-[238px] sm:justify-start sm:gap-3 sm:rounded-full sm:px-4 ${open ? "concierge-trigger-open" : ""}`}
       >
         <span className={`concierge-callout hidden sm:block ${open ? "opacity-0" : "opacity-100"}`}>Mau tanya paket? Kami bantu</span>
-        <span className="concierge-pulse relative z-10 grid size-12 place-items-center rounded-full bg-white text-[#D4AF37] shadow-[inset_0_0_0_1px_rgba(20,125,115,.08),0_6px_18px_rgba(7,28,43,.18)]"><WhatsAppMark className="concierge-heartbeat size-7" /></span>
+        <span className="concierge-pulse relative z-10 grid size-12 place-items-center rounded-full bg-white text-[#147D73] shadow-[inset_0_0_0_1px_rgba(20,125,115,.08),0_6px_18px_rgba(7,28,43,.18)]"><WhatsAppMark className="concierge-heartbeat size-7" /></span>
         <span className="hidden items-center gap-2.5 text-left sm:flex">
           <span><strong className="block text-[13px] font-extrabold">Butuh Bantuan?</strong><span className="mt-0.5 block text-[10px] font-medium text-white/82">Chat langsung dengan kami</span></span>
           <span className="grid h-8 w-12 place-items-center rounded-lg bg-white px-1.5"><Image src={`${assetRoot}/logo.png`} alt="" width={500} height={116} className="h-auto w-full" /></span>
@@ -131,7 +131,7 @@ export function WhatsAppConcierge() {
             aria-label="WhatsApp concierge Jam Wisata"
             className="max-h-[min(610px,calc(100dvh-116px))] w-full overflow-y-auto rounded-[26px] border border-white/80 bg-white shadow-[0_30px_90px_rgba(7,28,43,.28),0_0_0_1px_rgba(16,43,63,.06)]"
           >
-            <div className="sticky top-0 z-10 flex items-center gap-3 bg-gradient-to-br from-[#D4AF37] to-[#0E675F] p-5 text-white">
+            <div className="sticky top-0 z-10 flex items-center gap-3 bg-gradient-whatsapp p-5 text-white">
               <span className="grid h-11 w-16 shrink-0 place-items-center rounded-[13px] bg-white px-2"><Image src={`${assetRoot}/logo.png`} alt="Logo Jam Wisata" width={500} height={116} className="h-auto w-full" /></span>
               <div className="min-w-0"><p className="font-extrabold">Jam Wisata</p><p className="mt-0.5 flex items-center gap-1.5 text-[10px] text-white/78"><span className="size-1.5 rounded-full bg-[#E8C967]" /> Biasanya membalas pada jam operasional</p></div>
               <button type="button" onClick={() => close()} aria-label="Tutup WhatsApp concierge" className="ml-auto grid size-10 shrink-0 place-items-center rounded-full bg-white/12 transition hover:bg-white/20"><X className="size-5" /></button>
