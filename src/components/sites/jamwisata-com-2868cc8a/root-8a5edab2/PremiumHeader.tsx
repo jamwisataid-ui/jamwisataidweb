@@ -136,10 +136,10 @@ export function PremiumHeader() {
             ))}
           </nav>
           <div className="flex items-center gap-2.5">
-            <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="lift-soft sheen-light hidden min-h-11 items-center gap-2 rounded-[14px] bg-gradient-whatsapp px-5 text-xs font-extrabold text-white shadow-[0_10px_26px_rgba(37,211,102,.32),inset_0_1px_0_rgba(255,255,255,.32)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366] sm:inline-flex">
+            <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="lift-soft sheen-gold hidden min-h-11 items-center gap-2 rounded-[14px] bg-gradient-gold-rich px-5 text-xs font-extrabold text-[#0A1D3A] shadow-[0_10px_28px_rgba(184,134,11,.32),inset_0_1px_0_rgba(255,235,170,.55)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37] sm:inline-flex">
               <MessageCircle className="size-4" aria-hidden="true" /> Konsultasi Umrah
             </a>
-            <a href={whatsapp} aria-label="Konsultasi cepat via WhatsApp" target="_blank" rel="noopener noreferrer" className="grid size-11 place-items-center rounded-[13px] bg-gradient-whatsapp text-white shadow-[0_8px_22px_rgba(37,211,102,.28),inset_0_1px_0_rgba(255,255,255,.32)] sm:hidden">
+            <a href={whatsapp} aria-label="Konsultasi cepat via WhatsApp" target="_blank" rel="noopener noreferrer" className="grid size-11 place-items-center rounded-[13px] bg-gradient-gold-rich text-[#0A1D3A] shadow-[0_8px_22px_rgba(184,134,11,.30),inset_0_1px_0_rgba(255,235,170,.55)] sm:hidden">
               <MessageCircle className="size-5" aria-hidden="true" />
             </a>
             <button ref={triggerRef} type="button" aria-expanded={menuOpen} aria-controls="mobile-navigation" aria-label={menuOpen ? "Tutup menu" : "Buka menu"} onClick={() => setMenuOpen((value) => !value)} className="grid size-11 place-items-center rounded-[13px] border border-[#0A1D3A]/12 text-[#0A1D3A] xl:hidden">
@@ -166,7 +166,7 @@ export function PremiumHeader() {
             <div className="mt-auto rounded-[18px] bg-[#F7F3E9] p-4 text-xs leading-5 text-[#59616D]">
               <p className="font-bold text-[#0A1D3A]">Butuh bantuan memilih paket?</p>
               <p className="mt-1">Sen–Jum 09.00–17.00 · Sab 09.00–14.00 WIB</p>
-              <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="lift-soft sheen-light mt-4 flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-whatsapp px-4 font-bold text-white shadow-[0_8px_22px_rgba(37,211,102,.28),inset_0_1px_0_rgba(255,255,255,.32)]"><MessageCircle className="size-4" /> Konsultasi Umrah</a>
+              <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="lift-soft sheen-gold mt-4 flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-gold-rich px-4 font-extrabold text-[#0A1D3A] shadow-[0_8px_22px_rgba(184,134,11,.30),inset_0_1px_0_rgba(255,235,170,.55)]"><MessageCircle className="size-4" /> Konsultasi Umrah</a>
             </div>
           </div>
         </div>

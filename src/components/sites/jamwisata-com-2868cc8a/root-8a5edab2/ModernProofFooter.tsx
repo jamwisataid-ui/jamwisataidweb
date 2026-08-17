@@ -573,7 +573,7 @@ export function ModernProofFooter() {
               )}
               target="_blank"
               rel="noopener noreferrer"
-              className="sheen-light lift-soft mt-7 inline-flex min-h-13 items-center justify-center gap-3 rounded-[14px] bg-gradient-whatsapp px-6 text-sm font-extrabold tracking-[-.005em] text-white shadow-[0_18px_42px_rgba(37,211,102,.30),inset_0_1px_0_rgba(255,255,255,.32)]"
+              className="lift-soft mt-7 inline-flex min-h-13 items-center justify-center gap-3 rounded-[14px] bg-[#25D366] px-6 text-sm font-extrabold tracking-[-.005em] text-white shadow-[0_18px_36px_rgba(37,211,102,.30)] hover:bg-[#1ebe5d]"
             >
               <MessageCircle className="size-4" /> Konsultasi via WhatsApp
             </a>
