@@ -64,11 +64,11 @@ export function ModernPackages() {
             </div>
             <div className="grid gap-4 min-[430px]:grid-cols-2">
               {facilityGroups.map(([Icon, title, items, surface]) => (
-                <article key={title} className={`rounded-[22px] border border-[#0A1D3A]/8 p-5 transition duration-200 hover:-translate-y-0.5 hover:border-[#D4AF37]/45 sm:p-6 ${surface}`}>
-                  <span className="grid size-11 place-items-center rounded-[14px] bg-[#D4AF37] text-white shadow-[0_8px_18px_rgba(20,125,115,.16)]"><Icon className="size-5" strokeWidth={1.7} /></span>
-                  <h3 className="mt-4 text-[15px] leading-snug font-extrabold text-[#0A1D3A]">{title}</h3>
-                  <ul className="mt-4 space-y-2 border-t border-[#0A1D3A]/8 pt-4">
-                    {items.map((item) => <li key={item} className="flex items-start gap-2 text-[12px] leading-5 text-[#59616D]"><span className="mt-2 size-1 shrink-0 rounded-full bg-[#D4AF37]" />{item}</li>)}
+                <article key={title} className={`lift-soft group rounded-[22px] border border-[#0A1D3A]/10 p-5 transition-all duration-400 hover:-translate-y-1 hover:border-[#C0C0C0]/60 hover:shadow-[0_22px_50px_rgba(10,29,58,.16),0_0_0_1px_rgba(192,192,192,.18)] sm:p-6 ${surface}`}>
+                  <span className="grid size-11 place-items-center rounded-[14px] bg-gradient-gold-rich text-[#0A1D3A] shadow-[0_10px_22px_rgba(184,134,11,.30),inset_0_1px_0_rgba(255,235,170,.55)] transition-transform duration-500 group-hover:rotate-[8deg]"><Icon className="size-5" strokeWidth={1.7} /></span>
+                  <h3 className="mt-4 text-[15px] leading-snug font-extrabold text-[#0A1D3A] transition-colors duration-300 group-hover:text-[#1E3A5F]">{title}</h3>
+                  <ul className="mt-4 space-y-2 border-t border-[#0A1D3A]/10 pt-4">
+                    {items.map((item) => <li key={item} className="flex items-start gap-2 text-[12px] leading-5 text-[#59616D] transition-colors duration-300 group-hover:text-[#333333]"><span className="mt-2 size-1 shrink-0 rounded-full bg-gradient-gold" />{item}</li>)}
                   </ul>
                 </article>
               ))}
@@ -106,23 +106,25 @@ export function ModernPackages() {
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative aspect-[16/11] overflow-hidden rounded-[22px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E8C967]"
+                className="lift-soft sheen-gold group relative aspect-[16/11] overflow-hidden rounded-[22px] ring-1 ring-white/5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#C0C0C0]"
               >
                 <Image
                   src={`${assetRoot}/${image}`}
                   alt={`Wisata halal ${name}`}
                   fill
                   sizes="(min-width:768px) 33vw,100vw"
-                  className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                  className="object-cover transition duration-[700ms] ease-[cubic-bezier(.22,1,.36,1)] group-hover:scale-[1.06]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#06152B]/92 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#06152B]/92 via-[#06152B]/35 to-transparent transition-opacity duration-500 group-hover:from-[#06152B]/85" />
                 <div className="absolute inset-x-0 bottom-0 p-6">
-                  <p className="text-[11px] text-[#E8C967]">{place}</p>
+                  <p className="text-[11px] font-bold tracking-[.04em] text-[#E8C967] uppercase">{place}</p>
                   <div className="mt-1 flex items-end justify-between gap-4">
-                    <h3 className="text-[25px] font-extrabold tracking-[-.03em]">
+                    <h3 className="text-[25px] font-extrabold tracking-[-.03em] text-white">
                       {name}
                     </h3>
-                    <ArrowRight className="size-5 transition group-hover:translate-x-1" />
+                    <span className="grid size-10 place-items-center rounded-full bg-gradient-gold-rich text-[#0A1D3A] shadow-[0_6px_14px_rgba(184,134,11,.32),inset_0_1px_0_rgba(255,235,170,.55)] transition-transform duration-500 group-hover:translate-x-1 group-hover:scale-105">
+                      <ArrowRight className="size-4" />
+                    </span>
                   </div>
                 </div>
               </a>

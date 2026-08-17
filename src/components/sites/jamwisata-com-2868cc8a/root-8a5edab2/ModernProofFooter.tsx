@@ -228,7 +228,7 @@ function MediaModal({
           type="button"
           onClick={close}
           aria-label="Tutup"
-          className="absolute -top-12 right-0 grid size-11 place-items-center rounded-full bg-white text-[#0A1D3A]"
+          className="lift-soft absolute -top-12 right-0 grid size-11 place-items-center rounded-full bg-gradient-gold-rich text-[#0A1D3A] shadow-[0_10px_24px_rgba(184,134,11,.32),inset_0_1px_0_rgba(255,235,170,.55)]"
         >
           <X className="size-5" />
         </button>
@@ -274,17 +274,17 @@ function VideoSection() {
               type="button"
               onClick={() => move(-1)}
               aria-label="Video sebelumnya"
-              className="grid size-12 place-items-center rounded-full border border-[#0A1D3A]/15 text-[#0A1D3A] hover:border-[#D4AF37] hover:text-[#D4AF37]"
+              className="lift-soft grid size-12 place-items-center rounded-full border border-[#0A1D3A]/15 text-[#0A1D3A] transition-all duration-400 hover:border-[#C0C0C0]/55 hover:text-[#1E3A5F] hover:shadow-[0_8px_22px_-6px_rgba(192,192,192,.40)]"
             >
-              <ArrowLeft className="size-5" />
+              <ArrowLeft className="size-5 transition-transform duration-300 group-hover:-translate-x-0.5" />
             </button>
             <button
               type="button"
               onClick={() => move(1)}
               aria-label="Video berikutnya"
-              className="grid size-12 place-items-center rounded-full bg-[#0A1D3A] text-white hover:bg-[#D4AF37]"
+              className="lift-soft sheen-gold grid size-12 place-items-center rounded-full bg-gradient-gold-rich text-[#0A1D3A] shadow-[0_10px_26px_rgba(184,134,11,.32),inset_0_1px_0_rgba(255,235,170,.55)]"
             >
-              <ArrowRight className="size-5" />
+              <ArrowRight className="size-5 transition-transform duration-300 group-hover:translate-x-0.5" />
             </button>
           </div>
         </div>
@@ -320,7 +320,7 @@ function VideoSection() {
           {testimonialVideos.map((video) => (
             <article
               key={video.id}
-              className="group shrink-0 snap-start self-start overflow-hidden rounded-[24px] bg-white shadow-[0_18px_48px_rgba(16,43,63,.11)] ring-1 ring-[#0A1D3A]/7 transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(16,43,63,.16)] w-[76vw] max-w-[280px] sm:w-[270px] lg:w-[286px]"
+              className="lift-soft group shrink-0 snap-start self-start overflow-hidden rounded-[24px] bg-white shadow-[0_18px_48px_rgba(10,29,58,.11)] ring-1 ring-[#0A1D3A]/7 transition-all duration-500 hover:shadow-[0_28px_64px_rgba(10,29,58,.18),0_0_0_1px_rgba(192,192,192,.20)] w-[76vw] max-w-[280px] sm:w-[270px] lg:w-[286px]"
             >
               <lite-youtube
                 ref={(element) => {
@@ -354,7 +354,7 @@ function VideoSection() {
           {testimonialVideos.map((video, index) => (
             <span
               key={video.id}
-              className={`h-1.5 rounded-full transition-all ${index === activeIndex ? "w-7 bg-[#D4AF37]" : "w-1.5 bg-[#0A1D3A]/18"}`}
+              className={`h-1.5 rounded-full transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)] ${index === activeIndex ? "w-7 bg-gradient-gold shadow-[0_0_8px_rgba(184,134,11,.45)]" : "w-1.5 bg-[#C0C0C0]/45"}`}
             />
           ))}
         </div>
@@ -426,16 +426,16 @@ function GallerySection() {
                         key={`${copy}-${item.image}`}
                         tabIndex={copy === 1 ? -1 : 0}
                         onClick={() => setActiveIndex(originalIndex)}
-                        className={`group relative h-[145px] shrink-0 overflow-hidden rounded-[16px] bg-[#dfe5e2] text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37] sm:h-[195px] ${item.width}`}
+                        className={`group relative h-[145px] shrink-0 overflow-hidden rounded-[16px] bg-[#E8E4DB] text-left ring-1 ring-[#0A1D3A]/8 transition-all duration-500 hover:ring-[#D4AF37]/45 hover:shadow-[0_18px_38px_rgba(10,29,58,.22)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C0C0C0] sm:h-[195px] ${item.width}`}
                       >
                         <Image
                           src={`${assetRoot}/${item.image}`}
                           alt={copy === 0 ? item.alt : ""}
                           fill
                           sizes="360px"
-                          className="object-cover transition duration-300 group-hover:scale-[1.02]"
+                          className="object-cover transition duration-[700ms] ease-[cubic-bezier(.22,1,.36,1)] group-hover:scale-[1.05]"
                         />
-                        <span className="absolute inset-x-0 bottom-0 translate-y-full bg-gradient-to-t from-[#0A1D3A]/85 to-transparent px-4 pt-10 pb-3 text-xs font-bold text-white transition group-hover:translate-y-0">
+                        <span className="absolute inset-x-0 bottom-0 translate-y-full bg-gradient-to-t from-[#0A1D3A]/92 via-[#0A1D3A]/55 to-transparent px-4 pt-10 pb-3 text-xs font-bold text-white transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] group-hover:translate-y-0">
                           {item.caption}
                         </span>
                       </button>
@@ -468,17 +468,17 @@ function GallerySection() {
               type="button"
               aria-label="Gambar sebelumnya"
               onClick={() => move(-1)}
-              className="absolute top-1/2 left-3 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-[#0A1D3A]"
+              className="lift-soft group absolute top-1/2 left-3 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/95 text-[#0A1D3A] shadow-[0_8px_22px_rgba(0,0,0,.18)]"
             >
-              <ArrowLeft className="size-5" />
+              <ArrowLeft className="size-5 transition-transform duration-300 group-hover:-translate-x-0.5" />
             </button>
             <button
               type="button"
               aria-label="Gambar berikutnya"
               onClick={() => move(1)}
-              className="absolute top-1/2 right-3 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-[#0A1D3A]"
+              className="lift-soft group absolute top-1/2 right-3 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/95 text-[#0A1D3A] shadow-[0_8px_22px_rgba(0,0,0,.18)]"
             >
-              <ArrowRight className="size-5" />
+              <ArrowRight className="size-5 transition-transform duration-300 group-hover:translate-x-0.5" />
             </button>
             <p className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-[#06152B] px-6 pt-12 pb-5 text-center text-sm font-bold text-white">
               {gallery[activeIndex].caption}
@@ -516,12 +516,12 @@ export function ModernProofFooter() {
                       aria-expanded={isOpen}
                       aria-controls={`faq-panel-${index}`}
                       onClick={() => setOpenFaq(isOpen ? -1 : index)}
-                      className="flex min-h-[66px] w-full items-center justify-between gap-5 py-4 text-left text-sm font-extrabold text-[#0A1D3A]"
+                      className="group flex min-h-[66px] w-full items-center justify-between gap-5 py-4 text-left text-sm font-extrabold text-[#0A1D3A] transition-colors duration-300 hover:text-[#1E3A5F]"
                     >
                       <span>{question}</span>
-                      <ChevronDown
-                        className={`size-5 shrink-0 text-[#D4AF37] transition ${isOpen ? "rotate-180" : ""}`}
-                      />
+                      <span className={`grid size-8 place-items-center rounded-full bg-gradient-gold-soft text-[#0A1D3A] shadow-[0_4px_10px_rgba(184,134,11,.18)] transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] ${isOpen ? "rotate-180" : ""}`}>
+                        <ChevronDown className="size-4" />
+                      </span>
                     </button>
                   </h3>
                   <div
@@ -545,15 +545,16 @@ export function ModernProofFooter() {
         id="kontak"
         className="scroll-mt-20 bg-white px-4 pb-12 sm:px-0 sm:pb-16"
       >
-        <div className="jam-container relative overflow-hidden rounded-[28px] bg-[#0A1D3A] px-7 py-12 text-white sm:px-12 lg:px-16 lg:py-16">
+        <div className="jam-container relative overflow-hidden rounded-[28px] bg-gradient-hero px-7 py-12 text-white sm:px-12 lg:px-16 lg:py-16">
           <Image
             src={`${assetRoot}/promo.jpg`}
             alt=""
             fill
             sizes="1280px"
-            className="object-cover opacity-28"
+            className="object-cover opacity-30"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0A1D3A] via-[#0A1D3A]/90 to-[#0A1D3A]/58" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#06152B]/95 via-[#0A1D3A]/85 to-[#06152B]/55" />
+          <div className="absolute inset-0 opacity-40" style={{backgroundImage:"radial-gradient(circle at 20% 20%, rgba(192,192,192,.18), transparent 40%), radial-gradient(circle at 80% 70%, rgba(212,175,55,.16), transparent 45%)"}} aria-hidden="true" />
           <div className="relative max-w-[780px]">
             <p className="section-eyebrow !text-[#E8C967]">
               Rencanakan Perjalanan
@@ -561,7 +562,7 @@ export function ModernProofFooter() {
             <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] leading-[1.04] font-extrabold tracking-[-.045em]">
               Siap Merencanakan Perjalanan Bersama Jam Wisata?
             </h2>
-            <p className="mt-5 max-w-[660px] text-sm leading-7 text-white/68">
+            <p className="mt-5 max-w-[660px] text-sm leading-7 text-white/72">
               Konsultasikan kebutuhan Anda, pilih program yang sesuai, dan tim
               kami akan membantu proses persiapannya.
             </p>
@@ -572,18 +573,18 @@ export function ModernProofFooter() {
               )}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-7 inline-flex min-h-13 items-center justify-center gap-3 rounded-[14px] bg-[#D4AF37] px-6 text-sm font-bold text-white"
+              className="sheen-gold lift-soft mt-7 inline-flex min-h-13 items-center justify-center gap-3 rounded-[14px] bg-gradient-gold-rich px-6 text-sm font-extrabold tracking-[-.005em] text-[#0A1D3A] shadow-[0_18px_42px_rgba(184,134,11,.32),inset_0_1px_0_rgba(255,235,170,.55)]"
             >
               <MessageCircle className="size-4" /> Konsultasi via WhatsApp
             </a>
-            <p className="mt-3 text-xs text-white/48">
+            <p className="mt-3 text-xs text-white/55">
               Admin melayani sesuai jam operasional Jam Wisata.
             </p>
           </div>
         </div>
       </section>
 
-      <footer className="bg-[#0A1D3A] text-white">
+      <footer className="bg-gradient-navy text-white">
         <div className="jam-container grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.25fr_.75fr_.75fr_1.25fr]">
           <div>
             <Image
@@ -600,7 +601,7 @@ export function ModernProofFooter() {
               Partner perjalanan umrah dan wisata halal dengan pendampingan
               penuh perhatian.
             </p>
-            <a href="https://www.instagram.com/jamwisata/" target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/12 px-4 text-sm font-bold text-white/72 transition hover:border-[#E8C967]/50 hover:text-white">
+            <a href="https://www.instagram.com/jamwisata/" target="_blank" rel="noopener noreferrer" className="lift-soft mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/12 bg-white/4 px-4 text-sm font-bold text-white/72 transition-all duration-400 hover:border-[#C0C0C0]/55 hover:bg-white/8 hover:text-white hover:shadow-[0_8px_24px_-6px_rgba(192,192,192,.4)]">
               <InstagramMark className="size-4 text-[#E8C967]" /> @jamwisata
             </a>
           </div>
@@ -615,7 +616,7 @@ export function ModernProofFooter() {
                 ["FAQ", "faq"],
               ].map(([label, id]) => (
                 <li key={id}>
-                  <a href={`#${id}`} className="hover:text-white">
+                  <a href={`#${id}`} className="silver-underline transition-colors duration-300 hover:text-white">
                     {label}
                   </a>
                 </li>
@@ -630,7 +631,7 @@ export function ModernProofFooter() {
                   href="https://jamwisata.com/transaksi/paket-umrah"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-white"
+                  className="silver-underline transition-colors duration-300 hover:text-white"
                 >
                   Paket Umrah
                 </a>
@@ -640,7 +641,7 @@ export function ModernProofFooter() {
                   href="https://jamwisata.com/transaksi/paket-wisata"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-white"
+                  className="silver-underline transition-colors duration-300 hover:text-white"
                 >
                   Wisata Halal
                 </a>
@@ -653,7 +654,7 @@ export function ModernProofFooter() {
                   )}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-white"
+                  className="silver-underline transition-colors duration-300 hover:text-white"
                 >
                   Konsultasi Perjalanan
                 </a>
@@ -665,19 +666,19 @@ export function ModernProofFooter() {
             <div className="mt-5 space-y-4 text-sm leading-6 text-white/55">
               <a
                 href="tel:+6281809627499"
-                className="flex gap-3 hover:text-white"
+                className="silver-underline flex gap-3 transition-colors duration-300 hover:text-white"
               >
                 <Phone className="mt-1 size-4 shrink-0 text-[#E8C967]" />
                 +62 818-0962-7499
               </a>
               <a
                 href="mailto:jamwisata99@gmail.com"
-                className="flex gap-3 hover:text-white"
+                className="silver-underline flex gap-3 transition-colors duration-300 hover:text-white"
               >
                 <Mail className="mt-1 size-4 shrink-0 text-[#E8C967]" />
                 jamwisata99@gmail.com
               </a>
-              <a href="https://maps.app.goo.gl/gVK4okTQSEtzyX9w5" target="_blank" rel="noopener noreferrer" className="flex gap-3 hover:text-white">
+              <a href="https://maps.app.goo.gl/gVK4okTQSEtzyX9w5" target="_blank" rel="noopener noreferrer" className="silver-underline flex gap-3 transition-colors duration-300 hover:text-white">
                 <MapPin className="mt-1 size-4 shrink-0 text-[#E8C967]" />
                 Jl. Cibangkong No. 28A, Bandung 40273
               </a>
@@ -699,7 +700,7 @@ export function ModernProofFooter() {
               href="https://jamwisata.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-white"
+              className="silver-underline transition-colors duration-300 hover:text-white"
             >
               Portal paket: jamwisata.com
             </a>
