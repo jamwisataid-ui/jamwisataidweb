@@ -1,8 +1,14 @@
 <div align="center">
 
-# Jam Wisata
+# 🕋 Jam Wisata
 
-Website paket umrah dan wisata halal yang responsif, informatif, dan berorientasi pada konsultasi calon jamaah.
+**Website paket umrah & wisata halal — responsif, informatif, dan berorientasi pada konsultasi calon jamaah.**
+
+[![Next.js](https://img.shields.io/badge/Next.js%2016-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![React 19](https://img.shields.io/badge/React%2019-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS 4](https://img.shields.io/badge/Tailwind%20CSS%204-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 [Fitur](#fitur-utama) · [Menjalankan Proyek](#menjalankan-proyek) · [Pengujian](#pengujian) · [Struktur Proyek](#struktur-proyek)
 
@@ -18,15 +24,15 @@ Antarmuka dirancang mobile-first dengan navigasi adaptif, kartu paket, testimoni
 
 ## Fitur Utama
 
-- Hero dan pencarian paket berdasarkan bulan, jenis paket, maskapai, serta bandara keberangkatan.
-- Filter paket yang tersinkron dengan query parameter URL.
-- Informasi jadwal, hotel, fasilitas, maskapai, harga, dan status paket.
-- Tautan WhatsApp dengan pesan konsultasi yang sudah disesuaikan konteks.
-- Navigasi desktop dan mobile dengan dukungan keyboard.
-- Testimoni YouTube dengan lazy loading melalui domain privasi `youtube-nocookie.com`.
-- WhatsApp concierge dengan dialog aksesibel, focus trap, dan auto-open satu kali per sesi.
-- Metadata SEO, Open Graph, dan canonical URL.
-- Layout responsif yang diuji pada viewport 320 px hingga 1920 px.
+- 🔍 **Pencarian paket** — hero filter berdasarkan bulan, jenis paket, maskapai, serta bandara keberangkatan.
+- 🔗 **URL tersinkron** — filter paket tersinkron dengan query parameter URL sehingga mudah dibagikan.
+- 🏨 **Informasi lengkap** — jadwal, hotel, fasilitas, maskapai, harga, dan status paket.
+- 💬 **Konsultasi WhatsApp** — tautan dengan pesan konsultasi yang sudah disesuaikan konteks.
+- 📱 **Navigasi adaptif** — desktop dan mobile dengan dukungan keyboard penuh.
+- 🎥 **Testimoni video** — YouTube lazy loading melalui domain privasi `youtube-nocookie.com`.
+- 🤝 **WhatsApp concierge** — dialog aksesibel, focus trap, dan auto-open satu kali per sesi.
+- 🚀 **SEO** — metadata, Open Graph, dan canonical URL.
+- 📐 **Responsif** — diuji pada viewport 320 px hingga 1920 px.
 
 ## Teknologi
 
@@ -50,8 +56,8 @@ Docker bersifat opsional apabila aplikasi akan dijalankan dalam container.
 1. Clone repository dan masuk ke direktori proyek.
 
    ```bash
-   git clone https://github.com/hmad28/jamwisata.git
-   cd jamwisata
+   git clone https://github.com/jamwisataid-ui/jamwisataidweb.git
+   cd jamwisataidweb
    ```
 
 2. Instal dependency.
