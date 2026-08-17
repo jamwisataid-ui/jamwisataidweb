@@ -90,7 +90,7 @@ export function PremiumHeader() {
 
   return (
     <header className="sticky inset-x-0 top-0 z-[70] bg-white">
-      <div className="bg-[#0A1D3A] text-white">
+      <div className="bg-[#102B3F] text-white">
         <div className="jam-container flex h-8 items-center justify-between gap-4 text-[11px] font-medium text-white/82">
           <div className="flex min-w-0 items-center gap-3 sm:gap-4">
             <a className="flex shrink-0 items-center gap-1.5 hover:text-white" href="tel:+6281809627499">
@@ -118,7 +118,7 @@ export function PremiumHeader() {
         </div>
       </div>
 
-      <div className="border-b border-[#0A1D3A]/8 bg-[#FFFDF8] shadow-[0_7px_24px_rgba(10,29,58,.07)]">
+      <div className="border-b border-[#102B3F]/8 bg-[#FBF9F4] shadow-[0_7px_24px_rgba(16,43,63,.07)]">
         <div className="jam-container flex h-[76px] items-center justify-between">
           <a href="#beranda" aria-label="Jam Wisata, kembali ke beranda" className="shrink-0">
             <Image src={`${assetRoot}/logo.png`} alt="Jam Wisata" width={500} height={116} priority className="h-auto w-[150px] sm:w-[170px]" />
@@ -129,20 +129,20 @@ export function PremiumHeader() {
                 key={id}
                 href={`#${id}`}
                 aria-current={active === id ? "location" : undefined}
-                className={`relative flex min-h-11 items-center px-3 text-[12px] font-bold transition-colors after:absolute after:right-3 after:bottom-1.5 after:left-3 after:h-0.5 after:origin-left after:rounded-full after:bg-[#D4AF37] after:transition-transform ${active === id ? "text-[#B8860B] after:scale-x-100" : "text-[#4F5864] after:scale-x-0 hover:text-[#0A1D3A] hover:after:scale-x-100"}`}
+                className={`relative flex min-h-11 items-center px-3 text-[12px] font-bold transition-colors after:absolute after:right-3 after:bottom-1.5 after:left-3 after:h-0.5 after:origin-left after:rounded-full after:bg-[#147D73] after:transition-transform ${active === id ? "text-[#147D73] after:scale-x-100" : "text-[#43535C] after:scale-x-0 hover:text-[#102B3F] hover:after:scale-x-100"}`}
               >
                 {label}
               </a>
             ))}
           </nav>
           <div className="flex items-center gap-2.5">
-            <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="hidden min-h-11 items-center gap-2 rounded-[12px] bg-[#D4AF37] px-5 text-xs font-extrabold text-[#0A1D3A] shadow-[0_8px_20px_rgba(184,134,11,.16)] transition hover:-translate-y-0.5 hover:bg-[#C59C25] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B8860B] sm:inline-flex">
+            <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="hidden min-h-11 items-center gap-2 rounded-[14px] bg-[#147D73] px-5 text-xs font-extrabold text-white shadow-[0_8px_20px_rgba(20,125,115,.16)] transition hover:-translate-y-0.5 hover:bg-[#106a62] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#147D73] sm:inline-flex">
               <MessageCircle className="size-4" aria-hidden="true" /> Konsultasi Umrah
             </a>
-            <a href={whatsapp} aria-label="Konsultasi cepat via WhatsApp" target="_blank" rel="noopener noreferrer" className="grid size-11 place-items-center rounded-[12px] bg-[#D4AF37] text-[#0A1D3A] sm:hidden">
+            <a href={whatsapp} aria-label="Konsultasi cepat via WhatsApp" target="_blank" rel="noopener noreferrer" className="grid size-11 place-items-center rounded-[13px] bg-[#147D73] text-white sm:hidden">
               <MessageCircle className="size-5" aria-hidden="true" />
             </a>
-            <button ref={triggerRef} type="button" aria-expanded={menuOpen} aria-controls="mobile-navigation" aria-label={menuOpen ? "Tutup menu" : "Buka menu"} onClick={() => setMenuOpen((value) => !value)} className="grid size-11 place-items-center rounded-[12px] border border-[#0A1D3A]/12 text-[#0A1D3A] xl:hidden">
+            <button ref={triggerRef} type="button" aria-expanded={menuOpen} aria-controls="mobile-navigation" aria-label={menuOpen ? "Tutup menu" : "Buka menu"} onClick={() => setMenuOpen((value) => !value)} className="grid size-11 place-items-center rounded-[13px] border border-[#102B3F]/12 text-[#102B3F] xl:hidden">
               {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
             </button>
           </div>
@@ -150,23 +150,23 @@ export function PremiumHeader() {
       </div>
 
       {menuOpen ? (
-        <div className="fixed inset-x-0 top-[108px] bottom-0 z-50 bg-[#06152B]/45 backdrop-blur-[2px] xl:hidden" onMouseDown={(event) => event.target === event.currentTarget && closeMenu()}>
-          <div id="mobile-navigation" ref={drawerRef} role="dialog" aria-modal="true" aria-label="Menu navigasi" className="ml-auto flex h-full w-[min(88vw,390px)] flex-col bg-[#FFFDF8] p-5 shadow-[-20px_0_50px_rgba(6,21,43,.18)]">
-            <div className="flex items-center justify-between border-b border-[#0A1D3A]/9 pb-4">
-              <span className="text-xs font-extrabold tracking-[.12em] text-[#B8860B] uppercase">Navigasi</span>
-              <button type="button" onClick={closeMenu} aria-label="Tutup menu navigasi" className="grid size-11 place-items-center rounded-full bg-white text-[#0A1D3A] shadow-sm"><X className="size-5" /></button>
+        <div className="fixed inset-x-0 top-[108px] bottom-0 z-50 bg-[#071c2b]/45 backdrop-blur-[2px] xl:hidden" onMouseDown={(event) => event.target === event.currentTarget && closeMenu()}>
+          <div id="mobile-navigation" ref={drawerRef} role="dialog" aria-modal="true" aria-label="Menu navigasi" className="ml-auto flex h-full w-[min(88vw,390px)] flex-col bg-[#FBF9F4] p-5 shadow-[-20px_0_50px_rgba(7,28,43,.18)]">
+            <div className="flex items-center justify-between border-b border-[#102B3F]/9 pb-4">
+              <span className="text-xs font-extrabold tracking-[.12em] text-[#147D73] uppercase">Navigasi</span>
+              <button type="button" onClick={closeMenu} aria-label="Tutup menu navigasi" className="grid size-11 place-items-center rounded-full bg-white text-[#102B3F] shadow-sm"><X className="size-5" /></button>
             </div>
             <nav aria-label="Navigasi mobile" className="mt-3">
               {links.map(([id, label]) => (
-                <a key={id} href={`#${id}`} onClick={closeMenu} className={`flex min-h-12 items-center justify-between border-b border-[#0A1D3A]/8 text-sm font-bold ${active === id ? "text-[#B8860B]" : "text-[#0A1D3A]"}`}>
+                <a key={id} href={`#${id}`} onClick={closeMenu} className={`flex min-h-12 items-center justify-between border-b border-[#102B3F]/8 text-sm font-bold ${active === id ? "text-[#147D73]" : "text-[#102B3F]"}`}>
                   {label}<span aria-hidden="true">↗</span>
                 </a>
               ))}
             </nav>
-            <div className="mt-auto rounded-[18px] bg-[#F7F3E9] p-4 text-xs leading-5 text-[#59616D]">
-              <p className="font-bold text-[#0A1D3A]">Ingin mempersiapkan perjalanan dengan tenang?</p>
+            <div className="mt-auto rounded-[18px] bg-[#EAF4F1] p-4 text-xs leading-5 text-[#4C5D65]">
+              <p className="font-bold text-[#102B3F]">Butuh bantuan memilih paket?</p>
               <p className="mt-1">Sen–Jum 09.00–17.00 · Sab 09.00–14.00 WIB</p>
-              <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="mt-4 flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#D4AF37] px-4 font-bold text-[#0A1D3A]"><MessageCircle className="size-4" /> Konsultasi Umrah</a>
+              <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="mt-4 flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#147D73] px-4 font-bold text-white"><MessageCircle className="size-4" /> Konsultasi Umrah</a>
             </div>
           </div>
         </div>
