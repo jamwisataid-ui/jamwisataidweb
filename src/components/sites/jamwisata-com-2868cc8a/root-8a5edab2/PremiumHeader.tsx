@@ -121,7 +121,7 @@ export function PremiumHeader() {
       <div className="border-b border-[#0A1D3A]/8 bg-[#FFFDF8] shadow-[0_7px_24px_rgba(16,43,63,.07)]">
         <div className="jam-container flex h-[76px] items-center justify-between">
           <a href="#beranda" aria-label="Jam Wisata, kembali ke beranda" className="shrink-0">
-            <Image src={`${assetRoot}/logo.png`} alt="Jam Wisata" width={500} height={116} priority className="h-auto w-[150px] sm:w-[170px]" />
+            <Image src={`${assetRoot}/logo.png`} alt="Jam Wisata" width={500} height={184} priority className="h-auto w-[160px] sm:w-[190px]" />
           </a>
           <nav aria-label="Navigasi utama" className="hidden items-center xl:flex">
             {links.map(([id, label]) => (

@@ -588,11 +588,11 @@ export function ModernProofFooter() {
         <div className="jam-container grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.25fr_.75fr_.75fr_1.25fr]">
           <div>
             <Image
-              src={`${assetRoot}/logo.png`}
+              src={`${assetRoot}/logo-white-text.png`}
               alt="Jam Wisata"
               width={500}
-              height={116}
-              className="h-auto w-[190px] brightness-0 invert"
+              height={184}
+              className="h-auto w-[190px]"
             />
             <p className="mt-4 text-sm font-bold text-[#E8C967]">
               Setiap Waktu Bernilai Ibadah

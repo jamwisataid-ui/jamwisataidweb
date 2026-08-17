@@ -117,7 +117,7 @@ export function WhatsAppConcierge() {
         <span className="concierge-pulse relative z-10 grid size-12 place-items-center rounded-full bg-white text-[#147D73] shadow-[inset_0_0_0_1px_rgba(20,125,115,.08),0_6px_18px_rgba(7,28,43,.18)]"><WhatsAppMark className="concierge-heartbeat size-7" /></span>
         <span className="hidden items-center gap-2.5 text-left sm:flex">
           <span><strong className="block text-[13px] font-extrabold">Butuh Bantuan?</strong><span className="mt-0.5 block text-[10px] font-medium text-white/82">Chat langsung dengan kami</span></span>
-          <span className="grid h-8 w-12 place-items-center rounded-lg bg-white px-1.5"><Image src={`${assetRoot}/logo.png`} alt="" width={500} height={116} className="h-auto w-full" /></span>
+          <span className="grid h-8 w-14 place-items-center rounded-lg bg-white px-1.5"><Image src={`${assetRoot}/logo.png`} alt="" width={500} height={184} className="h-auto w-full" /></span>
         </span>
       </button>
 
@@ -132,7 +132,7 @@ export function WhatsAppConcierge() {
             className="max-h-[min(610px,calc(100dvh-116px))] w-full overflow-y-auto rounded-[26px] border border-white/80 bg-white shadow-[0_30px_90px_rgba(7,28,43,.28),0_0_0_1px_rgba(16,43,63,.06)]"
           >
             <div className="sticky top-0 z-10 flex items-center gap-3 bg-gradient-navy p-5 text-white">
-              <span className="grid h-11 w-16 shrink-0 place-items-center rounded-[13px] bg-white px-2"><Image src={`${assetRoot}/logo.png`} alt="Logo Jam Wisata" width={500} height={116} className="h-auto w-full" /></span>
+              <span className="grid h-11 w-20 shrink-0 place-items-center rounded-[13px] bg-white px-2"><Image src={`${assetRoot}/logo.png`} alt="Logo Jam Wisata" width={500} height={184} className="h-auto w-full" /></span>
               <div className="min-w-0"><p className="font-extrabold">Jam Wisata</p><p className="mt-0.5 flex items-center gap-1.5 text-[10px] text-white/78"><span className="size-1.5 rounded-full bg-[#E8C967]" /> Biasanya membalas pada jam operasional</p></div>
               <button type="button" onClick={() => close()} aria-label="Tutup WhatsApp concierge" className="ml-auto grid size-10 shrink-0 place-items-center rounded-full bg-white/12 transition hover:bg-white/20"><X className="size-5" /></button>
             </div>
