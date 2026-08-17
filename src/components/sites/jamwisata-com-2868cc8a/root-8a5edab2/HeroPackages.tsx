@@ -230,7 +230,7 @@ export function HeroPackages() {
             <p className="mt-5 max-w-[540px] text-[17px] leading-7 text-white/78 sm:text-[18px]">Perjalanan umrah yang nyaman, terarah, dan dipersiapkan dengan sepenuh hati.</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a href="#paket-umrah" className="sheen-gold lift-soft inline-flex min-h-13 items-center justify-center gap-3 rounded-[14px] bg-gradient-gold-rich px-6 text-sm font-extrabold tracking-[-.005em] text-[#0A1D3A] shadow-[0_14px_36px_rgba(184,134,11,.32),inset_0_1px_0_rgba(255,235,170,.55)]">Lihat Paket Umrah <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" /></a>
-              <a href={whatsappHref("Assalamu’alaikum, saya ingin berkonsultasi mengenai paket perjalanan Jam Wisata.", "Hero")} target="_blank" rel="noopener noreferrer" className="lift-soft sheen-gold inline-flex min-h-13 items-center justify-center gap-3 rounded-[14px] border border-white/30 bg-gradient-gold-rich px-6 text-sm font-extrabold text-[#0A1D3A] shadow-[0_14px_36px_rgba(184,134,11,.32),inset_0_1px_0_rgba(255,235,170,.55)]"><MessageCircle className="size-4" /> Konsultasi via WhatsApp</a>
+              <a href={whatsappHref("Assalamu’alaikum, saya ingin berkonsultasi mengenai paket perjalanan Jam Wisata.", "Hero")} target="_blank" rel="noopener noreferrer" className="lift-soft inline-flex min-h-13 items-center justify-center gap-3 rounded-[14px] border border-white/30 bg-[#25D366] px-6 text-sm font-extrabold text-white shadow-[0_12px_26px_rgba(37,211,102,.30)] hover:bg-[#1ebe5d]"><MessageCircle className="size-4" /> Konsultasi via WhatsApp</a>
             </div>
           </div>
 
@@ -253,7 +253,7 @@ export function HeroPackages() {
             ) : (
               <div role="tabpanel" className="mt-4 flex flex-col gap-4 rounded-[14px] bg-[#F7F3E9] p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div><p className="text-sm font-extrabold">Program haji dikonsultasikan langsung bersama tim.</p><p className="mt-1 text-xs text-[#68707A]">Dapatkan informasi program dan persyaratan terbaru melalui WhatsApp.</p></div>
-                <a href={whatsappHref("Assalamu’alaikum, saya ingin berkonsultasi mengenai program haji Jam Wisata.", "Hero Search — Haji")} target="_blank" rel="noopener noreferrer" className="lift-soft sheen-gold inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-gold-rich px-4 text-xs font-extrabold text-[#0A1D3A] shadow-[0_8px_22px_rgba(184,134,11,.30),inset_0_1px_0_rgba(255,235,170,.55)]"><MessageCircle className="size-4" /> Konsultasi Haji</a>
+                <a href={whatsappHref("Assalamu’alaikum, saya ingin berkonsultasi mengenai program haji Jam Wisata.", "Hero Search — Haji")} target="_blank" rel="noopener noreferrer" className="lift-soft inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 text-xs font-extrabold text-white shadow-[0_8px_18px_rgba(37,211,102,.25)] hover:bg-[#1ebe5d]"><MessageCircle className="size-4" /> Konsultasi Haji</a>
               </div>
             )}
           </div>
