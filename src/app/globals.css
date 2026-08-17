@@ -6,9 +6,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-montserrat), Montserrat, ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, monospace;
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-cinzel), Cinzel, Georgia, serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -133,14 +133,22 @@ html {
 }
 
 .jam-page {
-  --jam-navy: #102b3f;
-  --jam-teal: #147d73;
-  --jam-sand: #d5b77a;
-  --jam-ivory: #f7f4ed;
-  --jam-text: #142027;
-  --jam-muted: #66737b;
+  --jam-navy: #0a1d3a;
+  --jam-navy-deep: #06152b;
+  --jam-navy-soft: #1e3a5f;
+  --jam-gold: #d4af37;
+  --jam-gold-dark: #b8860b;
+  --jam-gold-light: #e8c967;
+  --jam-silver: #c0c0c0;
+  --jam-silver-light: #e8e8e8;
+  --jam-silver-deep: #9a9a9a;
+  --jam-cream: #f7f3e9;
+  --jam-cream-soft: #fffdf8;
+  --jam-charcoal: #333333;
+  --jam-text: #333333;
+  --jam-muted: #68707a;
   color: var(--jam-text);
-  background: var(--jam-ivory);
+  background: var(--jam-cream);
   overflow-x: clip;
 }
 
@@ -150,16 +158,27 @@ html {
 }
 
 .font-display {
-  font-family: var(--font-manrope), Manrope, ui-sans-serif, sans-serif;
+  font-family: var(--font-cinzel), Cinzel, "Cormorant Garamond", Georgia, serif;
+  letter-spacing: 0.005em;
+}
+
+.font-subheading {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+}
+
+.font-quote {
+  font-family: var(--font-playfair), "Playfair Display", Georgia, serif;
+  font-style: italic;
 }
 
 .section-title {
   color: var(--jam-navy);
-  font-family: var(--font-manrope), Manrope, ui-sans-serif, sans-serif;
+  font-family: var(--font-cinzel), Cinzel, Georgia, serif;
   font-size: clamp(2rem, 4.1vw, 3.35rem);
-  font-weight: 800;
-  letter-spacing: -0.045em;
-  line-height: 1.06;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.08;
+  text-wrap: balance;
 }
 
 .section-eyebrow {
@@ -179,6 +198,114 @@ html {
   width: 1.75rem;
   height: 1px;
   background: currentColor;
+}
+
+.font-arabic {
+  font-family: var(--font-reem-kufi), "Reem Kufi", "Geeza Pro", serif;
+  direction: rtl;
+}
+
+/* Brand gradients — proper metallic, never flat */
+.bg-gradient-gold {
+  background-image: linear-gradient(
+    135deg,
+    #b8860b 0%,
+    #d4af37 38%,
+    #f5d97a 55%,
+    #d4af37 72%,
+    #b8860b 100%
+  );
+}
+
+.bg-gradient-gold-soft {
+  background-image: linear-gradient(
+    160deg,
+    #e8c967 0%,
+    #d4af37 50%,
+    #b8860b 100%
+  );
+}
+
+.bg-gradient-silver {
+  background-image: linear-gradient(
+    135deg,
+    #9a9a9a 0%,
+    #c0c0c0 38%,
+    #ededed 55%,
+    #c0c0c0 72%,
+    #9a9a9a 100%
+  );
+}
+
+.bg-gradient-silver-soft {
+  background-image: linear-gradient(
+    160deg,
+    #ededed 0%,
+    #c0c0c0 50%,
+    #9a9a9a 100%
+  );
+}
+
+.bg-gradient-navy {
+  background-image: linear-gradient(
+    160deg,
+    #0a1d3a 0%,
+    #1e3a5f 50%,
+    #06152b 100%
+  );
+}
+
+.bg-gradient-hero {
+  background-image: radial-gradient(
+      ellipse at top right,
+      rgba(212, 175, 55, 0.18) 0%,
+      transparent 55%
+    ),
+    linear-gradient(135deg, #06152b 0%, #0a1d3a 45%, #1e3a5f 100%);
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #b8860b 0%, #d4af37 50%, #f5d97a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.text-gradient-silver {
+  background: linear-gradient(135deg, #9a9a9a 0%, #c0c0c0 50%, #ededed 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.border-gradient-gold {
+  border-image: linear-gradient(135deg, #b8860b, #d4af37, #f5d97a) 1;
+}
+
+.divider-gold {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #b8860b 20%,
+    #d4af37 50%,
+    #b8860b 80%,
+    transparent 100%
+  );
+}
+
+.divider-silver {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #9a9a9a 20%,
+    #c0c0c0 50%,
+    #9a9a9a 80%,
+    transparent 100%
+  );
 }
 
 [id] {
@@ -255,7 +382,7 @@ html {
   bottom: calc(100% + 11px);
   width: max-content;
   padding: 8px 13px;
-  color: #102b3f;
+  color: #0a1d3a;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: -0.01em;
@@ -296,7 +423,7 @@ html {
   width: 100%;
   max-width: none;
   overflow: hidden;
-  background-color: #0b2233;
+  background-color: #0a1d3a;
   background-position: center;
   background-size: cover;
   border-radius: 24px 24px 0 0;

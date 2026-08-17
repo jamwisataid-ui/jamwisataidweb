@@ -1,28 +1,43 @@
 import type { Metadata } from "next";
-import { Inter, Manrope } from "next/font/google";
+import { Cinzel, Cormorant_Garamond, Montserrat, Playfair_Display } from "next/font/google";
 import "lite-youtube-embed/src/lite-yt-embed.css";
 import "./globals.css";
 
-const manrope = Manrope({
-  variable: "--font-manrope",
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const cinzel = Cinzel({
+  variable: "--font-cinzel",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://jamwisata.id"),
-  title: "Jam Wisata | Paket Umrah & Wisata Halal Tepercaya",
+  title: "Jam Wisata | Setiap Waktu Bernilai Ibadah",
   description:
-    "Temukan pilihan paket umrah dan wisata halal bersama Jam Wisata. Dapatkan informasi jadwal, fasilitas, akomodasi, serta konsultasi perjalanan melalui WhatsApp.",
+    "Jam Wisata tidak hanya mengantarkan langkah menuju Baitullah, tetapi juga menemani perjalanan hati menuju Allah. Pendampingan ibadah yang amanah, profesional, dan penuh keberkahan.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Jam Wisata | Paket Umrah & Wisata Halal Tepercaya",
+    title: "Jam Wisata | Setiap Waktu Bernilai Ibadah",
     description:
-      "Perjalanan umrah yang nyaman, terarah, dan dipersiapkan dengan sepenuh hati.",
+      "Setiap Waktu Bernilai Ibadah — pendampingan ibadah yang amanah, profesional, dan penuh keberkahan.",
     url: "https://jamwisata.id",
     siteName: "Jam Wisata",
     locale: "id_ID",
@@ -39,7 +54,7 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className={`${manrope.variable} ${inter.variable} h-full antialiased`}
+      className={`${montserrat.variable} ${cormorant.variable} ${cinzel.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

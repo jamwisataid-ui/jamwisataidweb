@@ -214,7 +214,7 @@ function MediaModal({
   }, [close]);
   return (
     <div
-      className="fixed inset-0 z-[100] grid place-items-center bg-[#071923]/92 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] grid place-items-center bg-[#06152B]/92 p-4 backdrop-blur-sm"
       onMouseDown={(event) => event.target === event.currentTarget && close()}
     >
       <div
@@ -228,7 +228,7 @@ function MediaModal({
           type="button"
           onClick={close}
           aria-label="Tutup"
-          className="absolute -top-12 right-0 grid size-11 place-items-center rounded-full bg-white text-[#102B3F]"
+          className="absolute -top-12 right-0 grid size-11 place-items-center rounded-full bg-white text-[#0A1D3A]"
         >
           <X className="size-5" />
         </button>
@@ -265,7 +265,7 @@ function VideoSection() {
             <h2 className="section-title max-w-[760px]">
               Pengalaman Jamaah, Diceritakan Langsung oleh Mereka.
             </h2>
-            <p className="mt-4 text-sm leading-6 text-[#66737B]">
+            <p className="mt-4 text-sm leading-6 text-[#68707A]">
               Saksikan pengalaman jamaah selama menjalani perjalanan bersama Jam Wisata.
             </p>
           </div>
@@ -274,7 +274,7 @@ function VideoSection() {
               type="button"
               onClick={() => move(-1)}
               aria-label="Video sebelumnya"
-              className="grid size-12 place-items-center rounded-full border border-[#102B3F]/15 text-[#102B3F] hover:border-[#147D73] hover:text-[#147D73]"
+              className="grid size-12 place-items-center rounded-full border border-[#0A1D3A]/15 text-[#0A1D3A] hover:border-[#D4AF37] hover:text-[#D4AF37]"
             >
               <ArrowLeft className="size-5" />
             </button>
@@ -282,7 +282,7 @@ function VideoSection() {
               type="button"
               onClick={() => move(1)}
               aria-label="Video berikutnya"
-              className="grid size-12 place-items-center rounded-full bg-[#102B3F] text-white hover:bg-[#147D73]"
+              className="grid size-12 place-items-center rounded-full bg-[#0A1D3A] text-white hover:bg-[#D4AF37]"
             >
               <ArrowRight className="size-5" />
             </button>
@@ -315,12 +315,12 @@ function VideoSection() {
             dragRef.current.active = false;
           }}
           onPointerLeave={() => { dragRef.current.active = false; }}
-          className="mt-10 flex cursor-grab snap-x snap-mandatory gap-5 overflow-x-auto pb-5 select-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#147D73] active:cursor-grabbing [scrollbar-width:none]"
+          className="mt-10 flex cursor-grab snap-x snap-mandatory gap-5 overflow-x-auto pb-5 select-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D4AF37] active:cursor-grabbing [scrollbar-width:none]"
         >
           {testimonialVideos.map((video) => (
             <article
               key={video.id}
-              className="group shrink-0 snap-start self-start overflow-hidden rounded-[24px] bg-white shadow-[0_18px_48px_rgba(16,43,63,.11)] ring-1 ring-[#102B3F]/7 transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(16,43,63,.16)] w-[76vw] max-w-[280px] sm:w-[270px] lg:w-[286px]"
+              className="group shrink-0 snap-start self-start overflow-hidden rounded-[24px] bg-white shadow-[0_18px_48px_rgba(16,43,63,.11)] ring-1 ring-[#0A1D3A]/7 transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(16,43,63,.16)] w-[76vw] max-w-[280px] sm:w-[270px] lg:w-[286px]"
             >
               <lite-youtube
                 ref={(element) => {
@@ -344,8 +344,8 @@ function VideoSection() {
               </lite-youtube>
               <div className="relative p-5">
                 <span className="absolute -top-4 right-4 grid size-8 place-items-center rounded-full bg-white text-[9px] font-black tracking-[-.04em] text-[#d73333] shadow-md" aria-hidden="true">YT</span>
-                <strong className="block pr-7 text-[14px] leading-snug text-[#102B3F]">{video.title}</strong>
-                <span className="mt-1.5 block text-[11px] text-[#748087]">{video.program}{video.year ? ` · ${video.year}` : ""}</span>
+                <strong className="block pr-7 text-[14px] leading-snug text-[#0A1D3A]">{video.title}</strong>
+                <span className="mt-1.5 block text-[11px] text-[#68707A]">{video.program}{video.year ? ` · ${video.year}` : ""}</span>
               </div>
             </article>
           ))}
@@ -354,7 +354,7 @@ function VideoSection() {
           {testimonialVideos.map((video, index) => (
             <span
               key={video.id}
-              className={`h-1.5 rounded-full transition-all ${index === activeIndex ? "w-7 bg-[#147D73]" : "w-1.5 bg-[#102B3F]/18"}`}
+              className={`h-1.5 rounded-full transition-all ${index === activeIndex ? "w-7 bg-[#D4AF37]" : "w-1.5 bg-[#0A1D3A]/18"}`}
             />
           ))}
         </div>
@@ -388,7 +388,7 @@ function GallerySection() {
   return (
     <section
       id="galeri"
-      className="overflow-x-clip bg-[#F7F4ED] py-20 sm:py-24"
+      className="overflow-x-clip bg-[#F7F3E9] py-20 sm:py-24"
       aria-labelledby="gallery-title"
     >
       <div className="jam-container text-center">
@@ -396,7 +396,7 @@ function GallerySection() {
         <h2 id="gallery-title" className="section-title">
           Momen Perjalanan Jamaah.
         </h2>
-        <p className="mt-4 text-sm leading-6 text-[#66737B]">
+        <p className="mt-4 text-sm leading-6 text-[#68707A]">
           Dokumentasi nyata dari persiapan, keberangkatan, hingga perjalanan di
           tanah suci.
         </p>
@@ -426,7 +426,7 @@ function GallerySection() {
                         key={`${copy}-${item.image}`}
                         tabIndex={copy === 1 ? -1 : 0}
                         onClick={() => setActiveIndex(originalIndex)}
-                        className={`group relative h-[145px] shrink-0 overflow-hidden rounded-[16px] bg-[#dfe5e2] text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#147D73] sm:h-[195px] ${item.width}`}
+                        className={`group relative h-[145px] shrink-0 overflow-hidden rounded-[16px] bg-[#dfe5e2] text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37] sm:h-[195px] ${item.width}`}
                       >
                         <Image
                           src={`${assetRoot}/${item.image}`}
@@ -435,7 +435,7 @@ function GallerySection() {
                           sizes="360px"
                           className="object-cover transition duration-300 group-hover:scale-[1.02]"
                         />
-                        <span className="absolute inset-x-0 bottom-0 translate-y-full bg-gradient-to-t from-[#0B2233]/85 to-transparent px-4 pt-10 pb-3 text-xs font-bold text-white transition group-hover:translate-y-0">
+                        <span className="absolute inset-x-0 bottom-0 translate-y-full bg-gradient-to-t from-[#0A1D3A]/85 to-transparent px-4 pt-10 pb-3 text-xs font-bold text-white transition group-hover:translate-y-0">
                           {item.caption}
                         </span>
                       </button>
@@ -450,7 +450,7 @@ function GallerySection() {
       {activeIndex !== null ? (
         <MediaModal title={gallery[activeIndex].caption} close={close}>
           <div
-            className="relative h-[75vh] max-h-[780px] overflow-hidden rounded-[22px] bg-[#0B2233]"
+            className="relative h-[75vh] max-h-[780px] overflow-hidden rounded-[22px] bg-[#0A1D3A]"
             onTouchStart={(e) => (touchStart.current = e.touches[0].clientX)}
             onTouchEnd={(e) => {
               const delta = e.changedTouches[0].clientX - touchStart.current;
@@ -468,7 +468,7 @@ function GallerySection() {
               type="button"
               aria-label="Gambar sebelumnya"
               onClick={() => move(-1)}
-              className="absolute top-1/2 left-3 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-[#102B3F]"
+              className="absolute top-1/2 left-3 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-[#0A1D3A]"
             >
               <ArrowLeft className="size-5" />
             </button>
@@ -476,11 +476,11 @@ function GallerySection() {
               type="button"
               aria-label="Gambar berikutnya"
               onClick={() => move(1)}
-              className="absolute top-1/2 right-3 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-[#102B3F]"
+              className="absolute top-1/2 right-3 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-[#0A1D3A]"
             >
               <ArrowRight className="size-5" />
             </button>
-            <p className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-[#071923] px-6 pt-12 pb-5 text-center text-sm font-bold text-white">
+            <p className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-[#06152B] px-6 pt-12 pb-5 text-center text-sm font-bold text-white">
               {gallery[activeIndex].caption}
             </p>
           </div>
@@ -501,11 +501,11 @@ export function ModernProofFooter() {
           <div>
             <p className="section-eyebrow">Pertanyaan Umum</p>
             <h2 className="section-title">Informasi Sebelum Berangkat.</h2>
-            <p className="mt-4 text-sm leading-6 text-[#66737B]">
+            <p className="mt-4 text-sm leading-6 text-[#68707A]">
               Jawaban ringkas untuk membantu Anda mempersiapkan perjalanan.
             </p>
           </div>
-          <div className="divide-y divide-[#102B3F]/10 border-y border-[#102B3F]/10">
+          <div className="divide-y divide-[#0A1D3A]/10 border-y border-[#0A1D3A]/10">
             {faqs.map(([question, answer], index) => {
               const isOpen = openFaq === index;
               return (
@@ -516,11 +516,11 @@ export function ModernProofFooter() {
                       aria-expanded={isOpen}
                       aria-controls={`faq-panel-${index}`}
                       onClick={() => setOpenFaq(isOpen ? -1 : index)}
-                      className="flex min-h-[66px] w-full items-center justify-between gap-5 py-4 text-left text-sm font-extrabold text-[#102B3F]"
+                      className="flex min-h-[66px] w-full items-center justify-between gap-5 py-4 text-left text-sm font-extrabold text-[#0A1D3A]"
                     >
                       <span>{question}</span>
                       <ChevronDown
-                        className={`size-5 shrink-0 text-[#147D73] transition ${isOpen ? "rotate-180" : ""}`}
+                        className={`size-5 shrink-0 text-[#D4AF37] transition ${isOpen ? "rotate-180" : ""}`}
                       />
                     </button>
                   </h3>
@@ -529,7 +529,7 @@ export function ModernProofFooter() {
                     className={`grid transition-[grid-template-rows] duration-300 ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
                   >
                     <div className="overflow-hidden">
-                      <p className="max-w-[720px] pb-5 text-sm leading-6 text-[#66737B]">
+                      <p className="max-w-[720px] pb-5 text-sm leading-6 text-[#68707A]">
                         {answer}
                       </p>
                     </div>
@@ -545,7 +545,7 @@ export function ModernProofFooter() {
         id="kontak"
         className="scroll-mt-20 bg-white px-4 pb-12 sm:px-0 sm:pb-16"
       >
-        <div className="jam-container relative overflow-hidden rounded-[28px] bg-[#102B3F] px-7 py-12 text-white sm:px-12 lg:px-16 lg:py-16">
+        <div className="jam-container relative overflow-hidden rounded-[28px] bg-[#0A1D3A] px-7 py-12 text-white sm:px-12 lg:px-16 lg:py-16">
           <Image
             src={`${assetRoot}/promo.jpg`}
             alt=""
@@ -553,9 +553,9 @@ export function ModernProofFooter() {
             sizes="1280px"
             className="object-cover opacity-28"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#102B3F] via-[#102B3F]/90 to-[#102B3F]/58" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0A1D3A] via-[#0A1D3A]/90 to-[#0A1D3A]/58" />
           <div className="relative max-w-[780px]">
-            <p className="section-eyebrow !text-[#D5B77A]">
+            <p className="section-eyebrow !text-[#E8C967]">
               Rencanakan Perjalanan
             </p>
             <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] leading-[1.04] font-extrabold tracking-[-.045em]">
@@ -572,7 +572,7 @@ export function ModernProofFooter() {
               )}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-7 inline-flex min-h-13 items-center justify-center gap-3 rounded-[14px] bg-[#147D73] px-6 text-sm font-bold text-white"
+              className="mt-7 inline-flex min-h-13 items-center justify-center gap-3 rounded-[14px] bg-[#D4AF37] px-6 text-sm font-bold text-white"
             >
               <MessageCircle className="size-4" /> Konsultasi via WhatsApp
             </a>
@@ -583,7 +583,7 @@ export function ModernProofFooter() {
         </div>
       </section>
 
-      <footer className="bg-[#0B2233] text-white">
+      <footer className="bg-[#0A1D3A] text-white">
         <div className="jam-container grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.25fr_.75fr_.75fr_1.25fr]">
           <div>
             <Image
@@ -593,15 +593,15 @@ export function ModernProofFooter() {
               height={116}
               className="h-auto w-[190px] brightness-0 invert"
             />
-            <p className="mt-4 text-sm font-bold text-[#D5B77A]">
+            <p className="mt-4 text-sm font-bold text-[#E8C967]">
               Setiap Waktu Bernilai Ibadah
             </p>
             <p className="mt-3 max-w-[310px] text-sm leading-6 text-white/55">
               Partner perjalanan umrah dan wisata halal dengan pendampingan
               penuh perhatian.
             </p>
-            <a href="https://www.instagram.com/jamwisata/" target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/12 px-4 text-sm font-bold text-white/72 transition hover:border-[#D5B77A]/50 hover:text-white">
-              <InstagramMark className="size-4 text-[#D5B77A]" /> @jamwisata
+            <a href="https://www.instagram.com/jamwisata/" target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/12 px-4 text-sm font-bold text-white/72 transition hover:border-[#E8C967]/50 hover:text-white">
+              <InstagramMark className="size-4 text-[#E8C967]" /> @jamwisata
             </a>
           </div>
           <nav aria-label="Navigasi footer">
@@ -667,22 +667,22 @@ export function ModernProofFooter() {
                 href="tel:+6281809627499"
                 className="flex gap-3 hover:text-white"
               >
-                <Phone className="mt-1 size-4 shrink-0 text-[#D5B77A]" />
+                <Phone className="mt-1 size-4 shrink-0 text-[#E8C967]" />
                 +62 818-0962-7499
               </a>
               <a
                 href="mailto:jamwisata99@gmail.com"
                 className="flex gap-3 hover:text-white"
               >
-                <Mail className="mt-1 size-4 shrink-0 text-[#D5B77A]" />
+                <Mail className="mt-1 size-4 shrink-0 text-[#E8C967]" />
                 jamwisata99@gmail.com
               </a>
               <a href="https://maps.app.goo.gl/gVK4okTQSEtzyX9w5" target="_blank" rel="noopener noreferrer" className="flex gap-3 hover:text-white">
-                <MapPin className="mt-1 size-4 shrink-0 text-[#D5B77A]" />
+                <MapPin className="mt-1 size-4 shrink-0 text-[#E8C967]" />
                 Jl. Cibangkong No. 28A, Bandung 40273
               </a>
               <p className="flex gap-3">
-                <Clock3 className="mt-1 size-4 shrink-0 text-[#D5B77A]" />
+                <Clock3 className="mt-1 size-4 shrink-0 text-[#E8C967]" />
                 Senin–Jumat 09.00–17.00
                 <br />
                 Sabtu 09.00–14.00 WIB
