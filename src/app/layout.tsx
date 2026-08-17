@@ -1,26 +1,27 @@
 import type { Metadata } from "next";
-import { Inter, Manrope } from "next/font/google";
+import { Cormorant_Garamond, Montserrat } from "next/font/google";
 import "lite-youtube-embed/src/lite-yt-embed.css";
 import "./globals.css";
 
-const manrope = Manrope({
-  variable: "--font-manrope",
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
+  weight: ["500", "600", "700"],
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://jamwisata.id"),
-  title: "Jam Wisata | Paket Umrah & Wisata Halal Tepercaya",
+  title: "Jam Wisata | Setiap Waktu Bernilai Ibadah",
   description:
-    "Temukan pilihan paket umrah dan wisata halal bersama Jam Wisata. Dapatkan informasi jadwal, fasilitas, akomodasi, serta konsultasi perjalanan melalui WhatsApp.",
+    "Jam Wisata mendampingi perjalanan menuju Baitullah dengan pelayanan yang amanah, profesional, dan penuh perhatian.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Jam Wisata | Paket Umrah & Wisata Halal Tepercaya",
+    title: "Jam Wisata | Setiap Waktu Bernilai Ibadah",
     description:
       "Perjalanan umrah yang nyaman, terarah, dan dipersiapkan dengan sepenuh hati.",
     url: "https://jamwisata.id",
@@ -39,7 +40,7 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className={`${manrope.variable} ${inter.variable} h-full antialiased`}
+      className={`${cormorant.variable} ${montserrat.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
