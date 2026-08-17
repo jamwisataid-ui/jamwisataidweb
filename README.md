@@ -10,7 +10,7 @@
 [![Tailwind CSS 4](https://img.shields.io/badge/Tailwind%20CSS%204-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[Fitur](#fitur-utama) · [Menjalankan Proyek](#menjalankan-proyek) · [Pengujian](#pengujian) · [Struktur Proyek](#struktur-proyek)
+[Fitur](#fitur-utama) · [Teknologi](#teknologi) · [Menjalankan Proyek](#menjalankan-proyek) · [Pengujian](#pengujian) · [Struktur Proyek](#struktur-proyek)
 
 </div>
 
