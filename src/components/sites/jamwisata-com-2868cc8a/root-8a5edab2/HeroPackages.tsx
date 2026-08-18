@@ -226,7 +226,7 @@ export function HeroPackages() {
       {/* Hero Section */}
       <section
         id="beranda"
-        className="relative isolate min-h-[620px] sm:min-h-[680px] lg:min-h-[740px] overflow-hidden rounded-b-[24px] sm:rounded-b-[32px] lg:rounded-b-[36px] bg-[#061A2F] text-white flex flex-col justify-between pt-[100px] sm:pt-[120px] pb-16 sm:pb-20 lg:pb-24 shadow-[0_20px_48px_rgba(6,26,47,0.3)]"
+        className="relative isolate min-h-[540px] sm:min-h-[580px] lg:min-h-[620px] overflow-hidden rounded-b-[20px] sm:rounded-b-[24px] bg-[#061A2F] text-white flex flex-col justify-between pt-[84px] sm:pt-[94px] lg:pt-[100px] pb-16 sm:pb-20 lg:pb-22 shadow-[0_20px_48px_rgba(6,26,47,0.3)]"
       >
         {/* Background Image of Masjidil Haram with Ka'bah & Clock Tower */}
         <Image
@@ -235,55 +235,56 @@ export function HeroPackages() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[75%_center] sm:object-[68%_center] lg:object-[65%_center]"
+          className="object-cover object-[58%_center] sm:object-[58%_center] lg:object-[60%_35%]"
         />
 
-        {/* Elegant Cinematic Gradient Overlay: Deep Navy on Left, Transparent on Right */}
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,26,47,0.96)_0%,rgba(6,26,47,0.88)_35%,rgba(6,26,47,0.45)_68%,rgba(6,26,47,0.15)_100%)]" />
-        {/* Top and Bottom Atmosphere Fades */}
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,26,47,0.75)_0%,transparent_22%,transparent_75%,rgba(6,26,47,0.95)_100%)]" />
+        {/* Directional Cinematic Gradient Overlay: Deep Navy on Left for Copy, Transparent on Right for Ka'bah */}
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,18,36,0.96)_0%,rgba(2,18,36,0.88)_26%,rgba(2,18,36,0.62)_48%,rgba(2,18,36,0.20)_72%,rgba(2,18,36,0.08)_100%)]" />
+        {/* Subtle Bottom and Top Atmosphere Fades */}
+        <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(2,18,36,0.55)_0%,transparent_40%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,18,36,0.65)_0%,transparent_25%)]" />
 
-        {/* Main Hero Content */}
-        <div className="jam-container relative z-10 w-full my-auto py-6 sm:py-8 lg:py-10">
-          <div className="max-w-[620px] lg:max-w-[560px] xl:max-w-[620px]">
-            {/* Bismillah & Sub Heading (Cormorant Garamond) */}
-            <div className="mb-4 sm:mb-5 flex flex-col items-start gap-2.5">
+        {/* Main Hero Content (Upper-Left 40% column, right 60% left for Ka'bah & Clock Tower) */}
+        <div className="jam-container relative z-10 w-full my-auto py-2 sm:py-4">
+          <div className="max-w-[480px] lg:max-w-[530px]">
+            {/* Bismillah & Eyebrow */}
+            <div className="mb-3 sm:mb-4 flex flex-col items-start gap-2">
               <Image
                 src={`${assetRoot}/bismillah.png`}
                 alt="Bismillahirrahmanirrahim"
                 width={384}
                 height={86}
-                className="h-auto w-[180px] sm:w-[210px] opacity-90 drop-shadow-sm"
+                className="h-auto w-[135px] sm:w-[155px] opacity-80 drop-shadow-sm"
               />
-              <div className="flex items-center gap-2.5">
-                <span className="h-px w-6 bg-gradient-gold-rich" />
-                <p className="font-[family-name:var(--font-cormorant)] text-base sm:text-lg lg:text-xl font-semibold italic tracking-wide text-[#E8C967]">
+              <div className="flex items-center gap-2">
+                <span className="h-px w-5 bg-gradient-gold-rich" />
+                <p className="font-[family-name:var(--font-cinzel)] text-[10px] sm:text-[11px] font-bold tracking-[0.18em] text-[#D7A72B] uppercase">
                   Biro Perjalanan Umrah &amp; Wisata Halal
                 </p>
               </div>
             </div>
 
-            {/* Heading — Cinzel (48–72pt / authoritative & elegant, strictly 2 lines) */}
-            <h1 className="font-[family-name:var(--font-cinzel)] text-[28px] xs:text-[34px] sm:text-[44px] lg:text-[52px] xl:text-[58px] font-bold leading-[1.18] tracking-[0.03em] text-white drop-shadow-md">
-              <span className="block">PERJALANAN IBADAH,</span>
-              <span className="text-gradient-gold-rich mt-1 block font-bold">
-                PENGALAMAN TAK TERLUPAKAN
+            {/* Heading — Cinzel (strictly 2 visual lines, elegant proportion) */}
+            <h1 className="font-[family-name:var(--font-cinzel)] text-[28px] xs:text-[34px] sm:text-[42px] lg:text-[48px] xl:text-[52px] font-bold leading-[1.08] tracking-[0.02em] text-white drop-shadow-md">
+              <span className="block whitespace-nowrap">Perjalanan Ibadah,</span>
+              <span className="text-gradient-gold-rich mt-0.5 block font-bold whitespace-nowrap">
+                Pengalaman Tak Terlupakan
               </span>
             </h1>
 
-            {/* Body — Montserrat (easy to read, clean, modern, text-left, line-height 150%) */}
-            <p className="font-[family-name:var(--font-montserrat)] mt-4 sm:mt-5 max-w-[530px] text-left text-xs sm:text-[14px] lg:text-[15px] font-normal leading-[1.65] text-slate-100/90 sm:leading-[1.7]">
+            {/* Body — Montserrat (max 3 lines, easy to read, clean, modern) */}
+            <p className="font-[family-name:var(--font-montserrat)] mt-3 sm:mt-3.5 max-w-[430px] text-left text-[13px] sm:text-[14.5px] font-normal leading-[1.6] text-slate-200/90">
               Jam Wisata hadir untuk menemani setiap langkah Anda menuju Baitullah dengan layanan amanah, profesional, dan penuh keberkahan.
             </p>
 
-            {/* CTA Buttons Row — Montserrat */}
-            <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4 font-[family-name:var(--font-montserrat)]">
+            {/* CTA Buttons Row — Compact (46-48px height, rounded-8px) */}
+            <div className="mt-5 sm:mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3 font-[family-name:var(--font-montserrat)]">
               {/* Primary Gold CTA */}
               <a
                 href="#paket-umrah"
-                className="lift-soft sheen-gold inline-flex h-12 sm:h-13 items-center justify-center gap-2.5 rounded-xl bg-gradient-gold-rich px-6 sm:px-7 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#061A2F] shadow-[0_12px_32px_rgba(184,134,11,.38)] transition duration-300 hover:scale-[1.03] active:scale-95"
+                className="lift-soft sheen-gold inline-flex h-[44px] sm:h-[48px] items-center justify-center gap-2 rounded-[8px] bg-gradient-gold-rich px-5 sm:px-6 text-xs font-bold uppercase tracking-wider text-[#061A2F] shadow-[0_8px_24px_rgba(184,134,11,.32)] transition duration-300 hover:scale-[1.02] active:scale-95"
               >
-                Lihat Paket Umroh <ArrowRight className="size-4" />
+                Lihat Paket Umroh <ArrowRight className="size-3.5" />
               </a>
 
               {/* Secondary Dark/Gold Outline CTA */}
@@ -291,45 +292,54 @@ export function HeroPackages() {
                 href="https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20berkonsultasi%20mengenai%20paket%20perjalanan%20Jam%20Wisata."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="lift-soft inline-flex h-12 sm:h-13 items-center justify-center gap-2.5 rounded-xl border border-[#D5A12B]/70 bg-[#061A2F]/50 px-5 sm:px-6 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#FAF8F3] backdrop-blur-sm transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/80 hover:text-[#E8C967] active:scale-95"
+                className="lift-soft inline-flex h-[44px] sm:h-[48px] items-center justify-center gap-2 rounded-[8px] border border-[#D7A72B]/60 bg-[#061A2F]/60 px-4.5 sm:px-5 text-xs font-bold uppercase tracking-wider text-[#FAF8F3] backdrop-blur-sm transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/85 hover:text-[#E8C967] active:scale-95"
               >
-                <MessageCircle className="size-4 text-[#E8C967]" />
+                <MessageCircle className="size-3.5 text-[#E8C967]" />
                 <span>Konsultasi Gratis</span>
               </a>
             </div>
 
-            {/* Trust Indicators Horizontal — Montserrat */}
-            <div className="font-[family-name:var(--font-montserrat)] mt-6 sm:mt-7 flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-2 text-[11px] sm:text-xs font-semibold text-slate-200">
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck className="size-4 text-[#E8C967]" />
-                <span>Legal &amp; Terpercaya</span>
+            {/* Trust Indicators (2 Visual Horizontal Blocks) */}
+            <div className="font-[family-name:var(--font-montserrat)] mt-5 sm:mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3.5 text-[11px] sm:text-xs">
+              <div className="flex items-center gap-2 rounded-lg border border-white/12 bg-[#061A2F]/40 px-3 py-1.5 backdrop-blur-xs">
+                <span className="grid size-6 place-items-center rounded-full bg-[#D7A72B]/15 text-[#E8C967]">
+                  <ShieldCheck className="size-3.5" />
+                </span>
+                <div className="text-left leading-tight">
+                  <strong className="block font-bold text-white">Legal &amp; Terpercaya</strong>
+                  <span className="text-[9.5px] text-slate-300">Amanah &amp; Profesional</span>
+                </div>
               </div>
-              <span className="text-white/30">•</span>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[#E8C967] text-sm leading-none">✦</span>
-                <span>Anggota ASTA</span>
+              <div className="flex items-center gap-2 rounded-lg border border-white/12 bg-[#061A2F]/40 px-3 py-1.5 backdrop-blur-xs">
+                <span className="grid size-6 place-items-center rounded-full bg-[#D7A72B]/15 text-[#E8C967] font-bold text-xs">
+                  ✦
+                </span>
+                <div className="text-left leading-tight">
+                  <strong className="block font-bold text-white">Anggota ASTA</strong>
+                  <span className="text-[9.5px] text-slate-300">Resmi &amp; Terakreditasi</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Video CTA Card (Right Side, Subtle Luxury Pill) */}
-        <div className="jam-container relative z-20 w-full pointer-events-none">
-          <div className="flex justify-end pointer-events-auto">
+        {/* Video CTA Card (Right Side of Hero, Compact Pill) */}
+        <div className="jam-container relative z-20 w-full pointer-events-none pb-2 sm:pb-3">
+          <div className="flex justify-end pointer-events-auto pr-2 sm:pr-4">
             <a
               href="https://www.youtube.com/@jamwisatabandung"
               target="_blank"
               rel="noopener noreferrer"
-              className="lift-soft group inline-flex items-center gap-3.5 rounded-2xl border border-[#D5A12B]/40 bg-[#061A2F]/80 px-4 py-3 text-white backdrop-blur-md shadow-[0_12px_32px_rgba(0,0,0,0.45)] transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/95 hover:scale-[1.02]"
+              className="lift-soft group inline-flex items-center gap-3 rounded-xl border border-[#D5A12B]/40 bg-[#061A2F]/80 px-3.5 py-2.5 text-white backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/95 hover:scale-[1.02]"
             >
-              <span className="grid size-10 place-items-center rounded-xl bg-gradient-gold-rich text-[#061A2F] shadow-md transition-transform group-hover:scale-110">
-                <Play className="size-4 fill-current ml-0.5" />
+              <span className="grid size-8 place-items-center rounded-lg bg-gradient-gold-rich text-[#061A2F] shadow-sm transition-transform group-hover:scale-105">
+                <Play className="size-3.5 fill-current ml-0.5" />
               </span>
-              <div className="text-left pr-1">
-                <span className="font-[family-name:var(--font-cormorant)] block text-xs sm:text-sm font-semibold italic text-slate-300">
+              <div className="text-left pr-1 leading-tight">
+                <span className="font-[family-name:var(--font-cormorant)] block text-[11px] italic text-slate-300">
                   Tonton Video Profil
                 </span>
-                <strong className="font-[family-name:var(--font-cinzel)] block text-xs sm:text-sm font-bold tracking-wider text-[#E8C967]">
+                <strong className="font-[family-name:var(--font-cinzel)] block text-xs font-bold tracking-wider text-[#E8C967]">
                   Jam Wisata
                 </strong>
               </div>
@@ -337,28 +347,28 @@ export function HeroPackages() {
           </div>
         </div>
 
-        {/* Bottom Rounded Rich Gold Border Accent following Hero's boundary */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[3px] sm:h-[3.5px] bg-gradient-gold-rich shadow-[0_-2px_12px_rgba(212,175,55,0.7)]" />
+        {/* Bottom Subtle Rich Gold Border Line */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[2.5px] bg-gradient-gold-rich shadow-[0_-2px_10px_rgba(212,175,55,0.6)]" />
       </section>
 
-      {/* Overlapping Floating Search Package Card (On Hero Boundary, 40-60px overlap) */}
-      <section className="relative z-30 -mt-10 sm:-mt-12 lg:-mt-14" aria-label="Pencarian Paket Umrah">
-        <div className="jam-container">
-          <div className="rounded-[18px] sm:rounded-[22px] border border-[#D5A12B]/25 bg-white p-4 sm:p-5 lg:p-6 shadow-[0_20px_50px_rgba(6,26,47,0.16)]">
+      {/* Overlapping Floating Search Package Card (Widescreen 1240px, 48-52px overlap on Hero Boundary) */}
+      <section className="relative z-30 -mt-[44px] sm:-mt-[48px] lg:-mt-[52px]" aria-label="Pencarian Paket Umrah">
+        <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
+          <div className="rounded-[14px] sm:rounded-[16px] border border-[#D5A12B]/25 bg-white p-3.5 sm:p-4 lg:p-5 shadow-[0_14px_40px_rgba(0,0,0,0.14)]">
             <form
               onSubmit={submitSearch}
-              className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.1fr_1.1fr_0.9fr_1.1fr_auto] lg:items-end"
+              className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-[1.1fr_1.1fr_0.9fr_1.1fr_auto] lg:items-end"
             >
               {/* Field 1: Tujuan */}
               <div className="min-w-0">
-                <label className="mb-1.5 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#061A2F]">
+                <label className="mb-1 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#061A2F]">
                   <Compass className="size-3.5 text-[#D5A12B]" />
                   <span>Tujuan</span>
                 </label>
                 <select
                   value={draft.type}
                   onChange={(e) => setDraft({ ...draft, type: e.target.value })}
-                  className="h-11 w-full rounded-xl border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-bold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
+                  className="h-[44px] sm:h-[46px] w-full rounded-[6px] border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-semibold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
                 >
                   <option value="">Semua Tujuan</option>
                   {options.types.map((type) => (
@@ -371,14 +381,14 @@ export function HeroPackages() {
 
               {/* Field 2: Tanggal Keberangkatan */}
               <div className="min-w-0">
-                <label className="mb-1.5 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#061A2F]">
+                <label className="mb-1 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#061A2F]">
                   <CalendarDays className="size-3.5 text-[#D5A12B]" />
                   <span>Tanggal Keberangkatan</span>
                 </label>
                 <select
                   value={draft.month}
                   onChange={(e) => setDraft({ ...draft, month: e.target.value })}
-                  className="h-11 w-full rounded-xl border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-bold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
+                  className="h-[44px] sm:h-[46px] w-full rounded-[6px] border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-semibold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
                 >
                   <option value="">Semua Bulan</option>
                   {options.months.map((month) => (
@@ -391,14 +401,14 @@ export function HeroPackages() {
 
               {/* Field 3: Durasi */}
               <div className="min-w-0">
-                <label className="mb-1.5 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#061A2F]">
+                <label className="mb-1 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#061A2F]">
                   <Clock3 className="size-3.5 text-[#D5A12B]" />
                   <span>Durasi</span>
                 </label>
                 <select
                   value={draft.duration}
                   onChange={(e) => setDraft({ ...draft, duration: e.target.value })}
-                  className="h-11 w-full rounded-xl border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-bold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
+                  className="h-[44px] sm:h-[46px] w-full rounded-[6px] border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-semibold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
                 >
                   <option value="">Semua Durasi</option>
                   {options.durations.map((dur) => (
@@ -411,14 +421,14 @@ export function HeroPackages() {
 
               {/* Field 4: Maskapai */}
               <div className="min-w-0">
-                <label className="mb-1.5 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#061A2F]">
+                <label className="mb-1 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#061A2F]">
                   <Plane className="size-3.5 text-[#D5A12B]" />
                   <span>Maskapai</span>
                 </label>
                 <select
                   value={draft.airline}
                   onChange={(e) => setDraft({ ...draft, airline: e.target.value })}
-                  className="h-11 w-full rounded-xl border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-bold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
+                  className="h-[44px] sm:h-[46px] w-full rounded-[6px] border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-semibold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
                 >
                   <option value="">Semua Maskapai</option>
                   {options.airlines.map((airline) => (
@@ -432,9 +442,9 @@ export function HeroPackages() {
               {/* Field 5: CARI PAKET Button (Dark Navy) */}
               <button
                 type="submit"
-                className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[#061A2F] hover:bg-[#0A2745] px-6 text-xs font-extrabold uppercase tracking-wider text-[#FAF8F3] hover:text-[#E8B84A] shadow-md transition duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer sm:col-span-2 lg:col-span-1"
+                className="flex h-[44px] sm:h-[46px] items-center justify-center gap-2 rounded-[6px] bg-[#061A2F] hover:bg-[#0A2745] px-6 text-xs font-extrabold uppercase tracking-wider text-[#FAF8F3] hover:text-[#E8B84A] shadow-md transition duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer sm:col-span-2 lg:col-span-1"
               >
-                <Search className="size-4 text-[#E8B84A]" />
+                <Search className="size-3.5 text-[#E8B84A]" />
                 <span>Cari Paket</span>
               </button>
             </form>
@@ -443,7 +453,7 @@ export function HeroPackages() {
       </section>
 
       {/* Tentang Jam Wisata Section */}
-      <section id="tentang-kami" className="scroll-mt-24 bg-[#FAF8F3] py-20 sm:py-24 lg:py-28">
+      <section id="tentang-kami" className="scroll-mt-24 bg-[#FAF9F5] pt-14 sm:pt-16 pb-20 sm:pb-24 lg:pb-28">
         <div className="jam-container grid items-center gap-12 lg:grid-cols-[.96fr_1.04fr] lg:gap-16">
           <div className="grid grid-cols-[1.25fr_.75fr] gap-3">
             <figure className="relative min-h-[440px] overflow-hidden rounded-[26px]">
