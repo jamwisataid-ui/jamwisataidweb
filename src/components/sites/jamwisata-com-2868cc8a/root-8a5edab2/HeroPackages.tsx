@@ -283,17 +283,17 @@ export function HeroPackages() {
               </div>
             </div>
 
-            {/* Heading — Cinzel (strictly 2 visual lines on desktop, nicely wrapped on small mobile) */}
+            {/* Heading — Cinzel */}
             <h1 className="font-[family-name:var(--font-cinzel)] text-[26px] xs:text-[30px] sm:text-[42px] lg:text-[50px] xl:text-[56px] font-bold leading-[1.12] sm:leading-[1.08] tracking-[0.02em] text-white drop-shadow-md">
-              <span className="block sm:whitespace-nowrap">Perjalanan Ibadah,</span>
+              <span className="block sm:whitespace-nowrap">Setiap Waktu</span>
               <span className="text-gradient-gold-rich mt-0.5 block font-bold sm:whitespace-nowrap">
-                Pengalaman Tak Terlupakan
+                Bernilai Ibadah
               </span>
             </h1>
 
-            {/* Body — Montserrat (easy to read, clean, modern) */}
+            {/* Body — Montserrat */}
             <p className="font-[family-name:var(--font-montserrat)] mt-2.5 sm:mt-3.5 max-w-[430px] lg:max-w-[460px] text-left text-[12.5px] sm:text-[14.5px] lg:text-[15.5px] font-normal leading-[1.55] sm:leading-[1.6] text-slate-200/90">
-              Jam Wisata hadir untuk menemani setiap langkah Anda menuju Baitullah dengan layanan amanah, profesional, dan penuh keberkahan.
+              Jam Wisata tidak hanya mengantarkan langkah menuju Baitullah, tetapi juga menemani perjalanan hati menuju Allah dengan amanah, profesional, dan berlandaskan sunnah.
             </p>
 
             {/* CTA Buttons Row — Exact same horizontal placement, enlarged font size */}
@@ -504,17 +504,16 @@ export function HeroPackages() {
       <section className="bg-white pt-10 sm:pt-12 lg:pt-14 pb-4 sm:pb-6" aria-label="Keunggulan Jam Wisata">
         <div className="w-full max-w-[1360px] mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-5 sm:gap-6 xl:gap-0 xl:divide-x xl:divide-[#061A2F]/10 rounded-2xl border border-[#061A2F]/8 bg-white p-5 sm:p-6 xl:p-4 shadow-xs">
-            {/* Item 1: Legal & Terpercaya */}
+            {/* Item 1: Legal & Berizin Resmi */}
             <div className="flex items-center gap-3 xl:px-3.5 first:xl:pl-2">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white border border-[#D5A12B]/35 text-[#D5A12B] shadow-2xs">
-                <svg className="size-5.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M208,40H48A16,16,0,0,0,32,56v58.78c0,89.61,75.82,119.34,91.25,124.39a15.54,15.54,0,0,0,9.5,0c15.43-5.05,91.25-34.78,91.25-124.39V56A16,16,0,0,0,208,40Z" />
-                  <polyline points="88 136 112 160 168 104" />
+                <svg className="size-5.5" viewBox="0 0 256 256" fill="currentColor">
+                  <path d="M208,40H48A16,16,0,0,0,32,56v58.78c0,89.61,75.82,119.34,91.25,124.39a15.54,15.54,0,0,0,9.5,0c15.43-5.05,91.25-34.78,91.25-124.39V56A16,16,0,0,0,208,40Zm0,74.79c0,78.42-66.35,105.77-80,110.5-13.65-4.73-80-32.08-80-110.5V56H208ZM173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34Z" />
                 </svg>
               </span>
               <div className="min-w-0">
                 <h3 className="text-[13px] font-bold text-[#061A2F] leading-snug">
-                  Legal &amp; Terpercaya
+                  Legal &amp; Berizin Resmi
                 </h3>
                 <p className="mt-0.5 text-[11px] text-[#59616D] leading-tight">
                   Amanah, profesional, dan berizin resmi
@@ -522,105 +521,87 @@ export function HeroPackages() {
               </div>
             </div>
 
-            {/* Item 2: Pelayanan Profesional */}
+            {/* Item 2: Bimbingan Sesuai Sunnah */}
             <div className="flex items-center gap-3 xl:px-3.5">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white border border-[#D5A12B]/35 text-[#D5A12B] shadow-2xs">
-                <svg className="size-5.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M208,128v40a24,24,0,0,1-24,24H168" />
-                  <path d="M48,128v40a24,24,0,0,0,24,24H88" />
-                  <path d="M48,128A80,80,0,0,1,208,128" />
-                  <rect x="32" y="128" width="32" height="56" rx="8" />
-                  <rect x="192" y="128" width="32" height="56" rx="8" />
-                  <path d="M128,216h24a16,16,0,0,0,16-16v-8" />
+                <svg className="size-5.5" viewBox="0 0 256 256" fill="currentColor">
+                  <path d="M216,40H48A16,16,0,0,0,32,56V184a16,16,0,0,0,16,16H208a8,8,0,0,1,8,8v8a8,8,0,0,1-16,0v-4H48a24,24,0,0,1-24-24V56A24,24,0,0,1,48,32H216a8,8,0,0,1,8,8V184a8,8,0,0,1-16,0V48A8,8,0,0,1,216,40ZM176,88H80a8,8,0,0,0,0,16h96a8,8,0,0,0,0-16Zm0,32H80a8,8,0,0,0,0,16h96a8,8,0,0,0,0-16Z" />
                 </svg>
               </span>
               <div className="min-w-0">
                 <h3 className="text-[13px] font-bold text-[#061A2F] leading-snug">
-                  Pelayanan Profesional
+                  Bimbingan Sunnah
                 </h3>
                 <p className="mt-0.5 text-[11px] text-[#59616D] leading-tight">
-                  Tim berpengalaman dan responsif
+                  Manasik intensif sesuai tuntunan Nabi
                 </p>
               </div>
             </div>
 
-            {/* Item 3: Hotel Berkualitas */}
+            {/* Item 3: Hotel Dekat Masjid */}
             <div className="flex items-center gap-3 xl:px-3.5">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white border border-[#D5A12B]/35 text-[#D5A12B] shadow-2xs">
-                <svg className="size-5.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="32" y="48" width="128" height="176" rx="8" />
-                  <path d="M160,88h56a8,8,0,0,1,8,8V224H160" />
-                  <line x1="72" y1="88" x2="88" y2="88" />
-                  <line x1="104" y1="88" x2="120" y2="88" />
-                  <line x1="72" y1="128" x2="88" y2="128" />
-                  <line x1="104" y1="128" x2="120" y2="128" />
-                  <line x1="72" y1="168" x2="88" y2="168" />
-                  <line x1="104" y1="168" x2="120" y2="168" />
-                  <path d="M80,224v-24a16,16,0,0,1,32,0v24" />
+                <svg className="size-5.5" viewBox="0 0 256 256" fill="currentColor">
+                  <path d="M240,192h-8V56a16,16,0,0,0-16-16H168a16,16,0,0,0-16,16v40H40A16,16,0,0,0,24,112V192H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM168,56h48V192H168ZM40,112H152V192H40Zm88,16a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16h56A8,8,0,0,1,128,128Zm0,32a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16h56A8,8,0,0,1,128,160Z" />
                 </svg>
               </span>
               <div className="min-w-0">
                 <h3 className="text-[13px] font-bold text-[#061A2F] leading-snug">
-                  Hotel Berkualitas
+                  Hotel Dekat Masjid
                 </h3>
                 <p className="mt-0.5 text-[11px] text-[#59616D] leading-tight">
-                  Pilihan hotel nyaman di lokasi strategis
+                  Kenyamanan maksimal di tanah suci
                 </p>
               </div>
             </div>
 
-            {/* Item 4: Maskapai Terbaik */}
+            {/* Item 4: Maskapai Ternama */}
             <div className="flex items-center gap-3 xl:px-3.5">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white border border-[#D5A12B]/35 text-[#D5A12B] shadow-2xs">
-                <svg className="size-5.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M236.4,79.6,183.1,133,96.6,112.5l-33.9,34,51.8,25.9L87.2,199.7,59.3,200,40,219.3l42.4,8.5,8.5,42.4,19.3-19.3.3-27.9,27.3-27.3,25.9,51.8,34-33.9L147.2,127.1l53.4-53.3a24,24,0,0,0-33.9-33.9l-6.7,6.7" />
+                <svg className="size-5.5" viewBox="0 0 256 256" fill="currentColor">
+                  <path d="M239.19,84.47l-48,48A8,8,0,0,1,185.54,135L144,119.46v44.69l18.83,18.83A8,8,0,0,1,165.19,190l-14.85,14.85a8,8,0,0,1-11.31,0L112,177.88,85,204.83a8,8,0,0,1-11.31,0L58.83,189.97a8,8,0,0,1,0-11.31L85.78,151.71,58.83,124.76a8,8,0,0,1,0-11.31L73.68,98.6a8,8,0,0,1,7.09-2.35L99.6,115.08,144.29,73.54,128.75,32A8,8,0,0,1,131,23.35l48-48a8,8,0,0,1,12.43,1.3l49.2,65.6A8,8,0,0,1,239.19,84.47Z" />
                 </svg>
               </span>
               <div className="min-w-0">
                 <h3 className="text-[13px] font-bold text-[#061A2F] leading-snug">
-                  Maskapai Terbaik
+                  Maskapai Ternama
                 </h3>
                 <p className="mt-0.5 text-[11px] text-[#59616D] leading-tight">
-                  Perjalanan dengan maskapai premium
+                  Garuda, Saudia, Qatar, Oman &amp; Emirates
                 </p>
               </div>
             </div>
 
-            {/* Item 5: Bimbingan Ibadah */}
+            {/* Item 5: Pelayanan Tulus */}
             <div className="flex items-center gap-3 xl:px-3.5">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white border border-[#D5A12B]/35 text-[#D5A12B] shadow-2xs">
-                <svg className="size-5.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M128,72c-24-24-48-24-88-24A16,16,0,0,0,24,64V192a16,16,0,0,0,16,16c40,0,64,0,88,24,24-24,48-24,88-24a16,16,0,0,0,16-16V64a16,16,0,0,0-16-16C176,48,152,48,128,72Z" />
-                  <line x1="128" y1="72" x2="128" y2="232" />
+                <svg className="size-5.5" viewBox="0 0 256 256" fill="currentColor">
+                  <path d="M178,40c-20.65,0-38.73,8.88-50,23.89C116.73,48.88,98.65,40,78,40a62.07,62.07,0,0,0-62,62c0,70,103.79,126.66,108.21,129a8,8,0,0,0,7.58,0C136.21,228.66,240,172,240,102A62.07,62.07,0,0,0,178,40ZM128,214.8C110.84,204,32,150.31,32,102A46.06,46.06,0,0,1,78,56c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46C224,150.31,145.16,204,128,214.8Z" />
                 </svg>
               </span>
               <div className="min-w-0">
                 <h3 className="text-[13px] font-bold text-[#061A2F] leading-snug">
-                  Bimbingan Ibadah
+                  Pelayanan Sepenuh Hati
                 </h3>
                 <p className="mt-0.5 text-[11px] text-[#59616D] leading-tight">
-                  Pendampingan selama perjalanan
+                  Mendampingi setiap kebutuhan jamaah
                 </p>
               </div>
             </div>
 
-            {/* Item 6: Keberangkatan Terjadwal */}
+            {/* Item 6: Transparansi Biaya */}
             <div className="flex items-center gap-3 xl:px-3.5 last:xl:pr-2">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white border border-[#D5A12B]/35 text-[#D5A12B] shadow-2xs">
-                <svg className="size-5.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="40" y="40" width="176" height="176" rx="16" />
-                  <line x1="176" y1="24" x2="176" y2="56" />
-                  <line x1="80" y1="24" x2="80" y2="56" />
-                  <line x1="40" y1="88" x2="216" y2="88" />
-                  <polyline points="92 148 116 172 164 124" />
+                <svg className="size-5.5" viewBox="0 0 256 256" fill="currentColor">
+                  <path d="M224,48H32A16,16,0,0,0,16,64V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V64A16,16,0,0,0,224,48Zm0,144H32V64H224V192Zm-96-88a24,24,0,1,0,24,24A24,24,0,0,0,128,104Zm0,32a8,8,0,1,1,8-8A8,8,0,0,1,128,136Z" />
                 </svg>
               </span>
               <div className="min-w-0">
                 <h3 className="text-[13px] font-bold text-[#061A2F] leading-snug">
-                  Keberangkatan Terjadwal
+                  Transparansi Biaya
                 </h3>
                 <p className="mt-0.5 text-[11px] text-[#59616D] leading-tight">
-                  Jadwal rutin dan jelas setiap bulan
+                  Harga all-in tanpa biaya tersembunyi
                 </p>
               </div>
             </div>
@@ -730,90 +711,79 @@ export function HeroPackages() {
 
         {/* Content Container */}
         <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 relative z-10">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-0 lg:divide-x lg:divide-white/15">
-            {/* Stat 1: Ratusan+ Jamaah Berangkat (Phosphor UsersThree Outline with Gold Rim Frame) */}
-            <div className="flex items-center justify-start lg:justify-center gap-3.5 sm:gap-4.5 lg:px-6 first:lg:pl-0">
-              <div className="p-[1.5px] rounded-2xl bg-gradient-to-b from-[#F5D97A] via-[#D4AF37] to-[#8C6708] shadow-[0_4px_18px_rgba(212,175,55,0.25)] shrink-0">
-                <span className="grid size-11 sm:size-12 place-items-center rounded-[14px] bg-[#021224] text-[#F5D97A]">
-                  <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="128" cy="140" r="40" />
-                    <path d="M196,216a68,68,0,0,0-136,0" />
-                    <path d="M56,112a32,32,0,1,1,32-32" />
-                    <path d="M24,176a56,56,0,0,1,40-20" />
-                    <path d="M200,112a32,32,0,1,0-32-32" />
-                    <path d="M232,176a56,56,0,0,0-40-20" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-0 lg:divide-x lg:divide-white/15">
+            {/* Stat 1: Ratusan+ Jamaah Berangkat */}
+            <div className="group rounded-2xl lg:rounded-none border border-[#D5A12B]/30 lg:border-none bg-[#061A2F]/85 lg:bg-transparent backdrop-blur-md p-3.5 sm:p-5 lg:p-0 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-4.5 text-center sm:text-left lg:px-6 first:lg:pl-0 shadow-md lg:shadow-none transition-all duration-300 hover:border-[#D5A12B]/60 hover:bg-[#061A2F]/95 lg:hover:bg-transparent">
+              <div className="p-[1.5px] rounded-2xl bg-gradient-to-b from-[#F5D97A] via-[#D4AF37] to-[#8C6708] shadow-[0_4px_16px_rgba(212,175,55,0.30)] shrink-0">
+                <span className="grid size-10 sm:size-12 place-items-center rounded-[14px] bg-[#021224] text-[#F5D97A]">
+                  <svg className="size-5.5 sm:size-6.5" viewBox="0 0 256 256" fill="currentColor">
+                    <path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.74a8,8,0,0,1-11.07-2.37A80,80,0,0,0,172,165.48a8,8,0,0,1,8.92-13.3A95.73,95.73,0,0,1,228.47,195.63,8,8,0,0,1,250.14,206.74ZM172,148a44,44,0,1,0-44-44,8,8,0,0,1-16,0,60,60,0,1,1,68.42,59.32,8,8,0,0,1-8.42-15.32Z" />
                   </svg>
                 </span>
               </div>
-              <div className="leading-tight">
-                <span className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
+              <div className="leading-tight min-w-0">
+                <span className="font-[family-name:var(--font-cinzel)] text-xl xs:text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
                   Ratusan+
                 </span>
-                <span className="mt-0.5 text-xs sm:text-[13.5px] font-medium text-slate-200 block">
+                <span className="mt-0.5 text-[11px] xs:text-xs sm:text-[13.5px] font-medium text-slate-100 block">
                   Jamaah Berangkat
                 </span>
               </div>
             </div>
 
-            {/* Stat 2: 3+ Tahun Pengalaman (Phosphor Hourglass Outline with Gold Rim Frame) */}
-            <div className="flex items-center justify-start lg:justify-center gap-3.5 sm:gap-4.5 lg:px-6">
-              <div className="p-[1.5px] rounded-2xl bg-gradient-to-b from-[#F5D97A] via-[#D4AF37] to-[#8C6708] shadow-[0_4px_18px_rgba(212,175,55,0.25)] shrink-0">
-                <span className="grid size-11 sm:size-12 place-items-center rounded-[14px] bg-[#021224] text-[#F5D97A]">
-                  <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="48" y1="40" x2="208" y2="40" />
-                    <line x1="48" y1="216" x2="208" y2="216" />
-                    <path d="M64,40v32a64,64,0,0,0,32,56,64,64,0,0,0-32,56v32" />
-                    <path d="M192,40v32a64,64,0,0,1-32,56,64,64,0,0,1,32,56v32" />
-                    <circle cx="128" cy="172" r="8" fill="currentColor" />
+            {/* Stat 2: 3+ Tahun Pengalaman */}
+            <div className="group rounded-2xl lg:rounded-none border border-[#D5A12B]/30 lg:border-none bg-[#061A2F]/85 lg:bg-transparent backdrop-blur-md p-3.5 sm:p-5 lg:p-0 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-4.5 text-center sm:text-left lg:px-6 shadow-md lg:shadow-none transition-all duration-300 hover:border-[#D5A12B]/60 hover:bg-[#061A2F]/95 lg:hover:bg-transparent">
+              <div className="p-[1.5px] rounded-2xl bg-gradient-to-b from-[#F5D97A] via-[#D4AF37] to-[#8C6708] shadow-[0_4px_16px_rgba(212,175,55,0.30)] shrink-0">
+                <span className="grid size-10 sm:size-12 place-items-center rounded-[14px] bg-[#021224] text-[#F5D97A]">
+                  <svg className="size-5.5 sm:size-6.5" viewBox="0 0 256 256" fill="currentColor">
+                    <path d="M225.86,102.82c-.06-.3-.12-.6-.19-.89l-13-56.49a16,16,0,0,0-12.16-12.16l-56.49-13c-.29-.07-.59-.13-.89-.19a16,16,0,0,0-6.26,0c-.3.06-.6.12-.89.19l-56.49,13A16,16,0,0,0,67.33,45.44l-13,56.49c-.07.29-.13.59-.19.89a16,16,0,0,0,0,6.26c.06.3.12.6.19.89l13,56.49a16,16,0,0,0,12.16,12.16l56.49,13c.3.07.59.13.89.19a16,16,0,0,0,6.26,0c.29-.06.59-.12.89-.19l56.49-13a16,16,0,0,0,12.16-12.16l13-56.49c.07-.29.13-.59.19-.89A16,16,0,0,0,225.86,102.82Zm-17.78,5.43-13,56.49-56.49,13h0L82.1,164.74l-13-56.49L82.1,51.76l56.49-13,56.49,13,13,56.49ZM173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34Z" />
                   </svg>
                 </span>
               </div>
-              <div className="leading-tight">
-                <span className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
+              <div className="leading-tight min-w-0">
+                <span className="font-[family-name:var(--font-cinzel)] text-xl xs:text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
                   3+ Tahun
                 </span>
-                <span className="mt-0.5 text-xs sm:text-[13.5px] font-medium text-slate-200 block">
+                <span className="mt-0.5 text-[11px] xs:text-xs sm:text-[13.5px] font-medium text-slate-100 block">
                   Pengalaman
                 </span>
               </div>
             </div>
 
-            {/* Stat 3: 99% Kepuasan Jamaah (Phosphor Heart Verified Outline with Gold Rim Frame) */}
-            <div className="flex items-center justify-start lg:justify-center gap-3.5 sm:gap-4.5 lg:px-6">
-              <div className="p-[1.5px] rounded-2xl bg-gradient-to-b from-[#F5D97A] via-[#D4AF37] to-[#8C6708] shadow-[0_4px_18px_rgba(212,175,55,0.25)] shrink-0">
-                <span className="grid size-11 sm:size-12 place-items-center rounded-[14px] bg-[#021224] text-[#F5D97A]">
-                  <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M128,216S24,144,24,88A56,56,0,0,1,120,48.6a56,56,0,0,1,96,39.4C216,144,128,216,128,216Z" />
-                    <polyline points="84 92 112 120 172 60" />
+            {/* Stat 3: 99% Kepuasan Jamaah */}
+            <div className="group rounded-2xl lg:rounded-none border border-[#D5A12B]/30 lg:border-none bg-[#061A2F]/85 lg:bg-transparent backdrop-blur-md p-3.5 sm:p-5 lg:p-0 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-4.5 text-center sm:text-left lg:px-6 shadow-md lg:shadow-none transition-all duration-300 hover:border-[#D5A12B]/60 hover:bg-[#061A2F]/95 lg:hover:bg-transparent">
+              <div className="p-[1.5px] rounded-2xl bg-gradient-to-b from-[#F5D97A] via-[#D4AF37] to-[#8C6708] shadow-[0_4px_16px_rgba(212,175,55,0.30)] shrink-0">
+                <span className="grid size-10 sm:size-12 place-items-center rounded-[14px] bg-[#021224] text-[#F5D97A]">
+                  <svg className="size-5.5 sm:size-6.5" viewBox="0 0 256 256" fill="currentColor">
+                    <path d="M239.2,97.29a16,16,0,0,0-13.81-11L166,81.17,142.72,25.81h0a15.95,15.95,0,0,0-29.44,0L90,81.17,30.61,86.32a16,16,0,0,0-9.11,28.06L66.37,153.5,53.09,212.34a16,16,0,0,0,23.84,17.34l51-31,51.11,31a16,16,0,0,0,23.84-17.34l-13.2-58.84,44.86-39.11A16,16,0,0,0,239.2,97.29Zm-52.09,46.73a8,8,0,0,0-2.58,7.94l11.53,51.41-44.64-27.12a8,8,0,0,0-8.36,0l-44.55,27.07,11.53-51.36a8,8,0,0,0-2.58-7.95L71.29,104.85l51.86-4.5a8,8,0,0,0,6.72-4.88L128,47.88l18.13,47.59a8,8,0,0,0,6.72,4.88l51.86,4.5Z" />
                   </svg>
                 </span>
               </div>
-              <div className="leading-tight">
-                <span className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
+              <div className="leading-tight min-w-0">
+                <span className="font-[family-name:var(--font-cinzel)] text-xl xs:text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
                   99%
                 </span>
-                <span className="mt-0.5 text-xs sm:text-[13.5px] font-medium text-slate-200 block">
+                <span className="mt-0.5 text-[11px] xs:text-xs sm:text-[13.5px] font-medium text-slate-100 block">
                   Kepuasan Jamaah
                 </span>
               </div>
             </div>
 
-            {/* Stat 4: 10+ Destinasi Terbaik (Phosphor Compass Outline with Gold Rim Frame) */}
-            <div className="flex items-center justify-start lg:justify-center gap-3.5 sm:gap-4.5 lg:px-6 last:lg:pr-0">
-              <div className="p-[1.5px] rounded-2xl bg-gradient-to-b from-[#F5D97A] via-[#D4AF37] to-[#8C6708] shadow-[0_4px_18px_rgba(212,175,55,0.25)] shrink-0">
-                <span className="grid size-11 sm:size-12 place-items-center rounded-[14px] bg-[#021224] text-[#F5D97A]">
-                  <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="128" cy="128" r="96" />
-                    <polygon points="128 72 152 128 208 128 160 160 176 216 128 184 80 216 96 160 48 128 104 128 128 72" fill="none" />
+            {/* Stat 4: 10+ Destinasi Pilihan */}
+            <div className="group rounded-2xl lg:rounded-none border border-[#D5A12B]/30 lg:border-none bg-[#061A2F]/85 lg:bg-transparent backdrop-blur-md p-3.5 sm:p-5 lg:p-0 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-4.5 text-center sm:text-left lg:px-6 last:lg:pr-0 shadow-md lg:shadow-none transition-all duration-300 hover:border-[#D5A12B]/60 hover:bg-[#061A2F]/95 lg:hover:bg-transparent">
+              <div className="p-[1.5px] rounded-2xl bg-gradient-to-b from-[#F5D97A] via-[#D4AF37] to-[#8C6708] shadow-[0_4px_16px_rgba(212,175,55,0.30)] shrink-0">
+                <span className="grid size-10 sm:size-12 place-items-center rounded-[14px] bg-[#021224] text-[#F5D97A]">
+                  <svg className="size-5.5 sm:size-6.5" viewBox="0 0 256 256" fill="currentColor">
+                    <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216ZM173.66,82.34a8,8,0,0,0-9.19-1.87l-64,24a8,8,0,0,0-4.63,4.63l-24,64a8,8,0,0,0,10.14,10.14l64-24a8,8,0,0,0,4.63-4.63l24-64A8,8,0,0,0,173.66,82.34Zm-26.47,40.85-30.82,11.56,11.56-30.82,30.82-11.56Z" />
                   </svg>
                 </span>
               </div>
-              <div className="leading-tight">
-                <span className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
+              <div className="leading-tight min-w-0">
+                <span className="font-[family-name:var(--font-cinzel)] text-xl xs:text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
                   10+
                 </span>
-                <span className="mt-0.5 text-xs sm:text-[13.5px] font-medium text-slate-200 block">
-                  Destinasi Terbaik
+                <span className="mt-0.5 text-[11px] xs:text-xs sm:text-[13.5px] font-medium text-slate-100 block">
+                  Destinasi Pilihan
                 </span>
               </div>
             </div>
@@ -867,12 +837,12 @@ export function HeroPackages() {
             <div className="flex flex-col justify-center lg:col-span-3 py-1">
               <ul className="space-y-3.5 sm:space-y-4">
                 {[
-                  "Amanah dan berintegritas",
-                  "Pelayanan profesional dan ramah",
-                  "Hotel pilihan terbaik",
-                  "Jadwal pasti setiap bulan",
-                  "Pembimbing ibadah berpengalaman",
-                  "Harga transparan tanpa biaya tersembunyi",
+                  "Legalitas Resmi & Terpercaya",
+                  "Bimbingan Ibadah Sesuai Sunnah",
+                  "Akomodasi Hotel Dekat Masjid",
+                  "Penerbangan Maskapai Ternama",
+                  "Transparansi Biaya & Layanan All In",
+                  "Sahabat Baitullah (Alumni Berkelanjutan)",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-xs sm:text-[13.5px] font-semibold text-[#061A2F] leading-snug">
                     <span className="grid size-5 shrink-0 place-items-center rounded-full border border-[#D5A12B]/40 bg-white text-[#D5A12B] shadow-2xs mt-0.5">

@@ -261,12 +261,12 @@ function VideoSection() {
       <div className="jam-container">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="section-eyebrow">Cerita Jamaah</p>
+            <p className="section-eyebrow">Testimoni Jamaah</p>
             <h2 className="section-title max-w-[760px]">
-              Pengalaman Jamaah, Diceritakan Langsung oleh Mereka.
+              Pengalaman Ibadah Bersama Jam Wisata.
             </h2>
             <p className="mt-4 text-sm leading-6 text-[#68707A]">
-              Saksikan pengalaman jamaah selama menjalani perjalanan bersama Jam Wisata.
+              Kisah nyata jamaah yang telah mempercayakan perjalanan ibadah mereka bersama Jam Wisata.
             </p>
           </div>
           <div className="hidden gap-2 sm:flex">
@@ -394,11 +394,10 @@ function GallerySection() {
       <div className="jam-container text-center">
         <p className="section-eyebrow justify-center">Galeri Perjalanan</p>
         <h2 id="gallery-title" className="section-title">
-          Momen Perjalanan Jamaah.
+          Dokumentasi Perjalanan Suci.
         </h2>
         <p className="mt-4 text-sm leading-6 text-[#68707A]">
-          Dokumentasi nyata dari persiapan, keberangkatan, hingga perjalanan di
-          tanah suci.
+          Momen penuh makna jamaah Jam Wisata selama di Makkah, Madinah, dan destinasi pilihan.
         </p>
       </div>
       <div className="gallery-mask mt-10 space-y-3 sm:space-y-4">
@@ -557,14 +556,13 @@ export function ModernProofFooter() {
           <div className="absolute inset-0 opacity-40" style={{backgroundImage:"radial-gradient(circle at 20% 20%, rgba(192,192,192,.18), transparent 40%), radial-gradient(circle at 80% 70%, rgba(212,175,55,.16), transparent 45%)"}} aria-hidden="true" />
           <div className="relative max-w-[780px]">
             <p className="section-eyebrow !text-[#E8C967]">
-              Rencanakan Perjalanan
+              Saatnya Melangkah ke Baitullah
             </p>
             <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] leading-[1.04] font-extrabold tracking-[-.045em]">
-              Siap Merencanakan Perjalanan Bersama Jam Wisata?
+              Siap Menemani Perjalanan Ibadah Anda.
             </h2>
             <p className="mt-5 max-w-[660px] text-sm leading-7 text-white/72">
-              Konsultasikan kebutuhan Anda, pilih program yang sesuai, dan tim
-              kami akan membantu proses persiapannya.
+              Jam Wisata siap menjaga amanah dan menghadirkan perjalanan ibadah yang penuh makna, nyaman, dan berkah. Konsultasikan jadwal dan pilihan program Anda sekarang.
             </p>
             <a
               href={whatsappHref(
@@ -578,7 +576,7 @@ export function ModernProofFooter() {
               <MessageCircle className="size-4" /> Konsultasi via WhatsApp
             </a>
             <p className="mt-3 text-xs text-white/55">
-              Admin melayani sesuai jam operasional Jam Wisata.
+              Admin melayani konsultasi perjalanan ibadah Anda.
             </p>
           </div>
         </div>
@@ -598,8 +596,7 @@ export function ModernProofFooter() {
               Setiap Waktu Bernilai Ibadah
             </p>
             <p className="mt-3 max-w-[310px] text-sm leading-6 text-white/55">
-              Partner perjalanan umrah dan wisata halal dengan pendampingan
-              penuh perhatian.
+              Biro perjalanan umrah dan wisata halal amanah, profesional, dan berlandaskan sunnah.
             </p>
             <a href="https://www.instagram.com/jamwisata/" target="_blank" rel="noopener noreferrer" className="lift-soft mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/12 bg-white/4 px-4 text-sm font-bold text-white/72 transition-all duration-400 hover:border-[#C0C0C0]/55 hover:bg-white/8 hover:text-white hover:shadow-[0_8px_24px_-6px_rgba(192,192,192,.4)]">
               <InstagramMark className="size-4 text-[#E8C967]" /> @jamwisata
