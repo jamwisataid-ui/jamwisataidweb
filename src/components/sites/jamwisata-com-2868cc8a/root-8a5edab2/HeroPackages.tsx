@@ -268,8 +268,8 @@ export function HeroPackages() {
               key={title}
               className="group flex min-h-[164px] flex-col items-start gap-3 bg-[#FFFDF8] px-4 py-5 transition-colors duration-300 hover:bg-white sm:px-5 sm:py-6"
             >
-              <span className="grid size-11 place-items-center rounded-[12px] border border-[#D4AF37]/25 bg-[#FBF5E3] text-[#B8860B] shadow-[0_5px_14px_rgba(184,134,11,.10)] transition-all duration-400 group-hover:border-[#D4AF37]/55 group-hover:text-[#D4AF37] group-hover:shadow-[0_8px_20px_rgba(184,134,11,.20)]">
-                <Icon className="size-5" strokeWidth={1.6} aria-hidden="true" />
+              <span className="grid size-11 place-items-center rounded-[12px] bg-gradient-gold-rich text-[#0A1D3A] shadow-[0_8px_20px_rgba(184,134,11,.28),inset_0_1px_0_rgba(255,235,170,.55)] transition-all duration-400 group-hover:shadow-[0_10px_24px_rgba(184,134,11,.36),inset_0_1px_0_rgba(255,235,170,.65)] group-hover:brightness-[1.03]">
+                <Icon className="size-5" strokeWidth={1.7} aria-hidden="true" />
               </span>
               <h2 className="mt-2 text-[11px] leading-snug font-extrabold tracking-[.02em] text-[#0A1D3A] sm:text-[12px]">
                 {title}
