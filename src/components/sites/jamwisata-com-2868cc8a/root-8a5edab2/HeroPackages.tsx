@@ -226,7 +226,7 @@ export function HeroPackages() {
       {/* Hero Section */}
       <section
         id="beranda"
-        className="relative isolate min-h-[560px] sm:min-h-[600px] lg:min-h-[640px] overflow-hidden rounded-b-[20px] sm:rounded-b-[24px] bg-[#061A2F] text-white flex flex-col justify-between pt-[112px] sm:pt-[126px] lg:pt-[136px] xl:pt-[144px] pb-16 sm:pb-20 lg:pb-22 shadow-[0_20px_48px_rgba(6,26,47,0.3)]"
+        className="relative isolate min-h-[560px] sm:min-h-[600px] lg:min-h-[640px] overflow-hidden rounded-b-[36px] sm:rounded-b-[54px] lg:rounded-b-[68px] bg-[#061A2F] text-white flex flex-col justify-between pt-[112px] sm:pt-[126px] lg:pt-[136px] xl:pt-[144px] pb-18 sm:pb-22 lg:pb-24 shadow-[0_24px_54px_rgba(6,26,47,0.35)]"
       >
         {/* Background Image of Masjidil Haram with Ka'bah & Clock Tower */}
         <Image
@@ -347,8 +347,35 @@ export function HeroPackages() {
           </div>
         </div>
 
-        {/* Bottom Subtle Rich Gold Border Line */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[2.5px] bg-gradient-gold-rich shadow-[0_-2px_10px_rgba(212,175,55,0.6)]" />
+        {/* Smooth Curved Bottom Rich Gold Border Accent */}
+        <div className="pointer-events-none absolute inset-x-0 -bottom-[1px] z-20 flex justify-center overflow-hidden">
+          <svg
+            viewBox="0 0 1440 48"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-[22px] sm:h-[32px] lg:h-[40px] w-full block"
+            preserveAspectRatio="none"
+          >
+            <defs>
+              <linearGradient id="goldRichCurve" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#8C6708" />
+                <stop offset="18%" stopColor="#B8860B" />
+                <stop offset="38%" stopColor="#D4AF37" />
+                <stop offset="52%" stopColor="#F5D97A" />
+                <stop offset="72%" stopColor="#D4AF37" />
+                <stop offset="90%" stopColor="#B8860B" />
+                <stop offset="100%" stopColor="#8C6708" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M0,0 Q720,44 1440,0"
+              stroke="url(#goldRichCurve)"
+              strokeWidth="3.5"
+              fill="none"
+              style={{ filter: "drop-shadow(0px -2px 8px rgba(212,175,55,0.7))" }}
+            />
+          </svg>
+        </div>
       </section>
 
       {/* Overlapping Floating Search Package Card (Widescreen 1240px, 48-52px overlap on Hero Boundary) */}
