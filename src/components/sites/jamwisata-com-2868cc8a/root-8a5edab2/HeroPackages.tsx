@@ -226,7 +226,7 @@ export function HeroPackages() {
       {/* Hero Section */}
       <section
         id="beranda"
-        className="relative isolate min-h-[640px] sm:min-h-[720px] lg:min-h-[780px] overflow-hidden bg-[#061A2F] text-white flex flex-col justify-between pt-[100px] sm:pt-[120px] pb-28 sm:pb-36 lg:pb-40"
+        className="relative isolate min-h-[620px] sm:min-h-[680px] lg:min-h-[740px] overflow-hidden rounded-b-[24px] sm:rounded-b-[32px] lg:rounded-b-[36px] bg-[#061A2F] text-white flex flex-col justify-between pt-[100px] sm:pt-[120px] pb-16 sm:pb-20 lg:pb-24 shadow-[0_20px_48px_rgba(6,26,47,0.3)]"
       >
         {/* Background Image of Masjidil Haram with Ka'bah & Clock Tower */}
         <Image
@@ -336,16 +336,13 @@ export function HeroPackages() {
             </a>
           </div>
         </div>
+
+        {/* Bottom Rounded Rich Gold Border Accent following Hero's boundary */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[3px] sm:h-[3.5px] bg-gradient-gold-rich shadow-[0_-2px_12px_rgba(212,175,55,0.7)]" />
       </section>
 
-      {/* Overlapping Curved White Layer with Rich Gold Border Transition */}
-      <section
-        className="relative z-30 -mt-14 sm:-mt-20 lg:-mt-24 rounded-t-[36px] sm:rounded-t-[54px] lg:rounded-t-[72px] bg-[#FAF8F3] pt-8 sm:pt-10 lg:pt-12 pb-6 shadow-[0_-16px_48px_rgba(6,26,47,0.22)]"
-        aria-label="Pencarian Paket Umrah"
-      >
-        {/* Curved Top Border Line with Gradient Gold Rich */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[3.5px] sm:h-[4px] rounded-t-[36px] sm:rounded-t-[54px] lg:rounded-t-[72px] bg-gradient-gold-rich shadow-[0_0_16px_rgba(212,175,55,0.7)]" />
-
+      {/* Overlapping Floating Search Package Card (On Hero Boundary, 40-60px overlap) */}
+      <section className="relative z-30 -mt-10 sm:-mt-12 lg:-mt-14" aria-label="Pencarian Paket Umrah">
         <div className="jam-container">
           <div className="rounded-[18px] sm:rounded-[22px] border border-[#D5A12B]/25 bg-white p-4 sm:p-5 lg:p-6 shadow-[0_20px_50px_rgba(6,26,47,0.16)]">
             <form
