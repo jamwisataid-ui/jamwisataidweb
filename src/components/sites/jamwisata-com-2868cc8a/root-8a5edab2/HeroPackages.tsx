@@ -45,95 +45,107 @@ const monthLabel = (value: string) => {
 };
 
 function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
-  const context = [
-    `Assalamu’alaikum, saya tertarik dengan Paket ${travelPackage.name}`,
-    travelPackage.departureDate ? `keberangkatan ${travelPackage.departureDate}.` : ".",
-    `Mohon informasi lengkap mengenai durasi, hotel Makkah dan Madinah, fasilitas, harga, serta ketersediaan seat.`,
-  ].join(" ");
+  const whatsappText =
+    travelPackage.whatsappMessage ||
+    `Assalamu’alaikum Jam Wisata, saya ingin konsultasi mengenai ${travelPackage.name}${travelPackage.departureDate ? ` (Keberangkatan ${travelPackage.departureDate})` : ""}. Mohon info seat dan rincian lengkapnya.`;
 
   return (
-    <article className="lift-soft group flex h-full flex-col overflow-hidden rounded-[26px] bg-white shadow-[0_16px_44px_rgba(6,26,47,.08)] ring-1 ring-[#061A2F]/8 transition-all duration-500 hover:shadow-[0_28px_64px_rgba(6,26,47,.16),0_0_0_1px_rgba(213,161,43,.3)]">
-      <div className="relative aspect-[4/3] overflow-hidden bg-[#E8E4DB]">
-        <Image
-          src={travelPackage.image}
-          alt={`Paket ${travelPackage.name} Jam Wisata`}
-          fill
-          sizes="(min-width:1024px) 33vw,(min-width:640px) 50vw,100vw"
-          className="object-cover transition duration-700 ease-[cubic-bezier(.22,1,.36,1)] group-hover:scale-[1.05]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#061A2F]/70 via-transparent to-[#061A2F]/10 transition-opacity duration-500 group-hover:from-[#061A2F]/60" />
-        {travelPackage.badge ? (
-          <span className="absolute top-4 left-4 rounded-xl bg-gradient-gold-rich px-3 py-1.5 text-[10px] font-extrabold tracking-wider text-[#061A2F] uppercase shadow-md">
-            {travelPackage.badge}
-          </span>
-        ) : null}
-        {travelPackage.departureDate ? (
-          <span className="absolute right-4 bottom-4 left-4 flex items-center gap-2 rounded-xl border border-white/15 bg-[#061A2F]/85 px-3.5 py-2 text-[11px] font-bold text-white backdrop-blur-md">
-            <CalendarDays className="size-4 text-[#E8C967]" />
-            {travelPackage.departureDate}
-          </span>
-        ) : null}
-      </div>
+    <article className="lift-soft group relative isolate min-h-[500px] overflow-hidden rounded-[26px] border border-[#061A2F]/12 bg-[#021224] p-6 sm:p-7 flex flex-col justify-between shadow-[0_16px_44px_rgba(6,26,47,.12)] transition-all duration-500 hover:shadow-[0_28px_64px_rgba(6,26,47,.25),0_0_0_1px_rgba(213,161,43,.35)] hover:-translate-y-1">
+      {/* Full Background Image */}
+      <Image
+        src={travelPackage.image}
+        alt={`Paket ${travelPackage.name} Jam Wisata`}
+        fill
+        sizes="(min-width:1024px) 33vw,(min-width:640px) 50vw,100vw"
+        className="object-cover transition duration-700 ease-[cubic-bezier(.22,1,.36,1)] group-hover:scale-105"
+      />
 
-      <div className="flex flex-1 flex-col p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[10px] font-extrabold tracking-[.14em] text-[#D5A12B] uppercase">
-              {packageTypeLabels[travelPackage.packageType]}
-            </p>
-            <h3 className="mt-1.5 text-[22px] leading-[1.15] font-extrabold tracking-tight text-[#061A2F] transition-colors duration-300 group-hover:text-[#0A2745]">
-              {travelPackage.name}
-            </h3>
+      {/* Cinematic Gradient Overlay from Left & Bottom for Superior Readability */}
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,18,36,0.85)_0%,rgba(2,18,36,0.70)_35%,rgba(2,18,36,0.92)_72%,rgba(2,18,36,0.98)_100%)] sm:bg-[linear-gradient(135deg,rgba(2,18,36,0.96)_0%,rgba(2,18,36,0.88)_45%,rgba(2,18,36,0.58)_80%,rgba(2,18,36,0.30)_100%)] transition-opacity duration-500" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,transparent_30%,rgba(2,18,36,0.65)_100%)]" />
+
+      {/* Content Container (Top to Bottom structure) */}
+      <div className="relative z-10 flex flex-col h-full justify-between">
+        <div>
+          {/* 1. Durasi hari (Card transparan dgn border gradient gold rich) */}
+          <div className="flex items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#D5A12B] bg-[#021224]/80 px-3.5 py-1 text-xs font-extrabold text-[#F5D97A] backdrop-blur-md shadow-xs ring-1 ring-[#D5A12B]/30">
+              <Clock3 className="size-3.5 text-[#E8C967]" />
+              <span>{travelPackage.durationDays ? `${travelPackage.durationDays} Hari` : "9 Hari"}</span>
+            </span>
+
+            {travelPackage.badge ? (
+              <span className="rounded-full bg-gradient-gold-rich px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#061A2F] shadow-sm">
+                {travelPackage.badge}
+              </span>
+            ) : null}
           </div>
-          <span className="grid size-9 shrink-0 place-items-center rounded-full bg-gradient-gold-rich text-[#061A2F] shadow-xs">
-            <Plane className="size-4" aria-hidden="true" />
-          </span>
+
+          {/* 2. Judul dgn teks putih & harga */}
+          <h3 className="mt-4 font-[family-name:var(--font-cinzel)] text-xl sm:text-[22px] font-bold leading-snug text-white drop-shadow-sm transition-colors group-hover:text-[#F5D97A]">
+            {travelPackage.name}
+          </h3>
+
+          {travelPackage.priceFrom ? (
+            <div className="mt-2 flex items-baseline gap-1.5 font-[family-name:var(--font-montserrat)]">
+              <span className="text-xs text-slate-300 font-medium">Mulai dari</span>
+              <span className="text-gradient-gold-rich text-xl font-extrabold">
+                Rp {formatIDR(travelPackage.priceFrom)}
+              </span>
+              <span className="text-[11px] text-slate-400">/pax</span>
+            </div>
+          ) : null}
+
+          {/* 3. List poin-poin kebawah: Hotel Makkah, Hotel Madinah, Maskapai */}
+          <div className="mt-5 space-y-2.5 rounded-2xl border border-white/12 bg-[#061A2F]/70 p-4 backdrop-blur-md">
+            {/* Hotel Makkah */}
+            <div className="flex items-start gap-2.5 text-xs text-slate-200">
+              <Hotel className="size-4 shrink-0 text-[#E8C967] mt-0.5" />
+              <div className="leading-tight">
+                <span className="block text-[10px] uppercase font-bold tracking-wider text-[#D5A12B]">Hotel Makkah</span>
+                <span className="font-semibold text-white">{travelPackage.makkahHotel?.name ?? "Hotel Bintang 5 Makkah"}</span>
+              </div>
+            </div>
+
+            {/* Hotel Madinah */}
+            <div className="flex items-start gap-2.5 text-xs text-slate-200">
+              <Building2 className="size-4 shrink-0 text-[#E8C967] mt-0.5" />
+              <div className="leading-tight">
+                <span className="block text-[10px] uppercase font-bold tracking-wider text-[#D5A12B]">Hotel Madinah</span>
+                <span className="font-semibold text-white">{travelPackage.madinahHotel?.name ?? "Hotel Bintang 5 Madinah"}</span>
+              </div>
+            </div>
+
+            {/* Maskapai */}
+            <div className="flex items-start gap-2.5 text-xs text-slate-200">
+              <Plane className="size-4 shrink-0 text-[#E8C967] mt-0.5" />
+              <div className="leading-tight">
+                <span className="block text-[10px] uppercase font-bold tracking-wider text-[#D5A12B]">Maskapai Penerbangan</span>
+                <span className="font-semibold text-white">{travelPackage.airline ?? "Garuda Indonesia / Saudia"}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 4. Jadwal Keberangkatan */}
+          {travelPackage.departureDate ? (
+            <div className="mt-3.5 flex items-center gap-2 px-1 text-xs text-slate-300">
+              <CalendarDays className="size-3.5 text-[#E8C967] shrink-0" />
+              <span>Jadwal: <strong className="font-semibold text-white">{travelPackage.departureDate}</strong></span>
+            </div>
+          ) : null}
         </div>
 
-        <div className="mt-4 grid grid-cols-2 divide-x divide-[#061A2F]/8 border-y border-[#061A2F]/8 py-3 text-[11px] text-[#64748B]">
-          <div className="flex items-center gap-2.5 pr-2">
-            <Clock3 className="size-4 shrink-0 text-[#D5A12B]" />
-            <span>
-              <strong className="block text-[10px] font-extrabold text-[#061A2F]">Durasi</strong>
-              {travelPackage.durationDays ? `${travelPackage.durationDays} hari` : "9 - 12 Hari"}
-            </span>
-          </div>
-          <div className="flex items-center gap-2.5 pl-3">
-            <Plane className="size-4 shrink-0 text-[#D5A12B]" />
-            <span>
-              <strong className="block text-[10px] font-extrabold text-[#061A2F]">Maskapai</strong>
-              {travelPackage.airline ?? "Saudia / Garuda"}
-            </span>
-          </div>
-        </div>
-
-        <div className="mt-4 flex flex-1 flex-col justify-between pt-2">
-          <div>
-            <span className="text-[11px] font-semibold text-[#64748B]">Mulai dari</span>
-            <p className="text-2xl font-black tracking-tight text-[#061A2F]">
-              {travelPackage.priceFrom ? `Rp${formatIDR(travelPackage.priceFrom)}` : "Hubungi Kami"}
-              {travelPackage.priceFrom ? <span className="ml-1 text-xs font-semibold text-[#64748B]">/pax</span> : null}
-            </p>
-          </div>
-
-          <div className="mt-5 grid gap-2 sm:grid-cols-2">
-            <a
-              href={travelPackage.detailUrl ?? "https://jamwisata.com/transaksi/paket-umrah"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="lift-soft sheen-gold inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-gold-rich px-3.5 text-xs font-bold text-[#061A2F] shadow-sm transition"
-            >
-              Lihat Detail <ArrowRight className="size-3.5" />
-            </a>
-            <a
-              href={whatsappHref(context, `Paket — ${travelPackage.name}`)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#D5A12B]/40 bg-white hover:bg-slate-50 px-3 text-xs font-bold text-[#061A2F] transition"
-            >
-              <MessageCircle className="size-3.5 text-[#D5A12B]" /> Tanya via WA
-            </a>
-          </div>
+        {/* 5. 1 Tombol gradient gold rich konsultasi paket ini yg mengarah ke WA */}
+        <div className="mt-6 pt-2">
+          <a
+            href={whatsappHref(whatsappText, `Paket — ${travelPackage.name}`)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="lift-soft sheen-gold flex h-11 sm:h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-gold-rich px-4 text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#061A2F] shadow-[0_6px_22px_rgba(184,134,11,0.35)] transition duration-300 hover:scale-[1.02] active:scale-95"
+          >
+            <MessageCircle className="size-4" />
+            <span>Konsultasi Paket Ini</span>
+          </a>
         </div>
       </div>
     </article>
@@ -628,90 +640,8 @@ export function HeroPackages() {
         </div>
       </section>
 
-      {/* Tentang Jam Wisata Section */}
-      <section id="tentang-kami" className="scroll-mt-24 bg-white pt-10 sm:pt-12 pb-20 sm:pb-24 lg:pb-28">
-        <div className="jam-container grid items-center gap-12 lg:grid-cols-[.96fr_1.04fr] lg:gap-16">
-          <div className="grid grid-cols-[1.25fr_.75fr] gap-3">
-            <figure className="relative min-h-[440px] overflow-hidden rounded-[26px]">
-              <Image
-                src={`${assetRoot}/about.jpg`}
-                alt="Kebersamaan jamaah Jam Wisata"
-                fill
-                sizes="(min-width:1024px) 38vw,65vw"
-                className="object-cover"
-              />
-            </figure>
-            <div className="grid gap-3 pt-12">
-              <figure className="relative overflow-hidden rounded-[18px]">
-                <Image
-                  src={`${assetRoot}/umrah-2.png`}
-                  alt="Kegiatan perjalanan jamaah"
-                  fill
-                  sizes="20vw"
-                  className="object-cover"
-                />
-              </figure>
-              <figure className="relative overflow-hidden rounded-[18px]">
-                <Image
-                  src={`${assetRoot}/umrah-3.png`}
-                  alt="Dokumentasi jamaah di tanah suci"
-                  fill
-                  sizes="20vw"
-                  className="object-cover"
-                />
-              </figure>
-            </div>
-          </div>
-
-          <div>
-            <span className="inline-flex items-center gap-1.5 rounded-md bg-white px-2.5 py-1 text-xs font-extrabold uppercase tracking-wider text-[#D5A12B] border border-[#D5A12B]/20">
-              <Building2 className="size-3.5" /> Tentang Jam Wisata
-            </span>
-            <h2 className="mt-3 font-playfair text-3xl sm:text-4xl font-bold leading-tight text-[#061A2F]">
-              Perjalanan yang Baik Dimulai dari Persiapan yang Dipercaya.
-            </h2>
-            <p className="mt-4 text-sm leading-relaxed text-[#59616D]">
-              Jam Wisata membantu mempersiapkan perjalanan umrah dan wisata halal dengan pelayanan yang jelas, nyaman, dan penuh perhatian. Mulai dari konsultasi hingga perjalanan selesai, tim kami siap mendampingi kebutuhan jamaah dan keluarga.
-            </p>
-
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="flex items-start gap-3 rounded-xl border border-[#061A2F]/8 bg-white p-3.5 shadow-2xs">
-                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-white text-[#D5A12B] border border-[#D5A12B]/30">
-                  <ShieldCheck className="size-4" />
-                </span>
-                <div>
-                  <h3 className="text-xs font-bold text-[#061A2F]">Program Terencana</h3>
-                  <p className="mt-0.5 text-[11px] text-[#64748B]">Jadwal dan rute disampaikan dengan transparan.</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 rounded-xl border border-[#061A2F]/8 bg-white p-3.5 shadow-2xs">
-                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-white text-[#D5A12B] border border-[#D5A12B]/30">
-                  <Hotel className="size-4" />
-                </span>
-                <div>
-                  <h3 className="text-xs font-bold text-[#061A2F]">Hotel Strategis</h3>
-                  <p className="mt-0.5 text-[11px] text-[#64748B]">Akomodasi dekat dengan Masjidil Haram &amp; Nabawi.</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8">
-              <a
-                href="https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20konsultasi%20paket%20umrah%20Jam%20Wisata."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-11 items-center gap-2.5 rounded-xl bg-[#061A2F] hover:bg-[#0A2745] px-6 text-xs font-bold text-white shadow-md transition hover:-translate-y-0.5"
-              >
-                Konsultasi Jadwal <ArrowRight className="size-4 text-[#E8B84A]" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Paket Umrah Section */}
-      <section id="paket-umrah" className="scroll-mt-24 bg-white py-20 sm:py-24 lg:py-28">
+      {/* Paket Umrah Section (Directly after Keunggulan) */}
+      <section id="paket-umrah" className="scroll-mt-24 bg-white py-16 sm:py-20 lg:py-24">
         <div className="jam-container">
           <div className="mx-auto max-w-[760px] text-center">
             <span className="inline-flex items-center gap-1.5 rounded-md bg-white px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-[#D5A12B] border border-[#D5A12B]/20">
@@ -794,6 +724,88 @@ export function HeroPackages() {
             >
               Lihat Semua Paket di Portal <ArrowRight className="size-3.5 text-[#D5A12B]" />
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Tentang Jam Wisata Section */}
+      <section id="tentang-kami" className="scroll-mt-24 bg-white py-16 sm:py-20 lg:py-24 border-t border-[#061A2F]/6">
+        <div className="jam-container grid items-center gap-12 lg:grid-cols-[.96fr_1.04fr] lg:gap-16">
+          <div className="grid grid-cols-[1.25fr_.75fr] gap-3">
+            <figure className="relative min-h-[440px] overflow-hidden rounded-[26px]">
+              <Image
+                src={`${assetRoot}/about.jpg`}
+                alt="Kebersamaan jamaah Jam Wisata"
+                fill
+                sizes="(min-width:1024px) 38vw,65vw"
+                className="object-cover"
+              />
+            </figure>
+            <div className="grid gap-3 pt-12">
+              <figure className="relative overflow-hidden rounded-[18px]">
+                <Image
+                  src={`${assetRoot}/umrah-2.png`}
+                  alt="Kegiatan perjalanan jamaah"
+                  fill
+                  sizes="20vw"
+                  className="object-cover"
+                />
+              </figure>
+              <figure className="relative overflow-hidden rounded-[18px]">
+                <Image
+                  src={`${assetRoot}/umrah-3.png`}
+                  alt="Dokumentasi jamaah di tanah suci"
+                  fill
+                  sizes="20vw"
+                  className="object-cover"
+                />
+              </figure>
+            </div>
+          </div>
+
+          <div>
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-white px-2.5 py-1 text-xs font-extrabold uppercase tracking-wider text-[#D5A12B] border border-[#D5A12B]/20">
+              <Building2 className="size-3.5" /> Tentang Jam Wisata
+            </span>
+            <h2 className="mt-3 font-playfair text-3xl sm:text-4xl font-bold leading-tight text-[#061A2F]">
+              Perjalanan yang Baik Dimulai dari Persiapan yang Dipercaya.
+            </h2>
+            <p className="mt-4 text-sm leading-relaxed text-[#59616D]">
+              Jam Wisata membantu mempersiapkan perjalanan umrah dan wisata halal dengan pelayanan yang jelas, nyaman, dan penuh perhatian. Mulai dari konsultasi hingga perjalanan selesai, tim kami siap mendampingi kebutuhan jamaah dan keluarga.
+            </p>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="flex items-start gap-3 rounded-xl border border-[#061A2F]/8 bg-white p-3.5 shadow-2xs">
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-white text-[#D5A12B] border border-[#D5A12B]/30">
+                  <ShieldCheck className="size-4" />
+                </span>
+                <div>
+                  <h3 className="text-xs font-bold text-[#061A2F]">Program Terencana</h3>
+                  <p className="mt-0.5 text-[11px] text-[#64748B]">Jadwal dan rute disampaikan dengan transparan.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 rounded-xl border border-[#061A2F]/8 bg-white p-3.5 shadow-2xs">
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-white text-[#D5A12B] border border-[#D5A12B]/30">
+                  <Hotel className="size-4" />
+                </span>
+                <div>
+                  <h3 className="text-xs font-bold text-[#061A2F]">Hotel Strategis</h3>
+                  <p className="mt-0.5 text-[11px] text-[#64748B]">Akomodasi dekat dengan Masjidil Haram &amp; Nabawi.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8">
+              <a
+                href="https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20konsultasi%20paket%20umrah%20Jam%20Wisata."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-11 items-center gap-2.5 rounded-xl bg-[#061A2F] hover:bg-[#0A2745] px-6 text-xs font-bold text-white shadow-md transition hover:-translate-y-0.5"
+              >
+                Konsultasi Jadwal <ArrowRight className="size-4 text-[#E8B84A]" />
+              </a>
+            </div>
           </div>
         </div>
       </section>
