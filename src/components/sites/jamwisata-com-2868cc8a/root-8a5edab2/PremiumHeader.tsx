@@ -149,9 +149,9 @@ export function PremiumHeader() {
                 key={id}
                 href={`#${id}`}
                 aria-current={active === id ? "location" : undefined}
-                className={`relative px-3.5 py-2 text-[13px] font-semibold tracking-wide transition-colors after:absolute after:inset-x-3.5 after:bottom-0 after:h-[2px] after:origin-left after:rounded-full after:bg-[#E8B84A] after:transition-transform ${
+                className={`relative px-3.5 py-2 text-[13px] font-semibold tracking-wide transition-colors after:absolute after:inset-x-3.5 after:bottom-0 after:h-[2.5px] after:origin-left after:rounded-full after:bg-gradient-gold-rich after:transition-transform ${
                   active === id
-                    ? "text-[#E8B84A] font-bold after:scale-x-100"
+                    ? "text-[#E8C967] font-bold after:scale-x-100"
                     : "text-white/85 after:scale-x-0 hover:text-white hover:after:scale-x-100"
                 }`}
               >
@@ -166,7 +166,7 @@ export function PremiumHeader() {
               href={whatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#D5A12B] via-[#E8B84A] to-[#D5A12B] px-5 py-2.5 text-xs font-extrabold uppercase tracking-wider text-[#061A2F] shadow-[0_8px_20px_rgba(213,161,43,0.32)] transition duration-300 hover:scale-[1.03] hover:shadow-[0_10px_26px_rgba(213,161,43,0.45)] active:scale-95"
+              className="lift-soft sheen-gold hidden sm:inline-flex items-center gap-2 rounded-xl bg-gradient-gold-rich px-5 py-2.5 text-xs font-extrabold uppercase tracking-wider text-[#061A2F] shadow-[0_8px_22px_rgba(184,134,11,.35)] transition duration-300 hover:scale-[1.03] active:scale-95"
             >
               <MessageCircle className="size-4 shrink-0" aria-hidden="true" />
               <span>Konsultasi Gratis</span>
@@ -203,7 +203,7 @@ export function PremiumHeader() {
             className="ml-auto flex h-full w-[min(85vw,340px)] flex-col border-l border-[#D5A12B]/20 bg-[#061A2F] p-6 text-white shadow-2xl"
           >
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <span className="text-xs font-extrabold tracking-[.15em] text-[#E8B84A] uppercase">Menu Navigasi</span>
+              <span className="text-xs font-extrabold tracking-[.15em] text-[#E8C967] uppercase">Menu Navigasi</span>
               <button
                 type="button"
                 onClick={closeMenu}
@@ -222,7 +222,7 @@ export function PremiumHeader() {
                   onClick={closeMenu}
                   className={`flex items-center justify-between rounded-xl px-3 py-3 text-sm font-semibold transition ${
                     active === id
-                      ? "bg-[#D5A12B]/15 text-[#E8B84A] font-bold"
+                      ? "bg-[#D5A12B]/20 text-[#E8C967] font-bold"
                       : "text-white/80 hover:bg-white/5 hover:text-white"
                   }`}
                 >
@@ -239,7 +239,7 @@ export function PremiumHeader() {
                 href={whatsapp}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-3.5 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D5A12B] to-[#E8B84A] py-2.5 font-bold text-[#061A2F] shadow-md"
+                className="lift-soft sheen-gold mt-3.5 flex items-center justify-center gap-2 rounded-xl bg-gradient-gold-rich py-2.5 font-bold text-[#061A2F] shadow-md"
               >
                 <MessageCircle className="size-4" /> Chat via WhatsApp
               </a>

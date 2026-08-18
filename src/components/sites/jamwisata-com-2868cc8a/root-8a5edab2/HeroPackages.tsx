@@ -64,13 +64,13 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#061A2F]/70 via-transparent to-[#061A2F]/10 transition-opacity duration-500 group-hover:from-[#061A2F]/60" />
         {travelPackage.badge ? (
-          <span className="absolute top-4 left-4 rounded-xl bg-gradient-to-r from-[#D5A12B] to-[#E8B84A] px-3 py-1.5 text-[10px] font-extrabold tracking-wider text-[#061A2F] uppercase shadow-md">
+          <span className="absolute top-4 left-4 rounded-xl bg-gradient-gold-rich px-3 py-1.5 text-[10px] font-extrabold tracking-wider text-[#061A2F] uppercase shadow-md">
             {travelPackage.badge}
           </span>
         ) : null}
         {travelPackage.departureDate ? (
           <span className="absolute right-4 bottom-4 left-4 flex items-center gap-2 rounded-xl border border-white/15 bg-[#061A2F]/85 px-3.5 py-2 text-[11px] font-bold text-white backdrop-blur-md">
-            <CalendarDays className="size-4 text-[#E8B84A]" />
+            <CalendarDays className="size-4 text-[#E8C967]" />
             {travelPackage.departureDate}
           </span>
         ) : null}
@@ -86,7 +86,7 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
               {travelPackage.name}
             </h3>
           </div>
-          <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#FAF8F3] border border-[#D5A12B]/30 text-[#D5A12B] shadow-xs">
+          <span className="grid size-9 shrink-0 place-items-center rounded-full bg-gradient-gold-rich text-[#061A2F] shadow-xs">
             <Plane className="size-4" aria-hidden="true" />
           </span>
         </div>
@@ -122,7 +122,7 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
               href={travelPackage.detailUrl ?? "https://jamwisata.com/transaksi/paket-umrah"}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D5A12B] to-[#E8B84A] px-3.5 text-xs font-bold text-[#061A2F] shadow-sm transition hover:brightness-105"
+              className="lift-soft sheen-gold inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-gold-rich px-3.5 text-xs font-bold text-[#061A2F] shadow-sm transition"
             >
               Lihat Detail <ArrowRight className="size-3.5" />
             </a>
@@ -256,8 +256,8 @@ export function HeroPackages() {
                 height={86}
                 className="h-auto w-[180px] sm:w-[210px] opacity-90 drop-shadow-sm"
               />
-              <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-[0.2em] text-[#E8B84A]">
-                <span className="h-px w-6 bg-[#E8B84A]" />
+              <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-[0.2em] text-[#E8C967]">
+                <span className="h-px w-6 bg-gradient-gold-rich" />
                 <span>Biro Perjalanan Umrah &amp; Wisata Halal</span>
               </div>
             </div>
@@ -265,7 +265,7 @@ export function HeroPackages() {
             {/* Headline with Elegant Serif Typography */}
             <h1 className="font-playfair text-[34px] sm:text-[48px] lg:text-[54px] xl:text-[60px] font-bold leading-[1.12] tracking-tight text-white drop-shadow-md">
               Perjalanan Ibadah,<br />
-              <span className="text-[#E8B84A] font-normal italic">Pengalaman Tak Terlupakan</span>
+              <span className="text-gradient-gold-rich font-normal italic">Pengalaman Tak Terlupakan</span>
             </h1>
 
             {/* Subheadline */}
@@ -278,7 +278,7 @@ export function HeroPackages() {
               {/* Primary Gold CTA */}
               <a
                 href="#paket-umrah"
-                className="inline-flex h-12 sm:h-13 items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-[#D5A12B] via-[#E8B84A] to-[#D5A12B] px-6 sm:px-7 text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#061A2F] shadow-[0_10px_28px_rgba(213,161,43,0.38)] transition duration-300 hover:scale-[1.03] hover:shadow-[0_14px_34px_rgba(213,161,43,0.5)] active:scale-95"
+                className="lift-soft sheen-gold inline-flex h-12 sm:h-13 items-center justify-center gap-2.5 rounded-xl bg-gradient-gold-rich px-6 sm:px-7 text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#061A2F] shadow-[0_12px_32px_rgba(184,134,11,.38)] transition duration-300 hover:scale-[1.03] active:scale-95"
               >
                 Lihat Paket Umroh <ArrowRight className="size-4" />
               </a>
@@ -288,9 +288,9 @@ export function HeroPackages() {
                 href="https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20berkonsultasi%20mengenai%20paket%20perjalanan%20Jam%20Wisata."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-12 sm:h-13 items-center justify-center gap-2.5 rounded-xl border border-[#D5A12B]/70 bg-[#061A2F]/50 px-5 sm:px-6 text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#FAF8F3] backdrop-blur-sm transition duration-300 hover:border-[#E8B84A] hover:bg-[#061A2F]/80 hover:text-[#E8B84A] active:scale-95"
+                className="lift-soft inline-flex h-12 sm:h-13 items-center justify-center gap-2.5 rounded-xl border border-[#D5A12B]/70 bg-[#061A2F]/50 px-5 sm:px-6 text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#FAF8F3] backdrop-blur-sm transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/80 hover:text-[#E8C967] active:scale-95"
               >
-                <MessageCircle className="size-4 text-[#E8B84A]" />
+                <MessageCircle className="size-4 text-[#E8C967]" />
                 <span>Konsultasi Gratis</span>
               </a>
             </div>
@@ -298,17 +298,17 @@ export function HeroPackages() {
             {/* Trust Indicators Horizontal (Subtle under CTA) */}
             <div className="mt-6 sm:mt-7 flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-2 text-[11px] sm:text-xs font-semibold text-slate-200">
               <div className="flex items-center gap-1.5">
-                <ShieldCheck className="size-4 text-[#E8B84A]" />
+                <ShieldCheck className="size-4 text-[#E8C967]" />
                 <span>Legal &amp; Terpercaya</span>
               </div>
               <span className="hidden sm:inline text-white/30">•</span>
               <div className="flex items-center gap-1.5">
-                <Sparkles className="size-4 text-[#E8B84A]" />
+                <Sparkles className="size-4 text-[#E8C967]" />
                 <span>Amanah &amp; Profesional</span>
               </div>
               <span className="hidden sm:inline text-white/30">•</span>
               <div className="flex items-center gap-1.5">
-                <span className="text-[#E8B84A] text-sm leading-none">✦</span>
+                <span className="text-[#E8C967] text-sm leading-none">✦</span>
                 <span>Anggota ASTA</span>
               </div>
             </div>
@@ -322,14 +322,14 @@ export function HeroPackages() {
               href="https://www.youtube.com/@jamwisatabandung"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-3.5 rounded-2xl border border-[#D5A12B]/40 bg-[#061A2F]/80 px-4 py-3 text-white backdrop-blur-md shadow-[0_12px_32px_rgba(0,0,0,0.45)] transition duration-300 hover:border-[#E8B84A] hover:bg-[#061A2F]/95 hover:scale-[1.02]"
+              className="lift-soft group inline-flex items-center gap-3.5 rounded-2xl border border-[#D5A12B]/40 bg-[#061A2F]/80 px-4 py-3 text-white backdrop-blur-md shadow-[0_12px_32px_rgba(0,0,0,0.45)] transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/95 hover:scale-[1.02]"
             >
-              <span className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-[#D5A12B] to-[#E8B84A] text-[#061A2F] shadow-md transition-transform group-hover:scale-110">
+              <span className="grid size-10 place-items-center rounded-xl bg-gradient-gold-rich text-[#061A2F] shadow-md transition-transform group-hover:scale-110">
                 <Play className="size-4 fill-current ml-0.5" />
               </span>
               <div className="text-left pr-1">
                 <span className="block text-[11px] font-medium text-slate-300">Tonton Video Profil</span>
-                <strong className="block text-xs font-bold text-[#E8B84A]">Jam Wisata</strong>
+                <strong className="block text-xs font-bold text-[#E8C967]">Jam Wisata</strong>
               </div>
             </a>
           </div>
@@ -586,7 +586,7 @@ export function HeroPackages() {
                   href={whatsappHref(emptyMessage, "Hasil Pencarian Kosong")}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D5A12B] to-[#E8B84A] px-4 text-xs font-extrabold text-[#061A2F] shadow-sm"
+                  className="lift-soft sheen-gold inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-gradient-gold-rich px-4 text-xs font-extrabold text-[#061A2F] shadow-sm"
                 >
                   <MessageCircle className="size-3.5" /> Tanyakan Jadwal via WhatsApp
                 </a>
