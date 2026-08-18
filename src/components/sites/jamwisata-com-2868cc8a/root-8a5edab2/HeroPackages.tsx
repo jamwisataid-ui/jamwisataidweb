@@ -11,14 +11,13 @@ import {
   CircleGauge,
   ClipboardCheck,
   Clock3,
-  Compass,
-  Headphones,
   Hotel,
   MapPin,
   MessageCircle,
   Plane,
   RotateCcw,
   Search,
+  ShieldCheck,
   UsersRound,
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
@@ -32,10 +31,12 @@ type Filters = { month: string; type: string; airline: string; airport: string }
 const emptyFilters: Filters = { month: "", type: "", airline: "", airport: "" };
 
 const trustItems = [
-  [Compass, "Perjalanan Terarah", "Program dan informasi dipersiapkan dengan jelas."],
-  [BookOpenCheck, "Manasik Jamaah", "Persiapan ibadah sebelum keberangkatan."],
-  [UsersRound, "Pendampingan", "Didampingi tour leader dan tim perjalanan."],
-  [Headphones, "Tim Indonesia & Saudi", "Koordinasi dari tanah air hingga tanah suci."],
+  [ShieldCheck, "LEGAL & TERPERCAYA", "Amanah, profesional, dan berintegritas."],
+  [UsersRound, "PELAYANAN PROFESIONAL", "Didampingi tim berpengalaman dan bersertifikat."],
+  [Hotel, "HOTEL BERKUALITAS", "Pilihan hotel terbaik di lokasi strategis."],
+  [Plane, "MASKAPAI TERBAIK", "Perjalanan nyaman bersama maskapai terpercaya."],
+  [BookOpenCheck, "BIMBINGAN IBADAH", "Pendampingan ibadah selama perjalanan."],
+  [CalendarDays, "KEBERANGKATAN TERJADWAL", "Jadwal keberangkatan rutin dan terencana."],
 ] as const;
 
 const advantages = [
@@ -260,20 +261,22 @@ export function HeroPackages() {
         </div>
       </section>
 
-      <section className="bg-white" aria-label="Keunggulan utama Jam Wisata">
-        <div className="jam-container grid grid-cols-2 border-x border-[#0A1D3A]/7 lg:grid-cols-4">
-          {trustItems.map(([Icon, title, text], index) => (
+      <section className="bg-[#FFFDF8]" aria-label="Keunggulan utama Jam Wisata">
+        <div className="jam-container grid grid-cols-2 gap-px border-x border-b border-[#0A1D3A]/8 bg-[#0A1D3A]/8 sm:grid-cols-3 lg:grid-cols-6">
+          {trustItems.map(([Icon, title, text]) => (
             <div
               key={title}
-              className={`lift-soft group flex min-h-[118px] items-start gap-3 rounded-[10px] px-4 py-6 transition-all duration-300 sm:px-6 ${index % 2 ? "border-l border-[#0A1D3A]/8" : ""} ${index > 1 ? "border-t border-[#0A1D3A]/8 lg:border-t-0 lg:border-l" : ""}`}
+              className="group flex min-h-[164px] flex-col items-start gap-3 bg-[#FFFDF8] px-4 py-5 transition-colors duration-300 hover:bg-white sm:px-5 sm:py-6"
             >
-              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-gradient-gold-rich text-[#0A1D3A] shadow-[0_6px_14px_rgba(184,134,11,.28)] transition-transform duration-500 group-hover:rotate-[8deg] group-hover:scale-105">
-                <Icon className="size-4.5" strokeWidth={1.7} />
+              <span className="grid size-11 place-items-center rounded-[12px] border border-[#D4AF37]/25 bg-[#FBF5E3] text-[#B8860B] shadow-[0_5px_14px_rgba(184,134,11,.10)] transition-all duration-400 group-hover:border-[#D4AF37]/55 group-hover:text-[#D4AF37] group-hover:shadow-[0_8px_20px_rgba(184,134,11,.20)]">
+                <Icon className="size-5" strokeWidth={1.6} aria-hidden="true" />
               </span>
-              <div>
-                <h2 className="text-[12px] font-extrabold text-[#0A1D3A] sm:text-sm">{title}</h2>
-                <p className="mt-1 text-[10px] leading-4 text-[#68707A] sm:text-xs">{text}</p>
-              </div>
+              <h2 className="mt-2 text-[11px] leading-snug font-extrabold tracking-[.02em] text-[#0A1D3A] sm:text-[12px]">
+                {title}
+              </h2>
+              <p className="mt-1 text-[10px] leading-4 text-[#68707A] sm:text-[11px] sm:leading-[1.45]">
+                {text}
+              </p>
             </div>
           ))}
         </div>

@@ -5,4 +5,4 @@
 - Prioritize smooth transitions, hover effects, and animations across the site; refine and polish them for a more premium feel. Confidence: 0.65
 - For WhatsApp CTA buttons, apply the gold sheen (`sheen-gold`) look rather than green/silver — user rejected the plain green result and asked to switch the WhatsApp CTAs back to gold. Confidence: 0.60
 - Keep header WhatsApp CTAs (desktop CTA, mobile drawer, mobile icon) on gold gradient; use plain solid WhatsApp green (#25D366, white text, hover #1ebe5d) for non-header WhatsApp CTAs (hero, Haji tab, empty state, final contact section) so they read as third-party actions rather than brand CTAs, and drop the gold sheen on green buttons. Confidence: 0.75
-- For icons in this project, source from phosphoricons.com, hugeicons.com, or iconify.design. Confidence: 0.70
+- For icons in this project, use Phosphor Icons, Hugeicons, or Iconify Design — not lucide-react (which the project currently uses). Confidence: 0.75
