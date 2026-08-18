@@ -15,7 +15,6 @@ import {
   RotateCcw,
   Search,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
@@ -305,12 +304,7 @@ export function HeroPackages() {
                 <ShieldCheck className="size-4 text-[#E8C967]" />
                 <span>Legal &amp; Terpercaya</span>
               </div>
-              <span className="hidden sm:inline text-white/30">•</span>
-              <div className="flex items-center gap-1.5">
-                <Sparkles className="size-4 text-[#E8C967]" />
-                <span>Amanah &amp; Profesional</span>
-              </div>
-              <span className="hidden sm:inline text-white/30">•</span>
+              <span className="text-white/30">•</span>
               <div className="flex items-center gap-1.5">
                 <span className="text-[#E8C967] text-sm leading-none">✦</span>
                 <span>Anggota ASTA</span>
