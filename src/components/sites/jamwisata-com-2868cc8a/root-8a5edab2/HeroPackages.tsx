@@ -500,8 +500,136 @@ export function HeroPackages() {
         </div>
       </section>
 
+      {/* Keunggulan Jam Wisata (Horizontal 6-Item Strip on Desktop) */}
+      <section className="bg-white pt-10 sm:pt-12 lg:pt-14 pb-4 sm:pb-6" aria-label="Keunggulan Jam Wisata">
+        <div className="w-full max-w-[1360px] mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-5 sm:gap-6 xl:gap-0 xl:divide-x xl:divide-[#061A2F]/10 rounded-2xl border border-[#061A2F]/8 bg-white p-5 sm:p-6 xl:p-4 shadow-xs">
+            {/* Item 1: Legal & Terpercaya */}
+            <div className="flex items-center gap-3 xl:px-3.5 first:xl:pl-2">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white border border-[#D5A12B]/35 text-[#D5A12B] shadow-2xs">
+                <svg className="size-5.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M208,40H48A16,16,0,0,0,32,56v58.78c0,89.61,75.82,119.34,91.25,124.39a15.54,15.54,0,0,0,9.5,0c15.43-5.05,91.25-34.78,91.25-124.39V56A16,16,0,0,0,208,40Z" />
+                  <polyline points="88 136 112 160 168 104" />
+                </svg>
+              </span>
+              <div className="min-w-0">
+                <h3 className="text-[13px] font-bold text-[#061A2F] leading-snug">
+                  Legal &amp; Terpercaya
+                </h3>
+                <p className="mt-0.5 text-[11px] text-[#59616D] leading-tight">
+                  Amanah, profesional, dan berizin resmi
+                </p>
+              </div>
+            </div>
+
+            {/* Item 2: Pelayanan Profesional */}
+            <div className="flex items-center gap-3 xl:px-3.5">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white border border-[#D5A12B]/35 text-[#D5A12B] shadow-2xs">
+                <svg className="size-5.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M208,128v40a24,24,0,0,1-24,24H168" />
+                  <path d="M48,128v40a24,24,0,0,0,24,24H88" />
+                  <path d="M48,128A80,80,0,0,1,208,128" />
+                  <rect x="32" y="128" width="32" height="56" rx="8" />
+                  <rect x="192" y="128" width="32" height="56" rx="8" />
+                  <path d="M128,216h24a16,16,0,0,0,16-16v-8" />
+                </svg>
+              </span>
+              <div className="min-w-0">
+                <h3 className="text-[13px] font-bold text-[#061A2F] leading-snug">
+                  Pelayanan Profesional
+                </h3>
+                <p className="mt-0.5 text-[11px] text-[#59616D] leading-tight">
+                  Tim berpengalaman dan responsif
+                </p>
+              </div>
+            </div>
+
+            {/* Item 3: Hotel Berkualitas */}
+            <div className="flex items-center gap-3 xl:px-3.5">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white border border-[#D5A12B]/35 text-[#D5A12B] shadow-2xs">
+                <svg className="size-5.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="32" y="48" width="128" height="176" rx="8" />
+                  <path d="M160,88h56a8,8,0,0,1,8,8V224H160" />
+                  <line x1="72" y1="88" x2="88" y2="88" />
+                  <line x1="104" y1="88" x2="120" y2="88" />
+                  <line x1="72" y1="128" x2="88" y2="128" />
+                  <line x1="104" y1="128" x2="120" y2="128" />
+                  <line x1="72" y1="168" x2="88" y2="168" />
+                  <line x1="104" y1="168" x2="120" y2="168" />
+                  <path d="M80,224v-24a16,16,0,0,1,32,0v24" />
+                </svg>
+              </span>
+              <div className="min-w-0">
+                <h3 className="text-[13px] font-bold text-[#061A2F] leading-snug">
+                  Hotel Berkualitas
+                </h3>
+                <p className="mt-0.5 text-[11px] text-[#59616D] leading-tight">
+                  Pilihan hotel nyaman di lokasi strategis
+                </p>
+              </div>
+            </div>
+
+            {/* Item 4: Maskapai Terbaik */}
+            <div className="flex items-center gap-3 xl:px-3.5">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white border border-[#D5A12B]/35 text-[#D5A12B] shadow-2xs">
+                <svg className="size-5.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M236.4,79.6,183.1,133,96.6,112.5l-33.9,34,51.8,25.9L87.2,199.7,59.3,200,40,219.3l42.4,8.5,8.5,42.4,19.3-19.3.3-27.9,27.3-27.3,25.9,51.8,34-33.9L147.2,127.1l53.4-53.3a24,24,0,0,0-33.9-33.9l-6.7,6.7" />
+                </svg>
+              </span>
+              <div className="min-w-0">
+                <h3 className="text-[13px] font-bold text-[#061A2F] leading-snug">
+                  Maskapai Terbaik
+                </h3>
+                <p className="mt-0.5 text-[11px] text-[#59616D] leading-tight">
+                  Perjalanan dengan maskapai premium
+                </p>
+              </div>
+            </div>
+
+            {/* Item 5: Bimbingan Ibadah */}
+            <div className="flex items-center gap-3 xl:px-3.5">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white border border-[#D5A12B]/35 text-[#D5A12B] shadow-2xs">
+                <svg className="size-5.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M128,72c-24-24-48-24-88-24A16,16,0,0,0,24,64V192a16,16,0,0,0,16,16c40,0,64,0,88,24,24-24,48-24,88-24a16,16,0,0,0,16-16V64a16,16,0,0,0-16-16C176,48,152,48,128,72Z" />
+                  <line x1="128" y1="72" x2="128" y2="232" />
+                </svg>
+              </span>
+              <div className="min-w-0">
+                <h3 className="text-[13px] font-bold text-[#061A2F] leading-snug">
+                  Bimbingan Ibadah
+                </h3>
+                <p className="mt-0.5 text-[11px] text-[#59616D] leading-tight">
+                  Pendampingan selama perjalanan
+                </p>
+              </div>
+            </div>
+
+            {/* Item 6: Keberangkatan Terjadwal */}
+            <div className="flex items-center gap-3 xl:px-3.5 last:xl:pr-2">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white border border-[#D5A12B]/35 text-[#D5A12B] shadow-2xs">
+                <svg className="size-5.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="40" y="40" width="176" height="176" rx="16" />
+                  <line x1="176" y1="24" x2="176" y2="56" />
+                  <line x1="80" y1="24" x2="80" y2="56" />
+                  <line x1="40" y1="88" x2="216" y2="88" />
+                  <polyline points="92 148 116 172 164 124" />
+                </svg>
+              </span>
+              <div className="min-w-0">
+                <h3 className="text-[13px] font-bold text-[#061A2F] leading-snug">
+                  Keberangkatan Terjadwal
+                </h3>
+                <p className="mt-0.5 text-[11px] text-[#59616D] leading-tight">
+                  Jadwal rutin dan jelas setiap bulan
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Tentang Jam Wisata Section */}
-      <section id="tentang-kami" className="scroll-mt-24 bg-white pt-14 sm:pt-16 pb-20 sm:pb-24 lg:pb-28">
+      <section id="tentang-kami" className="scroll-mt-24 bg-white pt-10 sm:pt-12 pb-20 sm:pb-24 lg:pb-28">
         <div className="jam-container grid items-center gap-12 lg:grid-cols-[.96fr_1.04fr] lg:gap-16">
           <div className="grid grid-cols-[1.25fr_.75fr] gap-3">
             <figure className="relative min-h-[440px] overflow-hidden rounded-[26px]">
