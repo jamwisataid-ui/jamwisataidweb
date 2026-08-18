@@ -381,8 +381,8 @@ export function HeroPackages() {
         </svg>
       </section>
 
-      {/* Overlapping Floating Search Package Card (Widescreen 1240px, overlaps across the curved boundary) */}
-      <section className="relative z-30 -mt-[18px] sm:-mt-[22px] lg:-mt-[26px]" aria-label="Pencarian Paket Umrah">
+      {/* Overlapping Floating Search Package Card (Widescreen 1240px, centered exactly on hero's bottom boundary line) */}
+      <section className="relative z-30 -mt-[44px] sm:-mt-[50px] lg:-mt-[56px]" aria-label="Pencarian Paket Umrah">
         <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
           <div className="rounded-[14px] sm:rounded-[16px] border border-[#D5A12B]/25 bg-white p-3.5 sm:p-4 lg:p-5 shadow-[0_14px_40px_rgba(0,0,0,0.14)]">
             <form
