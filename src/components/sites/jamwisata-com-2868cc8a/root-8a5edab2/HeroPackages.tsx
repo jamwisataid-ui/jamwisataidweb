@@ -734,12 +734,13 @@ export function HeroPackages() {
       <section className="relative isolate overflow-hidden bg-[#021224] text-white py-9 sm:py-11 lg:py-12 border-y border-[#D5A12B]/20" aria-label="Statistik & Kepercayaan Jamaah">
         {/* Subtle Photo Background with Deep Navy Gradient Overlay */}
         <Image
-          src="/hero-makkah-cinematic.png"
-          alt=""
+          src="/stats-bg-panoramic.png"
+          alt="Jam Wisata Travel Umrah"
           fill
-          className="object-cover object-center opacity-15 pointer-events-none"
+          sizes="100vw"
+          className="object-cover object-center opacity-30 pointer-events-none"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#021224] via-[#021224]/90 to-[#021224]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#021224]/95 via-[#021224]/80 to-[#021224]/95" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(213,161,43,0.06)_0%,transparent_70%)]" />
 
         {/* Mosque Silhouette / Skyline SVG on Left & Right Bottom Corners (15% opacity, muted gold) */}
