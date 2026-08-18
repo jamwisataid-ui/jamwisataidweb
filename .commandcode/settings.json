@@ -18,7 +18,9 @@
       "Shell(grep:*)",
       "Shell(node -e \"for(const k of Object.keys(process.env)){ if(/npm_config/i.test(k)) console.log(k, '=', process.env[k]) }\")",
       "Shell(node -e \"console.log('next', require('next/package.json').version); console.log('react', require('react/package.json').version);\")",
-      "Shell(node -e console.log('NODE_ENV=', process.env.NODE_ENV))"
+      "Shell(node -e console.log('NODE_ENV=', process.env.NODE_ENV))",
+      "Shell(copy:*)",
+      "Shell(node -e \"const b=require('fs').readFileSync('public/sites/jamwisata-com-2868cc8a/root-8a5edab2/hero.png');console.log('size',b.length);console.log('w',b.readUInt32BE(16),'h',b.readUInt32BE(20));\")"
     ],
     "deny": [],
     "defaultMode": "default"

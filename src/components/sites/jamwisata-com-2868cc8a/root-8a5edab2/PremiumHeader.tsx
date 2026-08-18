@@ -30,8 +30,16 @@ const links = [
 export function PremiumHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [active, setActive] = useState("beranda");
+  const [scrolled, setScrolled] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     const sections = links
@@ -89,8 +97,8 @@ export function PremiumHeader() {
   };
 
   return (
-    <header className="sticky inset-x-0 top-0 z-[70] bg-white">
-      <div className="bg-[#0A1D3A] text-white">
+    <header className="sticky inset-x-0 top-0 z-[70]">
+      <div className={`text-white transition-all duration-500 ${scrolled ? "bg-[#0A1D3A]" : "bg-transparent"}`}>
         <div className="jam-container flex h-8 items-center justify-between gap-4 text-[11px] font-medium text-white/82">
           <div className="flex min-w-0 items-center gap-3 sm:gap-4">
             <a className="flex shrink-0 items-center gap-1.5 hover:text-white" href="tel:+6281809627499">
@@ -118,10 +126,10 @@ export function PremiumHeader() {
         </div>
       </div>
 
-      <div className="border-b border-[#0A1D3A]/8 bg-[#FFFDF8] shadow-[0_7px_24px_rgba(16,43,63,.07)]">
+      <div className={`transition-all duration-500 ${scrolled ? "border-b border-[#0A1D3A]/8 bg-[#FFFDF8] shadow-[0_7px_24px_rgba(16,43,63,.07)]" : "border-b border-transparent bg-transparent"}`}>
         <div className="jam-container flex h-[76px] items-center justify-between">
           <a href="#beranda" aria-label="Jam Wisata, kembali ke beranda" className="shrink-0">
-            <Image src={`${assetRoot}/logo.png`} alt="Jam Wisata" width={500} height={184} priority className="h-auto w-[160px] sm:w-[190px]" />
+            <Image src={`${assetRoot}/logo.png`} alt="Jam Wisata" width={500} height={184} priority className={`h-auto w-[160px] transition-all duration-500 sm:w-[190px] ${scrolled ? "" : "brightness-0 invert"}`} />
           </a>
           <nav aria-label="Navigasi utama" className="hidden items-center xl:flex">
             {links.map(([id, label]) => (
@@ -129,7 +137,7 @@ export function PremiumHeader() {
                 key={id}
                 href={`#${id}`}
                 aria-current={active === id ? "location" : undefined}
-                className={`relative flex min-h-11 items-center px-3 text-[12px] font-bold transition-colors after:absolute after:right-3 after:bottom-1.5 after:left-3 after:h-0.5 after:origin-left after:rounded-full after:bg-[#D4AF37] after:transition-transform ${active === id ? "text-[#D4AF37] after:scale-x-100" : "text-[#43535C] after:scale-x-0 hover:text-[#0A1D3A] hover:after:scale-x-100"}`}
+                className={`relative flex min-h-11 items-center px-3 text-[12px] font-bold transition-colors after:absolute after:right-3 after:bottom-1.5 after:left-3 after:h-0.5 after:origin-left after:rounded-full after:bg-[#D4AF37] after:transition-transform ${active === id ? "text-[#D4AF37] after:scale-x-100" : scrolled ? "text-[#43535C] after:scale-x-0 hover:text-[#0A1D3A] hover:after:scale-x-100" : "text-white/85 after:scale-x-0 hover:text-white hover:after:scale-x-100"}`}
               >
                 {label}
               </a>
@@ -142,7 +150,7 @@ export function PremiumHeader() {
             <a href={whatsapp} aria-label="Konsultasi cepat via WhatsApp" target="_blank" rel="noopener noreferrer" className="grid size-11 place-items-center rounded-[13px] bg-gradient-gold-rich text-[#0A1D3A] shadow-[0_8px_22px_rgba(184,134,11,.30),inset_0_1px_0_rgba(255,235,170,.55)] sm:hidden">
               <MessageCircle className="size-5" aria-hidden="true" />
             </a>
-            <button ref={triggerRef} type="button" aria-expanded={menuOpen} aria-controls="mobile-navigation" aria-label={menuOpen ? "Tutup menu" : "Buka menu"} onClick={() => setMenuOpen((value) => !value)} className="grid size-11 place-items-center rounded-[13px] border border-[#0A1D3A]/12 text-[#0A1D3A] xl:hidden">
+            <button ref={triggerRef} type="button" aria-expanded={menuOpen} aria-controls="mobile-navigation" aria-label={menuOpen ? "Tutup menu" : "Buka menu"} onClick={() => setMenuOpen((value) => !value)} className={`grid size-11 place-items-center rounded-[13px] border transition-colors duration-500 xl:hidden ${scrolled ? "border-[#0A1D3A]/12 text-[#0A1D3A]" : "border-white/30 text-white"}`}>
               {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
             </button>
           </div>

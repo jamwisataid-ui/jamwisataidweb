@@ -279,7 +279,7 @@ export function HeroPackages() {
   return (
     <>
       <section id="beranda" className="relative isolate overflow-hidden bg-[#0A1D3A] text-white">
-        <Image src={`${assetRoot}/hero.jpg`} alt="Suasana perjalanan umrah menuju Baitullah" fill priority loading="eager" sizes="100vw" className="object-cover object-[58%_center] sm:object-center" />
+        <Image src={`${assetRoot}/hero.png`} alt="Suasana perjalanan umrah menuju Baitullah" fill priority loading="eager" sizes="100vw" className="object-cover object-[58%_center] sm:object-center" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,28,43,.94)_0%,rgba(7,28,43,.75)_48%,rgba(7,28,43,.46)_100%)]" />
         <div className="jam-container relative flex min-h-[980px] flex-col justify-center py-16 sm:min-h-[920px] lg:min-h-[680px] lg:py-14">
           <div className="max-w-[730px]">
