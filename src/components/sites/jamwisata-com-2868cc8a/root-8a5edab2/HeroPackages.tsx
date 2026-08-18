@@ -298,52 +298,67 @@ export function HeroPackages() {
                 <span>Konsultasi Gratis</span>
               </a>
             </div>
+          </div>
 
-            {/* Trust Indicators (2 Visual Horizontal Blocks) */}
-            <div className="font-[family-name:var(--font-montserrat)] mt-5 sm:mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3.5 text-[11px] sm:text-xs lg:text-[12.5px]">
-              <div className="flex items-center gap-2 rounded-lg border border-white/12 bg-[#061A2F]/40 px-3 py-1.5 backdrop-blur-xs">
-                <span className="grid size-6 place-items-center rounded-full bg-[#D7A72B]/15 text-[#E8C967]">
-                  <ShieldCheck className="size-3.5" />
-                </span>
+          {/* Bottom Aligned Row: Left Trust Indicators (Enlarged, Clean) + Right Video CTA (Enlarged) */}
+          <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between font-[family-name:var(--font-montserrat)] pt-2 pb-2">
+            {/* Left: Trust Indicators (Enlarged, Clean without card styling) */}
+            <div className="flex flex-wrap items-center gap-5 sm:gap-7 lg:gap-8">
+              {/* Trust Item 1: Legal & Terpercaya */}
+              <div className="flex items-center gap-3">
+                <svg className="size-6 sm:size-7 shrink-0 text-[#E8C967] drop-shadow-sm" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                  <path d="M208,40H48A16,16,0,0,0,32,56v58.78c0,89.61,75.82,119.34,91.25,124.39a15.54,15.54,0,0,0,9.5,0c15.43-5.05,91.25-34.78,91.25-124.39V56A16,16,0,0,0,208,40Zm0,74.79c0,78.42-66.35,105.77-80,110.5-13.65-4.73-80-32.08-80-110.5V56H208ZM173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34Z" />
+                </svg>
                 <div className="text-left leading-tight">
-                  <strong className="block font-bold text-white">Legal &amp; Terpercaya</strong>
-                  <span className="text-[9.5px] sm:text-[10px] text-slate-300">Amanah &amp; Profesional</span>
+                  <strong className="block text-sm sm:text-[15px] font-bold text-white tracking-wide">
+                    Legal &amp; Terpercaya
+                  </strong>
+                  <span className="text-[11px] sm:text-xs text-slate-300 font-medium">
+                    Amanah &amp; Profesional
+                  </span>
                 </div>
               </div>
-              <div className="flex items-center gap-2 rounded-lg border border-white/12 bg-[#061A2F]/40 px-3 py-1.5 backdrop-blur-xs">
-                <span className="grid size-6 place-items-center rounded-full bg-[#D7A72B]/15 text-[#E8C967] font-bold text-xs">
-                  ✦
-                </span>
+
+              {/* Subtle vertical separator */}
+              <span className="hidden sm:block h-7 w-px bg-white/20" />
+
+              {/* Trust Item 2: Anggota ASTA */}
+              <div className="flex items-center gap-3">
+                <svg className="size-6 sm:size-7 shrink-0 text-[#E8C967] drop-shadow-sm" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                  <path d="M229.66,109.66l-48,48a8,8,0,0,1-11.32,0L136,123.31V216a8,8,0,0,1-16,0V123.31L85.66,157.66a8,8,0,0,1-11.32-11.32l48-48a8,8,0,0,1,11.32,0L168,132.69l42.34-42.35a8,8,0,0,1,11.32,0A8,8,0,0,1,229.66,109.66ZM128,24A72,72,0,1,0,200,96,72.08,72.08,0,0,0,128,24Zm0,128a56,56,0,1,1,56-56A56.06,56.06,0,0,1,128,152Z" />
+                </svg>
                 <div className="text-left leading-tight">
-                  <strong className="block font-bold text-white">Anggota ASTA</strong>
-                  <span className="text-[9.5px] sm:text-[10px] text-slate-300">Resmi &amp; Terakreditasi</span>
+                  <strong className="block text-sm sm:text-[15px] font-bold text-white tracking-wide">
+                    Anggota ASTA
+                  </strong>
+                  <span className="text-[11px] sm:text-xs text-slate-300 font-medium">
+                    Resmi &amp; Terakreditasi
+                  </span>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Video CTA Card (Right Side of Hero, Compact Pill) */}
-        <div className="jam-container relative z-20 w-full pointer-events-none pb-2 sm:pb-3">
-          <div className="flex justify-end pointer-events-auto pr-2 sm:pr-4">
-            <a
-              href="https://www.youtube.com/@jamwisatabandung"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="lift-soft group inline-flex items-center gap-3 rounded-xl border border-[#D5A12B]/40 bg-[#061A2F]/80 px-3.5 py-2.5 text-white backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/95 hover:scale-[1.02]"
-            >
-              <span className="grid size-8 place-items-center rounded-lg bg-gradient-gold-rich text-[#061A2F] shadow-sm transition-transform group-hover:scale-105">
-                <Play className="size-3.5 fill-current ml-0.5" />
-              </span>
-              <div className="text-left pr-1 leading-tight">
-                <span className="font-[family-name:var(--font-cormorant)] block text-[11px] italic text-slate-300">
-                  Tonton Video Profil
+            {/* Right: Video Profile CTA (Enlarged, Aligned with Trust Items) */}
+            <div className="shrink-0 flex justify-start sm:justify-end">
+              <a
+                href="https://www.youtube.com/@jamwisatabandung"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="lift-soft group inline-flex items-center gap-3.5 rounded-2xl border border-[#D5A12B]/45 bg-[#061A2F]/80 px-4.5 py-2.5 sm:py-3 text-white backdrop-blur-md shadow-[0_12px_32px_rgba(0,0,0,0.45)] transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/95 hover:scale-[1.03]"
+              >
+                <span className="grid size-10 sm:size-11 place-items-center rounded-xl bg-gradient-gold-rich text-[#061A2F] shadow-md transition-transform group-hover:scale-110">
+                  <Play className="size-4 sm:size-4.5 fill-current ml-0.5" />
                 </span>
-                <strong className="font-[family-name:var(--font-cinzel)] block text-xs font-bold tracking-wider text-[#E8C967]">
-                  Jam Wisata
-                </strong>
-              </div>
-            </a>
+                <div className="text-left pr-1 leading-tight">
+                  <span className="font-[family-name:var(--font-cormorant)] block text-xs sm:text-sm font-semibold italic text-slate-200">
+                    Tonton Video Profil
+                  </span>
+                  <strong className="font-[family-name:var(--font-cinzel)] block text-sm sm:text-[15px] font-bold tracking-wider text-[#E8C967]">
+                    Jam Wisata
+                  </strong>
+                </div>
+              </a>
+            </div>
           </div>
         </div>
 
