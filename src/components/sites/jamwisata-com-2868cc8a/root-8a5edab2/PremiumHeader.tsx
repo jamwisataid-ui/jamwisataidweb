@@ -19,9 +19,8 @@ const whatsapp =
 
 const links = [
   ["beranda", "Beranda"],
-  ["tentang-kami", "Tentang"],
   ["paket-umrah", "Paket Umrah"],
-  ["paket-wisata", "Wisata Halal"],
+  ["tentang-kami", "Mengapa Kami"],
   ["testimoni", "Testimoni"],
   ["galeri", "Galeri"],
   ["faq", "FAQ"],

@@ -609,10 +609,10 @@ export function ModernProofFooter() {
             <h2 className="text-sm font-bold">Navigasi</h2>
             <ul className="mt-5 space-y-3 text-sm text-white/55">
               {[
-                ["Tentang", "tentang-kami"],
                 ["Paket Umrah", "paket-umrah"],
-                ["Fasilitas", "fasilitas"],
+                ["Mengapa Kami", "tentang-kami"],
                 ["Testimoni", "testimoni"],
+                ["Galeri", "galeri"],
                 ["FAQ", "faq"],
               ].map(([label, id]) => (
                 <li key={id}>
