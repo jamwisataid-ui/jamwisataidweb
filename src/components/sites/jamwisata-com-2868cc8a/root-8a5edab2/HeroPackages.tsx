@@ -129,7 +129,7 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
               href={whatsappHref(context, `Paket — ${travelPackage.name}`)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#D5A12B]/40 bg-[#FAF8F3] px-3 text-xs font-bold text-[#061A2F] transition hover:bg-[#F2EADB]"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#D5A12B]/40 bg-white hover:bg-slate-50 px-3 text-xs font-bold text-[#061A2F] transition"
             >
               <MessageCircle className="size-3.5 text-[#D5A12B]" /> Tanya via WA
             </a>
@@ -398,7 +398,7 @@ export function HeroPackages() {
                 <select
                   value={draft.type}
                   onChange={(e) => setDraft({ ...draft, type: e.target.value })}
-                  className="h-[44px] sm:h-[46px] w-full rounded-[6px] border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-semibold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
+                  className="h-[44px] sm:h-[46px] w-full rounded-[6px] border border-[#DCE5F0] bg-white px-3 text-xs font-semibold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
                 >
                   <option value="">Semua Tujuan</option>
                   {options.types.map((type) => (
@@ -418,7 +418,7 @@ export function HeroPackages() {
                 <select
                   value={draft.month}
                   onChange={(e) => setDraft({ ...draft, month: e.target.value })}
-                  className="h-[44px] sm:h-[46px] w-full rounded-[6px] border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-semibold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
+                  className="h-[44px] sm:h-[46px] w-full rounded-[6px] border border-[#DCE5F0] bg-white px-3 text-xs font-semibold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
                 >
                   <option value="">Semua Bulan</option>
                   {options.months.map((month) => (
@@ -438,7 +438,7 @@ export function HeroPackages() {
                 <select
                   value={draft.duration}
                   onChange={(e) => setDraft({ ...draft, duration: e.target.value })}
-                  className="h-[44px] sm:h-[46px] w-full rounded-[6px] border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-semibold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
+                  className="h-[44px] sm:h-[46px] w-full rounded-[6px] border border-[#DCE5F0] bg-white px-3 text-xs font-semibold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
                 >
                   <option value="">Semua Durasi</option>
                   {options.durations.map((dur) => (
@@ -458,7 +458,7 @@ export function HeroPackages() {
                 <select
                   value={draft.airline}
                   onChange={(e) => setDraft({ ...draft, airline: e.target.value })}
-                  className="h-[44px] sm:h-[46px] w-full rounded-[6px] border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-semibold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
+                  className="h-[44px] sm:h-[46px] w-full rounded-[6px] border border-[#DCE5F0] bg-white px-3 text-xs font-semibold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
                 >
                   <option value="">Semua Maskapai</option>
                   {options.airlines.map((airline) => (
@@ -483,7 +483,7 @@ export function HeroPackages() {
       </section>
 
       {/* Tentang Jam Wisata Section */}
-      <section id="tentang-kami" className="scroll-mt-24 bg-[#FAF9F5] pt-14 sm:pt-16 pb-20 sm:pb-24 lg:pb-28">
+      <section id="tentang-kami" className="scroll-mt-24 bg-white pt-14 sm:pt-16 pb-20 sm:pb-24 lg:pb-28">
         <div className="jam-container grid items-center gap-12 lg:grid-cols-[.96fr_1.04fr] lg:gap-16">
           <div className="grid grid-cols-[1.25fr_.75fr] gap-3">
             <figure className="relative min-h-[440px] overflow-hidden rounded-[26px]">
@@ -530,7 +530,7 @@ export function HeroPackages() {
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <div className="flex items-start gap-3 rounded-xl border border-[#061A2F]/8 bg-white p-3.5 shadow-2xs">
-                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[#FAF8F3] text-[#D5A12B] border border-[#D5A12B]/30">
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-white text-[#D5A12B] border border-[#D5A12B]/30">
                   <ShieldCheck className="size-4" />
                 </span>
                 <div>
@@ -540,7 +540,7 @@ export function HeroPackages() {
               </div>
 
               <div className="flex items-start gap-3 rounded-xl border border-[#061A2F]/8 bg-white p-3.5 shadow-2xs">
-                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[#FAF8F3] text-[#D5A12B] border border-[#D5A12B]/30">
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-white text-[#D5A12B] border border-[#D5A12B]/30">
                   <Hotel className="size-4" />
                 </span>
                 <div>
@@ -568,7 +568,7 @@ export function HeroPackages() {
       <section id="paket-umrah" className="scroll-mt-24 bg-white py-20 sm:py-24 lg:py-28">
         <div className="jam-container">
           <div className="mx-auto max-w-[760px] text-center">
-            <span className="inline-flex items-center gap-1.5 rounded-md bg-[#FAF8F3] px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-[#D5A12B] border border-[#D5A12B]/20">
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-white px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-[#D5A12B] border border-[#D5A12B]/20">
               Paket Pilihan
             </span>
             <h2 className="mt-3 font-playfair text-3xl sm:text-4xl font-bold text-[#061A2F]">
