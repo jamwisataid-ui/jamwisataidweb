@@ -731,31 +731,16 @@ export function HeroPackages() {
       </section>
 
       {/* Trust Statistics / Achievement Counter Section */}
-      <section className="relative isolate overflow-hidden bg-[#021224] text-white py-9 sm:py-11 lg:py-12 border-y border-[#D5A12B]/20" aria-label="Statistik & Kepercayaan Jamaah">
-        {/* Subtle Photo Background with Deep Navy Gradient Overlay */}
+      <section className="relative isolate overflow-hidden bg-[#030F1F] text-white py-12 sm:py-14 lg:py-16 border-y border-[#D5A12B]/30 shadow-inner" aria-label="Statistik & Kepercayaan Jamaah">
+        {/* Full Quality Panoramic Background Photo with Mosque Architecture */}
         <Image
           src="/stats-bg-panoramic.png"
           alt="Jam Wisata Travel Umrah"
           fill
+          priority
           sizes="100vw"
-          className="object-cover object-center opacity-30 pointer-events-none"
+          className="object-cover object-center pointer-events-none"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#021224]/95 via-[#021224]/80 to-[#021224]/95" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(213,161,43,0.06)_0%,transparent_70%)]" />
-
-        {/* Mosque Silhouette / Skyline SVG on Left & Right Bottom Corners (15% opacity, muted gold) */}
-        <div className="absolute -bottom-1 left-0 w-48 sm:w-64 lg:w-80 h-24 pointer-events-none opacity-15 text-[#D5A12B]" aria-hidden="true">
-          <svg viewBox="0 0 320 120" fill="currentColor" preserveAspectRatio="none" className="w-full h-full">
-            <path d="M0,120 L0,85 Q15,80 30,85 L30,60 Q35,40 40,60 L40,85 Q55,80 70,85 L70,30 Q75,10 80,30 L80,85 Q95,78 110,85 L110,50 Q115,28 120,50 L120,85 Q135,80 150,85 L150,65 Q160,45 170,65 L170,85 L320,85 L320,120 Z" />
-            <path d="M20,85 A15,15 0 0,1 50,85 Z M70,85 A20,20 0 0,1 110,85 Z M140,85 A18,18 0 0,1 176,85 Z" />
-          </svg>
-        </div>
-        <div className="absolute -bottom-1 right-0 w-48 sm:w-64 lg:w-80 h-24 pointer-events-none opacity-15 text-[#D5A12B] transform scale-x-[-1]" aria-hidden="true">
-          <svg viewBox="0 0 320 120" fill="currentColor" preserveAspectRatio="none" className="w-full h-full">
-            <path d="M0,120 L0,85 Q15,80 30,85 L30,60 Q35,40 40,60 L40,85 Q55,80 70,85 L70,30 Q75,10 80,30 L80,85 Q95,78 110,85 L110,50 Q115,28 120,50 L120,85 Q135,80 150,85 L150,65 Q160,45 170,65 L170,85 L320,85 L320,120 Z" />
-            <path d="M20,85 A15,15 0 0,1 50,85 Z M70,85 A20,20 0 0,1 110,85 Z M140,85 A18,18 0 0,1 176,85 Z" />
-          </svg>
-        </div>
 
         {/* Content Container */}
         <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 relative z-10">
