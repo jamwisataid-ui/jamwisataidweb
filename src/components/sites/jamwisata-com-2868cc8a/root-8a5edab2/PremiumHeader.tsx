@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import {
   Clock3,
   ExternalLink,
@@ -129,7 +130,7 @@ export function PremiumHeader() {
       >
         <div className="jam-container flex h-[70px] sm:h-[76px] lg:h-[82px] items-center justify-between">
           {/* Logo */}
-          <a href="#beranda" aria-label="Jam Wisata, kembali ke beranda" className="shrink-0 flex items-center">
+          <Link href="/" aria-label="Jam Wisata, kembali ke beranda" className="shrink-0 flex items-center">
             <Image
               src={`${assetRoot}/logo.png`}
               alt="Jam Wisata"
@@ -138,14 +139,14 @@ export function PremiumHeader() {
               priority
               className="h-11 sm:h-13 lg:h-[52px] w-auto max-w-[175px] sm:max-w-[210px] lg:max-w-[250px] object-contain drop-shadow-md transition-transform duration-300 hover:scale-[1.02]"
             />
-          </a>
+          </Link>
 
           {/* Navigation Links */}
           <nav aria-label="Navigasi utama" className="hidden items-center gap-1 lg:flex">
             {links.map(([id, label]) => (
               <a
                 key={id}
-                href={`#${id}`}
+                href={id === "beranda" ? "/" : `/#${id}`}
                 aria-current={active === id ? "location" : undefined}
                 className={`relative px-3 py-1.5 text-[13px] font-semibold tracking-wide transition-colors after:absolute after:inset-x-3 after:bottom-0 after:h-[2px] after:origin-left after:rounded-full after:bg-gradient-gold-rich after:transition-transform ${
                   active === id
@@ -216,7 +217,7 @@ export function PremiumHeader() {
               {links.map(([id, label]) => (
                 <a
                   key={id}
-                  href={`#${id}`}
+                  href={id === "beranda" ? "/" : `/#${id}`}
                   onClick={closeMenu}
                   className={`flex items-center justify-between rounded-xl px-3 py-3 text-sm font-semibold transition ${
                     active === id

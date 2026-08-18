@@ -161,7 +161,13 @@ export function HeroPackages() {
   const options = useMemo(() => ({
     months: [...new Set(umrahPackages.map((item) => item.departureMonth).filter(Boolean))] as string[],
     types: [...new Set(umrahPackages.map((item) => item.packageType))],
-    airlines: [...new Set(umrahPackages.map((item) => item.airline).filter(Boolean))] as string[],
+    airlines: [
+      "Garuda Indonesia",
+      "Saudia",
+      "Qatar Airways",
+      "Oman Air",
+      "Emirates",
+    ],
     durations: ["9 Hari", "10 Hari", "12 Hari", "16 Hari"],
   }), []);
 
@@ -313,41 +319,22 @@ export function HeroPackages() {
             </div>
           </div>
 
-          {/* Bottom Aligned Row: Left Trust Indicators (Enlarged, Clean) + Right Video CTA (Enlarged) */}
+          {/* Bottom Aligned Row: Left Trust Indicator (Legal & Terpercaya) + Right Video CTA */}
           <div className="mt-6 sm:mt-10 lg:mt-12 flex flex-col gap-3.5 sm:gap-4 sm:flex-row sm:items-center sm:justify-between font-[family-name:var(--font-montserrat)] pt-1 sm:pt-2 pb-1 sm:pb-2">
-            {/* Left: Trust Indicators (Clean without card styling) */}
-            <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-7 lg:gap-8">
-              {/* Trust Item 1: Legal & Terpercaya */}
-              <div className="flex items-center gap-2.5 sm:gap-3">
-                <svg className="size-5 sm:size-7 shrink-0 text-[#E8C967] drop-shadow-sm" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+            {/* Left: Trust Indicator */}
+            <div className="flex items-center gap-2.5 sm:gap-3.5">
+              <span className="grid size-9 sm:size-11 place-items-center rounded-xl bg-[#061A2F]/80 border border-[#D5A12B]/40 text-[#E8C967] shadow-sm ring-1 ring-[#D5A12B]/20">
+                <svg className="size-5 sm:size-6 text-[#E8C967]" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
                   <path d="M208,40H48A16,16,0,0,0,32,56v58.78c0,89.61,75.82,119.34,91.25,124.39a15.54,15.54,0,0,0,9.5,0c15.43-5.05,91.25-34.78,91.25-124.39V56A16,16,0,0,0,208,40Zm0,74.79c0,78.42-66.35,105.77-80,110.5-13.65-4.73-80-32.08-80-110.5V56H208ZM173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34Z" />
                 </svg>
-                <div className="text-left leading-tight">
-                  <strong className="block text-xs sm:text-[15px] font-bold text-white tracking-wide">
-                    Legal &amp; Terpercaya
-                  </strong>
-                  <span className="text-[10px] sm:text-xs text-slate-300 font-medium">
-                    Amanah &amp; Profesional
-                  </span>
-                </div>
-              </div>
-
-              {/* Subtle vertical separator (tablet & desktop) */}
-              <span className="hidden sm:block h-7 w-px bg-white/20" />
-
-              {/* Trust Item 2: Anggota ASTA */}
-              <div className="flex items-center gap-2.5 sm:gap-3">
-                <svg className="size-5 sm:size-7 shrink-0 text-[#E8C967] drop-shadow-sm" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
-                  <path d="M229.66,109.66l-48,48a8,8,0,0,1-11.32,0L136,123.31V216a8,8,0,0,1-16,0V123.31L85.66,157.66a8,8,0,0,1-11.32-11.32l48-48a8,8,0,0,1,11.32,0L168,132.69l42.34-42.35a8,8,0,0,1,11.32,0A8,8,0,0,1,229.66,109.66ZM128,24A72,72,0,1,0,200,96,72.08,72.08,0,0,0,128,24Zm0,128a56,56,0,1,1,56-56A56.06,56.06,0,0,1,128,152Z" />
-                </svg>
-                <div className="text-left leading-tight">
-                  <strong className="block text-xs sm:text-[15px] font-bold text-white tracking-wide">
-                    Anggota ASTA
-                  </strong>
-                  <span className="text-[10px] sm:text-xs text-slate-300 font-medium">
-                    Resmi &amp; Terakreditasi
-                  </span>
-                </div>
+              </span>
+              <div className="text-left leading-tight">
+                <strong className="block text-xs sm:text-[15px] font-bold text-white tracking-wide">
+                  Legal &amp; Terpercaya
+                </strong>
+                <span className="text-[10.5px] sm:text-xs text-slate-300 font-medium">
+                  Amanah &amp; Profesional
+                </span>
               </div>
             </div>
 
@@ -743,19 +730,21 @@ export function HeroPackages() {
 
         {/* Content Container */}
         <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 relative z-10">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-0 lg:divide-x lg:divide-white/12">
-            {/* Stat 1: Ratusan+ Jamaah Berangkat (Phosphor UsersThree outline) */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-0 lg:divide-x lg:divide-white/15">
+            {/* Stat 1: Ratusan+ Jamaah Berangkat (Phosphor UsersThree Outline with Gold Rim Frame) */}
             <div className="flex items-center justify-start lg:justify-center gap-3.5 sm:gap-4.5 lg:px-6 first:lg:pl-0">
-              <span className="grid size-11 sm:size-12 shrink-0 place-items-center rounded-2xl bg-[#061A2F]/80 border border-[#D5A12B]/40 text-[#E8C967] shadow-sm ring-1 ring-[#D5A12B]/20">
-                <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="128" cy="140" r="40" />
-                  <path d="M196,216a68,68,0,0,0-136,0" />
-                  <path d="M56,112a32,32,0,1,1,32-32" />
-                  <path d="M24,176a56,56,0,0,1,40-20" />
-                  <path d="M200,112a32,32,0,1,0-32-32" />
-                  <path d="M232,176a56,56,0,0,0-40-20" />
-                </svg>
-              </span>
+              <div className="p-[1.5px] rounded-2xl bg-gradient-to-b from-[#F5D97A] via-[#D4AF37] to-[#8C6708] shadow-[0_4px_18px_rgba(212,175,55,0.25)] shrink-0">
+                <span className="grid size-11 sm:size-12 place-items-center rounded-[14px] bg-[#021224] text-[#F5D97A]">
+                  <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="128" cy="140" r="40" />
+                    <path d="M196,216a68,68,0,0,0-136,0" />
+                    <path d="M56,112a32,32,0,1,1,32-32" />
+                    <path d="M24,176a56,56,0,0,1,40-20" />
+                    <path d="M200,112a32,32,0,1,0-32-32" />
+                    <path d="M232,176a56,56,0,0,0-40-20" />
+                  </svg>
+                </span>
+              </div>
               <div className="leading-tight">
                 <span className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
                   Ratusan+
@@ -766,18 +755,22 @@ export function HeroPackages() {
               </div>
             </div>
 
-            {/* Stat 2: 5+ Tahun Pengalaman (Phosphor Medal outline) */}
+            {/* Stat 2: 3+ Tahun Pengalaman (Phosphor Hourglass Outline with Gold Rim Frame) */}
             <div className="flex items-center justify-start lg:justify-center gap-3.5 sm:gap-4.5 lg:px-6">
-              <span className="grid size-11 sm:size-12 shrink-0 place-items-center rounded-2xl bg-[#061A2F]/80 border border-[#D5A12B]/40 text-[#E8C967] shadow-sm ring-1 ring-[#D5A12B]/20">
-                <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="128" cy="96" r="64" />
-                  <path d="M72,136l-32,88,88-32,88,32-32-88" />
-                  <polyline points="96 96 120 120 160 80" />
-                </svg>
-              </span>
+              <div className="p-[1.5px] rounded-2xl bg-gradient-to-b from-[#F5D97A] via-[#D4AF37] to-[#8C6708] shadow-[0_4px_18px_rgba(212,175,55,0.25)] shrink-0">
+                <span className="grid size-11 sm:size-12 place-items-center rounded-[14px] bg-[#021224] text-[#F5D97A]">
+                  <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="48" y1="40" x2="208" y2="40" />
+                    <line x1="48" y1="216" x2="208" y2="216" />
+                    <path d="M64,40v32a64,64,0,0,0,32,56,64,64,0,0,0-32,56v32" />
+                    <path d="M192,40v32a64,64,0,0,1-32,56,64,64,0,0,1,32,56v32" />
+                    <circle cx="128" cy="172" r="8" fill="currentColor" />
+                  </svg>
+                </span>
+              </div>
               <div className="leading-tight">
                 <span className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
-                  5+ Tahun
+                  3+ Tahun
                 </span>
                 <span className="mt-0.5 text-xs sm:text-[13.5px] font-medium text-slate-200 block">
                   Pengalaman
@@ -785,14 +778,16 @@ export function HeroPackages() {
               </div>
             </div>
 
-            {/* Stat 3: 99% Kepuasan Jamaah (Phosphor Heart Verified outline) */}
+            {/* Stat 3: 99% Kepuasan Jamaah (Phosphor Heart Verified Outline with Gold Rim Frame) */}
             <div className="flex items-center justify-start lg:justify-center gap-3.5 sm:gap-4.5 lg:px-6">
-              <span className="grid size-11 sm:size-12 shrink-0 place-items-center rounded-2xl bg-[#061A2F]/80 border border-[#D5A12B]/40 text-[#E8C967] shadow-sm ring-1 ring-[#D5A12B]/20">
-                <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M128,216S24,144,24,88A56,56,0,0,1,120,48.6a56,56,0,0,1,96,39.4C216,144,128,216,128,216Z" />
-                  <polyline points="84 92 112 120 172 60" />
-                </svg>
-              </span>
+              <div className="p-[1.5px] rounded-2xl bg-gradient-to-b from-[#F5D97A] via-[#D4AF37] to-[#8C6708] shadow-[0_4px_18px_rgba(212,175,55,0.25)] shrink-0">
+                <span className="grid size-11 sm:size-12 place-items-center rounded-[14px] bg-[#021224] text-[#F5D97A]">
+                  <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M128,216S24,144,24,88A56,56,0,0,1,120,48.6a56,56,0,0,1,96,39.4C216,144,128,216,128,216Z" />
+                    <polyline points="84 92 112 120 172 60" />
+                  </svg>
+                </span>
+              </div>
               <div className="leading-tight">
                 <span className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
                   99%
@@ -803,16 +798,16 @@ export function HeroPackages() {
               </div>
             </div>
 
-            {/* Stat 4: 10+ Destinasi Terbaik (Phosphor Globe Hemisphere outline) */}
+            {/* Stat 4: 10+ Destinasi Terbaik (Phosphor Compass Outline with Gold Rim Frame) */}
             <div className="flex items-center justify-start lg:justify-center gap-3.5 sm:gap-4.5 lg:px-6 last:lg:pr-0">
-              <span className="grid size-11 sm:size-12 shrink-0 place-items-center rounded-2xl bg-[#061A2F]/80 border border-[#D5A12B]/40 text-[#E8C967] shadow-sm ring-1 ring-[#D5A12B]/20">
-                <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="128" cy="128" r="96" />
-                  <ellipse cx="128" cy="128" rx="44" ry="96" />
-                  <line x1="32" y1="128" x2="224" y2="128" />
-                  <path d="M128,32V224" />
-                </svg>
-              </span>
+              <div className="p-[1.5px] rounded-2xl bg-gradient-to-b from-[#F5D97A] via-[#D4AF37] to-[#8C6708] shadow-[0_4px_18px_rgba(212,175,55,0.25)] shrink-0">
+                <span className="grid size-11 sm:size-12 place-items-center rounded-[14px] bg-[#021224] text-[#F5D97A]">
+                  <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="128" cy="128" r="96" />
+                    <polygon points="128 72 152 128 208 128 160 160 176 216 128 184 80 216 96 160 48 128 104 128 128 72" fill="none" />
+                  </svg>
+                </span>
+              </div>
               <div className="leading-tight">
                 <span className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
                   10+
@@ -847,9 +842,7 @@ export function HeroPackages() {
 
               <div className="mt-6 pt-2">
                 <a
-                  href="https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20tahu%20lebih%20banyak%20tentang%20layanan%20Jam%20Wisata."
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/tentang-kami"
                   className="inline-flex h-10 items-center justify-center rounded-lg bg-[#061A2F] hover:bg-[#0A2745] px-5 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:-translate-y-0.5"
                 >
                   Tentang Kami
