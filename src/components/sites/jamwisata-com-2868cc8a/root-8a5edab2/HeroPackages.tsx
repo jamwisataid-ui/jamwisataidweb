@@ -227,7 +227,7 @@ export function HeroPackages() {
       {/* Hero Section */}
       <section
         id="beranda"
-        className="relative isolate min-h-[640px] sm:min-h-[720px] lg:min-h-[780px] overflow-hidden bg-[#061A2F] text-white flex flex-col justify-between pt-[100px] sm:pt-[120px] pb-24 sm:pb-28 lg:pb-24"
+        className="relative isolate min-h-[640px] sm:min-h-[720px] lg:min-h-[780px] overflow-hidden rounded-b-[36px] sm:rounded-b-[50px] lg:rounded-b-[64px] bg-[#061A2F] text-white flex flex-col justify-between pt-[100px] sm:pt-[120px] pb-24 sm:pb-28 lg:pb-28 shadow-[0_24px_60px_rgba(6,26,47,0.35)]"
       >
         {/* Background Image of Masjidil Haram with Ka'bah & Clock Tower */}
         <Image
@@ -342,6 +342,9 @@ export function HeroPackages() {
             </a>
           </div>
         </div>
+
+        {/* Bottom Rounded Rich Gold Border Accent */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[3px] sm:h-[4px] bg-gradient-gold-rich shadow-[0_-2px_14px_rgba(212,175,55,0.7)]" />
       </section>
 
       {/* Overlapping Floating Search Package Card (1 Horizontal Row Desktop) */}
