@@ -277,12 +277,12 @@ export function HeroPackages() {
               Jam Wisata hadir untuk menemani setiap langkah Anda menuju Baitullah dengan layanan amanah, profesional, dan penuh keberkahan.
             </p>
 
-            {/* CTA Buttons Row — Touch friendly on mobile, exact horizontal row on desktop */}
-            <div className="mt-4 sm:mt-6 flex flex-col xs:flex-row flex-wrap items-stretch xs:items-center gap-2.5 sm:gap-3 font-[family-name:var(--font-montserrat)]">
+            {/* CTA Buttons Row — Exact same horizontal placement, enlarged font size */}
+            <div className="mt-5 sm:mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3 font-[family-name:var(--font-montserrat)]">
               {/* Primary Gold CTA */}
               <a
                 href="#paket-umrah"
-                className="lift-soft sheen-gold inline-flex h-[44px] sm:h-[48px] lg:h-[50px] items-center justify-center gap-2 rounded-[8px] bg-gradient-gold-rich px-5 sm:px-6 text-xs lg:text-[13px] font-bold uppercase tracking-wider text-[#061A2F] shadow-[0_8px_24px_rgba(184,134,11,.32)] transition duration-300 hover:scale-[1.02] active:scale-95 text-center"
+                className="lift-soft sheen-gold inline-flex h-[44px] sm:h-[48px] lg:h-[50px] items-center justify-center gap-2 rounded-[8px] bg-gradient-gold-rich px-5 sm:px-6 text-xs lg:text-[13px] font-bold uppercase tracking-wider text-[#061A2F] shadow-[0_8px_24px_rgba(184,134,11,.32)] transition duration-300 hover:scale-[1.02] active:scale-95"
               >
                 Lihat Paket Umroh <ArrowRight className="size-3.5" />
               </a>
@@ -292,7 +292,7 @@ export function HeroPackages() {
                 href="https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20berkonsultasi%20mengenai%20paket%20perjalanan%20Jam%20Wisata."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="lift-soft inline-flex h-[44px] sm:h-[48px] lg:h-[50px] items-center justify-center gap-2 rounded-[8px] border border-[#D7A72B]/60 bg-[#061A2F]/60 px-4.5 sm:px-5 text-xs lg:text-[13px] font-bold uppercase tracking-wider text-[#FAF8F3] backdrop-blur-sm transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/85 hover:text-[#E8C967] active:scale-95 text-center"
+                className="lift-soft inline-flex h-[44px] sm:h-[48px] lg:h-[50px] items-center justify-center gap-2 rounded-[8px] border border-[#D7A72B]/60 bg-[#061A2F]/60 px-4.5 sm:px-5 text-xs lg:text-[13px] font-bold uppercase tracking-wider text-[#FAF8F3] backdrop-blur-sm transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/85 hover:text-[#E8C967] active:scale-95"
               >
                 <MessageCircle className="size-3.5 text-[#E8C967]" />
                 <span>Konsultasi Gratis</span>
