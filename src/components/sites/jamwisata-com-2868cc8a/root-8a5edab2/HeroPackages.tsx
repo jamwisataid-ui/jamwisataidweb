@@ -17,7 +17,6 @@ import {
   Plane,
   RotateCcw,
   Search,
-  ShieldCheck,
   UsersRound,
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
@@ -30,13 +29,78 @@ const assetRoot = "/sites/jamwisata-com-2868cc8a/root-8a5edab2";
 type Filters = { month: string; type: string; airline: string; airport: string };
 const emptyFilters: Filters = { month: "", type: "", airline: "", airport: "" };
 
+type TrustIconProps = { className?: string };
+
+function ShieldVerifiedIcon({ className }: TrustIconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" aria-hidden="true">
+      <path d="M11.46 20.846A12 12 0 0 1 3.5 6A12 12 0 0 0 12 3a12 12 0 0 0 8.5 3a12 12 0 0 1-.09 7.06" />
+      <path d="M15 19l2 2l4-4" />
+    </svg>
+  );
+}
+
+function ServiceHeadsetIcon({ className }: TrustIconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" aria-hidden="true">
+      <path d="M4 14v-3a8 8 0 1 1 16 0v3" />
+      <path d="M4 14a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" />
+      <path d="M20 14a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2z" />
+      <path d="M18 19a3 3 0 0 1-3 3" />
+    </svg>
+  );
+}
+
+function HotelBuildingIcon({ className }: TrustIconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" aria-hidden="true">
+      <path d="M3 21h18" />
+      <path d="M5 21V7l8-4v18" />
+      <path d="M19 21V11l-6-4" />
+      <path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01" />
+    </svg>
+  );
+}
+
+function PlaneTiltIcon({ className }: TrustIconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" aria-hidden="true">
+      <path d="m14.5 6.5l3-2.9a2.05 2.05 0 0 1 2.9 2.9l-2.9 3L20 17l-2.5 2.55L14 13l-3 3v3l-2 2l-1.5-4.5L3 15l2-2h3l3-3l-6.5-3.5L7 4z" />
+    </svg>
+  );
+}
+
+function MosqueIcon({ className }: TrustIconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" aria-hidden="true">
+      <path d="M3 21h7v-2a2 2 0 1 1 4 0v2h7" />
+      <path d="M4 21V11m16 10V11" />
+      <path d="M4 16h3v-3h10v3h3" />
+      <path d="M17 13a5 5 0 0 0-10 0" />
+      <path d="M20 8l-.776 1.553A2.1 2.1 0 0 0 19 10.5a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5" />
+      <path d="M4 8l-.776 1.553A2.1 2.1 0 0 0 3 10.5a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5" />
+      <path d="M12 4a2 2 0 1 0 0-4a2 2 0 0 0 0 4m0-4v2" />
+    </svg>
+  );
+}
+
+function CalendarCheckIcon({ className }: TrustIconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" aria-hidden="true">
+      <path d="M11.5 21H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6" />
+      <path d="M16 3v4M8 3v4m-4 4h16" />
+      <path d="M16 18l2 2l4-4" />
+    </svg>
+  );
+}
+
 const trustItems = [
-  [ShieldCheck, "LEGAL & TERPERCAYA", "Amanah, profesional, dan berintegritas."],
-  [UsersRound, "PELAYANAN PROFESIONAL", "Didampingi tim berpengalaman dan bersertifikat."],
-  [Hotel, "HOTEL BERKUALITAS", "Pilihan hotel terbaik di lokasi strategis."],
-  [Plane, "MASKAPAI TERBAIK", "Perjalanan nyaman bersama maskapai terpercaya."],
-  [BookOpenCheck, "BIMBINGAN IBADAH", "Pendampingan ibadah selama perjalanan."],
-  [CalendarDays, "KEBERANGKATAN TERJADWAL", "Jadwal keberangkatan rutin dan terencana."],
+  [ShieldVerifiedIcon, "LEGAL & TERPERCAYA", "Amanah, profesional, dan berintegritas."],
+  [ServiceHeadsetIcon, "PELAYANAN PROFESIONAL", "Didampingi tim berpengalaman dan bersertifikat."],
+  [HotelBuildingIcon, "HOTEL BERKUALITAS", "Pilihan hotel terbaik di lokasi strategis."],
+  [PlaneTiltIcon, "MASKAPAI TERBAIK", "Perjalanan nyaman bersama maskapai terpercaya."],
+  [MosqueIcon, "BIMBINGAN IBADAH", "Pendampingan ibadah selama perjalanan."],
+  [CalendarCheckIcon, "KEBERANGKATAN TERJADWAL", "Jadwal keberangkatan rutin dan terencana."],
 ] as const;
 
 const advantages = [
@@ -269,7 +333,7 @@ export function HeroPackages() {
               className="group flex min-h-[164px] flex-col items-start gap-3 bg-[#FFFDF8] px-4 py-5 transition-colors duration-300 hover:bg-white sm:px-5 sm:py-6"
             >
               <span className="grid size-11 place-items-center rounded-[12px] bg-gradient-gold-rich text-[#0A1D3A] shadow-[0_8px_20px_rgba(184,134,11,.28),inset_0_1px_0_rgba(255,235,170,.55)] transition-all duration-400 group-hover:shadow-[0_10px_24px_rgba(184,134,11,.36),inset_0_1px_0_rgba(255,235,170,.65)] group-hover:brightness-[1.03]">
-                <Icon className="size-5" strokeWidth={1.7} aria-hidden="true" />
+                <Icon className="size-5" />
               </span>
               <h2 className="mt-2 text-[11px] leading-snug font-extrabold tracking-[.02em] text-[#0A1D3A] sm:text-[12px]">
                 {title}
