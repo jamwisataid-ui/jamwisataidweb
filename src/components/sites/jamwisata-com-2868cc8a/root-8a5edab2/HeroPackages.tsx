@@ -247,7 +247,7 @@ export function HeroPackages() {
         {/* Main Hero Content */}
         <div className="jam-container relative z-10 w-full my-auto py-6 sm:py-8 lg:py-10">
           <div className="max-w-[620px] lg:max-w-[560px] xl:max-w-[620px]">
-            {/* Bismillah & Eyebrow */}
+            {/* Bismillah & Sub Heading (Cormorant Garamond) */}
             <div className="mb-4 sm:mb-5 flex flex-col items-start gap-2.5">
               <Image
                 src={`${assetRoot}/bismillah.png`}
@@ -256,29 +256,33 @@ export function HeroPackages() {
                 height={86}
                 className="h-auto w-[180px] sm:w-[210px] opacity-90 drop-shadow-sm"
               />
-              <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-[0.2em] text-[#E8C967]">
+              <div className="flex items-center gap-2.5">
                 <span className="h-px w-6 bg-gradient-gold-rich" />
-                <span>Biro Perjalanan Umrah &amp; Wisata Halal</span>
+                <p className="font-[family-name:var(--font-cormorant)] text-base sm:text-lg lg:text-xl font-semibold italic tracking-wide text-[#E8C967]">
+                  Biro Perjalanan Umrah &amp; Wisata Halal
+                </p>
               </div>
             </div>
 
-            {/* Headline with Elegant Serif Typography */}
-            <h1 className="font-playfair text-[34px] sm:text-[48px] lg:text-[54px] xl:text-[60px] font-bold leading-[1.12] tracking-tight text-white drop-shadow-md">
-              Perjalanan Ibadah,<br />
-              <span className="text-gradient-gold-rich font-normal italic">Pengalaman Tak Terlupakan</span>
+            {/* Heading — Cinzel (48–72pt / authoritative & elegant) */}
+            <h1 className="font-[family-name:var(--font-cinzel)] text-[32px] sm:text-[46px] lg:text-[54px] xl:text-[62px] font-bold leading-[1.18] tracking-[0.03em] text-white drop-shadow-md">
+              PERJALANAN IBADAH,<br />
+              <span className="text-gradient-gold-rich mt-1 block font-bold">
+                PENGALAMAN TAK TERLUPAKAN
+              </span>
             </h1>
 
-            {/* Subheadline */}
-            <p className="mt-4 sm:mt-5 max-w-[520px] text-xs sm:text-[15px] lg:text-base leading-relaxed text-slate-100 font-medium sm:leading-7 text-balance">
+            {/* Body — Montserrat (easy to read, clean, modern, text-left, line-height 150%) */}
+            <p className="font-[family-name:var(--font-montserrat)] mt-4 sm:mt-5 max-w-[530px] text-left text-xs sm:text-[14px] lg:text-[15px] font-normal leading-[1.65] text-slate-100/90 sm:leading-[1.7]">
               Jam Wisata hadir untuk menemani setiap langkah Anda menuju Baitullah dengan layanan amanah, profesional, dan penuh keberkahan.
             </p>
 
-            {/* CTA Buttons Row */}
-            <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
+            {/* CTA Buttons Row — Montserrat */}
+            <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4 font-[family-name:var(--font-montserrat)]">
               {/* Primary Gold CTA */}
               <a
                 href="#paket-umrah"
-                className="lift-soft sheen-gold inline-flex h-12 sm:h-13 items-center justify-center gap-2.5 rounded-xl bg-gradient-gold-rich px-6 sm:px-7 text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#061A2F] shadow-[0_12px_32px_rgba(184,134,11,.38)] transition duration-300 hover:scale-[1.03] active:scale-95"
+                className="lift-soft sheen-gold inline-flex h-12 sm:h-13 items-center justify-center gap-2.5 rounded-xl bg-gradient-gold-rich px-6 sm:px-7 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#061A2F] shadow-[0_12px_32px_rgba(184,134,11,.38)] transition duration-300 hover:scale-[1.03] active:scale-95"
               >
                 Lihat Paket Umroh <ArrowRight className="size-4" />
               </a>
@@ -288,15 +292,15 @@ export function HeroPackages() {
                 href="https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20berkonsultasi%20mengenai%20paket%20perjalanan%20Jam%20Wisata."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="lift-soft inline-flex h-12 sm:h-13 items-center justify-center gap-2.5 rounded-xl border border-[#D5A12B]/70 bg-[#061A2F]/50 px-5 sm:px-6 text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#FAF8F3] backdrop-blur-sm transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/80 hover:text-[#E8C967] active:scale-95"
+                className="lift-soft inline-flex h-12 sm:h-13 items-center justify-center gap-2.5 rounded-xl border border-[#D5A12B]/70 bg-[#061A2F]/50 px-5 sm:px-6 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#FAF8F3] backdrop-blur-sm transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/80 hover:text-[#E8C967] active:scale-95"
               >
                 <MessageCircle className="size-4 text-[#E8C967]" />
                 <span>Konsultasi Gratis</span>
               </a>
             </div>
 
-            {/* Trust Indicators Horizontal (Subtle under CTA) */}
-            <div className="mt-6 sm:mt-7 flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-2 text-[11px] sm:text-xs font-semibold text-slate-200">
+            {/* Trust Indicators Horizontal — Montserrat */}
+            <div className="font-[family-name:var(--font-montserrat)] mt-6 sm:mt-7 flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-2 text-[11px] sm:text-xs font-semibold text-slate-200">
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="size-4 text-[#E8C967]" />
                 <span>Legal &amp; Terpercaya</span>
@@ -328,8 +332,12 @@ export function HeroPackages() {
                 <Play className="size-4 fill-current ml-0.5" />
               </span>
               <div className="text-left pr-1">
-                <span className="block text-[11px] font-medium text-slate-300">Tonton Video Profil</span>
-                <strong className="block text-xs font-bold text-[#E8C967]">Jam Wisata</strong>
+                <span className="font-[family-name:var(--font-cormorant)] block text-xs sm:text-sm font-semibold italic text-slate-300">
+                  Tonton Video Profil
+                </span>
+                <strong className="font-[family-name:var(--font-cinzel)] block text-xs sm:text-sm font-bold tracking-wider text-[#E8C967]">
+                  Jam Wisata
+                </strong>
               </div>
             </a>
           </div>
