@@ -226,23 +226,23 @@ export function HeroPackages() {
       {/* Hero Section */}
       <section
         id="beranda"
-        className="relative isolate min-h-[560px] sm:min-h-[600px] lg:min-h-[640px] overflow-hidden rounded-b-[36px] sm:rounded-b-[54px] lg:rounded-b-[68px] bg-[#061A2F] text-white flex flex-col justify-between pt-[112px] sm:pt-[126px] lg:pt-[136px] xl:pt-[144px] pb-18 sm:pb-22 lg:pb-24 shadow-[0_24px_54px_rgba(6,26,47,0.35)]"
+        className="relative isolate min-h-[560px] sm:min-h-[600px] lg:min-h-[640px] overflow-hidden rounded-b-[36px] sm:rounded-b-[54px] lg:rounded-b-[68px] bg-[#021224] text-white flex flex-col justify-between pt-[112px] sm:pt-[126px] lg:pt-[136px] xl:pt-[144px] pb-18 sm:pb-22 lg:pb-24 shadow-[0_24px_54px_rgba(6,26,47,0.35)]"
       >
-        {/* Background Image of Masjidil Haram with Ka'bah & Clock Tower */}
+        {/* Background Image of Masjidil Haram with Ka'bah & Clock Tower placed bottom-right */}
         <Image
           src="/jamwisata-makkah.png"
           alt="Suasana Masjidil Haram, Ka'bah dan Makkah Clock Tower"
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[58%_center] sm:object-[58%_center] lg:object-[60%_35%]"
+          className="object-cover object-[72%_80%] sm:object-[74%_75%] lg:object-[76%_65%]"
         />
 
-        {/* Directional Cinematic Gradient Overlay: Deep Navy on Left for Copy, Transparent on Right for Ka'bah */}
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,18,36,0.96)_0%,rgba(2,18,36,0.88)_26%,rgba(2,18,36,0.62)_48%,rgba(2,18,36,0.20)_72%,rgba(2,18,36,0.08)_100%)]" />
+        {/* Directional Cinematic Gradient Overlay: Solid Rich Deep Navy on Left to cover text completely, Clear on Right for Photo */}
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,18,36,1)_0%,rgba(2,18,36,1)_32%,rgba(2,18,36,0.92)_48%,rgba(2,18,36,0.55)_68%,rgba(2,18,36,0.14)_85%,rgba(2,18,36,0.02)_100%)]" />
         {/* Subtle Bottom and Top Atmosphere Fades */}
-        <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(2,18,36,0.55)_0%,transparent_40%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,18,36,0.65)_0%,transparent_25%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(2,18,36,0.60)_0%,transparent_38%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,18,36,0.70)_0%,transparent_25%)]" />
 
         {/* Main Hero Content (Upper-Left 40% column, right 60% left for Ka'bah & Clock Tower) */}
         <div className="jam-container relative z-10 w-full my-auto pt-2 sm:pt-4 pb-2 sm:pb-4">
