@@ -81,23 +81,13 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
             ) : null}
           </div>
 
-          {/* 2. Judul dgn teks putih & harga */}
+          {/* 2. Judul dgn teks putih */}
           <h3 className="mt-4 font-[family-name:var(--font-cinzel)] text-xl sm:text-[22px] font-bold leading-snug text-white drop-shadow-sm transition-colors group-hover:text-[#F5D97A]">
             {travelPackage.name}
           </h3>
 
-          {travelPackage.priceFrom ? (
-            <div className="mt-2 flex items-baseline gap-1.5 font-[family-name:var(--font-montserrat)]">
-              <span className="text-xs text-slate-300 font-medium">Mulai dari</span>
-              <span className="text-gradient-gold-rich text-xl font-extrabold">
-                Rp {formatIDR(travelPackage.priceFrom)}
-              </span>
-              <span className="text-[11px] text-slate-400">/pax</span>
-            </div>
-          ) : null}
-
           {/* 3. List poin-poin kebawah: Hotel Makkah, Hotel Madinah, Maskapai */}
-          <div className="mt-5 space-y-2.5 rounded-2xl border border-white/12 bg-[#061A2F]/70 p-4 backdrop-blur-md">
+          <div className="mt-4 space-y-2.5 rounded-2xl border border-white/12 bg-[#061A2F]/70 p-4 backdrop-blur-md">
             {/* Hotel Makkah */}
             <div className="flex items-start gap-2.5 text-xs text-slate-200">
               <Hotel className="size-4 shrink-0 text-[#E8C967] mt-0.5" />
@@ -135,8 +125,20 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
           ) : null}
         </div>
 
-        {/* 5. 1 Tombol gradient gold rich konsultasi paket ini yg mengarah ke WA */}
-        <div className="mt-6 pt-2">
+        {/* 5. Bagian Harga mulai dari ... & 6. 1 Tombol gradient gold rich konsultasi paket ini */}
+        <div className="mt-5 pt-2">
+          {travelPackage.priceFrom ? (
+            <div className="mb-3 flex items-baseline justify-between gap-1.5 px-1 font-[family-name:var(--font-montserrat)]">
+              <span className="text-xs text-slate-300 font-medium">Mulai dari</span>
+              <div>
+                <span className="text-gradient-gold-rich text-xl font-extrabold">
+                  Rp {formatIDR(travelPackage.priceFrom)}
+                </span>
+                <span className="ml-1 text-[11px] text-slate-400">/pax</span>
+              </div>
+            </div>
+          ) : null}
+
           <a
             href={whatsappHref(whatsappText, `Paket — ${travelPackage.name}`)}
             target="_blank"
