@@ -647,13 +647,13 @@ export function HeroPackages() {
         <div className="jam-container">
           <div className="mx-auto max-w-[760px] text-center">
             <span className="inline-flex items-center gap-1.5 rounded-md bg-white px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-[#D5A12B] border border-[#D5A12B]/20">
-              Paket Pilihan
+              Pilihan Terbaik
             </span>
             <h2 className="mt-3 font-playfair text-3xl sm:text-4xl font-bold text-[#061A2F]">
-              Temukan Program Umrah yang Sesuai untuk Anda
+              Paket Unggulan
             </h2>
-            <p className="mt-3 text-xs sm:text-sm leading-relaxed text-[#64748B]">
-              Pilih program berdasarkan jadwal, akomodasi, dan kebutuhan perjalanan ibadah Anda.
+            <p className="mt-2 text-xs sm:text-sm leading-relaxed text-[#64748B]">
+              Pilihan program ibadah dengan fasilitas terbaik dan pembimbing berpengalaman.
             </p>
           </div>
 
