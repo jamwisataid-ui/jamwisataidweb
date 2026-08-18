@@ -131,14 +131,14 @@ export function PremiumHeader() {
       >
         <div className="jam-container flex h-[68px] sm:h-[72px] items-center justify-between">
           {/* Logo */}
-          <a href="#beranda" aria-label="Jam Wisata, kembali ke beranda" className="shrink-0">
+          <a href="#beranda" aria-label="Jam Wisata, kembali ke beranda" className="shrink-0 flex items-center">
             <Image
               src={`${assetRoot}/logo.png`}
               alt="Jam Wisata"
-              width={500}
-              height={184}
+              width={600}
+              height={300}
               priority
-              className="h-auto w-[140px] sm:w-[165px] brightness-0 invert drop-shadow-sm transition-transform duration-300 hover:scale-[1.02]"
+              className="h-11 sm:h-12 w-auto max-w-[180px] sm:max-w-[220px] object-contain drop-shadow-sm transition-transform duration-300 hover:scale-[1.02]"
             />
           </a>
 
