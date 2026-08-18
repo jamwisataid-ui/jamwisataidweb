@@ -238,51 +238,51 @@ export function HeroPackages() {
           className="object-cover object-[64%_52%] sm:object-[62%_48%] lg:object-[64%_45%]"
         />
 
-        {/* Directional Cinematic Gradient Overlay: Deep Navy on Left for Copy Readability, Clear on Right for Ka'bah */}
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,18,36,0.96)_0%,rgba(2,18,36,0.88)_28%,rgba(2,18,36,0.55)_50%,rgba(2,18,36,0.12)_75%,rgba(2,18,36,0.02)_100%)]" />
+        {/* Directional Cinematic Gradient Overlay: Mobile top-down fade for text contrast, Desktop left-rich for Ka'bah */}
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,18,36,0.93)_0%,rgba(2,18,36,0.82)_45%,rgba(2,18,36,0.60)_75%,rgba(2,18,36,0.40)_100%)] lg:bg-[linear-gradient(90deg,rgba(2,18,36,0.96)_0%,rgba(2,18,36,0.88)_28%,rgba(2,18,36,0.55)_50%,rgba(2,18,36,0.12)_75%,rgba(2,18,36,0.02)_100%)]" />
         {/* Subtle Atmosphere Fades */}
         <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(2,18,36,0.55)_0%,transparent_38%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,18,36,0.65)_0%,transparent_25%)]" />
 
-        {/* Main Hero Content (Upper-Left 40% column, right 60% left for Ka'bah & Clock Tower) */}
+        {/* Main Hero Content (Upper-Left 40% column on desktop, well-balanced on mobile) */}
         <div className="jam-container relative z-10 w-full my-auto pt-2 sm:pt-4 pb-2 sm:pb-4">
           <div className="max-w-[480px] lg:max-w-[530px]">
             {/* Bismillah & Eyebrow */}
-            <div className="mb-3 sm:mb-4 flex flex-col items-start gap-2">
+            <div className="mb-2.5 sm:mb-4 flex flex-col items-start gap-1.5 sm:gap-2">
               <Image
                 src={`${assetRoot}/bismillah.png`}
                 alt="Bismillahirrahmanirrahim"
                 width={384}
                 height={86}
-                className="h-auto w-[135px] sm:w-[155px] lg:w-[175px] opacity-85 drop-shadow-sm"
+                className="h-auto w-[120px] sm:w-[155px] lg:w-[175px] opacity-85 drop-shadow-sm"
               />
               <div className="flex items-center gap-2">
-                <span className="h-px w-5 bg-gradient-gold-rich" />
-                <p className="font-[family-name:var(--font-cinzel)] text-[10px] sm:text-[11px] lg:text-xs font-bold tracking-[0.2em] text-[#D7A72B] uppercase">
+                <span className="h-px w-4 sm:w-5 bg-gradient-gold-rich" />
+                <p className="font-[family-name:var(--font-cinzel)] text-[9.5px] sm:text-[11px] lg:text-xs font-bold tracking-[0.16em] sm:tracking-[0.2em] text-[#D7A72B] uppercase">
                   Biro Perjalanan Umrah &amp; Wisata Halal
                 </p>
               </div>
             </div>
 
-            {/* Heading — Cinzel (strictly 2 visual lines, enlarged for desktop) */}
-            <h1 className="font-[family-name:var(--font-cinzel)] text-[28px] xs:text-[34px] sm:text-[42px] lg:text-[50px] xl:text-[56px] font-bold leading-[1.08] tracking-[0.02em] text-white drop-shadow-md">
-              <span className="block whitespace-nowrap">Perjalanan Ibadah,</span>
-              <span className="text-gradient-gold-rich mt-0.5 block font-bold whitespace-nowrap">
+            {/* Heading — Cinzel (strictly 2 visual lines on desktop, nicely wrapped on small mobile) */}
+            <h1 className="font-[family-name:var(--font-cinzel)] text-[26px] xs:text-[30px] sm:text-[42px] lg:text-[50px] xl:text-[56px] font-bold leading-[1.12] sm:leading-[1.08] tracking-[0.02em] text-white drop-shadow-md">
+              <span className="block sm:whitespace-nowrap">Perjalanan Ibadah,</span>
+              <span className="text-gradient-gold-rich mt-0.5 block font-bold sm:whitespace-nowrap">
                 Pengalaman Tak Terlupakan
               </span>
             </h1>
 
-            {/* Body — Montserrat (easy to read, clean, modern, max 3 lines) */}
-            <p className="font-[family-name:var(--font-montserrat)] mt-3 sm:mt-3.5 max-w-[430px] lg:max-w-[460px] text-left text-[13px] sm:text-[14.5px] lg:text-[15.5px] font-normal leading-[1.6] text-slate-200/90">
+            {/* Body — Montserrat (easy to read, clean, modern) */}
+            <p className="font-[family-name:var(--font-montserrat)] mt-2.5 sm:mt-3.5 max-w-[430px] lg:max-w-[460px] text-left text-[12.5px] sm:text-[14.5px] lg:text-[15.5px] font-normal leading-[1.55] sm:leading-[1.6] text-slate-200/90">
               Jam Wisata hadir untuk menemani setiap langkah Anda menuju Baitullah dengan layanan amanah, profesional, dan penuh keberkahan.
             </p>
 
-            {/* CTA Buttons Row — Exact same horizontal placement, enlarged font size */}
-            <div className="mt-5 sm:mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3 font-[family-name:var(--font-montserrat)]">
+            {/* CTA Buttons Row — Touch friendly on mobile, exact horizontal row on desktop */}
+            <div className="mt-4 sm:mt-6 flex flex-col xs:flex-row flex-wrap items-stretch xs:items-center gap-2.5 sm:gap-3 font-[family-name:var(--font-montserrat)]">
               {/* Primary Gold CTA */}
               <a
                 href="#paket-umrah"
-                className="lift-soft sheen-gold inline-flex h-[44px] sm:h-[48px] lg:h-[50px] items-center justify-center gap-2 rounded-[8px] bg-gradient-gold-rich px-5 sm:px-6 text-xs lg:text-[13px] font-bold uppercase tracking-wider text-[#061A2F] shadow-[0_8px_24px_rgba(184,134,11,.32)] transition duration-300 hover:scale-[1.02] active:scale-95"
+                className="lift-soft sheen-gold inline-flex h-[44px] sm:h-[48px] lg:h-[50px] items-center justify-center gap-2 rounded-[8px] bg-gradient-gold-rich px-5 sm:px-6 text-xs lg:text-[13px] font-bold uppercase tracking-wider text-[#061A2F] shadow-[0_8px_24px_rgba(184,134,11,.32)] transition duration-300 hover:scale-[1.02] active:scale-95 text-center"
               >
                 Lihat Paket Umroh <ArrowRight className="size-3.5" />
               </a>
@@ -292,7 +292,7 @@ export function HeroPackages() {
                 href="https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20berkonsultasi%20mengenai%20paket%20perjalanan%20Jam%20Wisata."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="lift-soft inline-flex h-[44px] sm:h-[48px] lg:h-[50px] items-center justify-center gap-2 rounded-[8px] border border-[#D7A72B]/60 bg-[#061A2F]/60 px-4.5 sm:px-5 text-xs lg:text-[13px] font-bold uppercase tracking-wider text-[#FAF8F3] backdrop-blur-sm transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/85 hover:text-[#E8C967] active:scale-95"
+                className="lift-soft inline-flex h-[44px] sm:h-[48px] lg:h-[50px] items-center justify-center gap-2 rounded-[8px] border border-[#D7A72B]/60 bg-[#061A2F]/60 px-4.5 sm:px-5 text-xs lg:text-[13px] font-bold uppercase tracking-wider text-[#FAF8F3] backdrop-blur-sm transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/85 hover:text-[#E8C967] active:scale-95 text-center"
               >
                 <MessageCircle className="size-3.5 text-[#E8C967]" />
                 <span>Konsultasi Gratis</span>
@@ -301,37 +301,37 @@ export function HeroPackages() {
           </div>
 
           {/* Bottom Aligned Row: Left Trust Indicators (Enlarged, Clean) + Right Video CTA (Enlarged) */}
-          <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between font-[family-name:var(--font-montserrat)] pt-2 pb-2">
-            {/* Left: Trust Indicators (Enlarged, Clean without card styling) */}
-            <div className="flex flex-wrap items-center gap-5 sm:gap-7 lg:gap-8">
+          <div className="mt-6 sm:mt-10 lg:mt-12 flex flex-col gap-3.5 sm:gap-4 sm:flex-row sm:items-center sm:justify-between font-[family-name:var(--font-montserrat)] pt-1 sm:pt-2 pb-1 sm:pb-2">
+            {/* Left: Trust Indicators (Clean without card styling) */}
+            <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-7 lg:gap-8">
               {/* Trust Item 1: Legal & Terpercaya */}
-              <div className="flex items-center gap-3">
-                <svg className="size-6 sm:size-7 shrink-0 text-[#E8C967] drop-shadow-sm" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+              <div className="flex items-center gap-2.5 sm:gap-3">
+                <svg className="size-5 sm:size-7 shrink-0 text-[#E8C967] drop-shadow-sm" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
                   <path d="M208,40H48A16,16,0,0,0,32,56v58.78c0,89.61,75.82,119.34,91.25,124.39a15.54,15.54,0,0,0,9.5,0c15.43-5.05,91.25-34.78,91.25-124.39V56A16,16,0,0,0,208,40Zm0,74.79c0,78.42-66.35,105.77-80,110.5-13.65-4.73-80-32.08-80-110.5V56H208ZM173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34Z" />
                 </svg>
                 <div className="text-left leading-tight">
-                  <strong className="block text-sm sm:text-[15px] font-bold text-white tracking-wide">
+                  <strong className="block text-xs sm:text-[15px] font-bold text-white tracking-wide">
                     Legal &amp; Terpercaya
                   </strong>
-                  <span className="text-[11px] sm:text-xs text-slate-300 font-medium">
+                  <span className="text-[10px] sm:text-xs text-slate-300 font-medium">
                     Amanah &amp; Profesional
                   </span>
                 </div>
               </div>
 
-              {/* Subtle vertical separator */}
+              {/* Subtle vertical separator (tablet & desktop) */}
               <span className="hidden sm:block h-7 w-px bg-white/20" />
 
               {/* Trust Item 2: Anggota ASTA */}
-              <div className="flex items-center gap-3">
-                <svg className="size-6 sm:size-7 shrink-0 text-[#E8C967] drop-shadow-sm" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+              <div className="flex items-center gap-2.5 sm:gap-3">
+                <svg className="size-5 sm:size-7 shrink-0 text-[#E8C967] drop-shadow-sm" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
                   <path d="M229.66,109.66l-48,48a8,8,0,0,1-11.32,0L136,123.31V216a8,8,0,0,1-16,0V123.31L85.66,157.66a8,8,0,0,1-11.32-11.32l48-48a8,8,0,0,1,11.32,0L168,132.69l42.34-42.35a8,8,0,0,1,11.32,0A8,8,0,0,1,229.66,109.66ZM128,24A72,72,0,1,0,200,96,72.08,72.08,0,0,0,128,24Zm0,128a56,56,0,1,1,56-56A56.06,56.06,0,0,1,128,152Z" />
                 </svg>
                 <div className="text-left leading-tight">
-                  <strong className="block text-sm sm:text-[15px] font-bold text-white tracking-wide">
+                  <strong className="block text-xs sm:text-[15px] font-bold text-white tracking-wide">
                     Anggota ASTA
                   </strong>
-                  <span className="text-[11px] sm:text-xs text-slate-300 font-medium">
+                  <span className="text-[10px] sm:text-xs text-slate-300 font-medium">
                     Resmi &amp; Terakreditasi
                   </span>
                 </div>
@@ -339,24 +339,27 @@ export function HeroPackages() {
             </div>
 
             {/* Right: Video Profile CTA (Enlarged, Aligned with Trust Items) */}
-            <div className="shrink-0 flex justify-start sm:justify-end">
+            <div className="shrink-0 flex justify-start sm:justify-end mt-1 sm:mt-0">
               <a
                 href="https://www.youtube.com/@jamwisatabandung"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="lift-soft group inline-flex items-center gap-3.5 rounded-2xl border border-[#D5A12B]/45 bg-[#061A2F]/80 px-4.5 py-2.5 sm:py-3 text-white backdrop-blur-md shadow-[0_12px_32px_rgba(0,0,0,0.45)] transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/95 hover:scale-[1.03]"
+                className="lift-soft group inline-flex w-full xs:w-auto items-center justify-between xs:justify-start gap-3 sm:gap-3.5 rounded-xl sm:rounded-2xl border border-[#D5A12B]/45 bg-[#061A2F]/80 px-3.5 sm:px-4.5 py-2 sm:py-3 text-white backdrop-blur-md shadow-[0_10px_28px_rgba(0,0,0,0.45)] transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/95 hover:scale-[1.03]"
               >
-                <span className="grid size-10 sm:size-11 place-items-center rounded-xl bg-gradient-gold-rich text-[#061A2F] shadow-md transition-transform group-hover:scale-110">
-                  <Play className="size-4 sm:size-4.5 fill-current ml-0.5" />
-                </span>
-                <div className="text-left pr-1 leading-tight">
-                  <span className="font-[family-name:var(--font-cormorant)] block text-xs sm:text-sm font-semibold italic text-slate-200">
-                    Tonton Video Profil
+                <div className="flex items-center gap-3">
+                  <span className="grid size-8 sm:size-11 place-items-center rounded-lg sm:rounded-xl bg-gradient-gold-rich text-[#061A2F] shadow-md transition-transform group-hover:scale-110">
+                    <Play className="size-3.5 sm:size-4.5 fill-current ml-0.5" />
                   </span>
-                  <strong className="font-[family-name:var(--font-cinzel)] block text-sm sm:text-[15px] font-bold tracking-wider text-[#E8C967]">
-                    Jam Wisata
-                  </strong>
+                  <div className="text-left pr-1 leading-tight">
+                    <span className="font-[family-name:var(--font-cormorant)] block text-[11px] sm:text-sm font-semibold italic text-slate-200">
+                      Tonton Video Profil
+                    </span>
+                    <strong className="font-[family-name:var(--font-cinzel)] block text-xs sm:text-[15px] font-bold tracking-wider text-[#E8C967]">
+                      Jam Wisata
+                    </strong>
+                  </div>
                 </div>
+                <ArrowRight className="size-3.5 text-[#E8C967] xs:hidden" />
               </a>
             </div>
           </div>
