@@ -125,10 +125,10 @@ export function PremiumHeader() {
         className={`transition-all duration-300 ${
           scrolled
             ? "border-b border-[#D5A12B]/20 bg-[#061A2F]/95 shadow-[0_12px_36px_rgba(0,0,0,0.45)] backdrop-blur-md"
-            : "border-b border-white/10 bg-gradient-to-b from-[#061A2F]/85 via-[#061A2F]/40 to-transparent backdrop-blur-[1px]"
+            : "border-b border-white/10 bg-gradient-to-b from-[#061A2F]/90 via-[#061A2F]/45 to-transparent backdrop-blur-[1px]"
         }`}
       >
-        <div className="jam-container flex h-[64px] sm:h-[68px] items-center justify-between">
+        <div className="jam-container flex h-[70px] sm:h-[76px] lg:h-[82px] items-center justify-between">
           {/* Logo */}
           <a href="#beranda" aria-label="Jam Wisata, kembali ke beranda" className="shrink-0 flex items-center">
             <Image
@@ -137,7 +137,7 @@ export function PremiumHeader() {
               width={537}
               height={161}
               priority
-              className="h-10 sm:h-11 lg:h-[46px] w-auto max-w-[160px] sm:max-w-[185px] object-contain drop-shadow-md transition-transform duration-300 hover:scale-[1.02]"
+              className="h-11 sm:h-13 lg:h-[52px] w-auto max-w-[175px] sm:max-w-[210px] lg:max-w-[250px] object-contain drop-shadow-md transition-transform duration-300 hover:scale-[1.02]"
             />
           </a>
 
