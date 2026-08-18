@@ -759,16 +759,16 @@ export function HeroPackages() {
         {/* Content Container */}
         <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-0 lg:divide-x lg:divide-white/12">
-            {/* Stat 1: Ratusan+ Jamaah Berangkat */}
-            <div className="flex items-center justify-start lg:justify-center gap-3 sm:gap-4.5 lg:px-6 first:lg:pl-0">
+            {/* Stat 1: Ratusan+ Jamaah Berangkat (Phosphor UsersThree outline) */}
+            <div className="flex items-center justify-start lg:justify-center gap-3.5 sm:gap-4.5 lg:px-6 first:lg:pl-0">
               <span className="grid size-11 sm:size-12 shrink-0 place-items-center rounded-2xl bg-[#061A2F]/80 border border-[#D5A12B]/40 text-[#E8C967] shadow-sm ring-1 ring-[#D5A12B]/20">
-                <svg className="size-5.5 sm:size-6" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M128,128a48,48,0,1,0-48-48A48,48,0,0,0,128,128Z" />
-                  <path d="M64,208a64,64,0,0,1,128,0" />
-                  <path d="M184,80a40,40,0,0,1,0,80" />
-                  <path d="M224,208a56,56,0,0,0-56-48" />
-                  <path d="M72,160a40,40,0,0,0,0-80" />
-                  <path d="M32,208a56,56,0,0,1,56-48" />
+                <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="128" cy="140" r="40" />
+                  <path d="M196,216a68,68,0,0,0-136,0" />
+                  <path d="M56,112a32,32,0,1,1,32-32" />
+                  <path d="M24,176a56,56,0,0,1,40-20" />
+                  <path d="M200,112a32,32,0,1,0-32-32" />
+                  <path d="M232,176a56,56,0,0,0-40-20" />
                 </svg>
               </span>
               <div className="leading-tight">
@@ -781,13 +781,13 @@ export function HeroPackages() {
               </div>
             </div>
 
-            {/* Stat 2: 5+ Tahun Pengalaman */}
-            <div className="flex items-center justify-start lg:justify-center gap-3 sm:gap-4.5 lg:px-6">
+            {/* Stat 2: 5+ Tahun Pengalaman (Phosphor Medal outline) */}
+            <div className="flex items-center justify-start lg:justify-center gap-3.5 sm:gap-4.5 lg:px-6">
               <span className="grid size-11 sm:size-12 shrink-0 place-items-center rounded-2xl bg-[#061A2F]/80 border border-[#D5A12B]/40 text-[#E8C967] shadow-sm ring-1 ring-[#D5A12B]/20">
-                <svg className="size-5.5 sm:size-6" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="128" cy="96" r="64" />
-                  <polyline points="72 136 40 224 128 192 216 224 184 136" />
-                  <polyline points="104 96 120 112 152 80" />
+                  <path d="M72,136l-32,88,88-32,88,32-32-88" />
+                  <polyline points="96 96 120 120 160 80" />
                 </svg>
               </span>
               <div className="leading-tight">
@@ -800,13 +800,12 @@ export function HeroPackages() {
               </div>
             </div>
 
-            {/* Stat 3: 99% Kepuasan Jamaah */}
-            <div className="flex items-center justify-start lg:justify-center gap-3 sm:gap-4.5 lg:px-6">
+            {/* Stat 3: 99% Kepuasan Jamaah (Phosphor Heart Verified outline) */}
+            <div className="flex items-center justify-start lg:justify-center gap-3.5 sm:gap-4.5 lg:px-6">
               <span className="grid size-11 sm:size-12 shrink-0 place-items-center rounded-2xl bg-[#061A2F]/80 border border-[#D5A12B]/40 text-[#E8C967] shadow-sm ring-1 ring-[#D5A12B]/20">
-                <svg className="size-5.5 sm:size-6" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M128,88a32,32,0,0,1,32-32,32,32,0,0,1,32,32c0,32-64,72-64,72S64,120,64,88A32,32,0,0,1,96,56,32,32,0,0,1,128,88Z" />
-                  <path d="M48,168l32,32a16,16,0,0,0,22.6,0L128,176" />
-                  <path d="M208,168l-32,32a16,16,0,0,1-22.6,0L128,176" />
+                <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M128,216S24,144,24,88A56,56,0,0,1,120,48.6a56,56,0,0,1,96,39.4C216,144,128,216,128,216Z" />
+                  <polyline points="84 92 112 120 172 60" />
                 </svg>
               </span>
               <div className="leading-tight">
@@ -819,13 +818,14 @@ export function HeroPackages() {
               </div>
             </div>
 
-            {/* Stat 4: 10+ Destinasi Terbaik */}
-            <div className="flex items-center justify-start lg:justify-center gap-3 sm:gap-4.5 lg:px-6 last:lg:pr-0">
+            {/* Stat 4: 10+ Destinasi Terbaik (Phosphor Globe Hemisphere outline) */}
+            <div className="flex items-center justify-start lg:justify-center gap-3.5 sm:gap-4.5 lg:px-6 last:lg:pr-0">
               <span className="grid size-11 sm:size-12 shrink-0 place-items-center rounded-2xl bg-[#061A2F]/80 border border-[#D5A12B]/40 text-[#E8C967] shadow-sm ring-1 ring-[#D5A12B]/20">
-                <svg className="size-5.5 sm:size-6" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="size-6 sm:size-6.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="128" cy="128" r="96" />
+                  <ellipse cx="128" cy="128" rx="44" ry="96" />
                   <line x1="32" y1="128" x2="224" y2="128" />
-                  <path d="M128,32a136,136,0,0,1,48,96,136,136,0,0,1-48,96,136,136,0,0,1-48-96,136,136,0,0,1,48-96Z" />
+                  <path d="M128,32V224" />
                 </svg>
               </span>
               <div className="leading-tight">
