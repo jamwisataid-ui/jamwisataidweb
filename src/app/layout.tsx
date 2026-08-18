@@ -62,7 +62,7 @@ export default function RootLayout({
       lang="id"
       className={`${montserrat.variable} ${cormorant.variable} ${cinzel.variable} ${playfair.variable} ${reemKufi.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col bg-white text-[#333333]">{children}</body>
     </html>
   );
 }

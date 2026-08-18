@@ -145,13 +145,13 @@ html {
   --jam-silver: #c0c0c0;
   --jam-silver-light: #e8e8e8;
   --jam-silver-deep: #9a9a9a;
-  --jam-cream: #f7f3e9;
-  --jam-cream-soft: #fffdf8;
+  --jam-cream: #ffffff;
+  --jam-cream-soft: #ffffff;
   --jam-charcoal: #333333;
   --jam-text: #333333;
   --jam-muted: #68707a;
   color: var(--jam-text);
-  background: var(--jam-cream);
+  background: #ffffff;
   overflow-x: clip;
 }
 
