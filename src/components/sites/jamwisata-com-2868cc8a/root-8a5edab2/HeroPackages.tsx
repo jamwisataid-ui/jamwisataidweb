@@ -730,6 +730,117 @@ export function HeroPackages() {
         </div>
       </section>
 
+      {/* Trust Statistics / Achievement Counter Section */}
+      <section className="relative isolate overflow-hidden bg-[#021224] text-white py-9 sm:py-11 lg:py-12 border-y border-[#D5A12B]/20" aria-label="Statistik & Kepercayaan Jamaah">
+        {/* Subtle Photo Background with Deep Navy Gradient Overlay */}
+        <Image
+          src="/hero-makkah-cinematic.png"
+          alt=""
+          fill
+          className="object-cover object-center opacity-15 pointer-events-none"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#021224] via-[#021224]/90 to-[#021224]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(213,161,43,0.06)_0%,transparent_70%)]" />
+
+        {/* Mosque Silhouette / Skyline SVG on Left & Right Bottom Corners (15% opacity, muted gold) */}
+        <div className="absolute -bottom-1 left-0 w-48 sm:w-64 lg:w-80 h-24 pointer-events-none opacity-15 text-[#D5A12B]" aria-hidden="true">
+          <svg viewBox="0 0 320 120" fill="currentColor" preserveAspectRatio="none" className="w-full h-full">
+            <path d="M0,120 L0,85 Q15,80 30,85 L30,60 Q35,40 40,60 L40,85 Q55,80 70,85 L70,30 Q75,10 80,30 L80,85 Q95,78 110,85 L110,50 Q115,28 120,50 L120,85 Q135,80 150,85 L150,65 Q160,45 170,65 L170,85 L320,85 L320,120 Z" />
+            <path d="M20,85 A15,15 0 0,1 50,85 Z M70,85 A20,20 0 0,1 110,85 Z M140,85 A18,18 0 0,1 176,85 Z" />
+          </svg>
+        </div>
+        <div className="absolute -bottom-1 right-0 w-48 sm:w-64 lg:w-80 h-24 pointer-events-none opacity-15 text-[#D5A12B] transform scale-x-[-1]" aria-hidden="true">
+          <svg viewBox="0 0 320 120" fill="currentColor" preserveAspectRatio="none" className="w-full h-full">
+            <path d="M0,120 L0,85 Q15,80 30,85 L30,60 Q35,40 40,60 L40,85 Q55,80 70,85 L70,30 Q75,10 80,30 L80,85 Q95,78 110,85 L110,50 Q115,28 120,50 L120,85 Q135,80 150,85 L150,65 Q160,45 170,65 L170,85 L320,85 L320,120 Z" />
+            <path d="M20,85 A15,15 0 0,1 50,85 Z M70,85 A20,20 0 0,1 110,85 Z M140,85 A18,18 0 0,1 176,85 Z" />
+          </svg>
+        </div>
+
+        {/* Content Container */}
+        <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 relative z-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-0 lg:divide-x lg:divide-white/12">
+            {/* Stat 1: Ratusan+ Jamaah Berangkat */}
+            <div className="flex items-center justify-start lg:justify-center gap-3 sm:gap-4.5 lg:px-6 first:lg:pl-0">
+              <span className="grid size-11 sm:size-12 shrink-0 place-items-center rounded-2xl bg-[#061A2F]/80 border border-[#D5A12B]/40 text-[#E8C967] shadow-sm ring-1 ring-[#D5A12B]/20">
+                <svg className="size-5.5 sm:size-6" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M128,128a48,48,0,1,0-48-48A48,48,0,0,0,128,128Z" />
+                  <path d="M64,208a64,64,0,0,1,128,0" />
+                  <path d="M184,80a40,40,0,0,1,0,80" />
+                  <path d="M224,208a56,56,0,0,0-56-48" />
+                  <path d="M72,160a40,40,0,0,0,0-80" />
+                  <path d="M32,208a56,56,0,0,1,56-48" />
+                </svg>
+              </span>
+              <div className="leading-tight">
+                <span className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
+                  Ratusan+
+                </span>
+                <span className="mt-0.5 text-xs sm:text-[13.5px] font-medium text-slate-200 block">
+                  Jamaah Berangkat
+                </span>
+              </div>
+            </div>
+
+            {/* Stat 2: 5+ Tahun Pengalaman */}
+            <div className="flex items-center justify-start lg:justify-center gap-3 sm:gap-4.5 lg:px-6">
+              <span className="grid size-11 sm:size-12 shrink-0 place-items-center rounded-2xl bg-[#061A2F]/80 border border-[#D5A12B]/40 text-[#E8C967] shadow-sm ring-1 ring-[#D5A12B]/20">
+                <svg className="size-5.5 sm:size-6" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="128" cy="96" r="64" />
+                  <polyline points="72 136 40 224 128 192 216 224 184 136" />
+                  <polyline points="104 96 120 112 152 80" />
+                </svg>
+              </span>
+              <div className="leading-tight">
+                <span className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
+                  5+ Tahun
+                </span>
+                <span className="mt-0.5 text-xs sm:text-[13.5px] font-medium text-slate-200 block">
+                  Pengalaman
+                </span>
+              </div>
+            </div>
+
+            {/* Stat 3: 99% Kepuasan Jamaah */}
+            <div className="flex items-center justify-start lg:justify-center gap-3 sm:gap-4.5 lg:px-6">
+              <span className="grid size-11 sm:size-12 shrink-0 place-items-center rounded-2xl bg-[#061A2F]/80 border border-[#D5A12B]/40 text-[#E8C967] shadow-sm ring-1 ring-[#D5A12B]/20">
+                <svg className="size-5.5 sm:size-6" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M128,88a32,32,0,0,1,32-32,32,32,0,0,1,32,32c0,32-64,72-64,72S64,120,64,88A32,32,0,0,1,96,56,32,32,0,0,1,128,88Z" />
+                  <path d="M48,168l32,32a16,16,0,0,0,22.6,0L128,176" />
+                  <path d="M208,168l-32,32a16,16,0,0,1-22.6,0L128,176" />
+                </svg>
+              </span>
+              <div className="leading-tight">
+                <span className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
+                  99%
+                </span>
+                <span className="mt-0.5 text-xs sm:text-[13.5px] font-medium text-slate-200 block">
+                  Kepuasan Jamaah
+                </span>
+              </div>
+            </div>
+
+            {/* Stat 4: 10+ Destinasi Terbaik */}
+            <div className="flex items-center justify-start lg:justify-center gap-3 sm:gap-4.5 lg:px-6 last:lg:pr-0">
+              <span className="grid size-11 sm:size-12 shrink-0 place-items-center rounded-2xl bg-[#061A2F]/80 border border-[#D5A12B]/40 text-[#E8C967] shadow-sm ring-1 ring-[#D5A12B]/20">
+                <svg className="size-5.5 sm:size-6" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="128" cy="128" r="96" />
+                  <line x1="32" y1="128" x2="224" y2="128" />
+                  <path d="M128,32a136,136,0,0,1,48,96,136,136,0,0,1-48,96,136,136,0,0,1-48-96,136,136,0,0,1,48-96Z" />
+                </svg>
+              </span>
+              <div className="leading-tight">
+                <span className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-[28px] lg:text-[32px] font-bold text-gradient-gold-rich tracking-tight block">
+                  10+
+                </span>
+                <span className="mt-0.5 text-xs sm:text-[13.5px] font-medium text-slate-200 block">
+                  Destinasi Terbaik
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Tentang Jam Wisata Section */}
       <section id="tentang-kami" className="scroll-mt-24 bg-white py-16 sm:py-20 lg:py-24 border-t border-[#061A2F]/6">
         <div className="jam-container grid items-center gap-12 lg:grid-cols-[.96fr_1.04fr] lg:gap-16">
