@@ -129,16 +129,16 @@ export function PremiumHeader() {
             : "border-b border-white/10 bg-gradient-to-b from-[#061A2F]/80 via-[#061A2F]/30 to-transparent backdrop-blur-[1px]"
         }`}
       >
-        <div className="jam-container flex h-[68px] sm:h-[72px] items-center justify-between">
+        <div className="jam-container flex h-[74px] sm:h-[80px] lg:h-[84px] items-center justify-between">
           {/* Logo */}
-          <a href="#beranda" aria-label="Jam Wisata, kembali ke beranda" className="shrink-0 flex items-center">
+          <a href="#beranda" aria-label="Jam Wisata, kembali ke beranda" className="shrink-0 flex items-center py-1">
             <Image
               src={`${assetRoot}/logo.png`}
               alt="Jam Wisata"
-              width={600}
-              height={300}
+              width={537}
+              height={161}
               priority
-              className="h-11 sm:h-12 w-auto max-w-[180px] sm:max-w-[220px] object-contain drop-shadow-sm transition-transform duration-300 hover:scale-[1.02]"
+              className="h-12 sm:h-14 lg:h-[58px] w-auto max-w-[210px] sm:max-w-[260px] lg:max-w-[300px] object-contain drop-shadow-md transition-transform duration-300 hover:scale-[1.03]"
             />
           </a>
 
@@ -191,7 +191,7 @@ export function PremiumHeader() {
       {/* Mobile Drawer Navigation */}
       {menuOpen ? (
         <div
-          className="fixed inset-0 top-[68px] z-50 bg-black/60 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 top-[74px] sm:top-[80px] z-50 bg-black/60 backdrop-blur-sm lg:hidden"
           onMouseDown={(event) => event.target === event.currentTarget && closeMenu()}
         >
           <div
