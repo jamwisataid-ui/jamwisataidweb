@@ -3,21 +3,19 @@
 import Image from "next/image";
 import {
   ArrowRight,
-  BookOpenCheck,
   Building2,
   CalendarDays,
-  Check,
-  ChevronDown,
   CircleGauge,
-  ClipboardCheck,
   Clock3,
+  Compass,
   Hotel,
-  MapPin,
   MessageCircle,
   Plane,
+  Play,
   RotateCcw,
   Search,
-  UsersRound,
+  ShieldCheck,
+  Sparkles,
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
@@ -26,89 +24,14 @@ import type { TravelPackage } from "@/types/jamwisata";
 
 const assetRoot = "/sites/jamwisata-com-2868cc8a/root-8a5edab2";
 
-type Filters = { month: string; type: string; airline: string; airport: string };
-const emptyFilters: Filters = { month: "", type: "", airline: "", airport: "" };
+type Filters = {
+  type: string;
+  month: string;
+  duration: string;
+  airline: string;
+};
 
-type TrustIconProps = { className?: string };
-
-function ShieldVerifiedIcon({ className }: TrustIconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" aria-hidden="true">
-      <path d="M11.46 20.846A12 12 0 0 1 3.5 6A12 12 0 0 0 12 3a12 12 0 0 0 8.5 3a12 12 0 0 1-.09 7.06" />
-      <path d="M15 19l2 2l4-4" />
-    </svg>
-  );
-}
-
-function ServiceHeadsetIcon({ className }: TrustIconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" aria-hidden="true">
-      <path d="M4 14v-3a8 8 0 1 1 16 0v3" />
-      <path d="M4 14a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" />
-      <path d="M20 14a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2z" />
-      <path d="M18 19a3 3 0 0 1-3 3" />
-    </svg>
-  );
-}
-
-function HotelBuildingIcon({ className }: TrustIconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" aria-hidden="true">
-      <path d="M3 21h18" />
-      <path d="M5 21V7l8-4v18" />
-      <path d="M19 21V11l-6-4" />
-      <path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01" />
-    </svg>
-  );
-}
-
-function PlaneTiltIcon({ className }: TrustIconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" aria-hidden="true">
-      <path d="m14.5 6.5l3-2.9a2.05 2.05 0 0 1 2.9 2.9l-2.9 3L20 17l-2.5 2.55L14 13l-3 3v3l-2 2l-1.5-4.5L3 15l2-2h3l3-3l-6.5-3.5L7 4z" />
-    </svg>
-  );
-}
-
-function MosqueIcon({ className }: TrustIconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" aria-hidden="true">
-      <path d="M3 21h7v-2a2 2 0 1 1 4 0v2h7" />
-      <path d="M4 21V11m16 10V11" />
-      <path d="M4 16h3v-3h10v3h3" />
-      <path d="M17 13a5 5 0 0 0-10 0" />
-      <path d="M20 8l-.776 1.553A2.1 2.1 0 0 0 19 10.5a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5" />
-      <path d="M4 8l-.776 1.553A2.1 2.1 0 0 0 3 10.5a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5" />
-      <path d="M12 4a2 2 0 1 0 0-4a2 2 0 0 0 0 4m0-4v2" />
-    </svg>
-  );
-}
-
-function CalendarCheckIcon({ className }: TrustIconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" aria-hidden="true">
-      <path d="M11.5 21H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6" />
-      <path d="M16 3v4M8 3v4m-4 4h16" />
-      <path d="M16 18l2 2l4-4" />
-    </svg>
-  );
-}
-
-const trustItems = [
-  [ShieldVerifiedIcon, "LEGAL & TERPERCAYA", "Amanah, profesional, dan berintegritas."],
-  [ServiceHeadsetIcon, "PELAYANAN PROFESIONAL", "Didampingi tim berpengalaman dan bersertifikat."],
-  [HotelBuildingIcon, "HOTEL BERKUALITAS", "Pilihan hotel terbaik di lokasi strategis."],
-  [PlaneTiltIcon, "MASKAPAI TERBAIK", "Perjalanan nyaman bersama maskapai terpercaya."],
-  [MosqueIcon, "BIMBINGAN IBADAH", "Pendampingan ibadah selama perjalanan."],
-  [CalendarCheckIcon, "KEBERANGKATAN TERJADWAL", "Jadwal keberangkatan rutin dan terencana."],
-] as const;
-
-const advantages = [
-  [ClipboardCheck, "Program Terencana", "Jadwal dan kebutuhan perjalanan disampaikan dengan jelas."],
-  [UsersRound, "Pendampingan Jamaah", "Tim membantu sejak persiapan hingga kepulangan."],
-  [BookOpenCheck, "Manasik Terarah", "Jamaah dibantu mempersiapkan rangkaian ibadah."],
-  [Hotel, "Akomodasi Pilihan", "Pilihan perjalanan disesuaikan dengan kebutuhan jamaah."],
-] as const;
+const emptyFilters: Filters = { type: "", month: "", duration: "", airline: "" };
 
 const packageTypeLabels: Record<TravelPackage["packageType"], string> = {
   "bintang-5": "Umroh Bintang 5",
@@ -122,33 +45,6 @@ const monthLabel = (value: string) => {
   return new Intl.DateTimeFormat("id-ID", { month: "long", year: "numeric" }).format(new Date(year, month - 1, 1));
 };
 
-function SelectField({ label, value, onChange, children }: { label: string; value: string; onChange: (value: string) => void; children: React.ReactNode }) {
-  return (
-    <label className="block min-w-0">
-      <span className="mb-2 block text-[11px] font-extrabold tracking-[.04em] text-[#1E3A5F] uppercase">{label}</span>
-      <span className="relative block">
-        <select value={value} onChange={(event) => onChange(event.target.value)} className="min-h-12 w-full appearance-none rounded-[13px] border border-[#0A1D3A]/12 bg-white py-3 pr-10 pl-3.5 text-[13px] font-semibold text-[#0A1D3A] outline-none transition focus:border-[#D4AF37] focus:ring-3 focus:ring-[#D4AF37]/12">
-          {children}
-        </select>
-        <ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-[#68707A]" aria-hidden="true" />
-      </span>
-    </label>
-  );
-}
-
-function HotelRow({ city, hotel }: { city: string; hotel?: TravelPackage["makkahHotel"] }) {
-  return (
-    <div className="grid grid-cols-[36px_1fr] gap-3 py-3.5">
-      <span className="grid size-9 place-items-center rounded-[11px] bg-white text-[#D4AF37] shadow-[0_5px_14px_rgba(16,43,63,.06)]"><Building2 className="size-4" aria-hidden="true" /></span>
-      <div className="min-w-0">
-        <p className="text-[9px] font-black tracking-[.13em] text-[#D4AF37] uppercase">{city}</p>
-        <p className="mt-1 text-[13px] leading-4 font-extrabold text-[#0A1D3A]">{hotel?.name ?? "Hotel setaraf — konfirmasi admin"}</p>
-        {hotel?.star ? <p className="mt-0.5 text-[10px] text-[#68707A]">Bintang {hotel.star}</p> : null}
-      </div>
-    </div>
-  );
-}
-
 function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
   const context = [
     `Assalamu’alaikum, saya tertarik dengan Paket ${travelPackage.name}`,
@@ -157,52 +53,87 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
   ].join(" ");
 
   return (
-    <article className="lift-soft group flex h-full flex-col overflow-hidden rounded-[28px] bg-white shadow-[0_18px_48px_rgba(10,29,58,.10)] ring-1 ring-[#0A1D3A]/7 transition-shadow duration-500 hover:shadow-[0_30px_72px_rgba(10,29,58,.18),0_0_0_1px_rgba(192,192,192,.18)]">
+    <article className="lift-soft group flex h-full flex-col overflow-hidden rounded-[26px] bg-white shadow-[0_16px_44px_rgba(6,26,47,.08)] ring-1 ring-[#061A2F]/8 transition-all duration-500 hover:shadow-[0_28px_64px_rgba(6,26,47,.16),0_0_0_1px_rgba(213,161,43,.3)]">
       <div className="relative aspect-[4/3] overflow-hidden bg-[#E8E4DB]">
-        <Image src={travelPackage.image} alt={`Paket ${travelPackage.name} Jam Wisata`} fill sizes="(min-width:1024px) 33vw,(min-width:640px) 50vw,100vw" className="object-cover transition duration-[700ms] ease-[cubic-bezier(.22,1,.36,1)] group-hover:scale-[1.05]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#06152B]/65 via-transparent to-[#06152B]/10 transition-opacity duration-500 group-hover:from-[#06152B]/55" />
-        {travelPackage.badge ? <span className="absolute top-4 left-4 rounded-[10px] bg-gradient-gold-rich px-3 py-2 text-[10px] font-black tracking-[.08em] text-[#0A1D3A] uppercase shadow-[0_6px_14px_rgba(184,134,11,.32),inset_0_1px_0_rgba(255,235,170,.55)]">{travelPackage.badge}</span> : null}
-        {travelPackage.departureDate ? <span className="absolute right-4 bottom-4 left-4 flex items-center gap-2 rounded-[12px] border border-white/15 bg-[#0A1D3A]/84 px-3.5 py-2.5 text-[11px] font-bold text-white backdrop-blur-md transition-all duration-400 group-hover:border-[#C0C0C0]/35 group-hover:bg-[#0A1D3A]/90"><CalendarDays className="size-4 text-[#E8C967] transition-transform duration-400 group-hover:rotate-[-6deg]" />{travelPackage.departureDate}</span> : null}
+        <Image
+          src={travelPackage.image}
+          alt={`Paket ${travelPackage.name} Jam Wisata`}
+          fill
+          sizes="(min-width:1024px) 33vw,(min-width:640px) 50vw,100vw"
+          className="object-cover transition duration-700 ease-[cubic-bezier(.22,1,.36,1)] group-hover:scale-[1.05]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#061A2F]/70 via-transparent to-[#061A2F]/10 transition-opacity duration-500 group-hover:from-[#061A2F]/60" />
+        {travelPackage.badge ? (
+          <span className="absolute top-4 left-4 rounded-xl bg-gradient-to-r from-[#D5A12B] to-[#E8B84A] px-3 py-1.5 text-[10px] font-extrabold tracking-wider text-[#061A2F] uppercase shadow-md">
+            {travelPackage.badge}
+          </span>
+        ) : null}
+        {travelPackage.departureDate ? (
+          <span className="absolute right-4 bottom-4 left-4 flex items-center gap-2 rounded-xl border border-white/15 bg-[#061A2F]/85 px-3.5 py-2 text-[11px] font-bold text-white backdrop-blur-md">
+            <CalendarDays className="size-4 text-[#E8B84A]" />
+            {travelPackage.departureDate}
+          </span>
+        ) : null}
       </div>
+
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[10px] font-extrabold tracking-[.13em] text-[#D4AF37] uppercase">{packageTypeLabels[travelPackage.packageType]}</p>
-            <h3 className="mt-1.5 text-[23px] leading-[1.12] font-extrabold tracking-[-.035em] text-[#0A1D3A] transition-colors duration-300 group-hover:text-[#1E3A5F]">{travelPackage.name}</h3>
+            <p className="text-[10px] font-extrabold tracking-[.14em] text-[#D5A12B] uppercase">
+              {packageTypeLabels[travelPackage.packageType]}
+            </p>
+            <h3 className="mt-1.5 text-[22px] leading-[1.15] font-extrabold tracking-tight text-[#061A2F] transition-colors duration-300 group-hover:text-[#0A2745]">
+              {travelPackage.name}
+            </h3>
           </div>
-          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-gradient-gold-soft text-[#0A1D3A] shadow-[0_6px_14px_rgba(184,134,11,.24)] transition-transform duration-500 group-hover:rotate-[10deg]"><Plane className="size-4.5" aria-hidden="true" /></span>
+          <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#FAF8F3] border border-[#D5A12B]/30 text-[#D5A12B] shadow-xs">
+            <Plane className="size-4" aria-hidden="true" />
+          </span>
         </div>
 
-        <div className="mt-5 grid grid-cols-2 divide-x divide-[#0A1D3A]/9 border-y border-[#0A1D3A]/9 py-3.5 text-[11px] text-[#68707A]">
-          <div className="flex items-center gap-2.5 pr-3"><Clock3 className="size-4 shrink-0 text-[#D4AF37]" /><span><strong className="block text-[10px] font-extrabold text-[#0A1D3A]">Durasi</strong>{travelPackage.durationDays ? `${travelPackage.durationDays} hari` : "Konfirmasi admin"}</span></div>
-          <div className="flex items-center gap-2.5 pl-4"><Plane className="size-4 shrink-0 text-[#D4AF37]" /><span><strong className="block text-[10px] font-extrabold text-[#0A1D3A]">Maskapai</strong>{travelPackage.airline ?? "Konfirmasi admin"}</span></div>
-        </div>
-
-        <div className="mt-4 flex items-start gap-2.5 text-[12px] leading-5 text-[#68707A]">
-          <MapPin className="mt-0.5 size-4 shrink-0 text-[#D4AF37]" aria-hidden="true" />
-          <p><strong className="font-bold text-[#1E3A5F]">Berangkat dari</strong><br />{travelPackage.departureAirport ?? "Konfirmasi admin"}{travelPackage.arrivalAirport ? ` → ${travelPackage.arrivalAirport}` : ""}</p>
-        </div>
-
-        <div className="mt-4 divide-y divide-[#0A1D3A]/8 rounded-[18px] bg-gradient-to-br from-[#F7F3E9]/85 to-[#FFFDF8] px-4 ring-1 ring-[#D4AF37]/14 transition-all duration-400 group-hover:ring-[#D4AF37]/35">
-          <HotelRow city="Makkah" hotel={travelPackage.makkahHotel} />
-          <HotelRow city="Madinah" hotel={travelPackage.madinahHotel} />
-        </div>
-
-        {travelPackage.facilities?.length ? (
-          <div className="mt-4 flex flex-wrap gap-1.5">
-            {travelPackage.facilities.slice(0, 3).map((facility) => <span key={facility} className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[#59616D]"><Check className="size-3.5 text-[#D4AF37]" />{facility}</span>)}
+        <div className="mt-4 grid grid-cols-2 divide-x divide-[#061A2F]/8 border-y border-[#061A2F]/8 py-3 text-[11px] text-[#64748B]">
+          <div className="flex items-center gap-2.5 pr-2">
+            <Clock3 className="size-4 shrink-0 text-[#D5A12B]" />
+            <span>
+              <strong className="block text-[10px] font-extrabold text-[#061A2F]">Durasi</strong>
+              {travelPackage.durationDays ? `${travelPackage.durationDays} hari` : "9 - 12 Hari"}
+            </span>
           </div>
-        ) : null}
+          <div className="flex items-center gap-2.5 pl-3">
+            <Plane className="size-4 shrink-0 text-[#D5A12B]" />
+            <span>
+              <strong className="block text-[10px] font-extrabold text-[#061A2F]">Maskapai</strong>
+              {travelPackage.airline ?? "Saudia / Garuda"}
+            </span>
+          </div>
+        </div>
 
-        <div className="mt-auto pt-5">
-          <p className="text-[10px] font-semibold text-[#68707A]">Harga mulai</p>
-          <p className="mt-0.5 text-[27px] font-black tracking-[-.045em] text-[#0A1D3A] tabular-nums">
-            {travelPackage.priceFrom ? `Rp${formatIDR(travelPackage.priceFrom)}` : "Hubungi Kami"}
-            {travelPackage.priceFrom ? <span className="ml-1 text-[11px] font-semibold text-[#68707A]">/pax</span> : null}
-          </p>
-          <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-            <a href={travelPackage.detailUrl ?? "https://jamwisata.com/transaksi/paket-umrah"} target="_blank" rel="noopener noreferrer" className="lift-soft sheen-gold inline-flex min-h-12 items-center justify-center gap-2 rounded-[13px] bg-gradient-gold-rich px-4 text-xs font-extrabold text-[#0A1D3A] shadow-[0_10px_24px_rgba(184,134,11,.28),inset_0_1px_0_rgba(255,235,170,.55)]">Lihat Detail <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" /></a>
-            <a href={whatsappHref(context, `Paket — ${travelPackage.name}`)} target="_blank" rel="noopener noreferrer" className="lift-soft hover-silver-border inline-flex min-h-12 items-center justify-center gap-2 rounded-[13px] border border-[#D4AF37]/30 bg-[#FFFDF8] px-3 text-xs font-extrabold text-[#B8860B]"><MessageCircle className="size-4" /> Tanya via WhatsApp</a>
+        <div className="mt-4 flex flex-1 flex-col justify-between pt-2">
+          <div>
+            <span className="text-[11px] font-semibold text-[#64748B]">Mulai dari</span>
+            <p className="text-2xl font-black tracking-tight text-[#061A2F]">
+              {travelPackage.priceFrom ? `Rp${formatIDR(travelPackage.priceFrom)}` : "Hubungi Kami"}
+              {travelPackage.priceFrom ? <span className="ml-1 text-xs font-semibold text-[#64748B]">/pax</span> : null}
+            </p>
+          </div>
+
+          <div className="mt-5 grid gap-2 sm:grid-cols-2">
+            <a
+              href={travelPackage.detailUrl ?? "https://jamwisata.com/transaksi/paket-umrah"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D5A12B] to-[#E8B84A] px-3.5 text-xs font-bold text-[#061A2F] shadow-sm transition hover:brightness-105"
+            >
+              Lihat Detail <ArrowRight className="size-3.5" />
+            </a>
+            <a
+              href={whatsappHref(context, `Paket — ${travelPackage.name}`)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#D5A12B]/40 bg-[#FAF8F3] px-3 text-xs font-bold text-[#061A2F] transition hover:bg-[#F2EADB]"
+            >
+              <MessageCircle className="size-3.5 text-[#D5A12B]" /> Tanya via WA
+            </a>
           </div>
         </div>
       </div>
@@ -211,7 +142,6 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
 }
 
 export function HeroPackages() {
-  const [tab, setTab] = useState<"umrah" | "hajj">("umrah");
   const [draft, setDraft] = useState<Filters>(emptyFilters);
   const [applied, setApplied] = useState<Filters>(emptyFilters);
   const [hasSearched, setHasSearched] = useState(false);
@@ -220,35 +150,49 @@ export function HeroPackages() {
     months: [...new Set(umrahPackages.map((item) => item.departureMonth).filter(Boolean))] as string[],
     types: [...new Set(umrahPackages.map((item) => item.packageType))],
     airlines: [...new Set(umrahPackages.map((item) => item.airline).filter(Boolean))] as string[],
-    airports: [...new Set(umrahPackages.map((item) => item.departureAirport).filter(Boolean))] as string[],
+    durations: ["9 Hari", "10 Hari", "12 Hari", "16 Hari"],
   }), []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const fromUrl = { month: params.get("bulan") ?? "", type: params.get("jenis") ?? "", airline: params.get("maskapai") ?? "", airport: params.get("bandara") ?? "" };
+    const fromUrl = {
+      type: params.get("tujuan") ?? "",
+      month: params.get("bulan") ?? "",
+      duration: params.get("durasi") ?? "",
+      airline: params.get("maskapai") ?? "",
+    };
     if (Object.values(fromUrl).some(Boolean)) {
-      const syncFromUrl = window.setTimeout(() => {
+      const timer = window.setTimeout(() => {
         setDraft(fromUrl);
         setApplied(fromUrl);
         setHasSearched(true);
       }, 0);
-      return () => window.clearTimeout(syncFromUrl);
+      return () => window.clearTimeout(timer);
     }
   }, []);
 
-  const filteredPackages = useMemo(() => umrahPackages.filter((item) =>
-    (!applied.month || item.departureMonth === applied.month) &&
-    (!applied.type || item.packageType === applied.type) &&
-    (!applied.airline || item.airline === applied.airline) &&
-    (!applied.airport || item.departureAirport === applied.airport)
-  ), [applied]);
+  const filteredPackages = useMemo(() => {
+    return umrahPackages.filter((item) => {
+      const matchType = !applied.type || item.packageType === applied.type;
+      const matchMonth = !applied.month || item.departureMonth === applied.month;
+      const matchAirline = !applied.airline || item.airline === applied.airline;
+      const matchDuration =
+        !applied.duration ||
+        (applied.duration === "9 Hari" && item.durationDays === 9) ||
+        (applied.duration === "10 Hari" && item.durationDays === 10) ||
+        (applied.duration === "12 Hari" && item.durationDays === 12) ||
+        (applied.duration === "16 Hari" && item.durationDays === 16);
+
+      return matchType && matchMonth && matchAirline && matchDuration;
+    });
+  }, [applied]);
 
   const updateUrl = (filters: Filters) => {
     const params = new URLSearchParams();
+    if (filters.type) params.set("tujuan", filters.type);
     if (filters.month) params.set("bulan", filters.month);
-    if (filters.type) params.set("jenis", filters.type);
+    if (filters.duration) params.set("durasi", filters.duration);
     if (filters.airline) params.set("maskapai", filters.airline);
-    if (filters.airport) params.set("bandara", filters.airport);
     window.history.replaceState({}, "", `${window.location.pathname}${params.size ? `?${params}` : ""}${window.location.hash}`);
   };
 
@@ -257,7 +201,9 @@ export function HeroPackages() {
     setApplied(draft);
     setHasSearched(true);
     updateUrl(draft);
-    window.setTimeout(() => document.getElementById("paket-umrah")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+    window.setTimeout(() => {
+      document.getElementById("paket-umrah")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
   };
 
   const reset = () => {
@@ -268,115 +214,396 @@ export function HeroPackages() {
   };
 
   const activeChips = [
-    applied.month ? monthLabel(applied.month) : "",
     applied.type ? packageTypeLabels[applied.type as TravelPackage["packageType"]] : "",
+    applied.month ? monthLabel(applied.month) : "",
+    applied.duration,
     applied.airline,
-    applied.airport,
   ].filter(Boolean);
 
-  const emptyMessage = `Assalamu’alaikum, saya mencari paket umrah dengan keberangkatan ${applied.month ? monthLabel(applied.month) : "semua bulan"}, jenis paket ${applied.type ? packageTypeLabels[applied.type as TravelPackage["packageType"]] : "semua paket"}, maskapai ${applied.airline || "semua maskapai"}, dan bandara ${applied.airport || "semua bandara"}. Mohon informasi jadwal yang tersedia.`;
+  const emptyMessage = `Assalamu’alaikum, saya mencari paket umrah Jam Wisata dengan kriteria: ${activeChips.join(", ") || "semua kriteria"}. Mohon informasi jadwal dan ketersediaan paket.`;
 
   return (
     <>
-      <section id="beranda" className="relative isolate overflow-hidden bg-[#0A1D3A] text-white">
-        <Image src={`${assetRoot}/hero.png`} alt="Suasana perjalanan umrah menuju Baitullah" fill priority loading="eager" sizes="100vw" className="object-cover object-[58%_center] sm:object-center" />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,28,43,.94)_0%,rgba(7,28,43,.75)_48%,rgba(7,28,43,.46)_100%)]" />
-        <div className="jam-container relative flex min-h-[980px] flex-col justify-center py-16 sm:min-h-[920px] lg:min-h-[680px] lg:py-14">
-          <div className="max-w-[730px]">
-            <Image
-              src={`${assetRoot}/bismillah.png`}
-              alt="Bismillahirrahmanirrahim"
-              width={384}
-              height={86}
-              className="mb-5 h-auto w-[210px] opacity-95 sm:w-[250px]"
-            />
-            <p className="flex items-center gap-3 text-[11px] font-extrabold tracking-[.2em] text-[#E8C967] uppercase sm:text-xs"><span className="h-px w-8 bg-[#E8C967]" /> Umrah & Wisata Halal</p>
-            <h1 className="mt-5 text-[clamp(2.5rem,6vw,4.75rem)] leading-[1.01] font-extrabold tracking-[-.052em] text-balance">SETIAP WAKTU<br />BERNILAI IBADAH.</h1>
-            <p className="mt-5 max-w-[540px] text-[17px] leading-7 text-white/78 sm:text-[18px]">Perjalanan umrah yang nyaman, terarah, dan dipersiapkan dengan sepenuh hati.</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a href="#paket-umrah" className="sheen-gold lift-soft inline-flex min-h-13 items-center justify-center gap-3 rounded-[14px] bg-gradient-gold-rich px-6 text-sm font-extrabold tracking-[-.005em] text-[#0A1D3A] shadow-[0_14px_36px_rgba(184,134,11,.32),inset_0_1px_0_rgba(255,235,170,.55)]">Lihat Paket Umrah <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" /></a>
-              <a href={whatsappHref("Assalamu’alaikum, saya ingin berkonsultasi mengenai paket perjalanan Jam Wisata.", "Hero")} target="_blank" rel="noopener noreferrer" className="lift-soft inline-flex min-h-13 items-center justify-center gap-3 rounded-[14px] border border-white/30 bg-[#25D366] px-6 text-sm font-extrabold text-white shadow-[0_12px_26px_rgba(37,211,102,.30)] hover:bg-[#1ebe5d]"><MessageCircle className="size-4" /> Konsultasi via WhatsApp</a>
-            </div>
-          </div>
+      {/* Hero Section */}
+      <section
+        id="beranda"
+        className="relative isolate min-h-[640px] sm:min-h-[720px] lg:min-h-[780px] overflow-hidden bg-[#061A2F] text-white flex flex-col justify-between pt-[100px] sm:pt-[120px] pb-24 sm:pb-28 lg:pb-24"
+      >
+        {/* Background Image of Masjidil Haram with Ka'bah & Clock Tower */}
+        <Image
+          src="/jamwisata-makkah.png"
+          alt="Suasana Masjidil Haram, Ka'bah dan Makkah Clock Tower"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[75%_center] sm:object-[68%_center] lg:object-[65%_center]"
+        />
 
-          <div className="mt-14 rounded-[22px] border border-[#0A1D3A]/8 bg-[#FFFDF8] p-4 text-[#0A1D3A] shadow-[0_26px_70px_rgba(2,18,29,.24)] sm:p-5 lg:mt-16 lg:p-6">
-            <div className="flex flex-col gap-4 border-b border-[#0A1D3A]/8 pb-4 sm:flex-row sm:items-end sm:justify-between">
-              <div><p className="text-[16px] font-extrabold">Temukan Paket Perjalanan Anda</p><p className="mt-1 text-xs text-[#68707A]">Pilih preferensi perjalanan untuk melihat paket yang sesuai.</p></div>
-              <div role="tablist" aria-label="Jenis perjalanan" className="grid grid-cols-2 rounded-[12px] bg-[#E8E4DB] p-1">
-                <button type="button" role="tab" aria-selected={tab === "umrah"} onClick={() => setTab("umrah")} className={`min-h-10 rounded-[9px] px-4 text-xs font-extrabold transition-all duration-300 ${tab === "umrah" ? "bg-gradient-gold-rich text-[#0A1D3A] shadow-[0_6px_16px_rgba(184,134,11,.28)]" : "text-[#59616D] hover:bg-[#C0C0C0]/18 hover:text-[#0A1D3A]"}`}>Paket Umrah</button>
-                <button type="button" role="tab" aria-selected={tab === "hajj"} onClick={() => setTab("hajj")} className={`min-h-10 rounded-[9px] px-4 text-xs font-extrabold transition-all duration-300 ${tab === "hajj" ? "bg-gradient-gold-rich text-[#0A1D3A] shadow-[0_6px_16px_rgba(184,134,11,.28)]" : "text-[#59616D] hover:bg-[#C0C0C0]/18 hover:text-[#0A1D3A]"}`}>Paket Haji</button>
+        {/* Elegant Cinematic Gradient Overlay: Deep Navy on Left, Transparent on Right */}
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,26,47,0.96)_0%,rgba(6,26,47,0.88)_35%,rgba(6,26,47,0.45)_68%,rgba(6,26,47,0.15)_100%)]" />
+        {/* Top and Bottom Atmosphere Fades */}
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,26,47,0.75)_0%,transparent_22%,transparent_75%,rgba(6,26,47,0.95)_100%)]" />
+
+        {/* Main Hero Content */}
+        <div className="jam-container relative z-10 w-full my-auto py-6 sm:py-8 lg:py-10">
+          <div className="max-w-[620px] lg:max-w-[560px] xl:max-w-[620px]">
+            {/* Bismillah & Eyebrow */}
+            <div className="mb-4 sm:mb-5 flex flex-col items-start gap-2.5">
+              <Image
+                src={`${assetRoot}/bismillah.png`}
+                alt="Bismillahirrahmanirrahim"
+                width={384}
+                height={86}
+                className="h-auto w-[180px] sm:w-[210px] opacity-90 drop-shadow-sm"
+              />
+              <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-[0.2em] text-[#E8B84A]">
+                <span className="h-px w-6 bg-[#E8B84A]" />
+                <span>Biro Perjalanan Umrah &amp; Wisata Halal</span>
               </div>
             </div>
-            {tab === "umrah" ? (
-              <form onSubmit={submitSearch} className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1.2fr_auto] lg:items-end">
-                <SelectField label="Bulan Keberangkatan" value={draft.month} onChange={(month) => setDraft({ ...draft, month })}><option value="">Semua Bulan</option>{options.months.map((month) => <option key={month} value={month}>{monthLabel(month)}</option>)}</SelectField>
-                <SelectField label="Jenis Paket" value={draft.type} onChange={(type) => setDraft({ ...draft, type })}><option value="">Semua Paket</option>{options.types.filter((type) => type !== "tour").map((type) => <option key={type} value={type}>{packageTypeLabels[type]}</option>)}</SelectField>
-                <SelectField label="Maskapai" value={draft.airline} onChange={(airline) => setDraft({ ...draft, airline })}><option value="">Semua Maskapai</option>{options.airlines.map((airline) => <option key={airline} value={airline}>{airline}</option>)}</SelectField>
-                <SelectField label="Bandara Keberangkatan" value={draft.airport} onChange={(airport) => setDraft({ ...draft, airport })}><option value="">Semua Bandara</option>{options.airports.map((airport) => <option key={airport} value={airport}>{airport}</option>)}</SelectField>
-                <button type="submit" className="lift-soft sheen-gold inline-flex min-h-12 items-center justify-center gap-2 rounded-[13px] bg-gradient-gold-rich px-5 text-sm font-extrabold text-[#0A1D3A] shadow-[0_10px_26px_rgba(184,134,11,.32)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C0C0C0]/70"><Search className="size-4" /> Cari Paket</button>
-              </form>
-            ) : (
-              <div role="tabpanel" className="mt-4 flex flex-col gap-4 rounded-[14px] bg-[#F7F3E9] p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div><p className="text-sm font-extrabold">Program haji dikonsultasikan langsung bersama tim.</p><p className="mt-1 text-xs text-[#68707A]">Dapatkan informasi program dan persyaratan terbaru melalui WhatsApp.</p></div>
-                <a href={whatsappHref("Assalamu’alaikum, saya ingin berkonsultasi mengenai program haji Jam Wisata.", "Hero Search — Haji")} target="_blank" rel="noopener noreferrer" className="lift-soft inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 text-xs font-extrabold text-white shadow-[0_8px_18px_rgba(37,211,102,.25)] hover:bg-[#1ebe5d]"><MessageCircle className="size-4" /> Konsultasi Haji</a>
+
+            {/* Headline with Elegant Serif Typography */}
+            <h1 className="font-playfair text-[34px] sm:text-[48px] lg:text-[54px] xl:text-[60px] font-bold leading-[1.12] tracking-tight text-white drop-shadow-md">
+              Perjalanan Ibadah,<br />
+              <span className="text-[#E8B84A] font-normal italic">Pengalaman Tak Terlupakan</span>
+            </h1>
+
+            {/* Subheadline */}
+            <p className="mt-4 sm:mt-5 max-w-[520px] text-xs sm:text-[15px] lg:text-base leading-relaxed text-slate-100 font-medium sm:leading-7 text-balance">
+              Jam Wisata hadir untuk menemani setiap langkah Anda menuju Baitullah dengan layanan amanah, profesional, dan penuh keberkahan.
+            </p>
+
+            {/* CTA Buttons Row */}
+            <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
+              {/* Primary Gold CTA */}
+              <a
+                href="#paket-umrah"
+                className="inline-flex h-12 sm:h-13 items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-[#D5A12B] via-[#E8B84A] to-[#D5A12B] px-6 sm:px-7 text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#061A2F] shadow-[0_10px_28px_rgba(213,161,43,0.38)] transition duration-300 hover:scale-[1.03] hover:shadow-[0_14px_34px_rgba(213,161,43,0.5)] active:scale-95"
+              >
+                Lihat Paket Umroh <ArrowRight className="size-4" />
+              </a>
+
+              {/* Secondary Dark/Gold Outline CTA */}
+              <a
+                href="https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20berkonsultasi%20mengenai%20paket%20perjalanan%20Jam%20Wisata."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-12 sm:h-13 items-center justify-center gap-2.5 rounded-xl border border-[#D5A12B]/70 bg-[#061A2F]/50 px-5 sm:px-6 text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#FAF8F3] backdrop-blur-sm transition duration-300 hover:border-[#E8B84A] hover:bg-[#061A2F]/80 hover:text-[#E8B84A] active:scale-95"
+              >
+                <MessageCircle className="size-4 text-[#E8B84A]" />
+                <span>Konsultasi Gratis</span>
+              </a>
+            </div>
+
+            {/* Trust Indicators Horizontal (Subtle under CTA) */}
+            <div className="mt-6 sm:mt-7 flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-2 text-[11px] sm:text-xs font-semibold text-slate-200">
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck className="size-4 text-[#E8B84A]" />
+                <span>Legal &amp; Terpercaya</span>
               </div>
-            )}
+              <span className="hidden sm:inline text-white/30">•</span>
+              <div className="flex items-center gap-1.5">
+                <Sparkles className="size-4 text-[#E8B84A]" />
+                <span>Amanah &amp; Profesional</span>
+              </div>
+              <span className="hidden sm:inline text-white/30">•</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[#E8B84A] text-sm leading-none">✦</span>
+                <span>Anggota ASTA</span>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
 
-      <section className="bg-[#FFFDF8]" aria-label="Keunggulan utama Jam Wisata">
-        <div className="jam-container grid grid-cols-2 gap-px border-x border-b border-[#0A1D3A]/8 bg-[#0A1D3A]/8 sm:grid-cols-3 lg:grid-cols-6">
-          {trustItems.map(([Icon, title, text]) => (
-            <div
-              key={title}
-              className="group flex min-h-[164px] flex-col items-start gap-3 bg-[#FFFDF8] px-4 py-5 transition-colors duration-300 hover:bg-white sm:px-5 sm:py-6"
+        {/* Video CTA Card (Right Side, Subtle Luxury Pill) */}
+        <div className="jam-container relative z-20 w-full pointer-events-none">
+          <div className="flex justify-end pointer-events-auto">
+            <a
+              href="https://www.youtube.com/@jamwisatabandung"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-3.5 rounded-2xl border border-[#D5A12B]/40 bg-[#061A2F]/80 px-4 py-3 text-white backdrop-blur-md shadow-[0_12px_32px_rgba(0,0,0,0.45)] transition duration-300 hover:border-[#E8B84A] hover:bg-[#061A2F]/95 hover:scale-[1.02]"
             >
-              <span className="grid size-11 place-items-center rounded-[12px] bg-gradient-gold-rich text-[#0A1D3A] shadow-[0_8px_20px_rgba(184,134,11,.28),inset_0_1px_0_rgba(255,235,170,.55)] transition-all duration-400 group-hover:shadow-[0_10px_24px_rgba(184,134,11,.36),inset_0_1px_0_rgba(255,235,170,.65)] group-hover:brightness-[1.03]">
-                <Icon className="size-5" />
+              <span className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-[#D5A12B] to-[#E8B84A] text-[#061A2F] shadow-md transition-transform group-hover:scale-110">
+                <Play className="size-4 fill-current ml-0.5" />
               </span>
-              <h2 className="mt-2 text-[11px] leading-snug font-extrabold tracking-[.02em] text-[#0A1D3A] sm:text-[12px]">
-                {title}
-              </h2>
-              <p className="mt-1 text-[10px] leading-4 text-[#68707A] sm:text-[11px] sm:leading-[1.45]">
-                {text}
-              </p>
-            </div>
-          ))}
+              <div className="text-left pr-1">
+                <span className="block text-[11px] font-medium text-slate-300">Tonton Video Profil</span>
+                <strong className="block text-xs font-bold text-[#E8B84A]">Jam Wisata</strong>
+              </div>
+            </a>
+          </div>
         </div>
       </section>
 
-      <section id="tentang-kami" className="scroll-mt-24 bg-[#F7F3E9] py-20 sm:py-24 lg:py-28">
+      {/* Overlapping Floating Search Package Card (1 Horizontal Row Desktop) */}
+      <section className="relative z-30 -mt-10 sm:-mt-14 lg:-mt-14" aria-label="Pencarian Paket Umrah">
+        <div className="jam-container">
+          <div className="rounded-[18px] sm:rounded-[22px] border border-[#D5A12B]/25 bg-white p-4 sm:p-5 lg:p-6 shadow-[0_20px_50px_rgba(6,26,47,0.16)]">
+            <form
+              onSubmit={submitSearch}
+              className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.1fr_1.1fr_0.9fr_1.1fr_auto] lg:items-end"
+            >
+              {/* Field 1: Tujuan */}
+              <div className="min-w-0">
+                <label className="mb-1.5 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#061A2F]">
+                  <Compass className="size-3.5 text-[#D5A12B]" />
+                  <span>Tujuan</span>
+                </label>
+                <select
+                  value={draft.type}
+                  onChange={(e) => setDraft({ ...draft, type: e.target.value })}
+                  className="h-11 w-full rounded-xl border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-bold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
+                >
+                  <option value="">Semua Tujuan</option>
+                  {options.types.map((type) => (
+                    <option key={type} value={type}>
+                      {packageTypeLabels[type]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Field 2: Tanggal Keberangkatan */}
+              <div className="min-w-0">
+                <label className="mb-1.5 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#061A2F]">
+                  <CalendarDays className="size-3.5 text-[#D5A12B]" />
+                  <span>Tanggal Keberangkatan</span>
+                </label>
+                <select
+                  value={draft.month}
+                  onChange={(e) => setDraft({ ...draft, month: e.target.value })}
+                  className="h-11 w-full rounded-xl border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-bold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
+                >
+                  <option value="">Semua Bulan</option>
+                  {options.months.map((month) => (
+                    <option key={month} value={month}>
+                      {monthLabel(month)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Field 3: Durasi */}
+              <div className="min-w-0">
+                <label className="mb-1.5 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#061A2F]">
+                  <Clock3 className="size-3.5 text-[#D5A12B]" />
+                  <span>Durasi</span>
+                </label>
+                <select
+                  value={draft.duration}
+                  onChange={(e) => setDraft({ ...draft, duration: e.target.value })}
+                  className="h-11 w-full rounded-xl border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-bold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
+                >
+                  <option value="">Semua Durasi</option>
+                  {options.durations.map((dur) => (
+                    <option key={dur} value={dur}>
+                      {dur}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Field 4: Maskapai */}
+              <div className="min-w-0">
+                <label className="mb-1.5 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#061A2F]">
+                  <Plane className="size-3.5 text-[#D5A12B]" />
+                  <span>Maskapai</span>
+                </label>
+                <select
+                  value={draft.airline}
+                  onChange={(e) => setDraft({ ...draft, airline: e.target.value })}
+                  className="h-11 w-full rounded-xl border border-[#DCE5F0] bg-[#FAF8F3] px-3 text-xs font-bold text-[#061A2F] outline-none transition focus:border-[#D5A12B] focus:bg-white cursor-pointer"
+                >
+                  <option value="">Semua Maskapai</option>
+                  {options.airlines.map((airline) => (
+                    <option key={airline} value={airline}>
+                      {airline}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Field 5: CARI PAKET Button (Dark Navy) */}
+              <button
+                type="submit"
+                className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[#061A2F] hover:bg-[#0A2745] px-6 text-xs font-extrabold uppercase tracking-wider text-[#FAF8F3] hover:text-[#E8B84A] shadow-md transition duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer sm:col-span-2 lg:col-span-1"
+              >
+                <Search className="size-4 text-[#E8B84A]" />
+                <span>Cari Paket</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* Tentang Jam Wisata Section */}
+      <section id="tentang-kami" className="scroll-mt-24 bg-[#FAF8F3] py-20 sm:py-24 lg:py-28">
         <div className="jam-container grid items-center gap-12 lg:grid-cols-[.96fr_1.04fr] lg:gap-16">
-          <div className="grid grid-cols-[1.25fr_.75fr] gap-3"><figure className="relative min-h-[470px] overflow-hidden rounded-[28px]"><Image src={`${assetRoot}/about.jpg`} alt="Kebersamaan jamaah Jam Wisata" fill sizes="(min-width:1024px) 38vw,65vw" className="object-cover" /></figure><div className="grid gap-3 pt-14"><figure className="relative overflow-hidden rounded-[20px]"><Image src={`${assetRoot}/umrah-2.png`} alt="Kegiatan perjalanan jamaah" fill sizes="20vw" className="object-cover" /></figure><figure className="relative overflow-hidden rounded-[20px]"><Image src={`${assetRoot}/umrah-3.png`} alt="Dokumentasi jamaah di tanah suci" fill sizes="20vw" className="object-cover" /></figure></div></div>
-          <div><p className="section-eyebrow">Tentang Jam Wisata</p><h2 className="section-title max-w-[650px]">Perjalanan yang Baik Dimulai dari Persiapan yang Dipercaya.</h2><p className="mt-5 max-w-[620px] text-[15px] leading-7 text-[#68707A]">Jam Wisata membantu mempersiapkan perjalanan umrah dan wisata halal dengan pelayanan yang jelas, nyaman, dan penuh perhatian. Mulai dari konsultasi hingga perjalanan selesai, tim kami siap mendampingi kebutuhan jamaah dan keluarga.</p><div className="mt-7 grid gap-x-7 gap-y-5 sm:grid-cols-2">{advantages.map(([Icon, title, text]) => (
-            <div key={title} className="group lift-soft grid grid-cols-[34px_1fr] gap-3 border-t border-[#0A1D3A]/12 pt-4 transition-all duration-300 hover:border-[#C0C0C0]/55">
-              <span className="grid size-7 place-items-center rounded-[10px] bg-gradient-gold-soft text-[#0A1D3A] shadow-[0_4px_10px_rgba(184,134,11,.18)] transition-transform duration-500 group-hover:rotate-[6deg]">
-                <Icon className="size-4" strokeWidth={1.7} />
-              </span>
-              <div>
-                <h3 className="text-sm font-extrabold text-[#0A1D3A]">{title}</h3>
-                <p className="mt-1 text-xs leading-5 text-[#68707A]">{text}</p>
+          <div className="grid grid-cols-[1.25fr_.75fr] gap-3">
+            <figure className="relative min-h-[440px] overflow-hidden rounded-[26px]">
+              <Image
+                src={`${assetRoot}/about.jpg`}
+                alt="Kebersamaan jamaah Jam Wisata"
+                fill
+                sizes="(min-width:1024px) 38vw,65vw"
+                className="object-cover"
+              />
+            </figure>
+            <div className="grid gap-3 pt-12">
+              <figure className="relative overflow-hidden rounded-[18px]">
+                <Image
+                  src={`${assetRoot}/umrah-2.png`}
+                  alt="Kegiatan perjalanan jamaah"
+                  fill
+                  sizes="20vw"
+                  className="object-cover"
+                />
+              </figure>
+              <figure className="relative overflow-hidden rounded-[18px]">
+                <Image
+                  src={`${assetRoot}/umrah-3.png`}
+                  alt="Dokumentasi jamaah di tanah suci"
+                  fill
+                  sizes="20vw"
+                  className="object-cover"
+                />
+              </figure>
+            </div>
+          </div>
+
+          <div>
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-white px-2.5 py-1 text-xs font-extrabold uppercase tracking-wider text-[#D5A12B] border border-[#D5A12B]/20">
+              <Building2 className="size-3.5" /> Tentang Jam Wisata
+            </span>
+            <h2 className="mt-3 font-playfair text-3xl sm:text-4xl font-bold leading-tight text-[#061A2F]">
+              Perjalanan yang Baik Dimulai dari Persiapan yang Dipercaya.
+            </h2>
+            <p className="mt-4 text-sm leading-relaxed text-[#59616D]">
+              Jam Wisata membantu mempersiapkan perjalanan umrah dan wisata halal dengan pelayanan yang jelas, nyaman, dan penuh perhatian. Mulai dari konsultasi hingga perjalanan selesai, tim kami siap mendampingi kebutuhan jamaah dan keluarga.
+            </p>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="flex items-start gap-3 rounded-xl border border-[#061A2F]/8 bg-white p-3.5 shadow-2xs">
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[#FAF8F3] text-[#D5A12B] border border-[#D5A12B]/30">
+                  <ShieldCheck className="size-4" />
+                </span>
+                <div>
+                  <h3 className="text-xs font-bold text-[#061A2F]">Program Terencana</h3>
+                  <p className="mt-0.5 text-[11px] text-[#64748B]">Jadwal dan rute disampaikan dengan transparan.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 rounded-xl border border-[#061A2F]/8 bg-white p-3.5 shadow-2xs">
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[#FAF8F3] text-[#D5A12B] border border-[#D5A12B]/30">
+                  <Hotel className="size-4" />
+                </span>
+                <div>
+                  <h3 className="text-xs font-bold text-[#061A2F]">Hotel Strategis</h3>
+                  <p className="mt-0.5 text-[11px] text-[#64748B]">Akomodasi dekat dengan Masjidil Haram &amp; Nabawi.</p>
+                </div>
               </div>
             </div>
-          ))}</div><a href="#kontak" className="lift-soft mt-8 inline-flex min-h-12 items-center gap-3 rounded-[14px] bg-gradient-navy px-6 text-sm font-bold text-white shadow-[0_10px_26px_rgba(10,29,58,.32)] hover:shadow-[0_12px_28px_rgba(192,192,192,.25),0_10px_26px_rgba(10,29,58,.4)]">Kenal Lebih Dekat <ArrowRight className="size-4" /></a></div>
+
+            <div className="mt-8">
+              <a
+                href="https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20konsultasi%20paket%20umrah%20Jam%20Wisata."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-11 items-center gap-2.5 rounded-xl bg-[#061A2F] hover:bg-[#0A2745] px-6 text-xs font-bold text-white shadow-md transition hover:-translate-y-0.5"
+              >
+                Konsultasi Jadwal <ArrowRight className="size-4 text-[#E8B84A]" />
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 
+      {/* Paket Umrah Section */}
       <section id="paket-umrah" className="scroll-mt-24 bg-white py-20 sm:py-24 lg:py-28">
         <div className="jam-container">
-          <div className="mx-auto max-w-[760px] text-center"><p className="section-eyebrow justify-center">Paket Pilihan</p><h2 className="section-title">Temukan Program Umrah yang Sesuai untuk Anda.</h2><p className="mt-4 text-sm leading-6 text-[#68707A] sm:text-base">Pilih program berdasarkan jadwal, akomodasi, dan kebutuhan perjalanan Anda.</p></div>
-          <div aria-live="polite" className="mt-8 flex min-h-8 flex-wrap items-center justify-center gap-2">
-            {hasSearched ? (<>
-                <span className="mr-1 text-xs font-extrabold text-[#0A1D3A]">{filteredPackages.length} paket ditemukan</span>
-                {activeChips.map((chip) => (
-                  <span key={chip} className="lift-soft rounded-full bg-gradient-gold-soft px-3 py-1.5 text-[10px] font-bold text-[#0A1D3A] shadow-[0_3px_9px_rgba(184,134,11,.18)]">{chip}</span>
-                ))}
-                <button type="button" onClick={reset} className="lift-soft silver-underline inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-[10px] font-bold text-[#68707A] hover:text-[#0A1D3A]"><RotateCcw className="size-3" /> Reset</button>
-              </>) : null}
+          <div className="mx-auto max-w-[760px] text-center">
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-[#FAF8F3] px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-[#D5A12B] border border-[#D5A12B]/20">
+              Paket Pilihan
+            </span>
+            <h2 className="mt-3 font-playfair text-3xl sm:text-4xl font-bold text-[#061A2F]">
+              Temukan Program Umrah yang Sesuai untuk Anda
+            </h2>
+            <p className="mt-3 text-xs sm:text-sm leading-relaxed text-[#64748B]">
+              Pilih program berdasarkan jadwal, akomodasi, dan kebutuhan perjalanan ibadah Anda.
+            </p>
           </div>
-          {filteredPackages.length ? <div className="mt-4 grid gap-6 md:grid-cols-2 lg:grid-cols-3">{filteredPackages.map((item) => <PackageCard key={item.id} travelPackage={item} />)}</div> : <div className="mx-auto mt-4 max-w-[700px] rounded-[24px] border border-[#0A1D3A]/9 bg-[#F7F3E9] p-8 text-center"><CircleGauge className="mx-auto size-8 text-[#D4AF37]" /><h3 className="mt-4 text-xl font-extrabold text-[#0A1D3A]">Belum ada paket yang sesuai dengan pilihan Anda.</h3><p className="mt-2 text-sm text-[#68707A]">Tim kami dapat membantu mencarikan jadwal dengan kriteria serupa.</p><div className="mt-5 flex flex-col justify-center gap-2 sm:flex-row"><button type="button" onClick={reset} className="lift-soft hover-silver-border inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#0A1D3A]/14 px-4 text-xs font-bold text-[#0A1D3A]"><RotateCcw className="size-4" /> Reset Filter</button><a href={whatsappHref(emptyMessage, "Hasil Pencarian Kosong")} target="_blank" rel="noopener noreferrer" className="lift-soft inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 text-xs font-extrabold text-white shadow-[0_8px_18px_rgba(37,211,102,.25)] hover:bg-[#1ebe5d]"><MessageCircle className="size-4" /> Tanyakan Jadwal via WhatsApp</a></div></div>}
-          <div className="mt-9 text-center"><a href="https://jamwisata.com/transaksi/paket-umrah" target="_blank" rel="noopener noreferrer" className="lift-soft hover-silver-border group inline-flex min-h-12 items-center gap-3 rounded-[14px] border border-[#0A1D3A]/18 px-6 text-sm font-bold text-[#0A1D3A] hover:text-[#1E3A5F]">Lihat Semua Paket <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" /></a></div>
+
+          <div aria-live="polite" className="mt-6 flex min-h-8 flex-wrap items-center justify-center gap-2">
+            {hasSearched ? (
+              <>
+                <span className="mr-1 text-xs font-extrabold text-[#061A2F]">
+                  {filteredPackages.length} paket ditemukan:
+                </span>
+                {activeChips.map((chip) => (
+                  <span
+                    key={chip}
+                    className="rounded-full bg-[#FAF8F3] border border-[#D5A12B]/30 px-3 py-1 text-[11px] font-bold text-[#061A2F]"
+                  >
+                    {chip}
+                  </span>
+                ))}
+                <button
+                  type="button"
+                  onClick={reset}
+                  className="inline-flex items-center gap-1 text-xs font-bold text-[#D5A12B] hover:underline ml-2 cursor-pointer"
+                >
+                  <RotateCcw className="size-3" /> Reset Filter
+                </button>
+              </>
+            ) : null}
+          </div>
+
+          {filteredPackages.length ? (
+            <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {filteredPackages.map((item) => (
+                <PackageCard key={item.id} travelPackage={item} />
+              ))}
+            </div>
+          ) : (
+            <div className="mx-auto mt-8 max-w-[640px] rounded-3xl border border-[#061A2F]/10 bg-[#FAF8F3] p-8 text-center">
+              <CircleGauge className="mx-auto size-8 text-[#D5A12B]" />
+              <h3 className="mt-3 text-lg font-extrabold text-[#061A2F]">
+                Belum ada paket yang sesuai dengan filter pencarian.
+              </h3>
+              <p className="mt-1.5 text-xs text-[#64748B]">
+                Tim kami siap membantu mencarikan jadwal dan kriteria yang sesuai untuk Anda.
+              </p>
+              <div className="mt-5 flex flex-col justify-center gap-2 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={reset}
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#061A2F]/20 px-4 text-xs font-bold text-[#061A2F]"
+                >
+                  <RotateCcw className="size-3.5" /> Reset Filter
+                </button>
+                <a
+                  href={whatsappHref(emptyMessage, "Hasil Pencarian Kosong")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D5A12B] to-[#E8B84A] px-4 text-xs font-extrabold text-[#061A2F] shadow-sm"
+                >
+                  <MessageCircle className="size-3.5" /> Tanyakan Jadwal via WhatsApp
+                </a>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-10 text-center">
+            <a
+              href="https://jamwisata.com/transaksi/paket-umrah"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-12 items-center gap-2.5 rounded-xl border border-[#061A2F]/20 hover:border-[#D5A12B] bg-white px-6 text-xs font-bold text-[#061A2F] transition hover:-translate-y-0.5 shadow-2xs"
+            >
+              Lihat Semua Paket di Portal <ArrowRight className="size-3.5 text-[#D5A12B]" />
+            </a>
+          </div>
         </div>
       </section>
     </>

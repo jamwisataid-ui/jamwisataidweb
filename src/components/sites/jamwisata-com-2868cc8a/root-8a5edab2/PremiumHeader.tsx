@@ -35,7 +35,7 @@ export function PremiumHeader() {
   const drawerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setScrolled(window.scrollY > 30);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -72,17 +72,6 @@ export function PremiumHeader() {
         setMenuOpen(false);
         triggerRef.current?.focus();
       }
-      if (event.key === "Tab" && focusable?.length) {
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-          last.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first.focus();
-        }
-      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => {
@@ -97,84 +86,163 @@ export function PremiumHeader() {
   };
 
   return (
-    <header className="sticky inset-x-0 top-0 z-[70]">
-      <div className={`text-white transition-all duration-500 ${scrolled ? "bg-[#0A1D3A]" : "bg-transparent"}`}>
-        <div className="jam-container flex h-8 items-center justify-between gap-4 text-[11px] font-medium text-white/82">
+    <header className="fixed inset-x-0 top-0 z-[70] transition-all duration-300">
+      {/* Top Bar - Subtle dark luxury info strip */}
+      <div
+        className={`border-b transition-all duration-300 ${
+          scrolled
+            ? "h-0 overflow-hidden border-transparent opacity-0"
+            : "border-white/10 bg-[#061A2F]/40 backdrop-blur-[2px] opacity-100"
+        }`}
+      >
+        <div className="jam-container flex h-8 items-center justify-between gap-4 text-[11px] font-medium text-white/80">
           <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-            <a className="flex shrink-0 items-center gap-1.5 hover:text-white" href="tel:+6281809627499">
-              <Phone className="size-3.5" aria-hidden="true" />
-              <span className="sm:hidden">WhatsApp</span>
+            <a className="flex shrink-0 items-center gap-1.5 hover:text-[#E8B84A] transition" href="tel:+6281809627499">
+              <Phone className="size-3 text-[#E8B84A]" aria-hidden="true" />
+              <span className="sm:hidden">+62 818-0962-7499</span>
               <span className="hidden sm:inline">+62 818-0962-7499</span>
             </a>
-            <a className="hidden items-center gap-1.5 border-l border-white/15 pl-4 hover:text-white md:flex" href="mailto:jamwisata99@gmail.com">
-              <Mail className="size-3.5" aria-hidden="true" /> jamwisata99@gmail.com
+            <a className="hidden items-center gap-1.5 border-l border-white/15 pl-4 hover:text-[#E8B84A] transition md:flex" href="mailto:jamwisata99@gmail.com">
+              <Mail className="size-3 text-[#E8B84A]" aria-hidden="true" /> jamwisata99@gmail.com
             </a>
-            <span className="hidden items-center gap-1.5 border-l border-white/15 pl-4 lg:flex">
-              <MapPin className="size-3.5" aria-hidden="true" /> Bandung, Jawa Barat
+            <span className="hidden items-center gap-1.5 border-l border-white/15 pl-4 lg:flex text-white/70">
+              <MapPin className="size-3 text-[#E8B84A]" aria-hidden="true" /> Bandung, Jawa Barat
             </span>
           </div>
-          <div className="flex shrink-0 items-center gap-3">
-            <span className="flex items-center gap-1.5">
-              <Clock3 className="size-3.5" aria-hidden="true" />
-              <span className="hidden sm:inline">Sen–Jum 09.00–17.00 · Sab 09.00–14.00 WIB</span>
-              <span className="sm:hidden">09.00–17.00 WIB</span>
+          <div className="flex shrink-0 items-center gap-3 text-white/70">
+            <span className="hidden sm:flex items-center gap-1.5">
+              <Clock3 className="size-3 text-[#E8B84A]" aria-hidden="true" />
+              <span>Sen–Jum 09.00–17.00 · Sab 09.00–14.00 WIB</span>
             </span>
-            <a className="hidden items-center gap-1.5 border-l border-white/15 pl-3 hover:text-white xl:flex" href="https://jamwisata.com" target="_blank" rel="noopener noreferrer">
+            <a className="hidden items-center gap-1.5 border-l border-white/15 pl-3 hover:text-white transition xl:flex" href="https://jamwisata.com" target="_blank" rel="noopener noreferrer">
               Portal Jamaah <ExternalLink className="size-3" aria-hidden="true" />
             </a>
           </div>
         </div>
       </div>
 
-      <div className={`transition-all duration-500 ${scrolled ? "border-b border-[#0A1D3A]/8 bg-[#FFFDF8] shadow-[0_7px_24px_rgba(16,43,63,.07)]" : "border-b border-transparent bg-transparent"}`}>
-        <div className="jam-container flex h-[76px] items-center justify-between">
+      {/* Main Navbar */}
+      <div
+        className={`transition-all duration-300 ${
+          scrolled
+            ? "border-b border-[#D5A12B]/20 bg-[#061A2F]/95 shadow-[0_12px_36px_rgba(0,0,0,0.45)] backdrop-blur-md"
+            : "border-b border-white/10 bg-gradient-to-b from-[#061A2F]/80 via-[#061A2F]/30 to-transparent backdrop-blur-[1px]"
+        }`}
+      >
+        <div className="jam-container flex h-[68px] sm:h-[72px] items-center justify-between">
+          {/* Logo */}
           <a href="#beranda" aria-label="Jam Wisata, kembali ke beranda" className="shrink-0">
-            <Image src={`${assetRoot}/logo.png`} alt="Jam Wisata" width={500} height={184} priority className={`h-auto w-[160px] transition-all duration-500 sm:w-[190px] ${scrolled ? "" : "brightness-0 invert"}`} />
+            <Image
+              src={`${assetRoot}/logo.png`}
+              alt="Jam Wisata"
+              width={500}
+              height={184}
+              priority
+              className="h-auto w-[140px] sm:w-[165px] brightness-0 invert drop-shadow-sm transition-transform duration-300 hover:scale-[1.02]"
+            />
           </a>
-          <nav aria-label="Navigasi utama" className="hidden items-center xl:flex">
+
+          {/* Navigation Links */}
+          <nav aria-label="Navigasi utama" className="hidden items-center gap-1 lg:flex">
             {links.map(([id, label]) => (
               <a
                 key={id}
                 href={`#${id}`}
                 aria-current={active === id ? "location" : undefined}
-                className={`relative flex min-h-11 items-center px-3 text-[12px] font-bold transition-colors after:absolute after:right-3 after:bottom-1.5 after:left-3 after:h-0.5 after:origin-left after:rounded-full after:bg-[#D4AF37] after:transition-transform ${active === id ? "text-[#D4AF37] after:scale-x-100" : scrolled ? "text-[#43535C] after:scale-x-0 hover:text-[#0A1D3A] hover:after:scale-x-100" : "text-white/85 after:scale-x-0 hover:text-white hover:after:scale-x-100"}`}
+                className={`relative px-3.5 py-2 text-[13px] font-semibold tracking-wide transition-colors after:absolute after:inset-x-3.5 after:bottom-0 after:h-[2px] after:origin-left after:rounded-full after:bg-[#E8B84A] after:transition-transform ${
+                  active === id
+                    ? "text-[#E8B84A] font-bold after:scale-x-100"
+                    : "text-white/85 after:scale-x-0 hover:text-white hover:after:scale-x-100"
+                }`}
               >
                 {label}
               </a>
             ))}
           </nav>
-          <div className="flex items-center gap-2.5">
-            <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="lift-soft sheen-gold hidden min-h-11 items-center gap-2 rounded-[14px] bg-gradient-gold-rich px-5 text-xs font-extrabold text-[#0A1D3A] shadow-[0_10px_28px_rgba(184,134,11,.32),inset_0_1px_0_rgba(255,235,170,.55)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37] sm:inline-flex">
-              <MessageCircle className="size-4" aria-hidden="true" /> Konsultasi Umrah
+
+          {/* CTA Area */}
+          <div className="flex items-center gap-3">
+            <a
+              href={whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#D5A12B] via-[#E8B84A] to-[#D5A12B] px-5 py-2.5 text-xs font-extrabold uppercase tracking-wider text-[#061A2F] shadow-[0_8px_20px_rgba(213,161,43,0.32)] transition duration-300 hover:scale-[1.03] hover:shadow-[0_10px_26px_rgba(213,161,43,0.45)] active:scale-95"
+            >
+              <MessageCircle className="size-4 shrink-0" aria-hidden="true" />
+              <span>Konsultasi Gratis</span>
             </a>
-            <a href={whatsapp} aria-label="Konsultasi cepat via WhatsApp" target="_blank" rel="noopener noreferrer" className="grid size-11 place-items-center rounded-[13px] bg-gradient-gold-rich text-[#0A1D3A] shadow-[0_8px_22px_rgba(184,134,11,.30),inset_0_1px_0_rgba(255,235,170,.55)] sm:hidden">
-              <MessageCircle className="size-5" aria-hidden="true" />
-            </a>
-            <button ref={triggerRef} type="button" aria-expanded={menuOpen} aria-controls="mobile-navigation" aria-label={menuOpen ? "Tutup menu" : "Buka menu"} onClick={() => setMenuOpen((value) => !value)} className={`grid size-11 place-items-center rounded-[13px] border transition-colors duration-500 xl:hidden ${scrolled ? "border-[#0A1D3A]/12 text-[#0A1D3A]" : "border-white/30 text-white"}`}>
+
+            {/* Mobile Menu Trigger */}
+            <button
+              ref={triggerRef}
+              type="button"
+              aria-expanded={menuOpen}
+              aria-controls="mobile-navigation"
+              aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
+              onClick={() => setMenuOpen((value) => !value)}
+              className="grid size-10 place-items-center rounded-xl border border-white/20 bg-[#061A2F]/60 text-white backdrop-blur-sm transition-colors hover:bg-white/10 lg:hidden cursor-pointer"
+            >
               {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
             </button>
           </div>
         </div>
       </div>
 
+      {/* Mobile Drawer Navigation */}
       {menuOpen ? (
-        <div className="fixed inset-x-0 top-[108px] bottom-0 z-50 bg-[#06152B]/45 backdrop-blur-[2px] xl:hidden" onMouseDown={(event) => event.target === event.currentTarget && closeMenu()}>
-          <div id="mobile-navigation" ref={drawerRef} role="dialog" aria-modal="true" aria-label="Menu navigasi" className="ml-auto flex h-full w-[min(88vw,390px)] flex-col bg-[#FFFDF8] p-5 shadow-[-20px_0_50px_rgba(7,28,43,.18)]">
-            <div className="flex items-center justify-between border-b border-[#0A1D3A]/9 pb-4">
-              <span className="text-xs font-extrabold tracking-[.12em] text-[#D4AF37] uppercase">Navigasi</span>
-              <button type="button" onClick={closeMenu} aria-label="Tutup menu navigasi" className="grid size-11 place-items-center rounded-full bg-white text-[#0A1D3A] shadow-sm"><X className="size-5" /></button>
+        <div
+          className="fixed inset-0 top-[68px] z-50 bg-black/60 backdrop-blur-sm lg:hidden"
+          onMouseDown={(event) => event.target === event.currentTarget && closeMenu()}
+        >
+          <div
+            id="mobile-navigation"
+            ref={drawerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu navigasi"
+            className="ml-auto flex h-full w-[min(85vw,340px)] flex-col border-l border-[#D5A12B]/20 bg-[#061A2F] p-6 text-white shadow-2xl"
+          >
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <span className="text-xs font-extrabold tracking-[.15em] text-[#E8B84A] uppercase">Menu Navigasi</span>
+              <button
+                type="button"
+                onClick={closeMenu}
+                aria-label="Tutup menu"
+                className="grid size-9 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20"
+              >
+                <X className="size-4" />
+              </button>
             </div>
-            <nav aria-label="Navigasi mobile" className="mt-3">
+
+            <nav aria-label="Navigasi mobile" className="mt-4 space-y-1">
               {links.map(([id, label]) => (
-                <a key={id} href={`#${id}`} onClick={closeMenu} className={`flex min-h-12 items-center justify-between border-b border-[#0A1D3A]/8 text-sm font-bold ${active === id ? "text-[#D4AF37]" : "text-[#0A1D3A]"}`}>
-                  {label}<span aria-hidden="true">↗</span>
+                <a
+                  key={id}
+                  href={`#${id}`}
+                  onClick={closeMenu}
+                  className={`flex items-center justify-between rounded-xl px-3 py-3 text-sm font-semibold transition ${
+                    active === id
+                      ? "bg-[#D5A12B]/15 text-[#E8B84A] font-bold"
+                      : "text-white/80 hover:bg-white/5 hover:text-white"
+                  }`}
+                >
+                  {label}
+                  <span className="text-xs text-white/40">↗</span>
                 </a>
               ))}
             </nav>
-            <div className="mt-auto rounded-[18px] bg-[#F7F3E9] p-4 text-xs leading-5 text-[#59616D]">
-              <p className="font-bold text-[#0A1D3A]">Butuh bantuan memilih paket?</p>
-              <p className="mt-1">Sen–Jum 09.00–17.00 · Sab 09.00–14.00 WIB</p>
-              <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="lift-soft sheen-gold mt-4 flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-gold-rich px-4 font-extrabold text-[#0A1D3A] shadow-[0_8px_22px_rgba(184,134,11,.30),inset_0_1px_0_rgba(255,235,170,.55)]"><MessageCircle className="size-4" /> Konsultasi Umrah</a>
+
+            <div className="mt-auto rounded-2xl border border-[#D5A12B]/20 bg-[#0A2745]/60 p-4 text-xs">
+              <p className="font-bold text-white">Konsultasi Jadwal Umrah</p>
+              <p className="mt-1 text-slate-300">Tim kami siap melayani informasi keberangkatan dan pilihan paket.</p>
+              <a
+                href={whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3.5 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D5A12B] to-[#E8B84A] py-2.5 font-bold text-[#061A2F] shadow-md"
+              >
+                <MessageCircle className="size-4" /> Chat via WhatsApp
+              </a>
             </div>
           </div>
         </div>
