@@ -10,7 +10,6 @@
   --font-heading: var(--font-cinzel), Cinzel, Georgia, serif;
   --font-cinzel: var(--font-cinzel), Cinzel, Georgia, serif;
   --font-cormorant: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
-  --font-playfair: var(--font-playfair), "Playfair Display", Georgia, serif;
   --font-reem-kufi: var(--font-reem-kufi), "Reem Kufi", serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -170,7 +169,7 @@ html {
 }
 
 .font-quote {
-  font-family: var(--font-playfair), "Playfair Display", Georgia, serif;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
   font-style: italic;
 }
 

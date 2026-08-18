@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cinzel, Cormorant_Garamond, Montserrat, Playfair_Display, Reem_Kufi } from "next/font/google";
+import { Cinzel, Cormorant_Garamond, Montserrat, Reem_Kufi } from "next/font/google";
 import "lite-youtube-embed/src/lite-yt-embed.css";
 import "./globals.css";
 
@@ -19,13 +19,6 @@ const cinzel = Cinzel({
   variable: "--font-cinzel",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  weight: ["400", "500", "600"],
 });
 
 const reemKufi = Reem_Kufi({
@@ -60,7 +53,7 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className={`${montserrat.variable} ${cormorant.variable} ${cinzel.variable} ${playfair.variable} ${reemKufi.variable} h-full antialiased`}
+      className={`${montserrat.variable} ${cormorant.variable} ${cinzel.variable} ${reemKufi.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-[#333333]">{children}</body>
     </html>

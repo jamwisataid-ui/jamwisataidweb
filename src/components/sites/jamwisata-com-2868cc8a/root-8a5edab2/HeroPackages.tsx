@@ -616,7 +616,7 @@ export function HeroPackages() {
             <span className="inline-flex items-center gap-1.5 rounded-md bg-white px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-[#D5A12B] border border-[#D5A12B]/20">
               Pilihan Terbaik
             </span>
-            <h2 className="mt-3 font-playfair text-3xl sm:text-4xl font-bold text-[#061A2F]">
+            <h2 className="mt-3 font-[family-name:var(--font-cinzel)] text-3xl sm:text-4xl font-bold text-[#061A2F]">
               Paket Unggulan
             </h2>
             <p className="mt-2 text-xs sm:text-sm leading-relaxed text-[#64748B]">
@@ -801,7 +801,7 @@ export function HeroPackages() {
                 <span className="inline-flex items-center gap-1.5 rounded-md bg-white px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider text-[#D5A12B] border border-[#D5A12B]/25 mb-3">
                   <Building2 className="size-3.5" /> Mengapa Kami?
                 </span>
-                <h2 className="font-playfair text-2xl sm:text-3xl lg:text-[30px] font-bold leading-tight text-[#061A2F]">
+                <h2 className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-3xl lg:text-[30px] font-bold leading-tight text-[#061A2F]">
                   Mengapa Memilih Jam Wisata?
                 </h2>
                 <div className="w-12 h-1 bg-gradient-gold-rich rounded-full mt-3.5 mb-4" />
