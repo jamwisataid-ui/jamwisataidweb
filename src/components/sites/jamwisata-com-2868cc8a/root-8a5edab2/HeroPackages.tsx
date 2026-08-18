@@ -226,23 +226,23 @@ export function HeroPackages() {
       {/* Hero Section */}
       <section
         id="beranda"
-        className="relative isolate min-h-[560px] sm:min-h-[600px] lg:min-h-[640px] overflow-hidden rounded-b-[40px] sm:rounded-b-[56px] lg:rounded-b-[68px] border-b-[3px] border-[#D4AF37]/90 bg-[#021224] text-white flex flex-col justify-between pt-[112px] sm:pt-[126px] lg:pt-[136px] xl:pt-[144px] pb-18 sm:pb-22 lg:pb-24 shadow-[0_20px_50px_rgba(0,0,0,0.35),0_0_24px_rgba(212,175,55,0.25)]"
+        className="relative isolate min-h-[540px] sm:min-h-[580px] lg:min-h-[620px] bg-[#021224] text-white flex flex-col justify-between pt-[112px] sm:pt-[126px] lg:pt-[136px] xl:pt-[144px] pb-16 sm:pb-20 lg:pb-22 mb-7 sm:mb-9 lg:mb-11"
       >
-        {/* Background Image of Masjidil Haram with Ka'bah & Clock Tower placed bottom-right */}
+        {/* Background Image of Masjidil Haram with Ka'bah & Clock Tower */}
         <Image
-          src="/jamwisata-makkah.png"
-          alt="Suasana Masjidil Haram, Ka'bah dan Makkah Clock Tower"
+          src="/hero-makkah-cinematic.png"
+          alt="Keindahan Masjidil Haram, Ka'bah dan Makkah Clock Tower"
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[72%_80%] sm:object-[74%_75%] lg:object-[76%_65%]"
+          className="object-cover object-[64%_52%] sm:object-[62%_48%] lg:object-[64%_45%]"
         />
 
-        {/* Directional Cinematic Gradient Overlay: Solid Rich Deep Navy on Left to cover text completely, Clear on Right for Photo */}
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,18,36,1)_0%,rgba(2,18,36,1)_32%,rgba(2,18,36,0.92)_48%,rgba(2,18,36,0.55)_68%,rgba(2,18,36,0.14)_85%,rgba(2,18,36,0.02)_100%)]" />
+        {/* Directional Cinematic Gradient Overlay: Deep Navy on Left for Copy Readability, Clear on Right for Ka'bah */}
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,18,36,0.96)_0%,rgba(2,18,36,0.88)_28%,rgba(2,18,36,0.55)_50%,rgba(2,18,36,0.12)_75%,rgba(2,18,36,0.02)_100%)]" />
         {/* Subtle Bottom and Top Atmosphere Fades */}
-        <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(2,18,36,0.60)_0%,transparent_38%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,18,36,0.70)_0%,transparent_25%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(2,18,36,0.55)_0%,transparent_38%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,18,36,0.65)_0%,transparent_25%)]" />
 
         {/* Main Hero Content (Upper-Left 40% column, right 60% left for Ka'bah & Clock Tower) */}
         <div className="jam-container relative z-10 w-full my-auto pt-2 sm:pt-4 pb-2 sm:pb-4">
@@ -347,12 +347,42 @@ export function HeroPackages() {
           </div>
         </div>
 
-        {/* Ambient Bottom Gold Glow */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 rounded-b-[40px] sm:rounded-b-[56px] lg:rounded-b-[68px] shadow-[inset_0_-8px_24px_rgba(212,175,55,0.35)]" />
+        {/* Smooth Shallow Elliptical SVG Bottom Curve with Rich Gold Stroke */}
+        <svg
+          className="absolute inset-x-0 -bottom-[32px] sm:-bottom-[42px] lg:-bottom-[48px] w-full h-[34px] sm:h-[44px] lg:h-[50px] block pointer-events-none z-20"
+          viewBox="0 0 1440 70"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <defs>
+            <linearGradient id="heroCurveGoldRich" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#8C6708" />
+              <stop offset="18%" stopColor="#B8860B" />
+              <stop offset="38%" stopColor="#D4AF37" />
+              <stop offset="52%" stopColor="#F5D97A" />
+              <stop offset="72%" stopColor="#D4AF37" />
+              <stop offset="90%" stopColor="#B8860B" />
+              <stop offset="100%" stopColor="#8C6708" />
+            </linearGradient>
+          </defs>
+          {/* Smooth Solid Fill extending hero dark navy */}
+          <path
+            d="M0 0 H1440 C1100 55 340 55 0 0 Z"
+            fill="#021224"
+          />
+          {/* Smooth Gradient Gold Rich Stroke on the curved boundary */}
+          <path
+            d="M0 0 C340 55 1100 55 1440 0"
+            stroke="url(#heroCurveGoldRich)"
+            strokeWidth="3.5"
+            fill="none"
+            style={{ filter: "drop-shadow(0px 2px 8px rgba(212,175,55,0.65))" }}
+          />
+        </svg>
       </section>
 
-      {/* Overlapping Floating Search Package Card (Widescreen 1240px, 48-52px overlap on Hero Boundary) */}
-      <section className="relative z-30 -mt-[44px] sm:-mt-[48px] lg:-mt-[52px]" aria-label="Pencarian Paket Umrah">
+      {/* Overlapping Floating Search Package Card (Widescreen 1240px, overlaps across the curved boundary) */}
+      <section className="relative z-30 -mt-[18px] sm:-mt-[22px] lg:-mt-[26px]" aria-label="Pencarian Paket Umrah">
         <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
           <div className="rounded-[14px] sm:rounded-[16px] border border-[#D5A12B]/25 bg-white p-3.5 sm:p-4 lg:p-5 shadow-[0_14px_40px_rgba(0,0,0,0.14)]">
             <form
