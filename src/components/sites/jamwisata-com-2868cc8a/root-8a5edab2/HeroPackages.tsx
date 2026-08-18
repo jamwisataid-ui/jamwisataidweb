@@ -238,54 +238,53 @@ export function HeroPackages() {
           className="object-cover object-[64%_52%] sm:object-[62%_48%] lg:object-[64%_45%]"
         />
 
-        {/* Directional Cinematic Gradient Overlay: Mobile top-fade, Desktop left-pekat */}
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,18,36,0.95)_0%,rgba(2,18,36,0.84)_42%,rgba(2,18,36,0.50)_75%,rgba(2,18,36,0.25)_100%)] lg:bg-[linear-gradient(90deg,rgba(2,18,36,0.96)_0%,rgba(2,18,36,0.88)_28%,rgba(2,18,36,0.55)_50%,rgba(2,18,36,0.12)_75%,rgba(2,18,36,0.02)_100%)]" />
+        {/* Directional Cinematic Gradient Overlay: Deep Navy on Left for Copy Readability, Clear on Right for Ka'bah */}
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,18,36,0.96)_0%,rgba(2,18,36,0.88)_28%,rgba(2,18,36,0.55)_50%,rgba(2,18,36,0.12)_75%,rgba(2,18,36,0.02)_100%)]" />
         {/* Subtle Atmosphere Fades */}
-        <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(2,18,36,0.60)_0%,transparent_35%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,18,36,0.70)_0%,transparent_25%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(2,18,36,0.55)_0%,transparent_38%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,18,36,0.65)_0%,transparent_25%)]" />
 
-        {/* Main Hero Content */}
-        <div className="jam-container relative z-10 w-full my-auto pt-3 sm:pt-4 lg:pt-6 pb-4 sm:pb-6">
-          <div className="max-w-[540px] lg:max-w-[640px] xl:max-w-[700px]">
+        {/* Main Hero Content (Upper-Left 40% column, right 60% left for Ka'bah & Clock Tower) */}
+        <div className="jam-container relative z-10 w-full my-auto pt-2 sm:pt-4 pb-2 sm:pb-4">
+          <div className="max-w-[480px] lg:max-w-[530px]">
             {/* Bismillah & Eyebrow */}
-            <div className="mb-3 sm:mb-4 lg:mb-5 flex flex-col items-start gap-2.5">
+            <div className="mb-3 sm:mb-4 flex flex-col items-start gap-2">
               <Image
                 src={`${assetRoot}/bismillah.png`}
                 alt="Bismillahirrahmanirrahim"
                 width={384}
                 height={86}
-                className="h-auto w-[145px] sm:w-[170px] lg:w-[210px] opacity-85 drop-shadow-sm"
+                className="h-auto w-[135px] sm:w-[155px] lg:w-[175px] opacity-85 drop-shadow-sm"
               />
-              <div className="flex items-center gap-2.5">
-                <span className="h-px w-6 bg-gradient-gold-rich" />
-                <p className="font-[family-name:var(--font-cinzel)] text-[10.5px] sm:text-xs lg:text-[13px] font-bold tracking-[0.2em] text-[#D7A72B] uppercase">
+              <div className="flex items-center gap-2">
+                <span className="h-px w-5 bg-gradient-gold-rich" />
+                <p className="font-[family-name:var(--font-cinzel)] text-[10px] sm:text-[11px] lg:text-xs font-bold tracking-[0.2em] text-[#D7A72B] uppercase">
                   Biro Perjalanan Umrah &amp; Wisata Halal
                 </p>
               </div>
             </div>
 
-            {/* Heading — Cinzel (Large, authoritative, strictly 2 lines) */}
-            <h1 className="font-[family-name:var(--font-cinzel)] text-[28px] xs:text-[34px] sm:text-[44px] md:text-[50px] lg:text-[56px] xl:text-[62px] font-bold leading-[1.08] tracking-[0.02em] text-white drop-shadow-md">
-              <span className="block">Perjalanan Ibadah,</span>
-              <span className="text-gradient-gold-rich mt-1 block font-bold">
+            {/* Heading — Cinzel (strictly 2 visual lines, enlarged for desktop) */}
+            <h1 className="font-[family-name:var(--font-cinzel)] text-[28px] xs:text-[34px] sm:text-[42px] lg:text-[50px] xl:text-[56px] font-bold leading-[1.08] tracking-[0.02em] text-white drop-shadow-md">
+              <span className="block whitespace-nowrap">Perjalanan Ibadah,</span>
+              <span className="text-gradient-gold-rich mt-0.5 block font-bold whitespace-nowrap">
                 Pengalaman Tak Terlupakan
               </span>
             </h1>
 
-            {/* Body — Montserrat (easy to read, clean, modern) */}
-            <p className="font-[family-name:var(--font-montserrat)] mt-3.5 sm:mt-4 lg:mt-5 max-w-[480px] lg:max-w-[540px] text-left text-[13.5px] sm:text-[15px] lg:text-[16.5px] font-normal leading-[1.65] text-slate-100/95">
+            {/* Body — Montserrat (easy to read, clean, modern, max 3 lines) */}
+            <p className="font-[family-name:var(--font-montserrat)] mt-3 sm:mt-3.5 max-w-[430px] lg:max-w-[460px] text-left text-[13px] sm:text-[14.5px] lg:text-[15.5px] font-normal leading-[1.6] text-slate-200/90">
               Jam Wisata hadir untuk menemani setiap langkah Anda menuju Baitullah dengan layanan amanah, profesional, dan penuh keberkahan.
             </p>
 
-            {/* CTA Buttons Row — Responsive & Touch Friendly */}
-            <div className="mt-6 sm:mt-7 lg:mt-8 flex flex-col xs:flex-row flex-wrap items-stretch xs:items-center gap-3 sm:gap-3.5 font-[family-name:var(--font-montserrat)]">
+            {/* CTA Buttons Row — Exact same horizontal placement, enlarged font size */}
+            <div className="mt-5 sm:mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3 font-[family-name:var(--font-montserrat)]">
               {/* Primary Gold CTA */}
               <a
                 href="#paket-umrah"
-                className="lift-soft sheen-gold inline-flex h-[46px] sm:h-[48px] lg:h-[52px] items-center justify-center gap-2.5 rounded-[8px] bg-gradient-gold-rich px-5 sm:px-6 lg:px-7 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#061A2F] shadow-[0_8px_24px_rgba(184,134,11,.35)] transition duration-300 hover:scale-[1.02] active:scale-95 text-center"
+                className="lift-soft sheen-gold inline-flex h-[44px] sm:h-[48px] lg:h-[50px] items-center justify-center gap-2 rounded-[8px] bg-gradient-gold-rich px-5 sm:px-6 text-xs lg:text-[13px] font-bold uppercase tracking-wider text-[#061A2F] shadow-[0_8px_24px_rgba(184,134,11,.32)] transition duration-300 hover:scale-[1.02] active:scale-95"
               >
-                <span>Lihat Paket Umroh</span>
-                <ArrowRight className="size-3.5 sm:size-4" />
+                Lihat Paket Umroh <ArrowRight className="size-3.5" />
               </a>
 
               {/* Secondary Dark/Gold Outline CTA */}
@@ -293,31 +292,31 @@ export function HeroPackages() {
                 href="https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20berkonsultasi%20mengenai%20paket%20perjalanan%20Jam%20Wisata."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="lift-soft inline-flex h-[46px] sm:h-[48px] lg:h-[52px] items-center justify-center gap-2.5 rounded-[8px] border border-[#D7A72B]/60 bg-[#061A2F]/60 px-5 sm:px-6 lg:px-7 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#FAF8F3] backdrop-blur-sm transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/85 hover:text-[#E8C967] active:scale-95 text-center"
+                className="lift-soft inline-flex h-[44px] sm:h-[48px] lg:h-[50px] items-center justify-center gap-2 rounded-[8px] border border-[#D7A72B]/60 bg-[#061A2F]/60 px-4.5 sm:px-5 text-xs lg:text-[13px] font-bold uppercase tracking-wider text-[#FAF8F3] backdrop-blur-sm transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/85 hover:text-[#E8C967] active:scale-95"
               >
-                <MessageCircle className="size-3.5 sm:size-4 text-[#E8C967]" />
+                <MessageCircle className="size-3.5 text-[#E8C967]" />
                 <span>Konsultasi Gratis</span>
               </a>
             </div>
 
             {/* Trust Indicators (2 Visual Horizontal Blocks) */}
-            <div className="font-[family-name:var(--font-montserrat)] mt-6 sm:mt-7 flex flex-wrap items-center gap-3 sm:gap-4 text-xs lg:text-[13px]">
-              <div className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-[#061A2F]/50 px-3.5 py-2 backdrop-blur-xs shadow-sm">
-                <span className="grid size-6 sm:size-7 place-items-center rounded-full bg-[#D7A72B]/20 text-[#E8C967]">
-                  <ShieldCheck className="size-3.5 sm:size-4" />
+            <div className="font-[family-name:var(--font-montserrat)] mt-5 sm:mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3.5 text-[11px] sm:text-xs lg:text-[12.5px]">
+              <div className="flex items-center gap-2 rounded-lg border border-white/12 bg-[#061A2F]/40 px-3 py-1.5 backdrop-blur-xs">
+                <span className="grid size-6 place-items-center rounded-full bg-[#D7A72B]/15 text-[#E8C967]">
+                  <ShieldCheck className="size-3.5" />
                 </span>
                 <div className="text-left leading-tight">
                   <strong className="block font-bold text-white">Legal &amp; Terpercaya</strong>
-                  <span className="text-[10px] sm:text-[11px] text-slate-300">Amanah &amp; Profesional</span>
+                  <span className="text-[9.5px] sm:text-[10px] text-slate-300">Amanah &amp; Profesional</span>
                 </div>
               </div>
-              <div className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-[#061A2F]/50 px-3.5 py-2 backdrop-blur-xs shadow-sm">
-                <span className="grid size-6 sm:size-7 place-items-center rounded-full bg-[#D7A72B]/20 text-[#E8C967] font-bold text-xs sm:text-sm">
+              <div className="flex items-center gap-2 rounded-lg border border-white/12 bg-[#061A2F]/40 px-3 py-1.5 backdrop-blur-xs">
+                <span className="grid size-6 place-items-center rounded-full bg-[#D7A72B]/15 text-[#E8C967] font-bold text-xs">
                   ✦
                 </span>
                 <div className="text-left leading-tight">
                   <strong className="block font-bold text-white">Anggota ASTA</strong>
-                  <span className="text-[10px] sm:text-[11px] text-slate-300">Resmi &amp; Terakreditasi</span>
+                  <span className="text-[9.5px] sm:text-[10px] text-slate-300">Resmi &amp; Terakreditasi</span>
                 </div>
               </div>
             </div>
