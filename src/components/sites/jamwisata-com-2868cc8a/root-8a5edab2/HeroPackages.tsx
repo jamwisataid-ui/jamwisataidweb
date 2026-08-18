@@ -14,7 +14,6 @@ import {
   Play,
   RotateCcw,
   Search,
-  ShieldCheck,
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
@@ -827,83 +826,107 @@ export function HeroPackages() {
         </div>
       </section>
 
-      {/* Tentang Jam Wisata Section */}
+      {/* Mengapa Memilih Jam Wisata? (Why Choose Us) Section */}
       <section id="tentang-kami" className="scroll-mt-24 bg-white py-16 sm:py-20 lg:py-24 border-t border-[#061A2F]/6">
-        <div className="jam-container grid items-center gap-12 lg:grid-cols-[.96fr_1.04fr] lg:gap-16">
-          <div className="grid grid-cols-[1.25fr_.75fr] gap-3">
-            <figure className="relative min-h-[440px] overflow-hidden rounded-[26px]">
-              <Image
-                src={`${assetRoot}/about.jpg`}
-                alt="Kebersamaan jamaah Jam Wisata"
-                fill
-                sizes="(min-width:1024px) 38vw,65vw"
-                className="object-cover"
-              />
-            </figure>
-            <div className="grid gap-3 pt-12">
-              <figure className="relative overflow-hidden rounded-[18px]">
-                <Image
-                  src={`${assetRoot}/umrah-2.png`}
-                  alt="Kegiatan perjalanan jamaah"
-                  fill
-                  sizes="20vw"
-                  className="object-cover"
-                />
-              </figure>
-              <figure className="relative overflow-hidden rounded-[18px]">
-                <Image
-                  src={`${assetRoot}/umrah-3.png`}
-                  alt="Dokumentasi jamaah di tanah suci"
-                  fill
-                  sizes="20vw"
-                  className="object-cover"
-                />
-              </figure>
-            </div>
-          </div>
-
-          <div>
-            <span className="inline-flex items-center gap-1.5 rounded-md bg-white px-2.5 py-1 text-xs font-extrabold uppercase tracking-wider text-[#D5A12B] border border-[#D5A12B]/20">
-              <Building2 className="size-3.5" /> Tentang Jam Wisata
-            </span>
-            <h2 className="mt-3 font-playfair text-3xl sm:text-4xl font-bold leading-tight text-[#061A2F]">
-              Perjalanan yang Baik Dimulai dari Persiapan yang Dipercaya.
-            </h2>
-            <p className="mt-4 text-sm leading-relaxed text-[#59616D]">
-              Jam Wisata membantu mempersiapkan perjalanan umrah dan wisata halal dengan pelayanan yang jelas, nyaman, dan penuh perhatian. Mulai dari konsultasi hingga perjalanan selesai, tim kami siap mendampingi kebutuhan jamaah dan keluarga.
-            </p>
-
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="flex items-start gap-3 rounded-xl border border-[#061A2F]/8 bg-white p-3.5 shadow-2xs">
-                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-white text-[#D5A12B] border border-[#D5A12B]/30">
-                  <ShieldCheck className="size-4" />
+        <div className="jam-container">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 lg:gap-7 items-stretch">
+            {/* 1. Intro di Kiri */}
+            <div className="flex flex-col justify-between lg:col-span-3 py-1">
+              <div>
+                <span className="inline-flex items-center gap-1.5 rounded-md bg-white px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider text-[#D5A12B] border border-[#D5A12B]/25 mb-3">
+                  <Building2 className="size-3.5" /> Mengapa Kami?
                 </span>
-                <div>
-                  <h3 className="text-xs font-bold text-[#061A2F]">Program Terencana</h3>
-                  <p className="mt-0.5 text-[11px] text-[#64748B]">Jadwal dan rute disampaikan dengan transparan.</p>
-                </div>
+                <h2 className="font-playfair text-2xl sm:text-3xl lg:text-[30px] font-bold leading-tight text-[#061A2F]">
+                  Mengapa Memilih Jam Wisata?
+                </h2>
+                <div className="w-12 h-1 bg-gradient-gold-rich rounded-full mt-3.5 mb-4" />
+                <p className="text-xs sm:text-sm leading-relaxed text-[#59616D]">
+                  Kami berkomitmen memberikan layanan terbaik dengan mengutamakan amanah, kenyamanan, dan keberkahan.
+                </p>
               </div>
 
-              <div className="flex items-start gap-3 rounded-xl border border-[#061A2F]/8 bg-white p-3.5 shadow-2xs">
-                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-white text-[#D5A12B] border border-[#D5A12B]/30">
-                  <Hotel className="size-4" />
-                </span>
-                <div>
-                  <h3 className="text-xs font-bold text-[#061A2F]">Hotel Strategis</h3>
-                  <p className="mt-0.5 text-[11px] text-[#64748B]">Akomodasi dekat dengan Masjidil Haram &amp; Nabawi.</p>
-                </div>
+              <div className="mt-6 pt-2">
+                <a
+                  href="https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20tahu%20lebih%20banyak%20tentang%20layanan%20Jam%20Wisata."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-10 items-center justify-center rounded-lg bg-[#061A2F] hover:bg-[#0A2745] px-5 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:-translate-y-0.5"
+                >
+                  Tentang Kami
+                </a>
               </div>
             </div>
 
-            <div className="mt-8">
-              <a
-                href="https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20konsultasi%20paket%20umrah%20Jam%20Wisata."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-11 items-center gap-2.5 rounded-xl bg-[#061A2F] hover:bg-[#0A2745] px-6 text-xs font-bold text-white shadow-md transition hover:-translate-y-0.5"
-              >
-                Konsultasi Jadwal <ArrowRight className="size-4 text-[#E8B84A]" />
-              </a>
+            {/* 2. Gambar Utama Ka'bah & Jamaah */}
+            <div className="lg:col-span-3 flex">
+              <figure className="relative min-h-[340px] sm:min-h-[380px] w-full overflow-hidden rounded-[20px] shadow-xs border border-[#061A2F]/8">
+                <Image
+                  src="/why-choose-kabah.jpg"
+                  alt="Pintu Kiswah Ka'bah dan Jamaah Umrah Jam Wisata"
+                  fill
+                  sizes="(min-width:1024px) 25vw, 50vw"
+                  className="object-cover object-center"
+                />
+              </figure>
+            </div>
+
+            {/* 3. Checklist Keunggulan */}
+            <div className="flex flex-col justify-center lg:col-span-3 py-1">
+              <ul className="space-y-3.5 sm:space-y-4">
+                {[
+                  "Amanah dan berintegritas",
+                  "Pelayanan profesional dan ramah",
+                  "Hotel pilihan terbaik",
+                  "Jadwal pasti setiap bulan",
+                  "Pembimbing ibadah berpengalaman",
+                  "Harga transparan tanpa biaya tersembunyi",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-xs sm:text-[13.5px] font-semibold text-[#061A2F] leading-snug">
+                    <span className="grid size-5 shrink-0 place-items-center rounded-full border border-[#D5A12B]/40 bg-white text-[#D5A12B] shadow-2xs mt-0.5">
+                      <svg className="size-3.5" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="24" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="216 72 104 184 48 128" />
+                      </svg>
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* 4. Islamic Quote Card di Kanan */}
+            <div className="lg:col-span-3 flex">
+              <div className="relative isolate flex flex-col justify-center items-center text-center w-full overflow-hidden rounded-[22px] bg-[#021224] p-6 sm:p-7 border border-[#D5A12B]/35 shadow-md">
+                {/* Subtle Radial Glow */}
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(213,161,43,0.12)_0%,transparent_70%)] pointer-events-none" />
+                
+                {/* Subtle Mosque Silhouette at bottom */}
+                <div className="absolute -bottom-1 left-0 right-0 h-16 pointer-events-none opacity-12 text-[#D5A12B]" aria-hidden="true">
+                  <svg viewBox="0 0 320 120" fill="currentColor" preserveAspectRatio="none" className="w-full h-full">
+                    <path d="M0,120 L0,85 Q15,80 30,85 L30,60 Q35,40 40,60 L40,85 Q55,80 70,85 L70,30 Q75,10 80,30 L80,85 Q95,78 110,85 L110,50 Q115,28 120,50 L120,85 Q135,80 150,85 L150,65 Q160,45 170,65 L170,85 L320,85 L320,120 Z" />
+                    <path d="M20,85 A15,15 0 0,1 50,85 Z M70,85 A20,20 0 0,1 110,85 Z M140,85 A18,18 0 0,1 176,85 Z" />
+                  </svg>
+                </div>
+
+                <div className="relative z-10">
+                  {/* Arabic Calligraphy Verse */}
+                  <p className="font-serif text-xl sm:text-[22px] font-bold text-gradient-gold-rich leading-loose tracking-wide" dir="rtl">
+                    وَأَتِمُّوا الْحَجَّ وَالْعُمْرَةَ لِلَّهِ
+                  </p>
+
+                  {/* Translation */}
+                  <p className="mt-3 text-xs sm:text-[13px] text-slate-200 leading-relaxed">
+                    Dan sempurnakanlah ibadah Haji dan Umrah karena Allah.
+                  </p>
+
+                  {/* Divider */}
+                  <div className="w-14 h-px bg-[#D5A12B]/40 mx-auto my-3.5" />
+
+                  {/* Surah Reference */}
+                  <p className="text-[11px] sm:text-xs font-bold tracking-wider text-[#E8C967]">
+                    (QS. Al-Baqarah : 196)
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
