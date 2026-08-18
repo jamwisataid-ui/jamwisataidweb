@@ -226,7 +226,7 @@ export function HeroPackages() {
       {/* Hero Section */}
       <section
         id="beranda"
-        className="relative isolate min-h-[540px] sm:min-h-[580px] lg:min-h-[620px] overflow-hidden rounded-b-[20px] sm:rounded-b-[24px] bg-[#061A2F] text-white flex flex-col justify-between pt-[84px] sm:pt-[94px] lg:pt-[100px] pb-16 sm:pb-20 lg:pb-22 shadow-[0_20px_48px_rgba(6,26,47,0.3)]"
+        className="relative isolate min-h-[560px] sm:min-h-[600px] lg:min-h-[640px] overflow-hidden rounded-b-[20px] sm:rounded-b-[24px] bg-[#061A2F] text-white flex flex-col justify-between pt-[112px] sm:pt-[126px] lg:pt-[136px] xl:pt-[144px] pb-16 sm:pb-20 lg:pb-22 shadow-[0_20px_48px_rgba(6,26,47,0.3)]"
       >
         {/* Background Image of Masjidil Haram with Ka'bah & Clock Tower */}
         <Image
@@ -245,7 +245,7 @@ export function HeroPackages() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,18,36,0.65)_0%,transparent_25%)]" />
 
         {/* Main Hero Content (Upper-Left 40% column, right 60% left for Ka'bah & Clock Tower) */}
-        <div className="jam-container relative z-10 w-full my-auto py-2 sm:py-4">
+        <div className="jam-container relative z-10 w-full my-auto pt-2 sm:pt-4 pb-2 sm:pb-4">
           <div className="max-w-[480px] lg:max-w-[530px]">
             {/* Bismillah & Eyebrow */}
             <div className="mb-3 sm:mb-4 flex flex-col items-start gap-2">
