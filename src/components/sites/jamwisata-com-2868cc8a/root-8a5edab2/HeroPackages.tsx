@@ -589,7 +589,7 @@ export function HeroPackages() {
                 {activeChips.map((chip) => (
                   <span
                     key={chip}
-                    className="rounded-full bg-[#FAF8F3] border border-[#D5A12B]/30 px-3 py-1 text-[11px] font-bold text-[#061A2F]"
+                    className="rounded-full bg-white border border-[#D5A12B]/40 px-3 py-1 text-[11px] font-bold text-[#061A2F] shadow-xs"
                   >
                     {chip}
                   </span>
@@ -612,7 +612,7 @@ export function HeroPackages() {
               ))}
             </div>
           ) : (
-            <div className="mx-auto mt-8 max-w-[640px] rounded-3xl border border-[#061A2F]/10 bg-[#FAF8F3] p-8 text-center">
+            <div className="mx-auto mt-8 max-w-[640px] rounded-3xl border border-[#061A2F]/10 bg-white p-8 text-center shadow-xs">
               <CircleGauge className="mx-auto size-8 text-[#D5A12B]" />
               <h3 className="mt-3 text-lg font-extrabold text-[#061A2F]">
                 Belum ada paket yang sesuai dengan filter pencarian.
@@ -624,7 +624,7 @@ export function HeroPackages() {
                 <button
                   type="button"
                   onClick={reset}
-                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#061A2F]/20 px-4 text-xs font-bold text-[#061A2F]"
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#061A2F]/20 bg-white px-4 text-xs font-bold text-[#061A2F]"
                 >
                   <RotateCcw className="size-3.5" /> Reset Filter
                 </button>

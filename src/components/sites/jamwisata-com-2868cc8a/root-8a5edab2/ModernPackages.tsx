@@ -12,10 +12,10 @@ import { whatsappHref } from "@/data/jamwisata";
 
 const assetRoot = "/sites/jamwisata-com-2868cc8a/root-8a5edab2";
 const facilityGroups = [
-  [FileCheck2, "Dokumen & Keberangkatan", ["Visa umrah", "Asuransi perjalanan", "Handling bandara"], "bg-[#F7F3E9]"],
+  [FileCheck2, "Dokumen & Keberangkatan", ["Visa umrah", "Asuransi perjalanan", "Handling bandara"], "bg-white"],
   [Plane, "Penerbangan & Transportasi", ["Tiket pesawat PP", "Transportasi bus AC", "Penanganan bagasi"], "bg-white"],
-  [Hotel, "Hotel & Konsumsi", ["Hotel Makkah", "Hotel Madinah", "Konsumsi sesuai program"], "bg-[#FFFDF8]"],
-  [BookOpenCheck, "Ibadah & Pendampingan", ["Manasik", "Tour leader & muthawif", "Perlengkapan umrah"], "bg-[#E8E4DB]"],
+  [Hotel, "Hotel & Konsumsi", ["Hotel Makkah", "Hotel Madinah", "Konsumsi sesuai program"], "bg-white"],
+  [BookOpenCheck, "Ibadah & Pendampingan", ["Manasik", "Tour leader & muthawif", "Perlengkapan umrah"], "bg-white"],
 ] as const;
 const tours = [
   ["Turki", "Istanbul · Bursa · Cappadocia", "tour-1.png"],
@@ -28,7 +28,7 @@ export function ModernPackages() {
     <>
       <section
         id="fasilitas"
-        className="scroll-mt-20 bg-[#F7F3E9] py-20 sm:py-24"
+        className="scroll-mt-20 bg-white py-20 sm:py-24"
       >
         <div className="jam-container">
           <div className="mx-auto max-w-[850px] text-center">

@@ -388,7 +388,7 @@ function GallerySection() {
   return (
     <section
       id="galeri"
-      className="overflow-x-clip bg-[#F7F3E9] py-20 sm:py-24"
+      className="overflow-x-clip bg-white py-20 sm:py-24"
       aria-labelledby="gallery-title"
     >
       <div className="jam-container text-center">
@@ -426,7 +426,7 @@ function GallerySection() {
                         key={`${copy}-${item.image}`}
                         tabIndex={copy === 1 ? -1 : 0}
                         onClick={() => setActiveIndex(originalIndex)}
-                        className={`group relative h-[145px] shrink-0 overflow-hidden rounded-[16px] bg-[#E8E4DB] text-left ring-1 ring-[#0A1D3A]/8 transition-all duration-500 hover:ring-[#D4AF37]/45 hover:shadow-[0_18px_38px_rgba(10,29,58,.22)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C0C0C0] sm:h-[195px] ${item.width}`}
+                        className={`group relative h-[145px] shrink-0 overflow-hidden rounded-[16px] bg-slate-100 text-left ring-1 ring-[#0A1D3A]/8 transition-all duration-500 hover:ring-[#D4AF37]/45 hover:shadow-[0_18px_38px_rgba(10,29,58,.22)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C0C0C0] sm:h-[195px] ${item.width}`}
                       >
                         <Image
                           src={`${assetRoot}/${item.image}`}
