@@ -4,7 +4,21 @@
       "Shell(npx tsc --noEmit 2 >& 1)",
       "Shell(npx eslint src 2 >& 1)",
       "Shell(npm:*)",
-      "Shell(git:*)"
+      "Shell(git:*)",
+      "Shell(del:*)",
+      "powershell",
+      "Shell(rm:*)",
+      "Shell(node -e \"const p=require('./package.json'); console.log(Object.keys(p.dependencies||{})); console.log(Object.keys(p.devDependencies||{}));\")",
+      "Shell(if:*)",
+      "Shell(type:*)",
+      "Shell(else:*)",
+      "Shell(node -e \"console.log(process.env.NPM_CONFIG_OMIT, process.env.NPM_CONFIG_PRODUCTION, process.env.NODE_ENV)\")",
+      "Shell(set:*)",
+      "Shell(node -e console.log(process.env.NODE_ENV, process.env.NPM_CONFIG_OMIT))",
+      "Shell(grep:*)",
+      "Shell(node -e \"for(const k of Object.keys(process.env)){ if(/npm_config/i.test(k)) console.log(k, '=', process.env[k]) }\")",
+      "Shell(node -e \"console.log('next', require('next/package.json').version); console.log('react', require('react/package.json').version);\")",
+      "Shell(node -e console.log('NODE_ENV=', process.env.NODE_ENV))"
     ],
     "deny": [],
     "defaultMode": "default"
