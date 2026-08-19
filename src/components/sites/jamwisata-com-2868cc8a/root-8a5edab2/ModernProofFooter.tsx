@@ -539,7 +539,7 @@ export function ModernProofFooter() {
         </div>
       </section>
 
-      {/* Premium Full-Width Closing CTA Banner (Connected to Footer, Rounded Top Only) */}
+      {/* Premium Full-Width Closing CTA Banner (Connected to Footer, Rounded Top Only, Left Image Full Bleed) */}
       <section
         id="kontak"
         className="relative isolate overflow-hidden w-full bg-[#021224] text-white rounded-t-[32px] sm:rounded-t-[44px] lg:rounded-t-[52px] border-t border-[#D5A12B]/35 shadow-[0_-16px_48px_rgba(2,18,36,0.30)]"
@@ -548,24 +548,28 @@ export function ModernProofFooter() {
         {/* Subtle Background Radial Gold Glow */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(213,161,43,0.12)_0%,transparent_60%)] pointer-events-none" />
 
-        <div className="w-full max-w-[1360px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch min-h-[300px] lg:min-h-[290px]">
-            {/* 1. Kiri — Visual Image (Ka'bah & Jamaah menyatu dengan banner via smooth fade) */}
-            <div className="relative lg:col-span-4 min-h-[220px] sm:min-h-[260px] lg:min-h-full overflow-hidden">
-              <Image
-                src="/why-choose-kabah.jpg"
-                alt="Ka'bah dan Jamaah Umrah Jam Wisata"
-                fill
-                sizes="(min-width:1024px) 35vw, 100vw"
-                className="object-cover object-[center_30%]"
-              />
-              {/* Seamless Directional Blend Gradients */}
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#021224]/50 to-[#021224] lg:bg-gradient-to-r lg:from-transparent lg:via-[#021224]/60 lg:to-[#021224]" />
-              <div className="absolute inset-0 bg-[#021224]/15" />
-            </div>
+        {/* 1. Kiri — Visual Image (Full Bleed to the Left edge of the screen on Desktop & Tablet) */}
+        <div className="relative lg:absolute lg:inset-y-0 lg:left-0 lg:w-[38vw] xl:w-[34vw] min-h-[220px] sm:min-h-[280px] lg:min-h-full overflow-hidden pointer-events-none">
+          <Image
+            src="/why-choose-kabah.jpg"
+            alt="Ka'bah dan Jamaah Umrah Jam Wisata"
+            fill
+            sizes="(min-width:1024px) 40vw, 100vw"
+            className="object-cover object-[center_28%]"
+          />
+          {/* Directional Blend Gradient - smooth fade to navy rightwards */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#021224]/50 to-[#021224] lg:bg-gradient-to-r lg:from-transparent lg:via-[#021224]/60 lg:to-[#021224]" />
+          <div className="absolute inset-0 bg-[#021224]/15" />
+        </div>
+
+        {/* Content Container (Center and Right aligned properly inside container) */}
+        <div className="jam-container relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch min-h-[300px] lg:min-h-[310px]">
+            {/* Spacer for the Left Image in desktop grid */}
+            <div className="hidden lg:block lg:col-span-4" />
 
             {/* 2. Tengah — Headline + Subheadline + CTA Button */}
-            <div className="relative z-10 lg:col-span-5 flex flex-col justify-center px-6 py-8 sm:px-8 sm:py-10 lg:py-10 lg:px-7">
+            <div className="lg:col-span-5 flex flex-col justify-center px-2 py-8 sm:px-4 sm:py-10 lg:py-11 lg:px-6">
               <h2 className="font-[family-name:var(--font-cinzel)] text-2xl xs:text-[27px] sm:text-3xl lg:text-[32px] font-bold leading-[1.15] text-white tracking-tight">
                 Siap Berangkat ke Baitullah?
               </h2>
@@ -596,7 +600,7 @@ export function ModernProofFooter() {
             </div>
 
             {/* 3. Kanan — List Benefit / Trust Points dengan Divider Vertikal */}
-            <div className="relative z-10 lg:col-span-3 flex flex-col justify-center px-6 pb-8 pt-3 sm:px-8 sm:pb-10 lg:py-10 lg:pl-6 lg:pr-7 border-t border-white/12 lg:border-t-0 lg:border-l lg:border-white/15">
+            <div className="relative z-10 lg:col-span-3 flex flex-col justify-center px-2 pb-8 pt-3 sm:px-4 sm:pb-10 lg:py-11 lg:pl-6 lg:pr-2 border-t border-white/12 lg:border-t-0 lg:border-l lg:border-white/15">
               <ul className="space-y-3.5 sm:space-y-4">
                 {[
                   {
