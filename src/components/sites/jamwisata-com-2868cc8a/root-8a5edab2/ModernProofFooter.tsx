@@ -8,7 +8,6 @@ import {
   Clock3,
   Mail,
   MapPin,
-  MessageCircle,
   Phone,
   X,
 } from "lucide-react";
@@ -540,44 +539,116 @@ export function ModernProofFooter() {
         </div>
       </section>
 
+      {/* Premium Horizontal Closing CTA Banner */}
       <section
         id="kontak"
-        className="scroll-mt-20 bg-white px-4 pb-12 sm:px-0 sm:pb-16"
+        className="scroll-mt-20 bg-white px-4 pb-14 sm:px-0 sm:pb-20"
+        aria-label="Ajakan Konsultasi Umrah"
       >
-        <div className="jam-container relative overflow-hidden rounded-[28px] bg-gradient-hero px-7 py-12 text-white sm:px-12 lg:px-16 lg:py-16">
-          <Image
-            src={`${assetRoot}/promo.jpg`}
-            alt=""
-            fill
-            sizes="1280px"
-            className="object-cover opacity-30"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#06152B]/95 via-[#0A1D3A]/85 to-[#06152B]/55" />
-          <div className="absolute inset-0 opacity-40" style={{backgroundImage:"radial-gradient(circle at 20% 20%, rgba(192,192,192,.18), transparent 40%), radial-gradient(circle at 80% 70%, rgba(212,175,55,.16), transparent 45%)"}} aria-hidden="true" />
-          <div className="relative max-w-[780px]">
-            <p className="section-eyebrow !text-[#E8C967]">
-              Saatnya Melangkah ke Baitullah
-            </p>
-            <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] leading-[1.04] font-extrabold tracking-[-.045em]">
-              Siap Menemani Perjalanan Ibadah Anda.
-            </h2>
-            <p className="mt-5 max-w-[660px] text-sm leading-7 text-white/72">
-              Jam Wisata siap menjaga amanah dan menghadirkan perjalanan ibadah yang penuh makna, nyaman, dan berkah. Konsultasikan jadwal dan pilihan program Anda sekarang.
-            </p>
-            <a
-              href={whatsappHref(
-                "Assalamu’alaikum, saya ingin berkonsultasi mengenai paket perjalanan Jam Wisata.",
-                "Final CTA",
-              )}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="lift-soft mt-7 inline-flex min-h-13 items-center justify-center gap-3 rounded-[14px] bg-[#25D366] px-6 text-sm font-extrabold tracking-[-.005em] text-white shadow-[0_18px_36px_rgba(37,211,102,.30)] hover:bg-[#1ebe5d]"
-            >
-              <MessageCircle className="size-4" /> Konsultasi via WhatsApp
-            </a>
-            <p className="mt-3 text-xs text-white/55">
-              Admin melayani konsultasi perjalanan ibadah Anda.
-            </p>
+        <div className="jam-container relative isolate overflow-hidden rounded-[24px] sm:rounded-[32px] bg-[#021224] text-white border border-[#D5A12B]/35 shadow-[0_20px_50px_rgba(2,18,36,0.35)]">
+          {/* Subtle Background Radial Gold Glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(213,161,43,0.12)_0%,transparent_60%)] pointer-events-none" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch min-h-[300px] lg:min-h-[290px]">
+            {/* 1. Kiri — Visual Image (Ka'bah & Jamaah menyatu dengan banner via smooth fade) */}
+            <div className="relative lg:col-span-4 min-h-[220px] sm:min-h-[250px] lg:min-h-full overflow-hidden">
+              <Image
+                src="/why-choose-kabah.jpg"
+                alt="Ka'bah dan Jamaah Umrah Jam Wisata"
+                fill
+                sizes="(min-width:1024px) 35vw, 100vw"
+                className="object-cover object-[center_30%]"
+              />
+              {/* Seamless Directional Blend Gradients */}
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#021224]/50 to-[#021224] lg:bg-gradient-to-r lg:from-transparent lg:via-[#021224]/60 lg:to-[#021224]" />
+              <div className="absolute inset-0 bg-[#021224]/15" />
+            </div>
+
+            {/* 2. Tengah — Headline + Subheadline + CTA Button */}
+            <div className="relative z-10 lg:col-span-5 flex flex-col justify-center px-6 py-8 sm:px-8 sm:py-9 lg:py-9 lg:px-7">
+              <h2 className="font-[family-name:var(--font-cinzel)] text-2xl xs:text-[27px] sm:text-3xl lg:text-[32px] font-bold leading-[1.15] text-white tracking-tight">
+                Siap Berangkat ke Baitullah?
+              </h2>
+
+              <p className="mt-3 font-[family-name:var(--font-montserrat)] text-xs sm:text-[13.5px] leading-relaxed text-slate-200/90 max-w-[440px]">
+                Wujudkan impian suci Anda bersama Jam Wisata.<br className="hidden sm:inline" />
+                {" "}Konsultasikan rencana perjalanan Anda sekarang juga!
+              </p>
+
+              <div className="mt-6">
+                <a
+                  href={whatsappHref(
+                    "Assalamu’alaikum, saya ingin berkonsultasi mengenai rencana perjalanan ibadah umrah bersama Jam Wisata.",
+                    "Banner CTA Bawah",
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="lift-soft sheen-gold group inline-flex w-full xs:w-auto items-center justify-between xs:justify-center gap-3.5 rounded-xl bg-gradient-gold-rich px-5 sm:px-6 py-3.5 text-xs sm:text-[13px] font-extrabold uppercase tracking-wider text-[#061A2F] shadow-[0_10px_28px_rgba(212,175,55,0.35)] transition-all duration-300 hover:scale-[1.03] active:scale-95"
+                >
+                  <span>KONSULTASI GRATIS SEKARANG</span>
+                  <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[#061A2F] text-[#F5D97A] shadow-xs transition-transform group-hover:scale-110">
+                    <svg className="size-4 fill-current" viewBox="0 0 256 256" aria-hidden="true">
+                      <path d="M128,24A104,104,0,0,0,36.18,176.88L24.83,218.35a16,16,0,0,0,19.78,19.78l41.47-11.35A104,104,0,1,0,128,24Zm0,192a87.87,87.87,0,0,1-44.06-11.81,8,8,0,0,0-6-1l-34,9.3,9.3-34a8,8,0,0,0-1-6A88,88,0,1,1,128,216Zm47.6-67.6-21.72-10.86a16.09,16.09,0,0,0-17.76,3.13l-6.84,6.84a56.44,56.44,0,0,1-27.47-27.47l6.84-6.84a16.09,16.09,0,0,0,3.13-17.76L100.92,73.72A16,16,0,0,0,84,64.22a16.27,16.27,0,0,0-12,5.78C61.45,81.42,60.6,98.66,74.75,123.63S132.37,195.4,157.34,209.55c7.58,4.3,16,6.45,24.44,6.45a27.63,27.63,0,0,0,15.78-4.8,20.48,20.48,0,0,0,9.22-13.88,16,16,0,0,0-9.18-16.72Z" />
+                    </svg>
+                  </span>
+                </a>
+              </div>
+            </div>
+
+            {/* 3. Kanan — List Benefit / Trust Points dengan Divider Vertikal */}
+            <div className="relative z-10 lg:col-span-3 flex flex-col justify-center px-6 pb-8 pt-3 sm:px-8 sm:pb-9 lg:py-9 lg:pl-6 lg:pr-7 border-t border-white/12 lg:border-t-0 lg:border-l lg:border-white/15">
+              <ul className="space-y-3.5 sm:space-y-4">
+                {[
+                  {
+                    text: "Konsultasi Cepat & Gratis",
+                    icon: (
+                      <svg className="size-4.5 shrink-0" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M45.42,186.25A96,96,0,1,1,96,224a95.39,95.39,0,0,1-27.42-4L32,224Z" />
+                        <line x1="88" y1="128" x2="168" y2="128" />
+                        <line x1="88" y1="96" x2="168" y2="96" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    text: "Tim Profesional & Amanah",
+                    icon: (
+                      <svg className="size-4.5 shrink-0" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M208,40H48A16,16,0,0,0,32,56v58.78c0,89.61,75.82,119.34,91.25,124.39a15.54,15.54,0,0,0,9.5,0c15.43-5.05,91.25-34.78,91.25-124.39V56A16,16,0,0,0,208,40Z" />
+                        <polyline points="88 136 112 160 168 104" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    text: "Harga Kompetitif & Transparan",
+                    icon: (
+                      <svg className="size-4.5 shrink-0" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M224,48H32A16,16,0,0,0,16,64V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V64A16,16,0,0,0,224,48Zm0,144H32V64H224V192Z" />
+                        <circle cx="128" cy="128" r="24" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    text: "Keberangkatan Terjadwal",
+                    icon: (
+                      <svg className="size-4.5 shrink-0" viewBox="0 0 256 256" fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="40" y="40" width="176" height="176" rx="16" />
+                        <line x1="176" y1="24" x2="176" y2="56" />
+                        <line x1="80" y1="24" x2="80" y2="56" />
+                        <line x1="40" y1="88" x2="216" y2="88" />
+                        <polyline points="92 148 116 172 164 124" />
+                      </svg>
+                    ),
+                  },
+                ].map((item) => (
+                  <li key={item.text} className="flex items-center gap-3 text-xs sm:text-[13px] font-semibold text-white/95 leading-tight">
+                    <span className="grid size-7.5 sm:size-8 shrink-0 place-items-center rounded-lg bg-white/6 border border-white/14 text-[#E8C967] shadow-2xs">
+                      {item.icon}
+                    </span>
+                    <span>{item.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
