@@ -239,8 +239,77 @@ function MediaModal({
   );
 }
 
+function InlineVideoCard({ video }: { video: TestimonialVideo }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  return (
+    <article className="lift-soft group flex flex-col shrink-0 snap-start overflow-hidden rounded-[22px] bg-white shadow-[0_14px_40px_rgba(6,26,47,0.08)] ring-1 ring-[#061A2F]/8 transition-all duration-300 hover:shadow-[0_24px_60px_rgba(6,26,47,0.18)] hover:-translate-y-1.5 w-[76vw] max-w-[280px] sm:w-[260px] lg:w-full">
+      <div className="relative aspect-[9/16] w-full bg-[#061A2F] overflow-hidden">
+        {isPlaying ? (
+          <iframe
+            src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&playsinline=1&rel=0`}
+            title={video.title}
+            className="absolute inset-0 size-full border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setIsPlaying(true)}
+            aria-label={`Putar video testimoni: ${video.title}`}
+            className="group/btn relative size-full block text-left focus:outline-none cursor-pointer"
+          >
+            {/* High Quality Poster Thumbnail */}
+            <Image
+              src={`https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`}
+              alt={video.title}
+              fill
+              sizes="(min-width: 1024px) 20vw, 80vw"
+              className="object-cover transition-transform duration-500 group-hover/btn:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#061A2F]/85 via-transparent to-black/20" />
+
+            {/* Centered Glowing Play Button */}
+            <div className="absolute inset-0 grid place-items-center">
+              <span className="grid size-12 sm:size-14 place-items-center rounded-full bg-gradient-gold-rich text-[#061A2F] shadow-[0_8px_24px_rgba(212,175,55,0.45)] transition-all duration-300 group-hover/btn:scale-115 group-hover/btn:shadow-[0_12px_32px_rgba(212,175,55,0.65)]">
+                <Play className="size-5 sm:size-6 fill-current ml-0.5" />
+              </span>
+            </div>
+
+            {/* Top YouTube Tag */}
+            <span className="absolute top-3 right-3 rounded-md bg-black/60 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold tracking-wider text-white border border-white/15">
+              YouTube
+            </span>
+          </button>
+        )}
+      </div>
+
+      <div className="flex flex-col flex-1 justify-between p-4 bg-white">
+        <h3 className="font-[family-name:var(--font-cinzel)] text-[13px] sm:text-[14px] font-bold leading-snug text-[#061A2F] line-clamp-2">
+          {video.title}
+        </h3>
+        <div className="mt-2 flex items-center justify-between">
+          <p className="text-[11px] font-medium text-[#64748B]">
+            {video.program}
+          </p>
+          <a
+            href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            aria-label={`Buka ${video.title} di YouTube`}
+            className="text-[11px] font-bold text-[#D5A12B] hover:text-[#B8860B] flex items-center gap-0.5 transition"
+          >
+            YouTube <ExternalLink className="size-3" />
+          </a>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 function VideoSection() {
-  const [selectedVideo, setSelectedVideo] = useState<TestimonialVideo | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef({ active: false, startX: 0, scrollLeft: 0, moved: false });
@@ -324,48 +393,7 @@ function VideoSection() {
           className="mt-8 flex lg:grid lg:grid-cols-5 gap-4.5 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0 select-none snap-x snap-mandatory focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D4AF37] [scrollbar-width:none]"
         >
           {testimonialVideos.map((video) => (
-            <article
-              key={video.id}
-              onClick={() => setSelectedVideo(video)}
-              className="lift-soft group flex flex-col shrink-0 snap-start overflow-hidden rounded-[22px] bg-white shadow-[0_14px_40px_rgba(6,26,47,0.08)] ring-1 ring-[#061A2F]/8 transition-all duration-300 hover:shadow-[0_24px_60px_rgba(6,26,47,0.18)] hover:-translate-y-1.5 w-[76vw] max-w-[280px] sm:w-[260px] lg:w-full cursor-pointer"
-            >
-              <div className="relative aspect-[9/16] w-full bg-[#061A2F] overflow-hidden">
-                {/* High Quality Thumbnail */}
-                <Image
-                  src={`https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`}
-                  alt={video.title}
-                  fill
-                  sizes="(min-width: 1024px) 20vw, 80vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#061A2F]/90 via-transparent to-black/20" />
-
-                {/* Glowing Play Icon */}
-                <div className="absolute inset-0 grid place-items-center">
-                  <span className="grid size-12 sm:size-14 place-items-center rounded-full bg-gradient-gold-rich text-[#061A2F] shadow-[0_8px_24px_rgba(212,175,55,0.45)] transition-all duration-300 group-hover:scale-115 group-hover:shadow-[0_12px_32px_rgba(212,175,55,0.65)]">
-                    <Play className="size-5 sm:size-6 fill-current ml-0.5" />
-                  </span>
-                </div>
-
-                <span className="absolute top-3 right-3 rounded-md bg-black/60 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold tracking-wider text-white border border-white/15">
-                  Putar Video ↗
-                </span>
-              </div>
-
-              <div className="flex flex-col flex-1 justify-between p-4 bg-white">
-                <h3 className="font-[family-name:var(--font-cinzel)] text-[13px] sm:text-[14px] font-bold leading-snug text-[#061A2F] line-clamp-2">
-                  {video.title}
-                </h3>
-                <div className="mt-2 flex items-center justify-between">
-                  <p className="text-[11px] font-medium text-[#64748B]">
-                    {video.program}
-                  </p>
-                  <span className="text-[11px] font-bold text-[#D5A12B] flex items-center gap-0.5">
-                    Lihat <ExternalLink className="size-3" />
-                  </span>
-                </div>
-              </div>
-            </article>
+            <InlineVideoCard key={video.id} video={video} />
           ))}
         </div>
 
@@ -379,68 +407,6 @@ function VideoSection() {
           ))}
         </div>
       </div>
-
-      {/* Video Lightbox Modal with Multi-Option Playback */}
-      {selectedVideo && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={selectedVideo.title}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in duration-200"
-          onClick={() => setSelectedVideo(null)}
-        >
-          <div
-            className="relative w-full max-w-2xl overflow-hidden rounded-2xl bg-[#061A2F] border border-[#D5A12B]/40 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#021224]">
-              <div>
-                <span className="text-[10px] font-extrabold tracking-wider uppercase text-[#D5A12B]">Testimoni Jamaah</span>
-                <h3 className="font-[family-name:var(--font-cinzel)] text-sm sm:text-base font-bold text-white leading-tight">
-                  {selectedVideo.title}
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedVideo(null)}
-                aria-label="Tutup video"
-                className="grid size-9 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 transition cursor-pointer"
-              >
-                <X className="size-4.5" />
-              </button>
-            </div>
-
-            {/* Video Player */}
-            <div className="relative aspect-video sm:aspect-[16/9] w-full bg-black">
-              <iframe
-                src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}?autoplay=1&rel=0`}
-                title={selectedVideo.title}
-                className="absolute inset-0 size-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              />
-            </div>
-
-            {/* Bottom Actions & YouTube Direct Link */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-[#021224] border-t border-white/10 text-xs">
-              <p className="text-white/70 text-center sm:text-left">
-                Putar langsung di web atau tonton di aplikasi YouTube.
-              </p>
-              <a
-                href={`https://www.youtube.com/watch?v=${selectedVideo.youtubeId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="lift-soft flex items-center gap-2 rounded-xl bg-[#CC0000] hover:bg-[#E60000] px-4 py-2.5 font-bold text-white transition shadow-md whitespace-nowrap"
-              >
-                <Play className="size-3.5 fill-current" />
-                <span>Buka di YouTube ↗</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 }
