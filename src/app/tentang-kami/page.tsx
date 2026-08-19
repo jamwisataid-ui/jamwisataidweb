@@ -16,6 +16,7 @@ import {
   Star,
 } from "lucide-react";
 
+import { FounderLetterSection } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/FounderLetterSection";
 import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/ModernProofFooter";
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
@@ -142,6 +143,9 @@ export default function TentangKamiPage() {
           </div>
         </div>
       </section>
+
+      {/* Founder Letter Section */}
+      <FounderLetterSection />
 
       {/* Section 1: Brand Story & Visi Misi */}
       <section className="bg-white py-16 sm:py-20 lg:py-24 border-b border-[#061A2F]/8">
