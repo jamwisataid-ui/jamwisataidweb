@@ -10,12 +10,13 @@ import {
   Mail,
   MapPin,
   Phone,
+  Play,
+  RotateCw,
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { whatsappHref } from "@/data/jamwisata";
-import LiteYouTubeEmbed from "react-lite-youtube-embed";
 
 const assetRoot = "/sites/jamwisata-com-2868cc8a/root-8a5edab2";
 
@@ -240,21 +241,119 @@ function MediaModal({
 }
 
 function VideoCard({ video }: { video: TestimonialVideo }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSlow, setIsSlow] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const startPlaying = () => {
+    setIsPlaying(true);
+    setIsLoading(true);
+    setIsSlow(false);
+
+    // If still buffering/loading after 4 seconds (slow internet/DNS), show helper options
+    timerRef.current = setTimeout(() => {
+      setIsSlow(true);
+    }, 4000);
+  };
+
+  const handleIframeLoaded = () => {
+    setIsLoading(false);
+    if (timerRef.current) clearTimeout(timerRef.current);
+  };
+
+  const retry = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsPlaying(false);
+    setIsLoading(false);
+    setIsSlow(false);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setTimeout(() => startPlaying(), 60);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
   return (
     <article className="lift-soft group flex flex-col shrink-0 snap-start overflow-hidden rounded-[22px] bg-white shadow-[0_14px_40px_rgba(6,26,47,0.08)] ring-1 ring-[#061A2F]/8 transition-all duration-300 hover:shadow-[0_24px_60px_rgba(6,26,47,0.18)] hover:-translate-y-1.5 w-[76vw] max-w-[280px] sm:w-[260px] lg:w-full">
       <div className="relative aspect-[9/16] w-full bg-[#061A2F] overflow-hidden rounded-t-[20px]">
-        <LiteYouTubeEmbed
-          id={video.youtubeId}
-          title={video.title}
-          poster="hqdefault"
-          noCookie={true}
-          webp={false}
-          aspectHeight={16}
-          aspectWidth={9}
-          lazyLoad={true}
-          rel="0"
-          params="playsinline=1"
-        />
+        {isPlaying ? (
+          <>
+            <iframe
+              src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&playsinline=1&rel=0&enablejsapi=1`}
+              title={video.title}
+              onLoad={handleIframeLoaded}
+              className="absolute inset-0 size-full border-0 z-10"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+
+            {/* Smart Buffer / Slow Network Helper Overlay */}
+            {isLoading && (
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#061A2F]/92 p-4 text-center text-white backdrop-blur-xs">
+                <div className="size-10 animate-spin rounded-full border-3 border-[#D5A12B] border-t-transparent mb-3" />
+                <p className="text-xs font-semibold text-[#F5D97A]">Menghubungkan video...</p>
+
+                {isSlow && (
+                  <div className="mt-4 flex flex-col items-center gap-2.5 w-full max-w-[210px] animate-in fade-in duration-300">
+                    <p className="text-[11px] text-white/80 leading-tight">
+                      Koneksi internet sedang lambat?
+                    </p>
+                    <a
+                      href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full rounded-xl bg-[#CC0000] hover:bg-[#e60000] py-2 px-3 text-[11px] font-bold text-white shadow-md transition flex items-center justify-center gap-1.5"
+                    >
+                      <Play className="size-3 fill-current" />
+                      <span>Buka di YouTube ↗</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={retry}
+                      className="flex items-center gap-1 text-[11px] text-[#D5A12B] hover:text-white transition cursor-pointer font-medium"
+                    >
+                      <RotateCw className="size-3" />
+                      <span>Coba muat ulang</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={startPlaying}
+            aria-label={`Putar video testimoni: ${video.title}`}
+            className="group/btn relative size-full block text-left focus:outline-none cursor-pointer"
+          >
+            {/* High Quality Poster Thumbnail */}
+            <Image
+              src={`https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`}
+              alt={video.title}
+              fill
+              sizes="(min-width: 1024px) 20vw, 80vw"
+              className="object-cover transition-transform duration-500 group-hover/btn:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#061A2F]/85 via-transparent to-black/20" />
+
+            {/* Centered Glowing Play Button */}
+            <div className="absolute inset-0 grid place-items-center">
+              <span className="grid size-12 sm:size-14 place-items-center rounded-full bg-gradient-gold-rich text-[#061A2F] shadow-[0_8px_24px_rgba(212,175,55,0.45)] transition-all duration-300 group-hover/btn:scale-115 group-hover/btn:shadow-[0_12px_32px_rgba(212,175,55,0.65)]">
+                <Play className="size-5 sm:size-6 fill-current ml-0.5" />
+              </span>
+            </div>
+
+            {/* Top YouTube Tag */}
+            <span className="absolute top-3 right-3 rounded-md bg-black/60 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold tracking-wider text-white border border-white/15">
+              Putar Video
+            </span>
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col flex-1 justify-between p-4 bg-white">
