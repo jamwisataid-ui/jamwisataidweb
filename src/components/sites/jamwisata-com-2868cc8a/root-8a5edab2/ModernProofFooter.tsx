@@ -9,6 +9,7 @@ import {
   Mail,
   MapPin,
   Phone,
+  Play,
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -237,56 +238,119 @@ function MediaModal({
   );
 }
 
+function VideoCard({ video }: { video: TestimonialVideo }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  return (
+    <article className="lift-soft group flex flex-col shrink-0 snap-start overflow-hidden rounded-[22px] bg-white shadow-[0_14px_40px_rgba(6,26,47,0.08)] ring-1 ring-[#061A2F]/8 transition-all duration-300 hover:shadow-[0_22px_55px_rgba(6,26,47,0.16)] hover:-translate-y-1 w-[76vw] max-w-[280px] sm:w-[260px] lg:w-full">
+      <div className="relative aspect-[9/16] w-full bg-[#061A2F] overflow-hidden">
+        {isPlaying ? (
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}?autoplay=1&rel=0`}
+            title={video.title}
+            className="absolute inset-0 size-full border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setIsPlaying(true)}
+            aria-label={`Putar video: ${video.title}`}
+            className="group/btn relative size-full block text-left focus:outline-none cursor-pointer"
+          >
+            {/* Guaranteed High Quality YouTube Thumbnail */}
+            <Image
+              src={`https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`}
+              alt={video.title}
+              fill
+              sizes="(min-width: 1024px) 20vw, 80vw"
+              className="object-cover transition-transform duration-500 group-hover/btn:scale-105"
+            />
+            {/* Subtle Gradient Overlays */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#061A2F]/90 via-transparent to-black/25" />
+
+            {/* Glowing Gold Play Button */}
+            <div className="absolute inset-0 grid place-items-center">
+              <span className="grid size-12 sm:size-14 place-items-center rounded-full bg-gradient-gold-rich text-[#061A2F] shadow-[0_8px_24px_rgba(212,175,55,0.45)] transition-all duration-300 group-hover/btn:scale-115 group-hover/btn:shadow-[0_12px_32px_rgba(212,175,55,0.65)]">
+                <Play className="size-5 sm:size-6 fill-current ml-0.5" />
+              </span>
+            </div>
+
+            {/* Top YouTube Tag */}
+            <span className="absolute top-3 right-3 rounded-md bg-black/60 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold tracking-wider text-white border border-white/15">
+              YouTube
+            </span>
+          </button>
+        )}
+      </div>
+
+      <div className="flex flex-col flex-1 justify-between p-4 bg-white">
+        <h3 className="font-[family-name:var(--font-cinzel)] text-[13px] sm:text-[14px] font-bold leading-snug text-[#061A2F] line-clamp-2">
+          {video.title}
+        </h3>
+        <p className="mt-1.5 text-[11px] font-medium text-[#64748B]">
+          {video.program}
+        </p>
+      </div>
+    </article>
+  );
+}
+
 function VideoSection() {
   const [activeIndex, setActiveIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef({ active: false, startX: 0, scrollLeft: 0, moved: false });
-  useEffect(() => {
-    void import("lite-youtube-embed");
-  }, []);
+
   const move = (direction: number) =>
     trackRef.current?.scrollBy({
       left: direction * trackRef.current.clientWidth * 0.78,
       behavior: "smooth",
     });
+
   const updateActive = () => {
     const track = trackRef.current;
     const first = track?.firstElementChild as HTMLElement | null;
     if (!track || !first) return;
     setActiveIndex(Math.min(testimonialVideos.length - 1, Math.max(0, Math.round(track.scrollLeft / (first.offsetWidth + 20)))));
   };
+
   return (
     <section id="testimoni" className="scroll-mt-20 bg-white py-20 sm:py-24">
       <div className="jam-container">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="section-eyebrow">Testimoni Jamaah</p>
-            <h2 className="section-title max-w-[760px]">
-              Pengalaman Ibadah Bersama Jam Wisata.
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-white px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider text-[#D5A12B] border border-[#D5A12B]/25 mb-2">
+              Testimoni Jamaah
+            </span>
+            <h2 className="font-[family-name:var(--font-cinzel)] text-2xl sm:text-3xl lg:text-4xl font-bold text-[#061A2F] tracking-tight">
+              Pengalaman Ibadah Bersama Jam Wisata
             </h2>
-            <p className="mt-4 text-sm leading-6 text-[#68707A]">
+            <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-[#64748B] max-w-[620px]">
               Kisah nyata jamaah yang telah mempercayakan perjalanan ibadah mereka bersama Jam Wisata.
             </p>
           </div>
-          <div className="hidden gap-2 sm:flex">
+          <div className="hidden gap-2 sm:flex lg:hidden">
             <button
               type="button"
               onClick={() => move(-1)}
               aria-label="Video sebelumnya"
-              className="lift-soft grid size-12 place-items-center rounded-full border border-[#0A1D3A]/15 text-[#0A1D3A] transition-all duration-400 hover:border-[#C0C0C0]/55 hover:text-[#1E3A5F] hover:shadow-[0_8px_22px_-6px_rgba(192,192,192,.40)]"
+              className="lift-soft grid size-11 place-items-center rounded-full border border-[#061A2F]/15 text-[#061A2F] transition hover:border-[#D5A12B] hover:text-[#061A2F]"
             >
-              <ArrowLeft className="size-5 transition-transform duration-300 group-hover:-translate-x-0.5" />
+              <ArrowLeft className="size-4.5" />
             </button>
             <button
               type="button"
               onClick={() => move(1)}
               aria-label="Video berikutnya"
-              className="lift-soft sheen-gold grid size-12 place-items-center rounded-full bg-gradient-gold-rich text-[#0A1D3A] shadow-[0_10px_26px_rgba(184,134,11,.32),inset_0_1px_0_rgba(255,235,170,.55)]"
+              className="lift-soft sheen-gold grid size-11 place-items-center rounded-full bg-gradient-gold-rich text-[#061A2F] shadow-sm"
             >
-              <ArrowRight className="size-5 transition-transform duration-300 group-hover:translate-x-0.5" />
+              <ArrowRight className="size-4.5" />
             </button>
           </div>
         </div>
+
+        {/* Desktop: Clean 5-Column Grid. Mobile & Tablet: Horizontal Scroll */}
         <div
           ref={trackRef}
           tabIndex={0}
@@ -314,42 +378,15 @@ function VideoSection() {
             dragRef.current.active = false;
           }}
           onPointerLeave={() => { dragRef.current.active = false; }}
-          className="mt-10 flex cursor-grab snap-x snap-mandatory gap-5 overflow-x-auto pb-5 select-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D4AF37] active:cursor-grabbing [scrollbar-width:none]"
+          className="mt-8 flex lg:grid lg:grid-cols-5 gap-4.5 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0 select-none snap-x snap-mandatory focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D4AF37] [scrollbar-width:none]"
         >
           {testimonialVideos.map((video) => (
-            <article
-              key={video.id}
-              className="lift-soft group shrink-0 snap-start self-start overflow-hidden rounded-[24px] bg-white shadow-[0_18px_48px_rgba(10,29,58,.11)] ring-1 ring-[#0A1D3A]/7 transition-all duration-500 hover:shadow-[0_28px_64px_rgba(10,29,58,.18),0_0_0_1px_rgba(192,192,192,.20)] w-[76vw] max-w-[280px] sm:w-[270px] lg:w-[286px]"
-            >
-              <lite-youtube
-                ref={(element) => {
-                  if (element) {
-                    element.style.backgroundImage = `url("https://i.ytimg.com/vi/${video.youtubeId}/maxresdefault.jpg")`;
-                    element.style.backgroundPosition = video.focalPoint ?? "center";
-                  }
-                }}
-                videoid={video.youtubeId}
-                playlabel={`Putar video: ${video.title}`}
-                params="rel=0&modestbranding=1"
-                className="testimonial-lite-youtube"
-              >
-                <a
-                  href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
-                  className="lyt-playbtn"
-                  aria-label={`Putar video: ${video.title}`}
-                >
-                  <span className="lyt-visually-hidden">Putar video: {video.title}</span>
-                </a>
-              </lite-youtube>
-              <div className="relative p-5">
-                <span className="absolute -top-4 right-4 grid size-8 place-items-center rounded-full bg-white text-[9px] font-black tracking-[-.04em] text-[#d73333] shadow-md" aria-hidden="true">YT</span>
-                <strong className="block pr-7 text-[14px] leading-snug text-[#0A1D3A]">{video.title}</strong>
-                <span className="mt-1.5 block text-[11px] text-[#68707A]">{video.program}{video.year ? ` · ${video.year}` : ""}</span>
-              </div>
-            </article>
+            <VideoCard key={video.id} video={video} />
           ))}
         </div>
-        <div className="mt-2 flex justify-center gap-1.5">
+
+        {/* Mobile Indicator Dots */}
+        <div className="mt-4 flex justify-center gap-1.5 lg:hidden">
           {testimonialVideos.map((video, index) => (
             <span
               key={video.id}

@@ -14,6 +14,7 @@ import {
   Play,
   RotateCcw,
   Search,
+  X,
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
@@ -157,6 +158,7 @@ export function HeroPackages() {
   const [draft, setDraft] = useState<Filters>(emptyFilters);
   const [applied, setApplied] = useState<Filters>(emptyFilters);
   const [hasSearched, setHasSearched] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
   const options = useMemo(() => ({
     months: [...new Set(umrahPackages.map((item) => item.departureMonth).filter(Boolean))] as string[],
@@ -340,11 +342,10 @@ export function HeroPackages() {
 
             {/* Right: Video Profile CTA (Enlarged, Aligned with Trust Items) */}
             <div className="shrink-0 flex justify-start sm:justify-end mt-1 sm:mt-0">
-              <a
-                href="https://www.youtube.com/@jamwisatabandung"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="lift-soft group inline-flex w-full xs:w-auto items-center justify-between xs:justify-start gap-3 sm:gap-3.5 rounded-xl sm:rounded-2xl border border-[#D5A12B]/45 bg-[#061A2F]/80 px-3.5 sm:px-4.5 py-2 sm:py-3 text-white backdrop-blur-md shadow-[0_10px_28px_rgba(0,0,0,0.45)] transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/95 hover:scale-[1.03]"
+              <button
+                type="button"
+                onClick={() => setShowVideoModal(true)}
+                className="lift-soft group inline-flex w-full xs:w-auto items-center justify-between xs:justify-start gap-3 sm:gap-3.5 rounded-xl sm:rounded-2xl border border-[#D5A12B]/45 bg-[#061A2F]/80 px-3.5 sm:px-4.5 py-2 sm:py-3 text-white backdrop-blur-md shadow-[0_10px_28px_rgba(0,0,0,0.45)] transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/95 hover:scale-[1.03] cursor-pointer"
               >
                 <div className="flex items-center gap-3">
                   <span className="grid size-8 sm:size-11 place-items-center rounded-lg sm:rounded-xl bg-gradient-gold-rich text-[#061A2F] shadow-md transition-transform group-hover:scale-110">
@@ -360,10 +361,49 @@ export function HeroPackages() {
                   </div>
                 </div>
                 <ArrowRight className="size-3.5 text-[#E8C967] xs:hidden" />
-              </a>
+              </button>
             </div>
           </div>
         </div>
+
+        {/* Video Profile Modal */}
+        {showVideoModal && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Video Profil Jam Wisata"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+            onClick={() => setShowVideoModal(false)}
+          >
+            <div
+              className="relative w-full max-w-3xl overflow-hidden rounded-2xl bg-[#061A2F] border border-[#D5A12B]/40 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-[#021224]">
+                <h3 className="font-[family-name:var(--font-cinzel)] text-sm sm:text-base font-bold text-[#E8C967]">
+                  Video Profil Jam Wisata
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setShowVideoModal(false)}
+                  aria-label="Tutup video"
+                  className="grid size-8 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 transition cursor-pointer"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+              <div className="relative aspect-video w-full bg-black">
+                <iframe
+                  src="https://www.youtube-nocookie.com/embed/8vJae3mZooI?autoplay=1&rel=0"
+                  title="Video Profil Jam Wisata"
+                  className="absolute inset-0 size-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Smooth Shallow Elliptical SVG Bottom Curve with Rich Gold Stroke */}
         <svg
