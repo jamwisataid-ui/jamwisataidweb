@@ -539,19 +539,19 @@ export function ModernProofFooter() {
         </div>
       </section>
 
-      {/* Premium Horizontal Closing CTA Banner */}
+      {/* Premium Full-Width Closing CTA Banner (Connected to Footer, Rounded Top Only) */}
       <section
         id="kontak"
-        className="scroll-mt-20 bg-white px-4 pb-14 sm:px-0 sm:pb-20"
+        className="relative isolate overflow-hidden w-full bg-[#021224] text-white rounded-t-[32px] sm:rounded-t-[44px] lg:rounded-t-[52px] border-t border-[#D5A12B]/35 shadow-[0_-16px_48px_rgba(2,18,36,0.30)]"
         aria-label="Ajakan Konsultasi Umrah"
       >
-        <div className="jam-container relative isolate overflow-hidden rounded-[24px] sm:rounded-[32px] bg-[#021224] text-white border border-[#D5A12B]/35 shadow-[0_20px_50px_rgba(2,18,36,0.35)]">
-          {/* Subtle Background Radial Gold Glow */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(213,161,43,0.12)_0%,transparent_60%)] pointer-events-none" />
+        {/* Subtle Background Radial Gold Glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(213,161,43,0.12)_0%,transparent_60%)] pointer-events-none" />
 
+        <div className="w-full max-w-[1360px] mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch min-h-[300px] lg:min-h-[290px]">
             {/* 1. Kiri — Visual Image (Ka'bah & Jamaah menyatu dengan banner via smooth fade) */}
-            <div className="relative lg:col-span-4 min-h-[220px] sm:min-h-[250px] lg:min-h-full overflow-hidden">
+            <div className="relative lg:col-span-4 min-h-[220px] sm:min-h-[260px] lg:min-h-full overflow-hidden">
               <Image
                 src="/why-choose-kabah.jpg"
                 alt="Ka'bah dan Jamaah Umrah Jam Wisata"
@@ -565,7 +565,7 @@ export function ModernProofFooter() {
             </div>
 
             {/* 2. Tengah — Headline + Subheadline + CTA Button */}
-            <div className="relative z-10 lg:col-span-5 flex flex-col justify-center px-6 py-8 sm:px-8 sm:py-9 lg:py-9 lg:px-7">
+            <div className="relative z-10 lg:col-span-5 flex flex-col justify-center px-6 py-8 sm:px-8 sm:py-10 lg:py-10 lg:px-7">
               <h2 className="font-[family-name:var(--font-cinzel)] text-2xl xs:text-[27px] sm:text-3xl lg:text-[32px] font-bold leading-[1.15] text-white tracking-tight">
                 Siap Berangkat ke Baitullah?
               </h2>
@@ -596,7 +596,7 @@ export function ModernProofFooter() {
             </div>
 
             {/* 3. Kanan — List Benefit / Trust Points dengan Divider Vertikal */}
-            <div className="relative z-10 lg:col-span-3 flex flex-col justify-center px-6 pb-8 pt-3 sm:px-8 sm:pb-9 lg:py-9 lg:pl-6 lg:pr-7 border-t border-white/12 lg:border-t-0 lg:border-l lg:border-white/15">
+            <div className="relative z-10 lg:col-span-3 flex flex-col justify-center px-6 pb-8 pt-3 sm:px-8 sm:pb-10 lg:py-10 lg:pl-6 lg:pr-7 border-t border-white/12 lg:border-t-0 lg:border-l lg:border-white/15">
               <ul className="space-y-3.5 sm:space-y-4">
                 {[
                   {
@@ -653,7 +653,7 @@ export function ModernProofFooter() {
         </div>
       </section>
 
-      <footer className="bg-gradient-navy text-white">
+      <footer className="bg-[#021224] text-white border-t border-white/10">
         <div className="jam-container grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.25fr_.75fr_.75fr_1.25fr]">
           <div>
             <Image
