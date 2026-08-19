@@ -634,45 +634,48 @@ html {
   pointer-events: none !important;
 }
 
-.testimonial-lite-youtube {
+.testimonial-lite-youtube,
+.yt-lite {
   width: 100%;
+  height: 100%;
   max-width: none;
   overflow: hidden;
-  background-color: #0a1d3a;
+  background-color: #061a2f;
   background-position: center;
   background-size: cover;
-  border-radius: 24px 24px 0 0;
+  border-radius: 20px 20px 0 0;
   isolation: isolate;
 }
 
-.testimonial-lite-youtube::before {
-  height: 34%;
-  padding: 0;
-  background: linear-gradient(180deg, rgba(7, 28, 43, 0.42), transparent);
-  color: transparent;
+.testimonial-lite-youtube::after,
+.yt-lite::after {
+  content: "";
+  display: block;
+  padding-bottom: 177.7778% !important; /* 9:16 portrait */
 }
 
-.testimonial-lite-youtube::after {
-  padding-bottom: 177.7778%;
+.yt-lite > .lty-playbtn {
+  width: 52px !important;
+  height: 52px !important;
+  background: linear-gradient(135deg, #F5D97A 0%, #D5A12B 50%, #B8860B 100%) !important;
+  border-radius: 50% !important;
+  border: 0 !important;
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.45) !important;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease !important;
 }
 
-.testimonial-lite-youtube > .lyt-playbtn {
-  background-color: transparent;
-  background-size: 62px 44px;
-  filter: grayscale(0) drop-shadow(0 10px 22px rgba(7, 28, 43, 0.28));
-  transition: background-size 240ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 240ms ease;
+.yt-lite > .lty-playbtn::before {
+  border-color: transparent transparent transparent #061A2F !important;
+  border-width: 9px 0 9px 15px !important;
 }
 
-.testimonial-lite-youtube:hover > .lyt-playbtn,
-.testimonial-lite-youtube > .lyt-playbtn:focus-visible {
-  background-size: 68px 48px;
-  filter: grayscale(0) drop-shadow(0 14px 28px rgba(7, 28, 43, 0.38));
-  outline: 3px solid rgba(213, 183, 122, 0.9);
-  outline-offset: -6px;
+.yt-lite:hover > .lty-playbtn {
+  transform: translate3d(-50%, -50%, 0) scale(1.12) !important;
+  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.75) !important;
 }
 
-.testimonial-lite-youtube.lyt-activated {
+.testimonial-lite-youtube.lyt-activated,
+.yt-lite.lyt-activated {
   background-image: none !important;
 }
 

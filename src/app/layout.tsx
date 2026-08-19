@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Cinzel, Cormorant_Garamond, Montserrat, Reem_Kufi } from "next/font/google";
-import "lite-youtube-embed/src/lite-yt-embed.css";
+import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
 import "./globals.css";
 
 const montserrat = Montserrat({
