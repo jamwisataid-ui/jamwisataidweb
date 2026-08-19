@@ -665,7 +665,7 @@ export function ModernProofFooter() {
               alt="Jam Wisata"
               width={500}
               height={150}
-              className="h-auto w-[200px]"
+              className="h-auto w-[250px] sm:w-[290px] object-contain drop-shadow-md"
             />
             <p className="mt-4 text-sm font-bold text-[#E8C967]">
               Setiap Waktu Bernilai Ibadah

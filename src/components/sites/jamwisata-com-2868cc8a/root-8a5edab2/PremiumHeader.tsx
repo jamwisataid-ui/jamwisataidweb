@@ -128,7 +128,7 @@ export function PremiumHeader() {
             : "border-b border-white/10 bg-gradient-to-b from-[#061A2F]/90 via-[#061A2F]/45 to-transparent backdrop-blur-[1px]"
         }`}
       >
-        <div className="jam-container flex h-[70px] sm:h-[76px] lg:h-[82px] items-center justify-between">
+        <div className="jam-container flex h-[74px] sm:h-[82px] lg:h-[88px] items-center justify-between">
           {/* Logo */}
           <Link href="/" aria-label="Jam Wisata, kembali ke beranda" className="shrink-0 flex items-center">
             <Image
@@ -137,7 +137,7 @@ export function PremiumHeader() {
               width={537}
               height={161}
               priority
-              className="h-11 sm:h-13 lg:h-[52px] w-auto max-w-[175px] sm:max-w-[210px] lg:max-w-[250px] object-contain drop-shadow-md transition-transform duration-300 hover:scale-[1.02]"
+              className="h-12 sm:h-14 lg:h-[58px] w-auto max-w-[210px] sm:max-w-[250px] lg:max-w-[290px] object-contain drop-shadow-md transition-transform duration-300 hover:scale-[1.02]"
             />
           </Link>
 
