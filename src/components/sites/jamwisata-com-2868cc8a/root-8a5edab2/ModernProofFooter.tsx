@@ -9,7 +9,6 @@ import {
   Mail,
   MapPin,
   Phone,
-  Play,
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -239,50 +238,27 @@ function MediaModal({
 }
 
 function VideoCard({ video }: { video: TestimonialVideo }) {
-  const [isPlaying, setIsPlaying] = useState(false);
-
   return (
     <article className="lift-soft group flex flex-col shrink-0 snap-start overflow-hidden rounded-[22px] bg-white shadow-[0_14px_40px_rgba(6,26,47,0.08)] ring-1 ring-[#061A2F]/8 transition-all duration-300 hover:shadow-[0_22px_55px_rgba(6,26,47,0.16)] hover:-translate-y-1 w-[76vw] max-w-[280px] sm:w-[260px] lg:w-full">
       <div className="relative aspect-[9/16] w-full bg-[#061A2F] overflow-hidden">
-        {isPlaying ? (
-          <iframe
-            src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}?autoplay=1&rel=0`}
-            title={video.title}
-            className="absolute inset-0 size-full border-0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        ) : (
-          <button
-            type="button"
-            onClick={() => setIsPlaying(true)}
+        <lite-youtube
+          videoid={video.youtubeId}
+          playlabel={`Putar video: ${video.title}`}
+          params="rel=0&modestbranding=1"
+          style={{
+            backgroundImage: `url("https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg")`,
+            backgroundPosition: video.focalPoint ?? "center",
+          }}
+          className="testimonial-lite-youtube"
+        >
+          <a
+            href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+            className="lyt-playbtn"
             aria-label={`Putar video: ${video.title}`}
-            className="group/btn relative size-full block text-left focus:outline-none cursor-pointer"
           >
-            {/* Guaranteed High Quality YouTube Thumbnail */}
-            <Image
-              src={`https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`}
-              alt={video.title}
-              fill
-              sizes="(min-width: 1024px) 20vw, 80vw"
-              className="object-cover transition-transform duration-500 group-hover/btn:scale-105"
-            />
-            {/* Subtle Gradient Overlays */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#061A2F]/90 via-transparent to-black/25" />
-
-            {/* Glowing Gold Play Button */}
-            <div className="absolute inset-0 grid place-items-center">
-              <span className="grid size-12 sm:size-14 place-items-center rounded-full bg-gradient-gold-rich text-[#061A2F] shadow-[0_8px_24px_rgba(212,175,55,0.45)] transition-all duration-300 group-hover/btn:scale-115 group-hover/btn:shadow-[0_12px_32px_rgba(212,175,55,0.65)]">
-                <Play className="size-5 sm:size-6 fill-current ml-0.5" />
-              </span>
-            </div>
-
-            {/* Top YouTube Tag */}
-            <span className="absolute top-3 right-3 rounded-md bg-black/60 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold tracking-wider text-white border border-white/15">
-              YouTube
-            </span>
-          </button>
-        )}
+            <span className="lyt-visually-hidden">Putar video: {video.title}</span>
+          </a>
+        </lite-youtube>
       </div>
 
       <div className="flex flex-col flex-1 justify-between p-4 bg-white">
@@ -301,6 +277,10 @@ function VideoSection() {
   const [activeIndex, setActiveIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef({ active: false, startX: 0, scrollLeft: 0, moved: false });
+
+  useEffect(() => {
+    void import("lite-youtube-embed");
+  }, []);
 
   const move = (direction: number) =>
     trackRef.current?.scrollBy({
