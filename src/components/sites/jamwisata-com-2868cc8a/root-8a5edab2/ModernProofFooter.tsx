@@ -871,7 +871,7 @@ export function ModernProofFooter() {
               </a>
               <a href="https://maps.app.goo.gl/gVK4okTQSEtzyX9w5" target="_blank" rel="noopener noreferrer" className="silver-underline flex gap-3 transition-colors duration-300 hover:text-white">
                 <MapPin className="mt-1 size-4 shrink-0 text-[#E8C967]" />
-                Jl. Cibangkong No. 28A, Bandung 40273
+                Jl. Cibangkong No. 28A Gatot Subroto, Bandung 40273
               </a>
               <p className="flex gap-3">
                 <Clock3 className="mt-1 size-4 shrink-0 text-[#E8C967]" />
