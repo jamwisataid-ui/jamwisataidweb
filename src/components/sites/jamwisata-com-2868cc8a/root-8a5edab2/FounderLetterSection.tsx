@@ -82,7 +82,7 @@ export function FounderLetterSection() {
                 {/* Portrait Frame */}
                 <div className="relative w-full h-full overflow-hidden rounded-2xl border border-[#D7A348]/40 shadow-2xl bg-[#061A2F]">
                   <Image
-                    src="/sites/jamwisata-com-2868cc8a/root-8a5edab2/nanang-suharna-founder.jpeg"
+                    src="/sites/jamwisata-com-2868cc8a/root-8a5edab2/nanang-suharna-founder.png"
                     alt="Nanang Suharna — Founder & CEO Jam Wisata"
                     fill
                     sizes="(min-width: 1024px) 25vw, 280px"
