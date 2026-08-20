@@ -6,7 +6,6 @@ import {
   ArrowRight,
   BookOpen,
   Building2,
-  Clock,
   Compass,
   Heart,
   HeartHandshake,
@@ -267,10 +266,15 @@ export default function TentangKamiPage() {
             {/* Left: Clock Philosophy Card */}
             <div className="lg:col-span-5 flex justify-center">
               <div className="relative w-full max-w-[380px] rounded-3xl border border-[#D5A12B]/40 bg-[#061A2F]/80 p-7 sm:p-8 backdrop-blur-md shadow-2xl text-center">
-                <div className="mx-auto grid size-20 place-items-center rounded-2xl bg-gradient-to-b from-[#F5D97A] via-[#D4AF37] to-[#8C6708] p-[1.5px] shadow-[0_8px_24px_rgba(212,175,55,0.35)]">
-                  <span className="grid size-full place-items-center rounded-[14px] bg-[#021224] text-[#F5D97A]">
-                    <Clock className="size-10 text-[#F5D97A]" strokeWidth={1.7} />
-                  </span>
+                {/* Logo Jam 09.09 */}
+                <div className="relative mx-auto size-28 sm:size-32 flex items-center justify-center p-2 rounded-2xl border border-[#D5A12B]/35 bg-[#021224]/90 shadow-[0_10px_28px_rgba(212,175,55,0.25)]">
+                  <Image
+                    src="/sites/jamwisata-com-2868cc8a/root-8a5edab2/jam-0909-logo.png"
+                    alt="Logo Jam Wisata Pukul 09.09"
+                    fill
+                    sizes="(min-width: 640px) 128px, 112px"
+                    className="object-contain p-1.5"
+                  />
                 </div>
 
                 <h3 className="mt-5 font-[family-name:var(--font-cinzel)] text-2xl font-bold text-gradient-gold-rich">
