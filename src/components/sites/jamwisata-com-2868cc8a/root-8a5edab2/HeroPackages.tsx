@@ -125,11 +125,11 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
           ) : null}
         </div>
 
-        {/* 5. Bagian Harga mulai dari ... & 6. 1 Tombol gradient gold rich konsultasi paket ini */}
+        {/* 5. Bagian Harga All In ... & 6. 1 Tombol gradient gold rich konsultasi paket ini */}
         <div className="mt-5 pt-2">
           {travelPackage.priceFrom ? (
             <div className="mb-3 flex items-baseline justify-between gap-1.5 px-1 font-[family-name:var(--font-montserrat)]">
-              <span className="text-xs text-slate-300 font-medium">Mulai dari</span>
+              <span className="text-xs text-slate-300 font-medium">Harga All In</span>
               <div>
                 <span className="text-gradient-gold-rich text-xl font-extrabold">
                   Rp {formatIDR(travelPackage.priceFrom)}
