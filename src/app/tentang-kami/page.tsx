@@ -24,7 +24,7 @@ import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/roo
 export const metadata: Metadata = {
   title: "Tentang Kami | Jam Wisata — Setiap Waktu Bernilai Ibadah",
   description:
-    "Mengenal lebih dalam Jam Wisata (Jaris Ammar Madani). Filosofi nama, visi, misi, 6 nilai perusahaan, dan komitmen pelayanan ibadah umrah berlandaskan sunnah.",
+    "Mengenal lebih dalam Jam Wisata. Filosofi nama, visi, misi, 6 nilai perusahaan, dan komitmen pelayanan ibadah umrah berlandaskan sunnah.",
 };
 
 const filosofiItems = [
@@ -138,7 +138,7 @@ export default function TentangKamiPage() {
             </p>
 
             <p className="mt-5 text-sm sm:text-base leading-relaxed text-slate-200 font-[family-name:var(--font-montserrat)] max-w-[720px]">
-              Jam Wisata (PT Jaris Ammar Madani) hadir bukan sekadar sebagai penyelenggara perjalanan, melainkan sebagai sahabat terpercaya yang membimbing langkah dan menata kekhusyukan hati jamaah menuju Baitullah.
+              Jam Wisata hadir bukan sekadar sebagai penyelenggara perjalanan, melainkan sebagai sahabat terpercaya yang membimbing langkah dan menata kekhusyukan hati jamaah menuju Baitullah.
             </p>
           </div>
         </div>

@@ -74,27 +74,27 @@ export function FounderLetterSection() {
 
             {/* Founder Portrait & Circular Gold Decorative Halo */}
             <div className="relative mt-6 lg:mt-auto pt-6 flex flex-col items-center lg:items-start">
-              <div className="relative w-full max-w-[260px] aspect-[4/5] flex items-end justify-center">
+              <div className="relative w-full max-w-[280px] aspect-[4/5] flex items-end justify-center">
                 {/* Decorative subtle gold circular outline behind portrait */}
-                <div className="absolute inset-0 m-auto size-48 sm:size-52 rounded-full border border-[#D7A348]/25 bg-radial from-[#D7A348]/10 to-transparent -z-10 pointer-events-none" />
-                <div className="absolute inset-0 m-auto size-40 sm:size-44 rounded-full border border-dashed border-[#E0B55B]/20 -z-10 pointer-events-none" />
+                <div className="absolute inset-0 m-auto size-52 sm:size-56 rounded-full border border-[#D7A348]/25 bg-radial from-[#D7A348]/10 to-transparent -z-10 pointer-events-none" />
+                <div className="absolute inset-0 m-auto size-44 sm:size-48 rounded-full border border-dashed border-[#E0B55B]/20 -z-10 pointer-events-none" />
 
-                {/* Portrait Cutout */}
-                <div className="relative w-full h-full">
+                {/* Portrait Frame */}
+                <div className="relative w-full h-full overflow-hidden rounded-2xl border border-[#D7A348]/40 shadow-2xl bg-[#061A2F]">
                   <Image
-                    src="/sites/jamwisata-com-2868cc8a/root-8a5edab2/nanang-suharna-founder.png"
+                    src="/sites/jamwisata-com-2868cc8a/root-8a5edab2/nanang-suharna-founder.jpeg"
                     alt="Nanang Suharna — Founder & CEO Jam Wisata"
                     fill
-                    sizes="(min-width: 1024px) 25vw, 260px"
-                    className="object-contain object-bottom drop-shadow-[0_16px_24px_rgba(0,0,0,0.6)]"
+                    sizes="(min-width: 1024px) 25vw, 280px"
+                    className="object-cover object-top"
                   />
-                  {/* Subtle fade into bottom */}
-                  <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[#03152D] to-transparent" />
+                  {/* Subtle gradient blend into bottom */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#03152D]/90 via-transparent to-black/10" />
                 </div>
               </div>
 
               {/* Elegant Dark Navy + Gold Outline Nameplate */}
-              <div className="w-full max-w-[260px] mt-3 rounded-xl border border-[#D7A348]/40 bg-[#061A2F]/90 px-4 py-3 shadow-lg backdrop-blur-md text-center lg:text-left">
+              <div className="w-full max-w-[280px] mt-3 rounded-xl border border-[#D7A348]/40 bg-[#061A2F]/90 px-4 py-3 shadow-lg backdrop-blur-md text-center lg:text-left">
                 <h3 className="font-[family-name:var(--font-cinzel)] text-sm sm:text-base font-bold text-white tracking-wide">
                   Nanang Suharna
                 </h3>
