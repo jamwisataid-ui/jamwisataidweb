@@ -280,24 +280,18 @@ export function HeroPackages() {
               <div className="flex items-center gap-2">
                 <span className="h-px w-4 sm:w-5 bg-gradient-gold-rich" />
                 <p className="font-[family-name:var(--font-cinzel)] text-[9.5px] sm:text-[11px] lg:text-xs font-bold tracking-[0.16em] sm:tracking-[0.2em] text-[#D7A72B] uppercase">
-                  Travel Umroh Amanah &amp; Profesional
+                  Biro Perjalanan Umrah &amp; Wisata Halal
                 </p>
               </div>
             </div>
 
-            {/* Heading — Cinzel H1 */}
-            <h1 className="font-[family-name:var(--font-cinzel)] text-[26px] xs:text-[30px] sm:text-[40px] lg:text-[46px] xl:text-[52px] font-bold leading-[1.12] sm:leading-[1.1] tracking-[0.02em] text-white drop-shadow-md">
-              <span className="block">Perjalanan Umroh</span>
-              <span className="text-gradient-gold-rich mt-0.5 block font-bold">
-                Berlandaskan Sunnah
+            {/* Heading — Cinzel */}
+            <h1 className="font-[family-name:var(--font-cinzel)] text-[26px] xs:text-[30px] sm:text-[42px] lg:text-[50px] xl:text-[56px] font-bold leading-[1.12] sm:leading-[1.08] tracking-[0.02em] text-white drop-shadow-md">
+              <span className="block sm:whitespace-nowrap">Setiap Waktu</span>
+              <span className="text-gradient-gold-rich mt-0.5 block font-bold sm:whitespace-nowrap">
+                Bernilai Ibadah
               </span>
             </h1>
-
-            {/* Brand Headline Sub-badge */}
-            <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-[#D5A12B]/35 bg-[#021224]/80 px-3 py-1 text-xs font-semibold text-[#F5D97A] backdrop-blur-md">
-              <span>✦</span>
-              <span className="italic font-[family-name:var(--font-cormorant)] text-sm sm:text-base text-white font-medium">Setiap Waktu Bernilai Ibadah</span>
-            </div>
 
             {/* Body — Montserrat */}
             <p className="font-[family-name:var(--font-montserrat)] mt-2.5 sm:mt-3.5 max-w-[430px] lg:max-w-[460px] text-left text-[12.5px] sm:text-[14.5px] lg:text-[15.5px] font-normal leading-[1.55] sm:leading-[1.6] text-slate-200/90">
