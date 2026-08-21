@@ -29,20 +29,28 @@ const reemKufi = Reem_Kufi({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://jamwisata.id"),
-  title: "Jam Wisata | Setiap Waktu Bernilai Ibadah",
+  title: {
+    default: "Travel Umroh Terpercaya & Berlandaskan Sunnah | Jam Wisata",
+    template: "%s | Jam Wisata",
+  },
   description:
-    "Jam Wisata tidak hanya mengantarkan langkah menuju Baitullah, tetapi juga menemani perjalanan hati menuju Allah. Pendampingan ibadah yang amanah, profesional, dan penuh keberkahan.",
+    "Jam Wisata adalah travel umroh amanah dan profesional dari Bandung. Temukan paket umroh 2026–2027, jadwal keberangkatan, hotel, maskapai, bimbingan sunnah, dan konsultasi.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Jam Wisata | Setiap Waktu Bernilai Ibadah",
+    title: "Travel Umroh Terpercaya & Berlandaskan Sunnah | Jam Wisata",
     description:
-      "Setiap Waktu Bernilai Ibadah — pendampingan ibadah yang amanah, profesional, dan penuh keberkahan.",
+      "Jam Wisata adalah travel umroh amanah dan profesional dari Bandung. Temukan paket umroh 2026–2027, jadwal keberangkatan, hotel, maskapai, bimbingan sunnah, dan konsultasi.",
     url: "https://jamwisata.id",
     siteName: "Jam Wisata",
     locale: "id_ID",
     type: "website",
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "Travel Umroh Terpercaya & Berlandaskan Sunnah | Jam Wisata",
+    description:
+      "Jam Wisata adalah travel umroh amanah dan profesional dari Bandung. Temukan paket umroh 2026–2027, jadwal keberangkatan, hotel, maskapai, bimbingan sunnah, dan konsultasi.",
+  },
 };
 
 export default function RootLayout({

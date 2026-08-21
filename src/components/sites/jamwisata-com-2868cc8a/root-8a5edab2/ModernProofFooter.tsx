@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import {
   ArrowLeft,
   ArrowRight,
@@ -797,44 +798,80 @@ export function ModernProofFooter() {
             </a>
           </div>
           <nav aria-label="Navigasi footer">
-            <h2 className="text-sm font-bold">Navigasi</h2>
-            <ul className="mt-5 space-y-3 text-sm text-white/55">
-              {[
-                ["Paket Umrah", "paket-umrah"],
-                ["Mengapa Kami", "tentang-kami"],
-                ["Testimoni", "testimoni"],
-                ["Galeri", "galeri"],
-                ["FAQ", "faq"],
-              ].map(([label, id]) => (
-                <li key={id}>
-                  <a href={`#${id}`} className="silver-underline transition-colors duration-300 hover:text-white">
-                    {label}
-                  </a>
-                </li>
-              ))}
+            <h2 className="text-sm font-bold text-white">Program &amp; Panduan</h2>
+            <ul className="mt-5 space-y-2.5 text-xs sm:text-sm text-white/55">
+              <li>
+                <Link href="/travel-umroh-bandung" className="silver-underline transition-colors duration-300 hover:text-white">
+                  Travel Umroh Bandung
+                </Link>
+              </li>
+              <li>
+                <Link href="/paket-umroh" className="silver-underline transition-colors duration-300 hover:text-white">
+                  Paket Umroh 2026–2027
+                </Link>
+              </li>
+              <li>
+                <Link href="/jadwal-umroh" className="silver-underline transition-colors duration-300 hover:text-white">
+                  Jadwal Keberangkatan
+                </Link>
+              </li>
+              <li>
+                <Link href="/harga-umroh" className="silver-underline transition-colors duration-300 hover:text-white">
+                  Biaya &amp; Harga All In
+                </Link>
+              </li>
+              <li>
+                <Link href="/legalitas" className="silver-underline transition-colors duration-300 hover:text-white">
+                  Legalitas &amp; PPIU Resmi
+                </Link>
+              </li>
+              <li>
+                <Link href="/panduan-umroh" className="silver-underline transition-colors duration-300 hover:text-white">
+                  Panduan Ibadah Sunnah
+                </Link>
+              </li>
+              <li>
+                <Link href="/tentang-kami" className="silver-underline transition-colors duration-300 hover:text-white">
+                  Tentang Jam Wisata
+                </Link>
+              </li>
             </ul>
           </nav>
           <nav aria-label="Layanan">
-            <h2 className="text-sm font-bold">Layanan</h2>
-            <ul className="mt-5 space-y-3 text-sm text-white/55">
+            <h2 className="text-sm font-bold text-white">Pilihan Paket</h2>
+            <ul className="mt-5 space-y-2.5 text-xs sm:text-sm text-white/55">
               <li>
+                <Link
+                  href="/paket-umroh/umroh-9-hari-reguler"
+                  className="silver-underline transition-colors duration-300 hover:text-white"
+                >
+                  Umroh 9 Hari Reguler
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/paket-umroh/umroh-12-hari-plus-turkey"
+                  className="silver-underline transition-colors duration-300 hover:text-white"
+                >
+                  Umroh 12 Hari + Turki
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/paket-umroh/umroh-bintang-5-eksklusif"
+                  className="silver-underline transition-colors duration-300 hover:text-white"
+                >
+                  Umroh Bintang 5 Eksklusif
+                </Link>
+              </li>
+              <li className="pt-2 border-t border-white/10">
                 <a
                   href="https://jamwisata.com/transaksi/paket-umrah"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="silver-underline transition-colors duration-300 hover:text-white"
                 >
-                  Paket Umrah
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://jamwisata.com/transaksi/paket-wisata"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="silver-underline transition-colors duration-300 hover:text-white"
-                >
-                  Wisata Halal
+                  Portal Paket: jamwisata.com ↗
                 </a>
               </li>
               <li>
@@ -845,9 +882,9 @@ export function ModernProofFooter() {
                   )}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="silver-underline transition-colors duration-300 hover:text-white"
+                  className="silver-underline transition-colors duration-300 hover:text-white text-[#E8C967]"
                 >
-                  Konsultasi Perjalanan
+                  Konsultasi WhatsApp ↗
                 </a>
               </li>
             </ul>

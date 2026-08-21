@@ -29,6 +29,15 @@ export type TravelPackage = {
   status: "available" | "limited" | "sold-out" | "coming-soon";
   detailUrl?: string;
   whatsappMessage: string;
+  highlights?: string[];
+  includes?: string[];
+  excludes?: string[];
+  itinerary?: Array<{
+    day: number;
+    title: string;
+    description: string;
+  }>;
+  terms?: string[];
 };
 
 export type ArticlePreview = {
