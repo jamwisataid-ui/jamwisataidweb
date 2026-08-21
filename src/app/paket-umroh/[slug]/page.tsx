@@ -363,11 +363,11 @@ export default async function PackageDetailPage({ params }: Props) {
                   <span>Jaminan Amanah &amp; Berizin Resmi</span>
                 </div>
                 <p>
-                  Seluruh paket umroh Jam Wisata berizin resmi sesuai regulasi Kementerian Haji dan Umrah RI.
+                  Jam Wisata Brand of Fajar Indah Gemilang <strong className="text-[#061A2F]">PPIU Nomor 534 Tahun 2019</strong> menyelenggarakan perjalanan ibadah umroh berizin resmi sesuai regulasi Kementerian Haji dan Umrah RI.
                 </p>
                 <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
                   <Link href="/legalitas" className="font-bold text-[#D5A12B] hover:underline">
-                    Cek Legalitas PPIU →
+                    Cek Legalitas &amp; PPIU →
                   </Link>
                   <Link href="/travel-umroh-bandung" className="font-bold text-[#061A2F] hover:underline">
                     Kantor Bandung →

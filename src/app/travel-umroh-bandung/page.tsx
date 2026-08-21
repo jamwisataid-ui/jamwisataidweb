@@ -210,7 +210,7 @@ export default function TravelUmrohBandungPage() {
               <span>Ringkasan Resmi Jam Wisata Bandung</span>
             </div>
             <p className="mt-3 text-sm sm:text-base leading-relaxed text-[#061A2F] font-medium">
-              <strong>Jam Wisata</strong> adalah biro penyelenggara perjalanan ibadah umroh dan wisata halal yang berpusat di Kota Bandung. Dengan kantor operasional di <strong>Jl. Cibangkong No. 28A Gatot Subroto, Bandung 40273</strong>, Jam Wisata melayani jamaah asal Kota Bandung, Kabupaten Bandung, Cimahi, dan seluruh wilayah Jawa Barat dengan standar bimbingan ibadah berlandaskan sunnah, hotel berbintang di ring 1 Makkah/Madinah, dan maskapai penerbangan internasional berstandar tinggi.
+              <strong>Jam Wisata</strong> Brand of Fajar Indah Gemilang <strong>PPIU Nomor 534 Tahun 2019</strong> menyelenggarakan perjalanan ibadah umroh dan wisata halal yang berpusat di Kota Bandung. Dengan kantor operasional di <strong>Jl. Cibangkong No. 28A Gatot Subroto, Bandung 40273</strong>, Jam Wisata melayani jamaah asal Kota Bandung, Kabupaten Bandung, Cimahi, dan seluruh wilayah Jawa Barat dengan standar bimbingan ibadah berlandaskan sunnah, hotel berbintang di ring 1 Makkah/Madinah, dan maskapai penerbangan internasional berstandar tinggi.
             </p>
           </div>
         </div>

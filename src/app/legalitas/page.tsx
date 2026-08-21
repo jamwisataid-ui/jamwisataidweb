@@ -16,16 +16,16 @@ import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/roo
 import { whatsappHref } from "@/data/jamwisata";
 
 export const metadata: Metadata = {
-  title: "Legalitas & Izin Resmi Travel Umroh | Jam Wisata",
+  title: "Legalitas & Izin PPIU Resmi Travel Umroh | Jam Wisata",
   description:
-    "Cek legalitas resmi Jam Wisata. Terdaftar dan berizin PPIU Kementerian Haji dan Umrah Republik Indonesia. Panduan cek izin travel umroh aman dan terpercaya.",
+    "Jam Wisata Brand of Fajar Indah Gemilang PPIU Nomor 534 Tahun 2019 menyelenggarakan perjalanan ibadah umroh amanah, nyaman, dan berlandaskan sunnah.",
   alternates: {
     canonical: "/legalitas",
   },
   openGraph: {
-    title: "Legalitas & Izin Resmi Travel Umroh | Jam Wisata",
+    title: "Legalitas & Izin PPIU Resmi Travel Umroh | Jam Wisata",
     description:
-      "Transparansi legalitas, izin operasional PPIU, dan panduan verifikasi keaslian izin travel umroh melalui portal resmi Kementerian Haji & Umrah RI.",
+      "Jam Wisata Brand of Fajar Indah Gemilang PPIU Nomor 534 Tahun 2019 menyelenggarakan perjalanan ibadah umroh amanah, nyaman, dan berlandaskan sunnah.",
     url: "https://jamwisata.id/legalitas",
     siteName: "Jam Wisata",
     locale: "id_ID",
@@ -39,8 +39,9 @@ const legalSchema = {
     {
       "@type": "TravelAgency",
       name: "Jam Wisata",
+      alternateName: ["Fajar Indah Gemilang", "PPIU Nomor 534 Tahun 2019"],
       url: "https://jamwisata.id/legalitas",
-      description: "Penyelenggara Perjalanan Ibadah Umroh (PPIU) Resmi Berizin",
+      description: "Jam Wisata Brand of Fajar Indah Gemilang PPIU Nomor 534 Tahun 2019 menyelenggarakan perjalanan ibadah umroh.",
       telephone: "+6281809627499",
       address: {
         "@type": "PostalAddress",
@@ -86,7 +87,7 @@ export default function LegalitasPage() {
               <ArrowLeft className="size-3.5" /> Beranda
             </Link>
             <span className="text-[#D5A12B]">/</span>
-            <span className="text-white font-bold">Legalitas &amp; Izin Resmi</span>
+            <span className="text-white font-bold">Legalitas &amp; PPIU</span>
           </nav>
 
           <div className="max-w-[820px]">
@@ -114,7 +115,7 @@ export default function LegalitasPage() {
               <span>Fakta Legalitas Jam Wisata</span>
             </div>
             <p className="mt-3 text-xs sm:text-sm leading-relaxed text-[#061A2F] font-medium">
-              Jam Wisata menyelenggarakan perjalanan ibadah umroh berlandaskan izin resmi dari regulator berwenang <strong>Kementerian Haji dan Umrah Republik Indonesia</strong>. Seluruh proses pendaftaran, penerbitan visa, reservasi tiket maskapai, serta akomodasi hotel di Arab Saudi mematuhi regulasi resmi dan dapat diverifikasi keabsahannya.
+              Jam Wisata Brand of Fajar Indah Gemilang <strong>PPIU Nomor 534 Tahun 2019</strong> menyelenggarakan perjalanan ibadah umroh berlandaskan kepatuhan penuh terhadap ketentuan resmi Kementerian Haji dan Umrah Republik Indonesia. Seluruh proses pendaftaran, penerbitan visa, reservasi tiket maskapai, serta akomodasi hotel di Arab Saudi mematuhi standar operasional terpercaya untuk menjamin keamanan dan kenyamanan ibadah jamaah.
             </p>
           </div>
         </div>
@@ -129,17 +130,27 @@ export default function LegalitasPage() {
                 Kredensial &amp; Dokumen Perizinan
               </h2>
               <p className="text-xs sm:text-sm text-[#59616D] leading-relaxed">
-                Menjaga amanah jamaah adalah prioritas tertinggi Jam Wisata. Kami memastikan seluruh operasional ibadah memiliki payung hukum yang kuat dan transparan.
+                Menjaga amanah jamaah adalah prioritas tertinggi Jam Wisata. Kami memastikan seluruh operasional ibadah memiliki legalitas yang kuat, transparan, dan dapat dipertanggungjawabkan.
               </p>
 
               <div className="space-y-4">
+                <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-5">
+                  <span className="text-[11px] font-extrabold text-[#D5A12B] uppercase tracking-wider">Izin Penyelenggara Umroh</span>
+                  <h3 className="mt-1 font-bold text-sm sm:text-base text-[#061A2F]">
+                    Jam Wisata Brand of Fajar Indah Gemilang
+                  </h3>
+                  <p className="mt-1.5 text-xs text-[#59616D]">
+                    Nomor Izin Operasional: <strong>PPIU Nomor 534 Tahun 2019</strong>
+                  </p>
+                </div>
+
                 <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-5">
                   <span className="text-[11px] font-extrabold text-[#D5A12B] uppercase tracking-wider">Regulator Resmi</span>
                   <h3 className="mt-1 font-bold text-sm sm:text-base text-[#061A2F]">
                     Kementerian Haji dan Umrah Republik Indonesia (Kemenhaj RI)
                   </h3>
                   <p className="mt-1 text-xs text-[#59616D]">
-                    Regulator resmi penyelenggaraan ibadah haji dan umrah di Indonesia. Seluruh PPIU terdaftar terintegrasi ke dalam sistem verifikasi digital kementerian.
+                    Regulator resmi penyelenggaraan ibadah haji dan umrah di Indonesia yang memastikan kepatuhan standar pelayanan dan perlindungan hukum bagi jamaah.
                   </p>
                 </div>
 
@@ -157,7 +168,7 @@ export default function LegalitasPage() {
                   <span className="text-[11px] font-extrabold text-[#D5A12B] uppercase tracking-wider">Prinsip 5 Pasti Umrah</span>
                   <ul className="mt-2 space-y-1.5 text-xs text-[#59616D]">
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="size-3.5 text-[#D5A12B]" /> 1. Pasti Travelnya Berizin
+                      <CheckCircle2 className="size-3.5 text-[#D5A12B]" /> 1. Pasti Travelnya Berizin (PPIU No. 534 Th. 2019)
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle2 className="size-3.5 text-[#D5A12B]" /> 2. Pasti Jadwal &amp; Tiket Pesawatnya
@@ -176,13 +187,13 @@ export default function LegalitasPage() {
               </div>
             </div>
 
-            {/* How to Check PPIU Box */}
+            {/* How to Check Travel Box */}
             <div className="lg:col-span-5 space-y-6">
               <div className="rounded-2xl border border-[#D5A12B]/40 bg-[#061A2F] text-white p-6 sm:p-7 shadow-xl">
                 <div className="flex items-center gap-2.5 text-[#F5D97A]">
                   <Scale className="size-5" />
                   <h3 className="font-[family-name:var(--font-cinzel)] text-lg font-bold">
-                    Cara Cek Izin Travel Umroh
+                    Cara Cek Izin PPIU Travel Umroh
                   </h3>
                 </div>
                 <p className="mt-3 text-xs text-slate-300 leading-relaxed">
@@ -200,11 +211,11 @@ export default function LegalitasPage() {
                   </li>
                   <li className="flex gap-2">
                     <span className="font-bold text-[#F5D97A]">3.</span>
-                    <span>Ketik nama penyelenggara dan pastikan status izin aktif &amp; tidak dalam pembekuan.</span>
+                    <span>Ketik <strong>Fajar Indah Gemilang</strong> atau cari <strong>PPIU Nomor 534 Tahun 2019</strong> untuk memastikan status izin aktif dan terdaftar resmi.</span>
                   </li>
                   <li className="flex gap-2">
                     <span className="font-bold text-[#F5D97A]">4.</span>
-                    <span>Pastikan rekening pembayaran adalah rekening giro perusahaan, bukan rekening pribadi.</span>
+                    <span>Pastikan rekening pembayaran adalah rekening giro resmi perusahaan, bukan rekening pribadi.</span>
                   </li>
                 </ol>
 
