@@ -3,7 +3,7 @@ import { UploadThingError } from "uploadthing/server";
 
 import { requireDatabase } from "@/db";
 import { mediaAssets } from "@/db/schema";
-import { auth } from "@/lib/auth";
+import { readAdminSession } from "@/lib/admin-auth";
 
 const upload = createUploadthing();
 
@@ -15,9 +15,8 @@ export const uploadRouter = {
       minFileCount: 1,
     },
   })
-    .middleware(async ({ req }) => {
-      if (!auth) throw new UploadThingError("CMS belum dikonfigurasi.");
-      const session = await auth.api.getSession({ headers: req.headers });
+    .middleware(async () => {
+      const session = await readAdminSession();
 
       if (!session || session.user.role !== "admin") {
         throw new UploadThingError("Anda harus masuk sebagai admin.");

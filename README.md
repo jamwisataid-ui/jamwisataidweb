@@ -16,7 +16,7 @@ Website resmi dan content management system Jam Wisata, biro perjalanan Umrah da
 
 ## Stack
 
-Next.js 16 App Router, React 19, TypeScript, Tailwind CSS 4, Neon, Drizzle ORM, Better Auth, UploadThing, TipTap, Zod, Sonner, Resend, dan Playwright.
+Next.js 16 App Router, React 19, TypeScript, Tailwind CSS 4, Neon, Drizzle ORM, auth single-admin berbasis database, UploadThing, TipTap, Zod, Sonner, Resend, dan Playwright.
 
 ## Persyaratan
 
@@ -51,8 +51,6 @@ Website tersedia di `http://localhost:3000`, sedangkan CMS berada di `http://loc
 | --- | --- | --- |
 | `DATABASE_URL` | Ya | Neon pooled connection untuk aplikasi |
 | `DATABASE_URL_UNPOOLED` | Disarankan | Direct connection untuk migrasi Drizzle |
-| `BETTER_AUTH_SECRET` | Ya | Secret sesi, minimal 32 karakter acak |
-| `BETTER_AUTH_URL` | Ya | Origin autentikasi |
 | `NEXT_PUBLIC_APP_URL` | Ya | URL publik aplikasi |
 | `UPLOADTHING_TOKEN` | Produksi | Upload gambar CMS |
 | `RESEND_API_KEY` | Opsional | Pengiriman email reset password |
@@ -82,7 +80,7 @@ Jangan commit `.env.local`. Gunakan secret manager penyedia hosting untuk produc
 ```text
 src/
   app/admin/             Dashboard CMS dan login
-  app/api/auth/          Better Auth route handler
+  app/api/admin/         Endpoint login dan logout admin
   app/api/uploadthing/   UploadThing route handler
   app/artikel/           Artikel publik dari CMS
   components/admin/      Form dan navigasi CMS
@@ -112,7 +110,7 @@ npm run db:migrate
 npm run build
 ```
 
-Setelah deployment, ubah `BETTER_AUTH_URL` dan `NEXT_PUBLIC_APP_URL` ke domain production.
+Setelah deployment, ubah `NEXT_PUBLIC_APP_URL` ke domain production.
 
 ## Keamanan
 

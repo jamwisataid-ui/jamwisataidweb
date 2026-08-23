@@ -16,8 +16,6 @@ import {
   Settings2,
 } from "lucide-react";
 
-import { authClient } from "@/lib/auth-client";
-
 const nav = [
   ["/admin", "Ringkasan", CircleGauge],
   ["/admin/paket", "Paket & Jadwal", PackageOpen],
@@ -36,7 +34,7 @@ export function AdminSidebar({ name, email }: { name: string; email: string }) {
   const router = useRouter();
 
   async function logout() {
-    await authClient.signOut();
+    await fetch("/api/admin/logout", { method: "POST" });
     router.replace("/admin/login");
     router.refresh();
   }

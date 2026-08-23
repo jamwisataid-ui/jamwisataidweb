@@ -4,8 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, LoaderCircle, LockKeyhole, Mail } from "lucide-react";
 
-import { authClient } from "@/lib/auth-client";
-
 export function LoginForm({ configured }: { configured: boolean }) {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -17,14 +15,15 @@ export function LoginForm({ configured }: { configured: boolean }) {
     setPending(true);
     setMessage("");
     const form = new FormData(event.currentTarget);
-    const result = await authClient.signIn.email({
-      email: String(form.get("email")),
-      password: String(form.get("password")),
-      callbackURL: "/admin",
+    const response = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email: String(form.get("email")), password: String(form.get("password")) }),
     });
     setPending(false);
-    if (result.error) {
-      setMessage("Email atau kata sandi tidak sesuai.");
+    if (!response.ok) {
+      const result = await response.json().catch(() => null) as { message?: string } | null;
+      setMessage(result?.message ?? "Login gagal. Silakan coba kembali.");
       return;
     }
     router.replace("/admin");
@@ -33,7 +32,7 @@ export function LoginForm({ configured }: { configured: boolean }) {
 
   return (
     <form onSubmit={submit} className="admin-login-form">
-      {!configured ? <p className="admin-alert">DATABASE_URL dan BETTER_AUTH_SECRET belum dikonfigurasi.</p> : null}
+      {!configured ? <p className="admin-alert">DATABASE_URL belum dikonfigurasi.</p> : null}
       <label><span>Email admin</span><span className="admin-input-icon"><Mail className="size-4" /><input name="email" type="email" autoComplete="email" required placeholder="admin@jamwisata.id" /></span></label>
       <label><span>Kata sandi</span><span className="admin-input-icon"><LockKeyhole className="size-4" /><input name="password" type={showPassword ? "text" : "password"} autoComplete="current-password" required minLength={10} placeholder="Masukkan kata sandi" /><button type="button" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}>{showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}</button></span></label>
       {message ? <p className="admin-form-error" role="alert">{message}</p> : null}

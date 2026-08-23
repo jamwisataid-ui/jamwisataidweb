@@ -1,15 +1,9 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { auth } from "@/lib/auth";
+import { readAdminSession } from "@/lib/admin-auth";
 
 export async function getAdminSession() {
-  if (!auth) return null;
-
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session || session.user.role !== "admin") return null;
-
-  return session;
+  return readAdminSession();
 }
 export async function requireAdminSession() {
   const session = await getAdminSession();
