@@ -3,6 +3,7 @@ import { getAdminSession } from "@/lib/admin-session";
 import { LoginForm } from "@/components/admin/LoginForm";
 
 export const metadata = { title: "Masuk CMS" };
+export const dynamic = "force-dynamic";
 
 export default async function AdminLoginPage() {
   if (await getAdminSession()) redirect("/admin");
