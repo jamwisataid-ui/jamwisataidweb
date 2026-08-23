@@ -2,7 +2,7 @@ import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 import { and, eq, gt, lt } from "drizzle-orm";
 
-import { requireDatabase } from "@/db";
+import { isDatabaseConfigured, requireDatabase } from "@/db";
 import { sessions, users } from "@/db/schema";
 
 const SESSION_COOKIE = "jamwisata_admin_session";
@@ -36,7 +36,7 @@ export async function createAdminSession(userId: string, metadata?: { ipAddress?
 }
 
 export async function readAdminSession() {
-  if (!process.env.DATABASE_URL) return null;
+  if (!isDatabaseConfigured) return null;
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token) return null;
 
@@ -57,7 +57,7 @@ export async function readAdminSession() {
 export async function destroyAdminSession() {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE)?.value;
-  if (token && process.env.DATABASE_URL) {
+  if (token && isDatabaseConfigured) {
     await requireDatabase().delete(sessions).where(eq(sessions.token, hashToken(token)));
   }
   cookieStore.delete(SESSION_COOKIE);

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { requireDatabase } from "@/db";
+import { isDatabaseConfigured, requireDatabase } from "@/db";
 import { authRateLimits, users } from "@/db/schema";
 import { createAdminSession } from "@/lib/admin-auth";
 import { verifyPassword } from "@/lib/password";
@@ -17,7 +17,7 @@ const WINDOW_MS = 10 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
 
 export async function POST(request: Request) {
-  if (!process.env.DATABASE_URL) {
+  if (!isDatabaseConfigured) {
     return NextResponse.json({ message: "Database belum dikonfigurasi." }, { status: 503 });
   }
 

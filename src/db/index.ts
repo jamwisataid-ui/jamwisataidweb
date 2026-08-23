@@ -2,10 +2,15 @@ import { drizzle } from "drizzle-orm/neon-http";
 
 import * as schema from "./schema";
 
-export const isDatabaseConfigured = Boolean(process.env.DATABASE_URL);
+const databaseUrl =
+  process.env.DATABASE_URL?.trim() ||
+  process.env.POSTGRES_URL?.trim() ||
+  process.env.DATABASE_URL_UNPOOLED?.trim();
+
+export const isDatabaseConfigured = Boolean(databaseUrl);
 
 export const db = isDatabaseConfigured
-  ? drizzle(process.env.DATABASE_URL!, { schema })
+  ? drizzle(databaseUrl!, { schema })
   : null;
 
 export type Database = NonNullable<typeof db>;
