@@ -15,7 +15,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/ModernProofFooter";
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
-import { formatIDR, umrahPackages, whatsappHref } from "@/data/jamwisata";
+import { formatIDR, whatsappHref } from "@/data/jamwisata";
+import { getPublishedPackages } from "@/lib/cms/public";
+import type { TravelPackage } from "@/types/jamwisata";
 
 export const metadata: Metadata = {
   title: "Paket Umroh 2026 – 2027 All In & Berlandaskan Sunnah",
@@ -35,7 +37,7 @@ export const metadata: Metadata = {
   },
 };
 
-const packageHubSchema = {
+const packageHubSchema = (umrahPackages: TravelPackage[]) => ({
   "@context": "https://schema.org",
   "@graph": [
     {
@@ -67,7 +69,7 @@ const packageHubSchema = {
       ],
     },
   ],
-};
+});
 
 const hubFaqs = [
   {
@@ -84,10 +86,11 @@ const hubFaqs = [
   },
 ];
 
-export default function PaketUmrohHubPage() {
+export default async function PaketUmrohHubPage() {
+  const umrahPackages = await getPublishedPackages();
   return (
     <main className="jam-page min-h-screen bg-white text-[#333333]">
-      <JsonLd schema={packageHubSchema} />
+      <JsonLd schema={packageHubSchema(umrahPackages)} />
       <PremiumHeader />
 
       {/* Hero Section */}

@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
-import { umrahPackages } from "@/data/jamwisata";
+import { getPublishedArticles, getPublishedPackages } from "@/lib/cms/public";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [umrahPackages, articles] = await Promise.all([getPublishedPackages(), getPublishedArticles()]);
   const baseUrl = "https://jamwisata.id";
   const currentDate = new Date().toISOString();
 
@@ -65,5 +66,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }));
 
-  return [...staticRoutes, ...packageRoutes];
+  const articleRoutes: MetadataRoute.Sitemap = articles.map((article) => ({ url: `${baseUrl}/artikel/${article.slug}`, lastModified: article.updatedAt, changeFrequency: "monthly", priority: 0.7 }));
+  return [...staticRoutes, ...packageRoutes, ...articleRoutes];
 }

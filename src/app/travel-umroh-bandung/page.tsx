@@ -22,7 +22,8 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/ModernProofFooter";
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
-import { formatIDR, umrahPackages, whatsappHref } from "@/data/jamwisata";
+import { formatIDR, whatsappHref } from "@/data/jamwisata";
+import { getPublishedPackages } from "@/lib/cms/public";
 
 export const metadata: Metadata = {
   title: "Travel Umroh Bandung Terpercaya & Berlandaskan Sunnah",
@@ -129,7 +130,8 @@ const bandungFaqs = [
   },
 ];
 
-export default function TravelUmrohBandungPage() {
+export default async function TravelUmrohBandungPage() {
+  const umrahPackages = await getPublishedPackages();
   return (
     <main className="jam-page min-h-screen bg-white text-[#333333]">
       <JsonLd schema={bandungSchema} />

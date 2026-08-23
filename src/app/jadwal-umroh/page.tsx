@@ -11,7 +11,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/ModernProofFooter";
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
-import { formatIDR, umrahPackages, whatsappHref } from "@/data/jamwisata";
+import { formatIDR, whatsappHref } from "@/data/jamwisata";
+import { getPublishedPackages } from "@/lib/cms/public";
+import type { TravelPackage } from "@/types/jamwisata";
 
 export const metadata: Metadata = {
   title: "Jadwal Keberangkatan Umroh 2026 – 2027 | Jam Wisata",
@@ -31,7 +33,7 @@ export const metadata: Metadata = {
   },
 };
 
-const jadwalSchema = {
+const jadwalSchema = (umrahPackages: TravelPackage[]) => ({
   "@context": "https://schema.org",
   "@graph": [
     {
@@ -62,12 +64,13 @@ const jadwalSchema = {
       ],
     },
   ],
-};
+});
 
-export default function JadwalUmrohPage() {
+export default async function JadwalUmrohPage() {
+  const umrahPackages = await getPublishedPackages();
   return (
     <main className="jam-page min-h-screen bg-white text-[#333333]">
-      <JsonLd schema={jadwalSchema} />
+      <JsonLd schema={jadwalSchema(umrahPackages)} />
       <PremiumHeader />
 
       {/* Hero */}

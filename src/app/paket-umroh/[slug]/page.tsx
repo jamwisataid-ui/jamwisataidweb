@@ -18,13 +18,15 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/ModernProofFooter";
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
-import { formatIDR, umrahPackages, whatsappHref } from "@/data/jamwisata";
+import { formatIDR, whatsappHref } from "@/data/jamwisata";
+import { getPublishedPackages } from "@/lib/cms/public";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
+  const umrahPackages = await getPublishedPackages();
   return umrahPackages.map((pkg) => ({
     slug: pkg.slug,
   }));
@@ -32,6 +34,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const umrahPackages = await getPublishedPackages();
   const pkg = umrahPackages.find((p) => p.slug === slug);
 
   if (!pkg) {
@@ -68,6 +71,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PackageDetailPage({ params }: Props) {
   const { slug } = await params;
+  const umrahPackages = await getPublishedPackages();
   const pkg = umrahPackages.find((p) => p.slug === slug);
 
   if (!pkg) {

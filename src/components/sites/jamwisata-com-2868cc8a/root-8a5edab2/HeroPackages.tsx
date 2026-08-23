@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
-import { formatIDR, umrahPackages, whatsappHref } from "@/data/jamwisata";
+import { formatIDR, whatsappHref } from "@/data/jamwisata";
 import type { TravelPackage } from "@/types/jamwisata";
 
 const assetRoot = "/sites/jamwisata-com-2868cc8a/root-8a5edab2";
@@ -154,15 +154,15 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
   );
 }
 
-export function HeroPackages() {
+export function HeroPackages({ packages }: { packages: TravelPackage[] }) {
   const [draft, setDraft] = useState<Filters>(emptyFilters);
   const [applied, setApplied] = useState<Filters>(emptyFilters);
   const [hasSearched, setHasSearched] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
 
   const options = useMemo(() => ({
-    months: [...new Set(umrahPackages.map((item) => item.departureMonth).filter(Boolean))] as string[],
-    types: [...new Set(umrahPackages.map((item) => item.packageType))],
+    months: [...new Set(packages.map((item) => item.departureMonth).filter(Boolean))] as string[],
+    types: [...new Set(packages.map((item) => item.packageType))],
     airlines: [
       "Garuda Indonesia",
       "Saudia",
@@ -171,7 +171,7 @@ export function HeroPackages() {
       "Emirates",
     ],
     durations: ["9 Hari", "10 Hari", "12 Hari", "16 Hari"],
-  }), []);
+  }), [packages]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -192,7 +192,7 @@ export function HeroPackages() {
   }, []);
 
   const filteredPackages = useMemo(() => {
-    return umrahPackages.filter((item) => {
+    return packages.filter((item) => {
       const matchType = !applied.type || item.packageType === applied.type;
       const matchMonth = !applied.month || item.departureMonth === applied.month;
       const matchAirline = !applied.airline || item.airline === applied.airline;
@@ -205,7 +205,7 @@ export function HeroPackages() {
 
       return matchType && matchMonth && matchAirline && matchDuration;
     });
-  }, [applied]);
+  }, [applied, packages]);
 
   const updateUrl = (filters: Filters) => {
     const params = new URLSearchParams();

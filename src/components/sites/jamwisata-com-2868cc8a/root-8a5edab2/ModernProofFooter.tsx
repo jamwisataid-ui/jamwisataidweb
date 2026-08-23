@@ -39,7 +39,7 @@ type TestimonialVideo = {
   orientation: "portrait" | "landscape";
   focalPoint?: string;
 };
-const testimonialVideos: TestimonialVideo[] = [
+const defaultTestimonialVideos: TestimonialVideo[] = [
   {
     id: "video-1",
     youtubeId: "8vJae3mZooI",
@@ -82,7 +82,8 @@ const testimonialVideos: TestimonialVideo[] = [
   },
 ];
 
-const gallery = [
+type GalleryItem = { image: string; alt: string; caption: string; width: string };
+const defaultGallery: GalleryItem[] = [
   {
     image: "about.jpg",
     alt: "Suasana jamaah di Masjidil Haram",
@@ -144,9 +145,8 @@ const gallery = [
     width: "w-[360px]",
   },
 ] as const;
-const galleryRows = [gallery.slice(0, 5), gallery.slice(5)] as const;
 
-const faqs = [
+const defaultFaqs: ReadonlyArray<readonly [string, string]> = [
   [
     "Apa saja yang termasuk dalam paket umrah?",
     "Fasilitas berbeda pada setiap program. Umumnya paket dapat mencakup tiket, visa, hotel, transportasi, konsumsi, perlengkapan, dan pendampingan. Periksa detail paket sebelum mendaftar.",
@@ -380,7 +380,7 @@ function VideoCard({ video }: { video: TestimonialVideo }) {
   );
 }
 
-function VideoSection() {
+function VideoSection({ testimonialVideos }: { testimonialVideos: TestimonialVideo[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef({ active: false, startX: 0, scrollLeft: 0, moved: false });
@@ -482,7 +482,8 @@ function VideoSection() {
   );
 }
 
-function GallerySection() {
+function GallerySection({ gallery }: { gallery: GalleryItem[] }) {
+  const galleryRows = [gallery.slice(0, Math.ceil(gallery.length / 2)), gallery.slice(Math.ceil(gallery.length / 2))];
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const touchStart = useRef(0);
   const close = useCallback(() => setActiveIndex(null), []);
@@ -493,7 +494,7 @@ function GallerySection() {
           ? null
           : (current + direction + gallery.length) % gallery.length,
       ),
-    [],
+    [gallery.length],
   );
   useEffect(() => {
     if (activeIndex === null) return;
@@ -547,7 +548,7 @@ function GallerySection() {
                         className={`group relative h-[145px] shrink-0 overflow-hidden rounded-[16px] bg-slate-100 text-left ring-1 ring-[#0A1D3A]/8 transition-all duration-500 hover:ring-[#D4AF37]/45 hover:shadow-[0_18px_38px_rgba(10,29,58,.22)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C0C0C0] sm:h-[195px] ${item.width}`}
                       >
                         <Image
-                          src={`${assetRoot}/${item.image}`}
+                          src={item.image.startsWith("http") || item.image.startsWith("/") ? item.image : `${assetRoot}/${item.image}`}
                           alt={copy === 0 ? item.alt : ""}
                           fill
                           sizes="360px"
@@ -576,7 +577,7 @@ function GallerySection() {
             }}
           >
             <Image
-              src={`${assetRoot}/${gallery[activeIndex].image}`}
+              src={gallery[activeIndex].image.startsWith("http") || gallery[activeIndex].image.startsWith("/") ? gallery[activeIndex].image : `${assetRoot}/${gallery[activeIndex].image}`}
               alt={gallery[activeIndex].alt}
               fill
               sizes="95vw"
@@ -608,12 +609,12 @@ function GallerySection() {
   );
 }
 
-export function ModernProofFooter() {
+export function ModernProofFooter({ testimonials = defaultTestimonialVideos, gallery = defaultGallery, faqs = defaultFaqs }: { testimonials?: TestimonialVideo[]; gallery?: GalleryItem[]; faqs?: ReadonlyArray<readonly [string, string]> }) {
   const [openFaq, setOpenFaq] = useState(0);
   return (
     <>
-      <VideoSection />
-      <GallerySection />
+      <VideoSection testimonialVideos={testimonials} />
+      <GallerySection gallery={gallery} />
       <section id="faq" className="scroll-mt-20 bg-white py-20 sm:py-24">
         <div className="jam-container grid gap-10 lg:grid-cols-[.7fr_1.3fr] lg:gap-16">
           <div>

@@ -1,149 +1,127 @@
-<div align="center">
+# Jam Wisata Website & CMS
 
-# 🕋 Jam Wisata
+Website resmi dan content management system Jam Wisata, biro perjalanan Umrah dan wisata halal dengan semangat **“Setiap Waktu Bernilai Ibadah.”** Proyek ini mempertahankan pengalaman publik yang telah disetujui klien sekaligus menambahkan dashboard privat untuk mengelola paket, jadwal, artikel, testimonial, galeri, destinasi, FAQ, layanan, serta konten homepage.
 
-**Website paket umrah & wisata halal — responsif, informatif, dan berorientasi pada konsultasi calon jamaah.**
+## Fitur
 
-[![Next.js](https://img.shields.io/badge/Next.js%2016-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
-[![React 19](https://img.shields.io/badge/React%2019-61DAFB?logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Tailwind CSS 4](https://img.shields.io/badge/Tailwind%20CSS%204-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+- Website publik responsif dengan filter paket, detail program, harga, jadwal, SEO, dan konsultasi WhatsApp.
+- CMS privat di `/admin` dengan satu akun administrator.
+- Workflow draft dan publish manual; draft tidak tampil di website publik.
+- Paket lengkap: keberangkatan, maskapai, hotel, harga, seat, fasilitas, itinerary, dan SEO.
+- Artikel rich text menggunakan TipTap.
+- Testimonial YouTube, galeri gambar, destinasi halal, FAQ, layanan, homepage, dan pengaturan situs.
+- Neon PostgreSQL melalui Drizzle ORM, UploadThing untuk media, dan Resend untuk email.
+- Cache publik otomatis diinvalidasi setelah konten diterbitkan.
+- Audit log untuk aktivitas editorial.
 
-[Fitur](#fitur-utama) · [Teknologi](#teknologi) · [Menjalankan Proyek](#menjalankan-proyek) · [Pengujian](#pengujian) · [Struktur Proyek](#struktur-proyek)
+## Stack
 
-</div>
+Next.js 16 App Router, React 19, TypeScript, Tailwind CSS 4, Neon, Drizzle ORM, Better Auth, UploadThing, TipTap, Zod, Sonner, Resend, dan Playwright.
 
-![Tampilan terbaru website Jam Wisata](docs/design-references/jamwisata-final-desktop.png)
+## Persyaratan
 
-## Tentang Proyek
+- Node.js 24.x dan npm
+- Database Neon PostgreSQL
+- Akun UploadThing untuk upload media
+- Akun Resend bila reset password melalui email digunakan
 
-Jam Wisata adalah website pemasaran perjalanan umrah dan wisata halal yang dibangun dengan Next.js. Halaman menyajikan informasi paket secara terstruktur, membantu pengunjung menyaring jadwal sesuai kebutuhan, dan mengarahkan pertanyaan ke WhatsApp dengan konteks paket yang dipilih.
-
-Antarmuka dirancang mobile-first dengan navigasi adaptif, kartu paket, testimoni video yang dimuat secara lazy, dan WhatsApp concierge yang dapat dioperasikan menggunakan keyboard.
-
-## Fitur Utama
-
-- 🔍 **Pencarian paket** — hero filter berdasarkan bulan, jenis paket, maskapai, serta bandara keberangkatan.
-- 🔗 **URL tersinkron** — filter paket tersinkron dengan query parameter URL sehingga mudah dibagikan.
-- 🏨 **Informasi lengkap** — jadwal, hotel, fasilitas, maskapai, harga, dan status paket.
-- 💬 **Konsultasi WhatsApp** — tautan dengan pesan konsultasi yang sudah disesuaikan konteks.
-- 📱 **Navigasi adaptif** — desktop dan mobile dengan dukungan keyboard penuh.
-- 🎥 **Testimoni video** — YouTube lazy loading melalui domain privasi `youtube-nocookie.com`.
-- 🤝 **WhatsApp concierge** — dialog aksesibel, focus trap, dan auto-open satu kali per sesi.
-- 🚀 **SEO** — metadata, Open Graph, dan canonical URL.
-- 📐 **Responsif** — diuji pada viewport 320 px hingga 1920 px.
-
-## Teknologi
-
-- [Next.js 16](https://nextjs.org/) dengan App Router dan output standalone
-- [React 19](https://react.dev/) dan TypeScript strict
-- [Tailwind CSS 4](https://tailwindcss.com/)
-- [Lucide React](https://lucide.dev/) untuk ikon
-- [lite-youtube-embed](https://github.com/paulirish/lite-youtube-embed) untuk video yang ringan
-- [Playwright](https://playwright.dev/) untuk pengujian browser
-- Docker multi-stage untuk image produksi
-
-## Prasyarat
-
-- Node.js 24 atau lebih baru
-- npm
-
-Docker bersifat opsional apabila aplikasi akan dijalankan dalam container.
-
-## Menjalankan Proyek
-
-1. Clone repository dan masuk ke direktori proyek.
-
-   ```bash
-   git clone https://github.com/jamwisataid-ui/jamwisataidweb.git
-   cd jamwisataidweb
-   ```
-
-2. Instal dependency.
-
-   ```bash
-   npm ci
-   ```
-
-3. Jalankan development server.
-
-   ```bash
-   npm run dev
-   ```
-
-4. Buka [http://localhost:3000](http://localhost:3000).
-
-Proyek saat ini tidak memerlukan environment variable untuk penggunaan dasar. File `.env.local` atau `.env` tetap dapat digunakan oleh konfigurasi Docker jika diperlukan kemudian.
-
-## Script
-
-| Perintah | Kegunaan |
-| --- | --- |
-| `npm run dev` | Menjalankan development server |
-| `npm run build` | Membuat production build |
-| `npm run start` | Menjalankan production server hasil build |
-| `npm run lint` | Memeriksa kode dengan ESLint |
-| `npm run typecheck` | Memeriksa tipe TypeScript tanpa menghasilkan file |
-| `npm run check` | Menjalankan lint, typecheck, dan build secara berurutan |
-
-## Pengujian
-
-Tes Playwright memverifikasi layout responsif, perilaku filter dan URL, navigasi mobile, lazy loading video, aksesibilitas WhatsApp concierge, stabilitas sticky header, dan error runtime browser.
-
-Jalankan aplikasi terlebih dahulu:
+## Instalasi Lokal
 
 ```bash
+git clone https://github.com/jamwisataid-ui/jamwisataidweb.git
+cd jamwisataidweb
+npm ci
+Copy-Item .env.example .env.local
+```
+
+Isi `.env.local`, lalu siapkan database dan admin:
+
+```bash
+npm run db:migrate
+npm run db:seed
+npm run admin:create -- --email=admin@jamwisata.id --name="Admin Jam Wisata"
 npm run dev
 ```
 
-Kemudian, dari terminal lain:
+Website tersedia di `http://localhost:3000`, sedangkan CMS berada di `http://localhost:3000/admin`.
 
-```bash
-npx playwright test
-```
+## Environment Variables
 
-## Menjalankan dengan Docker
+| Variable | Wajib | Kegunaan |
+| --- | --- | --- |
+| `DATABASE_URL` | Ya | Neon pooled connection untuk aplikasi |
+| `DATABASE_URL_UNPOOLED` | Disarankan | Direct connection untuk migrasi Drizzle |
+| `BETTER_AUTH_SECRET` | Ya | Secret sesi, minimal 32 karakter acak |
+| `BETTER_AUTH_URL` | Ya | Origin autentikasi |
+| `NEXT_PUBLIC_APP_URL` | Ya | URL publik aplikasi |
+| `UPLOADTHING_TOKEN` | Produksi | Upload gambar CMS |
+| `RESEND_API_KEY` | Opsional | Pengiriman email reset password |
+| `EMAIL_FROM` | Opsional | Pengirim terverifikasi di Resend |
 
-Production container tersedia di port `3000` secara default:
+Jangan commit `.env.local`. Gunakan secret manager penyedia hosting untuk production.
 
-```bash
-docker compose up app --build
-```
+## Perintah
 
-Development container tersedia di port `3001` secara default:
+| Perintah | Kegunaan |
+| --- | --- |
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run start` | Menjalankan hasil build |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | Pemeriksaan TypeScript |
+| `npm run check` | Lint, typecheck, dan build |
+| `npm run db:generate` | Membuat SQL migration |
+| `npm run db:migrate` | Menerapkan migration ke Neon |
+| `npm run db:check` | Memeriksa migration |
+| `npm run db:studio` | Membuka Drizzle Studio |
+| `npm run db:seed` | Mengisi konten awal secara idempotent |
+| `npm run admin:create -- --email=... --name=...` | Membuat admin dan password sementara |
 
-```bash
-docker compose up dev --build
-```
-
-Port dapat diubah melalui environment variable `PORT` untuk production atau `DEV_PORT` untuk development.
-
-## Struktur Proyek
+## Struktur Utama
 
 ```text
 src/
-  app/                 Halaman utama, layout, metadata, dan global styles
-  components/sites/    Komponen antarmuka khusus Jam Wisata
-  components/ui/       Primitive UI yang dapat digunakan ulang
-  data/                Data paket dan helper WhatsApp
-  types/               Tipe domain dan deklarasi TypeScript
-public/sites/           Gambar dan aset lokal website
-tests/                  Pengujian end-to-end Playwright
-docs/research/          Audit, spesifikasi komponen, dan hasil inspeksi
-docs/design-references/ Referensi visual desktop, tablet, dan mobile
-scripts/                Script pengunduhan aset dan sinkronisasi tooling
+  app/admin/             Dashboard CMS dan login
+  app/api/auth/          Better Auth route handler
+  app/api/uploadthing/   UploadThing route handler
+  app/artikel/           Artikel publik dari CMS
+  components/admin/      Form dan navigasi CMS
+  components/sites/      Tampilan publik Jam Wisata
+  db/schema/             Schema auth dan konten Drizzle
+  lib/cms/               Query, validasi, dan Server Actions CMS
+drizzle/                 SQL migration terversi
+scripts/                 Seed CMS dan bootstrap admin
 ```
 
-## Memperbarui Konten
+## Workflow Editorial
 
-- Data paket umrah berada di `src/data/jamwisata.ts`.
-- Struktur tipe paket berada di `src/types/jamwisata.ts`.
-- Komponen halaman berada di `src/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/`.
-- Aset gambar berada di `public/sites/jamwisata-com-2868cc8a/root-8a5edab2/`.
+1. Masuk ke `/admin`.
+2. Tambah atau edit konten.
+3. Pilih **Simpan Draft** untuk pekerjaan internal.
+4. Pilih **Terbitkan** setelah informasi diverifikasi.
+5. Cache halaman terkait otomatis diinvalidasi.
 
-Saat mengubah paket, pastikan nilai `departureMonth` menggunakan format `YYYY-MM` agar filter bulan tetap berfungsi.
+Gunakan hanya data, harga, jadwal, legalitas, statistik, foto, dan testimonial yang telah diverifikasi. CMS tidak membuat urgency, rating, atau klaim secara otomatis.
+
+## Deployment
+
+Tambahkan seluruh environment variable production, jalankan migration terhadap database production, kemudian build aplikasi. `next.config.ts` sudah mengizinkan sumber gambar UploadThing dan thumbnail YouTube.
+
+```bash
+npm run db:migrate
+npm run build
+```
+
+Setelah deployment, ubah `BETTER_AUTH_URL` dan `NEXT_PUBLIC_APP_URL` ke domain production.
+
+## Keamanan
+
+- Registrasi publik dimatikan; bootstrap admin hanya melalui script lokal.
+- Seluruh Server Action CMS memverifikasi sesi dan role admin.
+- Endpoint upload hanya menerima admin terautentikasi.
+- Rate limit login disimpan di database.
+- Secret dan kredensial tidak boleh masuk Git.
 
 ## Lisensi
 
-Kode proyek ini tersedia berdasarkan ketentuan pada [LICENSE](LICENSE). Hak atas merek, logo, foto, video, dan materi pihak ketiga tetap dimiliki oleh pemiliknya masing-masing.
+Kode tersedia berdasarkan [MIT License](LICENSE). Hak merek, logo, foto, video, dan materi Jam Wisata tetap dimiliki pemilik masing-masing.
