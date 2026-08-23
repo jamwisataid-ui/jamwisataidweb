@@ -1,11 +1,33 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AdminEmptyState, AdminPageHeader, AdminStatus } from "@/components/admin/AdminUi";
 import { listEntriesAdmin } from "@/lib/cms/admin";
 
-const labels = { testimonial: "Testimonial", gallery: "Galeri", destination: "Destinasi", faq: "FAQ", service: "Layanan", homepage: "Homepage", "site-settings": "Pengaturan Situs" } as const;
-type EntryType = keyof typeof labels;
+const contentConfig = {
+  testimonial: ["Testimonial", "Kelola cerita jamaah dari video YouTube yang telah diverifikasi."],
+  gallery: ["Galeri perjalanan", "Susun dokumentasi asli dari perjalanan dan kegiatan jamaah."],
+  destination: ["Destinasi halal", "Tampilkan pilihan perjalanan halal selain program Umrah."],
+  faq: ["Pertanyaan umum", "Berikan jawaban singkat dan jelas sebelum jamaah berkonsultasi."],
+  service: ["Layanan", "Jelaskan bentuk pendampingan dan layanan yang diterima jamaah."],
+  homepage: ["Konten homepage", "Atur pesan utama dan bagian editorial pada halaman depan."],
+  "site-settings": ["Informasi situs", "Kelola identitas, kontak, dan informasi utama Jam Wisata."],
+} as const;
+type EntryType = keyof typeof contentConfig;
+
 export default async function ContentListPage({ params }: { params: Promise<{ type: string }> }) {
-  const { type: raw } = await params; if (!(raw in labels)) notFound(); const type = raw as EntryType;
+  const { type: raw } = await params;
+  if (!(raw in contentConfig)) notFound();
+  const type = raw as EntryType;
+  const [title, description] = contentConfig[type];
   const items = await listEntriesAdmin(type);
-  return <><header className="admin-page-header"><div><p className="admin-eyebrow">KONTEN SITUS</p><h1>{labels[type]}</h1><p>Atur urutan, visibilitas, dan isi konten yang tampil kepada jamaah.</p></div><Link className="admin-primary-button" href={`/admin/konten/${type}/baru`}>Tambah Konten</Link></header><section className="admin-panel"><div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Konten</th><th>Key</th><th>Status</th><th>Urutan</th><th /></tr></thead><tbody>{items.map((item) => <tr key={item.id}><td><strong>{item.title}</strong></td><td>{item.key}</td><td><span className={`admin-status ${item.status}`}>{item.status}</span></td><td>{item.sortOrder}</td><td><Link href={`/admin/konten/${type}/${item.id}`}>Edit →</Link></td></tr>)}</tbody></table></div></section></>;
+
+  return <>
+    <AdminPageHeader eyebrow="Konten situs" title={title} description={description} action={{ href: `/admin/konten/${type}/baru`, label: "Tambah konten" }} />
+    <section className="admin-panel">
+      {items.length ? <div className="admin-table-wrap"><table className="admin-table">
+        <thead><tr><th>Konten</th><th>Key internal</th><th>Status</th><th>Urutan</th><th>Aksi</th></tr></thead>
+        <tbody>{items.map((item) => <tr key={item.id}><td><strong>{item.title}</strong><small>Terakhir diubah {item.updatedAt.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</small></td><td>{item.key}</td><td><AdminStatus status={item.status} /></td><td>{item.sortOrder}</td><td><Link href={`/admin/konten/${type}/${item.id}`}>Kelola →</Link></td></tr>)}</tbody>
+      </table></div> : <AdminEmptyState title={`Belum ada ${title.toLowerCase()}`} description="Tambahkan konten pertama dan simpan sebagai draft sampai informasinya siap diterbitkan." href={`/admin/konten/${type}/baru`} action="Tambah konten" />}
+    </section>
+  </>;
 }

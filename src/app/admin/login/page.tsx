@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getAdminSession } from "@/lib/admin-session";
 import { LoginForm } from "@/components/admin/LoginForm";
@@ -7,5 +8,20 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminLoginPage() {
   if (await getAdminSession()) redirect("/admin");
-  return <main className="admin-login-page"><div className="admin-login-panel"><div className="admin-login-brand"><span>JW</span><p>JARIS AMMAR MADANI</p><h1>JAM WISATA</h1><small>Setiap Waktu Bernilai Ibadah</small></div><div className="admin-login-card"><p className="admin-eyebrow">CONTENT MANAGEMENT</p><h2>Selamat datang kembali</h2><p>Kelola perjalanan, informasi, dan cerita jamaah dalam satu tempat.</p><LoginForm /></div></div></main>;
+  return <main className="admin-login-page">
+    <div className="admin-login-panel">
+      <section className="admin-login-brand" aria-label="Jam Wisata">
+        <Image src="/images/logo-white.png" alt="Jaris Ammar Madani — Jam Wisata" width={480} height={177} priority />
+        <div><span>AMANAH</span><i /><span>PELAYANAN</span><i /><span>ILMU</span></div>
+        <blockquote>“Kami mendampingi setiap langkah agar perjalanan menjadi pengalaman ibadah yang bermakna.”</blockquote>
+      </section>
+      <section className="admin-login-card">
+        <div className="admin-login-heading"><Image src="/images/logo-emblem.png" alt="" width={48} height={48} /><div><p className="admin-eyebrow">CONTENT MANAGEMENT</p><span>Portal internal Jam Wisata</span></div></div>
+        <h1>Selamat datang kembali.</h1>
+        <p>Masuk untuk mengelola program perjalanan dan informasi jamaah.</p>
+        <LoginForm />
+        <footer><span>Portal aman untuk pengelola resmi</span><span>•</span><span>jamwisata.id</span></footer>
+      </section>
+    </div>
+  </main>;
 }
