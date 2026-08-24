@@ -41,14 +41,14 @@ export function AdminSidebar({ name, email }: { name: string; email: string }) {
   return (
     <>
       <header className="admin-mobile-bar">
-        <Link href="/admin" aria-label="Dashboard Jam Wisata"><Image src="/images/logo-emblem.png" alt="" width={38} height={38} /><span><strong>JAM WISATA</strong><small>Content Management</small></span></Link>
+        <Link href="/admin" aria-label="Dashboard Jam Wisata"><Image src="/images/admin-logo.webp" alt="Jam Wisata" width={640} height={278} priority /></Link>
         <button type="button" aria-label={open ? "Tutup menu" : "Buka menu"} aria-expanded={open} onClick={() => setOpen((value) => !value)}>{open ? <X /> : <Menu />}</button>
       </header>
       {open ? <button className="admin-sidebar-backdrop" aria-label="Tutup menu" onClick={() => setOpen(false)} /> : null}
       <aside className={`admin-sidebar ${open ? "is-open" : ""}`}>
       <button className="admin-sidebar-close" type="button" aria-label="Tutup menu" onClick={() => setOpen(false)}><X /></button>
       <div className="admin-brand">
-        <Image src="/images/logo-white.png" alt="Jam Wisata" width={220} height={81} priority />
+        <Image src="/images/admin-logo.webp" alt="Jam Wisata" width={640} height={278} priority />
         <span>CONTENT MANAGEMENT</span>
       </div>
       <nav aria-label="Navigasi CMS" className="admin-nav">
