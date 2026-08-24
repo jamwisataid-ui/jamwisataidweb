@@ -9,7 +9,10 @@ export function AdminAuthShell({ eyebrow, title, description, children }: { eyeb
         <blockquote>“Kami mendampingi setiap langkah agar perjalanan menjadi pengalaman ibadah yang bermakna.”</blockquote>
       </section>
       <section className="admin-login-card">
-        <div className="admin-login-heading"><span className="admin-login-heading-logo"><Image src="/images/admin-logo.webp" alt="Jam Wisata" width={640} height={278} /></span><div><p className="admin-eyebrow">{eyebrow}</p><span>Portal internal Jam Wisata</span></div></div>
+        <div className="admin-login-heading">
+          <span className="admin-login-heading-logo"><Image src="/images/admin-logo.webp" alt="Jam Wisata" width={640} height={278} priority /></span>
+          <p>{eyebrow}</p>
+        </div>
         <h1>{title}</h1>
         <p>{description}</p>
         {children}
