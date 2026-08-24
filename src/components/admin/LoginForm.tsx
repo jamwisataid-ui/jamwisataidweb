@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Eye, EyeOff, LoaderCircle, LockKeyhole, Mail } from "lucide-react";
 
 export function LoginForm() {
@@ -34,6 +35,7 @@ export function LoginForm() {
     <form onSubmit={submit} className="admin-login-form">
       <label><span>Email admin</span><span className="admin-input-icon"><Mail className="size-4" /><input name="email" type="email" autoComplete="email" required placeholder="admin@jamwisata.id" /></span></label>
       <label><span>Kata sandi</span><span className="admin-input-icon"><LockKeyhole className="size-4" /><input name="password" type={showPassword ? "text" : "password"} autoComplete="current-password" required minLength={10} placeholder="Masukkan kata sandi" /><button type="button" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}>{showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}</button></span></label>
+      <Link className="admin-forgot-link" href="/admin/lupa-password">Lupa kata sandi?</Link>
       {message ? <p className="admin-form-error" role="alert">{message}</p> : null}
       <button className="admin-primary-button" type="submit" disabled={pending}>{pending ? <LoaderCircle className="size-4 animate-spin" /> : null}{pending ? "Memeriksa..." : "Masuk ke CMS"}</button>
       <p className="admin-login-help">Akses khusus pengelola resmi Jam Wisata.</p>

@@ -9,6 +9,7 @@ import {
   House,
   FileQuestion,
   GalleryHorizontal,
+  KeyRound,
   LogOut,
   Menu,
   MessageSquareQuote,
@@ -36,7 +37,7 @@ export function AdminSidebar({ name, email }: { name: string; email: string }) {
   return (
     <>
       <header className={`admin-mobile-bar ${open ? "menu-open" : ""}`}>
-        <Link href="/admin" aria-label="Dashboard Jam Wisata"><Image src="/images/admin-logo.webp" alt="Jam Wisata" width={640} height={278} priority /></Link>
+        <Link className="admin-mobile-logo" href="/admin" aria-label="Dashboard Jam Wisata"><Image src="/images/admin-logo.webp" alt="Jam Wisata" width={640} height={278} priority /></Link>
         <button type="button" aria-label={open ? "Tutup menu" : "Buka menu"} aria-expanded={open} onClick={() => setOpen((value) => !value)}>{open ? <X /> : <Menu />}</button>
       </header>
       {open ? <button className="admin-sidebar-backdrop" aria-label="Tutup menu" onClick={() => setOpen(false)} /> : null}
@@ -52,6 +53,7 @@ export function AdminSidebar({ name, email }: { name: string; email: string }) {
           return <Link onClick={() => setOpen(false)} key={href} href={href} className={active ? "active" : ""}><Icon aria-hidden /><span>{label}</span>{active ? <i /> : null}</Link>;
         })}</section>)}
       </nav>
+      <Link className="admin-account-link" onClick={() => setOpen(false)} href="/admin/ganti-password"><KeyRound aria-hidden /><span>Ganti kata sandi</span></Link>
       <a className="admin-view-site" href="/" target="_blank" rel="noreferrer"><SquareArrowOutUpRight aria-hidden /><span>Buka website</span></a>
       <div className="admin-profile">
         <span>{name.slice(0, 1).toUpperCase()}</span>
