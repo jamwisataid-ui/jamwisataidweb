@@ -23,10 +23,10 @@ export default async function ContentListPage({ params }: { params: Promise<{ ty
 
   return <>
     <AdminPageHeader eyebrow="Konten situs" title={title} description={description} action={{ href: `/admin/konten/${type}/baru`, label: "Tambah konten" }} />
-    <section className="admin-panel">
+    <section className="admin-panel admin-list-panel">
       {items.length ? <div className="admin-table-wrap"><table className="admin-table">
         <thead><tr><th>Konten</th><th>Key internal</th><th>Status</th><th>Urutan</th><th>Aksi</th></tr></thead>
-        <tbody>{items.map((item) => <tr key={item.id}><td><strong>{item.title}</strong><small>Terakhir diubah {item.updatedAt.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</small></td><td>{item.key}</td><td><AdminStatus status={item.status} /></td><td>{item.sortOrder}</td><td><Link href={`/admin/konten/${type}/${item.id}`}>Kelola →</Link></td></tr>)}</tbody>
+        <tbody>{items.map((item) => <tr key={item.id}><td data-label="Konten"><strong>{item.title}</strong><small>Terakhir diubah {item.updatedAt.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</small></td><td data-label="Key">{item.key}</td><td data-label="Status"><AdminStatus status={item.status} /></td><td data-label="Urutan">{item.sortOrder}</td><td data-label="Aksi"><Link href={`/admin/konten/${type}/${item.id}`}>Kelola konten →</Link></td></tr>)}</tbody>
       </table></div> : <AdminEmptyState title={`Belum ada ${title.toLowerCase()}`} description="Tambahkan konten pertama dan simpan sebagai draft sampai informasinya siap diterbitkan." href={`/admin/konten/${type}/baru`} action="Tambah konten" />}
     </section>
   </>;
