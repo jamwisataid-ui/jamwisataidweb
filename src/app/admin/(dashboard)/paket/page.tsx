@@ -5,7 +5,7 @@ import { listPackagesAdmin } from "@/lib/cms/admin";
 export default async function PackagesAdminPage() {
   const items = await listPackagesAdmin();
   return <>
-    <AdminPageHeader eyebrow="Program & jadwal" title="Paket perjalanan" description="Kelola harga, hotel, maskapai, fasilitas, jadwal, dan itinerary dalam satu tempat." action={{ href: "/admin/paket/baru", label: "Tambah paket" }} />
+    <AdminPageHeader eyebrow="Program & jadwal" title="Paket perjalanan" description="Kelola informasi kartu paket yang tampil pada homepage." action={{ href: "/admin/paket/baru", label: "Tambah paket" }} />
     <section className="admin-panel admin-list-panel">
       {items.length ? <div className="admin-table-wrap"><table className="admin-table">
         <thead><tr><th>Program</th><th>Tipe</th><th>Status</th><th>Terakhir diubah</th><th>Aksi</th></tr></thead>

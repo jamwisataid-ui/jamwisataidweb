@@ -25,6 +25,7 @@ import {
   extractYoutubeId,
   lines,
   packageFormSchema,
+  slugify,
 } from "./validation";
 
 const value = (formData: FormData, key: string) => String(formData.get(key) ?? "");
@@ -48,7 +49,21 @@ export async function savePackageAction(_state: ActionState, formData: FormData)
   const session = await requireAdminSession();
   const intent = value(formData, "intent") === "publish" ? "publish" : "draft";
   const raw = Object.fromEntries(formData.entries());
-  const parsed = packageFormSchema.safeParse({ ...raw, featured: formData.get("featured") === "on" });
+  const name = value(formData, "name").trim();
+  const departureDate = value(formData, "departureDate");
+  const slug = value(formData, "slug") || slugify(name);
+  const departureLabel = departureDate
+    ? new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${departureDate}T00:00:00Z`))
+    : "";
+  const whatsappMessage = `Assalamu’alaikum Jam Wisata, saya ingin konsultasi mengenai ${name}${departureLabel ? ` (keberangkatan ${departureLabel})` : ""}. Mohon informasi selengkapnya.`;
+  const parsed = packageFormSchema.safeParse({
+    ...raw,
+    id: value(formData, "id") || randomUUID(),
+    slug,
+    departureLabel,
+    whatsappMessage,
+    featured: value(formData, "featured") === "true" || formData.get("featured") === "on",
+  });
   if (!parsed.success) return { ok: false, message: "Periksa kembali data paket.", errors: parsed.error.flatten().fieldErrors };
 
   const database = requireDatabase();
@@ -81,7 +96,7 @@ export async function savePackageAction(_state: ActionState, formData: FormData)
       set: { payload: data, updatedBy: session.user.id, updatedAt: new Date() },
     });
     await writeAudit(session.user.id, "save-draft", "package", data.id, `Draft ${data.name} disimpan`);
-    return { ok: true, message: "Draft paket berhasil disimpan." };
+    return { ok: true, message: "Draft paket berhasil disimpan.", redirectTo: `/admin/paket/${data.id}` };
   }
 
   if (existing && existing.slug !== data.slug) {

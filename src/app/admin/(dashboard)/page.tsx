@@ -5,7 +5,7 @@ import { getDashboardData } from "@/lib/cms/admin";
 export default async function DashboardPage() {
   const { counts, recent } = await getDashboardData();
   const cards = [["Program perjalanan", counts.packages, PackageOpen, "/admin/paket", "Program aktif dan draft"], ["Jadwal berangkat", counts.departures, CalendarDays, "/admin/paket", "Seluruh keberangkatan"], ["Artikel panduan", counts.articles, BookOpenText, "/admin/artikel", "Bekal ilmu jamaah"], ["Konten terkelola", counts.contents, FileStack, "/admin/konten/homepage", "Galeri, FAQ, dan lainnya"]] as const;
-  const quickActions = [["Susun paket baru", "Lengkapi program, hotel, harga, dan itinerary.", PackageOpen, "/admin/paket/baru"], ["Tulis artikel", "Bagikan panduan yang membantu persiapan jamaah.", BookOpenText, "/admin/artikel/baru"], ["Tambah galeri", "Simpan momen perjalanan yang autentik.", GalleryHorizontal, "/admin/konten/gallery/baru"], ["Tambah testimonial", "Hubungkan cerita jamaah melalui YouTube.", Quote, "/admin/konten/testimonial/baru"]] as const;
+  const quickActions = [["Tambah paket", "Isi kartu paket yang tampil pada homepage.", PackageOpen, "/admin/paket/baru"], ["Tulis artikel", "Bagikan panduan yang membantu persiapan jamaah.", BookOpenText, "/admin/artikel/baru"], ["Tambah galeri", "Simpan momen perjalanan yang autentik.", GalleryHorizontal, "/admin/konten/gallery/baru"], ["Tambah testimonial", "Hubungkan cerita jamaah melalui YouTube.", Quote, "/admin/konten/testimonial/baru"]] as const;
   const today = new Intl.DateTimeFormat("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
   return <>
     <section className="admin-welcome">
