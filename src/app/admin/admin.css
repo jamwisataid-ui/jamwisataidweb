@@ -420,9 +420,10 @@
 
 @media (max-width: 880px) {
   .admin-main { margin-left: 0; padding: 28px 20px 92px; }
-  .admin-mobile-bar { height: 72px; }
-  .admin-mobile-bar img { width: 174px; }
-  .admin-mobile-bar button { width: 46px; height: 46px; }
+  .admin-mobile-bar { height: 78px; justify-content: flex-end; padding-inline: 16px; }
+  .admin-mobile-bar > a { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+  .admin-mobile-bar img { width: 190px; }
+  .admin-mobile-bar button { width: 46px; height: 46px; margin-left: auto; }
   .admin-mobile-bar.menu-open > button { visibility: hidden; }
   .admin-sidebar { width: min(310px,90vw); }
   .admin-form-section,
@@ -460,4 +461,9 @@
   .admin-login-card > p,
   .admin-login-form label { font-size: 15px; }
   .admin-input-icon input { height: 54px; font-size: 16px; }
+}
+
+@media (max-width: 360px) {
+  .admin-mobile-bar img { width: 172px; }
+  .admin-mobile-bar button { width: 44px; height: 44px; }
 }
