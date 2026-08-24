@@ -65,8 +65,8 @@ export function PackageForm({ values = {} }: { values?: Values }) {
         </div>
       </section>
 
-      <div className="admin-package-note"><UploadCloud aria-hidden /><p><strong>Semua sudah otomatis.</strong><span>URL, label tanggal, pesan WhatsApp, dan pengaturan teknis dibuat oleh sistem.</span></p></div>
-      <div className="admin-form-actions"><button name="intent" value="draft" className="admin-secondary-button" disabled={pending}>Simpan Draft</button><button name="intent" value="publish" className="admin-primary-button" disabled={pending}>{pending ? "Menyimpan..." : "Tampilkan di Website"}</button></div>
+      <div className="admin-package-note"><UploadCloud aria-hidden /><p><strong>Tidak perlu mengatur hal teknis.</strong><span>Link halaman, tulisan tanggal, dan pesan WhatsApp dibuat otomatis.</span></p></div>
+      <div className="admin-form-actions"><button name="intent" value="draft" className="admin-secondary-button" disabled={pending}>Simpan dulu</button><button name="intent" value="publish" className="admin-primary-button" disabled={pending}>{pending ? "Menyimpan..." : "Tampilkan di website"}</button></div>
     </form>
   );
 }

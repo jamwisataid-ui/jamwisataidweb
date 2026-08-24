@@ -14,7 +14,7 @@ export function AdminPageHeader({ eyebrow, title, description, action, backHref 
 }
 
 export function AdminStatus({ status }: { status: string }) {
-  const label = { published: "Terbit", draft: "Draft", archived: "Diarsipkan" }[status] ?? status;
+  const label = { published: "Tampil di website", draft: "Belum tampil", archived: "Disimpan" }[status] ?? status;
   return <span className={`admin-status ${status}`}>{label}</span>;
 }
 

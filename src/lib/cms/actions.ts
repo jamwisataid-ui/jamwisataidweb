@@ -215,12 +215,26 @@ function entryData(type: string, data: { primary?: string; secondary?: string; t
 export async function saveEntryAction(_state: ActionState, formData: FormData): Promise<ActionState> {
   const session = await requireAdminSession();
   const intent = value(formData, "intent") === "publish" ? "publish" : "draft";
-  const parsed = entryFormSchema.safeParse(Object.fromEntries(formData.entries()));
+  const raw = Object.fromEntries(formData.entries());
+  const id = value(formData, "id") || randomUUID();
+  const type = value(formData, "type");
+  const suggestedTitle = {
+    testimonial: value(formData, "secondary") || "Video jamaah",
+    gallery: value(formData, "secondary") || value(formData, "tertiary") || "Foto galeri",
+    destination: value(formData, "primary") || "Destinasi halal",
+    faq: value(formData, "primary") || "Pertanyaan umum",
+    service: "Layanan Jam Wisata",
+    homepage: value(formData, "secondary") || "Bagian homepage",
+    "site-settings": value(formData, "primary") || "Informasi situs",
+  }[type] ?? "Konten website";
+  const title = value(formData, "title") || suggestedTitle;
+  const key = value(formData, "key") || `${slugify(title) || "konten"}-${id.slice(0, 8)}`;
+  const parsed = entryFormSchema.safeParse({ ...raw, id, title, key });
   if (!parsed.success) return { ok: false, message: "Periksa kembali data konten.", errors: parsed.error.flatten().fieldErrors };
 
   const database = requireDatabase();
   const input = parsed.data;
-  const id = input.id ?? randomUUID();
+  const entryId = input.id ?? id;
   const sortOrder = 0;
   let data: Record<string, unknown>;
   try {
@@ -232,30 +246,31 @@ export async function saveEntryAction(_state: ActionState, formData: FormData): 
   if (intent === "draft") {
     const existing = input.id ? await database.query.contentEntries.findFirst({ where: eq(contentEntries.id, input.id) }) : null;
     if (!existing) {
-      await database.insert(contentEntries).values({ id, type: input.type, key: input.key, title: input.title, data, status: "draft", sortOrder, createdBy: session.user.id, updatedBy: session.user.id });
+      await database.insert(contentEntries).values({ id: entryId, type: input.type, key: input.key, title: input.title, data, status: "draft", sortOrder, createdBy: session.user.id, updatedBy: session.user.id });
     }
-    await database.insert(contentDrafts).values({ entityType: input.type, entityId: id, payload: { ...input, data }, updatedBy: session.user.id }).onConflictDoUpdate({
+    await database.insert(contentDrafts).values({ entityType: input.type, entityId: entryId, payload: { ...input, data }, updatedBy: session.user.id }).onConflictDoUpdate({
       target: [contentDrafts.entityType, contentDrafts.entityId],
       set: { payload: { ...input, data }, updatedBy: session.user.id, updatedAt: new Date() },
     });
-    await writeAudit(session.user.id, "save-draft", input.type, id, `Draft ${input.title} disimpan`);
-    return { ok: true, message: "Draft berhasil disimpan.", redirectTo: `/admin/konten/${input.type}/${id}` };
+    await writeAudit(session.user.id, "save-draft", input.type, entryId, `Draft ${input.title} disimpan`);
+    return { ok: true, message: "Perubahan berhasil disimpan.", redirectTo: `/admin/konten/${input.type}/${entryId}` };
   }
 
-  await database.insert(contentEntries).values({ id, type: input.type, key: input.key, title: input.title, data, status: "published", sortOrder, publishedAt: new Date(), createdBy: session.user.id, updatedBy: session.user.id }).onConflictDoUpdate({
+  await database.insert(contentEntries).values({ id: entryId, type: input.type, key: input.key, title: input.title, data, status: "published", sortOrder, publishedAt: new Date(), createdBy: session.user.id, updatedBy: session.user.id }).onConflictDoUpdate({
     target: contentEntries.id,
     set: { key: input.key, title: input.title, data, status: "published", sortOrder, publishedAt: new Date(), updatedBy: session.user.id, updatedAt: new Date() },
   });
-  await database.delete(contentDrafts).where(and(eq(contentDrafts.entityType, input.type), eq(contentDrafts.entityId, id)));
-  await writeAudit(session.user.id, "publish", input.type, id, `${input.title} diterbitkan`);
+  await database.delete(contentDrafts).where(and(eq(contentDrafts.entityType, input.type), eq(contentDrafts.entityId, entryId)));
+  await writeAudit(session.user.id, "publish", input.type, entryId, `${input.title} diterbitkan`);
   invalidate("entries");
-  return { ok: true, message: "Konten berhasil diterbitkan.", redirectTo: `/admin/konten/${input.type}/${id}` };
+  return { ok: true, message: "Konten sudah tampil di website.", redirectTo: `/admin/konten/${input.type}/${entryId}` };
 }
 
 export async function saveArticleAction(_state: ActionState, formData: FormData): Promise<ActionState> {
   const session = await requireAdminSession();
   const intent = value(formData, "intent") === "publish" ? "publish" : "draft";
-  const parsed = articleFormSchema.safeParse(Object.fromEntries(formData.entries()));
+  const raw = Object.fromEntries(formData.entries());
+  const parsed = articleFormSchema.safeParse({ ...raw, slug: value(formData, "slug") || slugify(value(formData, "title")) });
   if (!parsed.success) return { ok: false, message: "Periksa kembali artikel.", errors: parsed.error.flatten().fieldErrors };
   const input = parsed.data;
   const database = requireDatabase();

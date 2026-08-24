@@ -5,6 +5,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import LinkExtension from "@tiptap/extension-link";
 import ImageExtension from "@tiptap/extension-image";
+import { CheckCircle2, ImageIcon } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
 import { saveArticleAction } from "@/lib/cms/actions";
 import { type ActionState } from "@/lib/cms/validation";
@@ -28,15 +29,15 @@ export function ArticleForm({ values = {} }: { values?: Values }) {
     <FormFeedback state={state} />
     {values.id ? <input type="hidden" name="id" value={value(values, "id")} /> : null}
     <input type="hidden" name="contentJson" value={contentJson} />
-    <section className="admin-form-section"><div><p>Artikel</p><span>Tulis panduan yang jelas, bermanfaat, dan menenangkan jamaah.</span></div><div className="admin-form-grid">
-      <label><span>Judul</span><input name="title" defaultValue={value(values, "title")} required /></label>
-      <label><span>Slug</span><input name="slug" defaultValue={value(values, "slug")} required /></label>
+    <input type="hidden" name="slug" value={value(values, "slug")} />
+    <input type="hidden" name="seoTitle" value={value(values, "seoTitle")} />
+    <input type="hidden" name="seoDescription" value={value(values, "seoDescription")} />
+    <section className="admin-form-section"><div><p>Isi artikel</p><span>Tulis judul, ringkasan, dan isi artikel. Pengaturan teknis dibuat otomatis.</span></div><div className="admin-form-grid">
+      <label className="admin-span-2"><span>Judul artikel</span><input name="title" defaultValue={value(values, "title")} required /></label>
       <label className="admin-span-2"><span>Ringkasan</span><textarea name="excerpt" rows={3} maxLength={300} defaultValue={value(values, "excerpt")} required /></label>
-      <div className="admin-span-2 admin-image-control"><label><span>Cover</span><input name="coverUrl" value={coverUrl} onChange={(event) => setCoverUrl(event.target.value)} /></label><UploadButton endpoint="cmsImage" onClientUploadComplete={(files) => { if (files[0]?.url) setCoverUrl(files[0].url); }} /></div>
-      <div className="admin-span-2"><span className="admin-field-label">Isi artikel</span><div className="admin-editor-toolbar"><button type="button" onClick={() => editor?.chain().focus().toggleBold().run()}>Bold</button><button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}>H2</button><button type="button" onClick={() => editor?.chain().focus().toggleBulletList().run()}>List</button><button type="button" onClick={() => editor?.chain().focus().toggleBlockquote().run()}>Quote</button></div><EditorContent editor={editor} className="admin-rich-editor" /></div>
-      <label><span>SEO title</span><input name="seoTitle" maxLength={70} defaultValue={value(values, "seoTitle")} /></label>
-      <label><span>SEO description</span><textarea name="seoDescription" maxLength={170} rows={3} defaultValue={value(values, "seoDescription")} /></label>
+      <div className="admin-simple-upload admin-span-2"><input type="hidden" name="coverUrl" value={coverUrl} /><span className="admin-simple-upload-icon"><ImageIcon aria-hidden /></span><div><strong>Foto sampul</strong><small>{coverUrl ? "Foto sudah dipilih." : "Pilih foto landscape untuk artikel."}</small></div>{coverUrl ? <span className="admin-upload-ready"><CheckCircle2 aria-hidden /> Siap</span> : null}<UploadButton endpoint="cmsImage" content={{ button: coverUrl ? "Ganti foto" : "Pilih foto", allowedContent: "JPG, PNG, atau WebP · maksimal 8 MB" }} onClientUploadComplete={(files) => { if (files[0]?.url) setCoverUrl(files[0].url); }} /></div>
+      <div className="admin-span-2"><span className="admin-field-label">Tulisan artikel</span><div className="admin-editor-toolbar"><button type="button" onClick={() => editor?.chain().focus().toggleBold().run()}>Tebal</button><button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}>Judul bagian</button><button type="button" onClick={() => editor?.chain().focus().toggleBulletList().run()}>Daftar</button><button type="button" onClick={() => editor?.chain().focus().toggleBlockquote().run()}>Kutipan</button></div><EditorContent editor={editor} className="admin-rich-editor" /></div>
     </div></section>
-    <div className="admin-form-actions"><button name="intent" value="draft" className="admin-secondary-button" disabled={pending}>Simpan Draft</button><button name="intent" value="publish" className="admin-primary-button" disabled={pending}>{pending ? "Menyimpan..." : "Terbitkan Artikel"}</button></div>
+    <div className="admin-form-actions"><button name="intent" value="draft" className="admin-secondary-button" disabled={pending}>Simpan dulu</button><button name="intent" value="publish" className="admin-primary-button" disabled={pending}>{pending ? "Menyimpan..." : "Tampilkan di website"}</button></div>
   </form>;
 }
