@@ -32,11 +32,11 @@ export function ContentEntryForm({ type, values = {} }: { type: EntryType; value
     <input type="hidden" name="type" value={type} />
     {values.id ? <input type="hidden" name="id" value={text(values, "id")} /> : null}
     <section className="admin-form-section">
-      <div><p>{details.title}</p><span>Konten dapat disimpan sebagai draft sebelum diterbitkan.</span></div>
+      <div><p>{details.title}</p><span>Konten terbaru otomatis tampil paling depan.</span></div>
       <div className="admin-form-grid">
         <label><span>Judul internal</span><input name="title" defaultValue={text(values, "title")} required /></label>
         <label><span>Key unik</span><input name="key" defaultValue={text(values, "key")} placeholder="nama-konten" required /></label>
-        <label><span>Urutan</span><input name="sortOrder" type="number" min="0" defaultValue={text(values, "sortOrder") || "0"} /></label>
+        <input type="hidden" name="sortOrder" value="0" />
         {details.fields.map(([name, label, kind]) => {
           const fieldValue = uploads[name] ?? text(values, name);
           if (kind === "textarea") return <label className="admin-span-2" key={name}><span>{label}</span><textarea name={name} rows={5} defaultValue={fieldValue} /></label>;

@@ -53,7 +53,7 @@ const queryPackages = unstable_cache(
       .select()
       .from(packages)
       .where(eq(packages.status, "published"))
-      .orderBy(asc(packages.sortOrder));
+      .orderBy(desc(packages.createdAt));
 
     if (!packageRows.length) return [];
     const ids = packageRows.map((item) => item.id);
@@ -126,7 +126,7 @@ const queryEntries = unstable_cache(
       })
       .from(contentEntries)
       .where(and(eq(contentEntries.type, type), eq(contentEntries.status, "published")))
-      .orderBy(asc(contentEntries.sortOrder));
+      .orderBy(desc(contentEntries.createdAt));
 
     return rows;
   },

@@ -33,7 +33,7 @@ export async function getDashboardData() {
   };
 }
 export async function listPackagesAdmin() {
-  return requireDatabase().select().from(packages).orderBy(asc(packages.sortOrder), desc(packages.updatedAt));
+  return requireDatabase().select().from(packages).orderBy(desc(packages.createdAt));
 }
 
 export async function getPackageAdmin(id: string) {
@@ -101,7 +101,7 @@ export async function getPackageAdmin(id: string) {
 }
 
 export async function listEntriesAdmin(type: typeof contentEntries.$inferSelect.type) {
-  return requireDatabase().select().from(contentEntries).where(eq(contentEntries.type, type)).orderBy(asc(contentEntries.sortOrder), desc(contentEntries.updatedAt));
+  return requireDatabase().select().from(contentEntries).where(eq(contentEntries.type, type)).orderBy(desc(contentEntries.createdAt));
 }
 
 export async function getEntryAdmin(type: string, id: string) {

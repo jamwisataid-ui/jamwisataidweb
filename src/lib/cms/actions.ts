@@ -221,6 +221,7 @@ export async function saveEntryAction(_state: ActionState, formData: FormData): 
   const database = requireDatabase();
   const input = parsed.data;
   const id = input.id ?? randomUUID();
+  const sortOrder = 0;
   let data: Record<string, unknown>;
   try {
     data = entryData(input.type, input);
@@ -231,7 +232,7 @@ export async function saveEntryAction(_state: ActionState, formData: FormData): 
   if (intent === "draft") {
     const existing = input.id ? await database.query.contentEntries.findFirst({ where: eq(contentEntries.id, input.id) }) : null;
     if (!existing) {
-      await database.insert(contentEntries).values({ id, type: input.type, key: input.key, title: input.title, data, status: "draft", sortOrder: input.sortOrder, createdBy: session.user.id, updatedBy: session.user.id });
+      await database.insert(contentEntries).values({ id, type: input.type, key: input.key, title: input.title, data, status: "draft", sortOrder, createdBy: session.user.id, updatedBy: session.user.id });
     }
     await database.insert(contentDrafts).values({ entityType: input.type, entityId: id, payload: { ...input, data }, updatedBy: session.user.id }).onConflictDoUpdate({
       target: [contentDrafts.entityType, contentDrafts.entityId],
@@ -241,9 +242,9 @@ export async function saveEntryAction(_state: ActionState, formData: FormData): 
     return { ok: true, message: "Draft berhasil disimpan.", redirectTo: `/admin/konten/${input.type}/${id}` };
   }
 
-  await database.insert(contentEntries).values({ id, type: input.type, key: input.key, title: input.title, data, status: "published", sortOrder: input.sortOrder, publishedAt: new Date(), createdBy: session.user.id, updatedBy: session.user.id }).onConflictDoUpdate({
+  await database.insert(contentEntries).values({ id, type: input.type, key: input.key, title: input.title, data, status: "published", sortOrder, publishedAt: new Date(), createdBy: session.user.id, updatedBy: session.user.id }).onConflictDoUpdate({
     target: contentEntries.id,
-    set: { key: input.key, title: input.title, data, status: "published", sortOrder: input.sortOrder, publishedAt: new Date(), updatedBy: session.user.id, updatedAt: new Date() },
+    set: { key: input.key, title: input.title, data, status: "published", sortOrder, publishedAt: new Date(), updatedBy: session.user.id, updatedAt: new Date() },
   });
   await database.delete(contentDrafts).where(and(eq(contentDrafts.entityType, input.type), eq(contentDrafts.entityId, id)));
   await writeAudit(session.user.id, "publish", input.type, id, `${input.title} diterbitkan`);
