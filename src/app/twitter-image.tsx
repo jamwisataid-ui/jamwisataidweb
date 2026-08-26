@@ -1,5 +1,6 @@
-import OpenGraphImage, { alt, contentType, runtime, size } from "./opengraph-image";
+import OpenGraphImage, { alt, contentType, size } from "./opengraph-image";
 
-export { alt, contentType, runtime, size };
+export const runtime = "edge";
+export { alt, contentType, size };
 
 export default OpenGraphImage;

@@ -227,3 +227,38 @@ export const auditLogs = pgTable(
   },
   (table) => [index("audit_logs_created_idx").on(table.createdAt)],
 );
+
+export const analyticsSessions = pgTable(
+  "analytics_sessions",
+  {
+    sessionId: text("session_id").primaryKey(),
+    visitorId: text("visitor_id").notNull(),
+    currentPath: text("current_path").notNull(),
+    referrer: text("referrer"),
+    device: text("device").notNull().default("desktop"),
+    pageViews: integer("page_views").notNull().default(1),
+    firstSeenAt: timestamp("first_seen_at", { withTimezone: true }).notNull().defaultNow(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("analytics_sessions_last_seen_idx").on(table.lastSeenAt),
+    index("analytics_sessions_visitor_idx").on(table.visitorId),
+  ],
+);
+
+export const analyticsPageViews = pgTable(
+  "analytics_page_views",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sessionId: text("session_id").notNull().references(() => analyticsSessions.sessionId, { onDelete: "cascade" }),
+    visitorId: text("visitor_id").notNull(),
+    path: text("path").notNull(),
+    referrer: text("referrer"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("analytics_page_views_created_idx").on(table.createdAt),
+    index("analytics_page_views_path_created_idx").on(table.path, table.createdAt),
+    index("analytics_page_views_visitor_created_idx").on(table.visitorId, table.createdAt),
+  ],
+);

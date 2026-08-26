@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Cinzel, Cormorant_Garamond, Montserrat, Reem_Kufi } from "next/font/google";
+import { VisitorTracker } from "@/components/analytics/VisitorTracker";
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
 import "./globals.css";
 
@@ -82,7 +84,12 @@ export default function RootLayout({
       lang="id"
       className={`${montserrat.variable} ${cormorant.variable} ${cinzel.variable} ${reemKufi.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-white text-[#333333]">{children}</body>
+      <body className="min-h-full flex flex-col bg-white text-[#333333]">
+        {children}
+        <Suspense fallback={null}>
+          <VisitorTracker />
+        </Suspense>
+      </body>
     </html>
   );
 }
