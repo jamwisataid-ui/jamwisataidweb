@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { CheckCircle2, ImageIcon, UploadCloud } from "lucide-react";
 
 import { savePackageAction } from "@/lib/cms/actions";
+import { cleanRupiahInput, formatRupiahInput, terbilangRupiah } from "@/lib/cms/utils";
 import type { ActionState } from "@/lib/cms/validation";
 import { UploadButton } from "@/lib/uploadthing";
 import { FormFeedback } from "./FormFeedback";
@@ -27,7 +28,17 @@ const preservedFields = [
 export function PackageForm({ values = {} }: { values?: Values }) {
   const [state, action, pending] = useActionState(savePackageAction, initialState);
   const [imageUrl, setImageUrl] = useState(field(values, "imageUrl"));
+  const [displayPrice, setDisplayPrice] = useState(() => formatRupiahInput(field(values, "price")));
+  const [durationDays, setDurationDays] = useState(() => field(values, "durationDays", "9"));
+
+  const rawDigits = cleanRupiahInput(displayPrice);
+  const terbilangText = terbilangRupiah(rawDigits);
   const error = (key: string) => state.errors?.[key]?.[0];
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatRupiahInput(e.target.value);
+    setDisplayPrice(formatted);
+  };
 
   return (
     <form action={action} className="admin-editor-form admin-package-simple-form">
@@ -56,8 +67,28 @@ export function PackageForm({ values = {} }: { values?: Values }) {
           <label>
             <span>Durasi perjalanan</span>
             <div className="admin-input-suffix">
-              <input name="durationDays" type="number" min="1" max="60" defaultValue={field(values, "durationDays", "9")} required />
+              <input
+                name="durationDays"
+                type="number"
+                min="1"
+                max="60"
+                value={durationDays}
+                onChange={(e) => setDurationDays(e.target.value)}
+                required
+              />
               <span>hari</span>
+            </div>
+            <div className="admin-quick-prices" style={{ marginTop: "6px" }}>
+              {[9, 10, 12, 14, 16].map((days) => (
+                <button
+                  key={days}
+                  type="button"
+                  onClick={() => setDurationDays(String(days))}
+                  className={`admin-duration-chip ${durationDays === String(days) ? "is-active" : ""}`}
+                >
+                  {days} Hari
+                </button>
+              ))}
             </div>
             {error("durationDays") ? <small className="admin-upload-error">{error("durationDays")}</small> : null}
           </label>
@@ -122,12 +153,45 @@ export function PackageForm({ values = {} }: { values?: Values }) {
             {error("madinahHotel") ? <small className="admin-upload-error">{error("madinahHotel")}</small> : null}
           </label>
           <label className="admin-span-2">
-            <span>Harga per jamaah</span>
+            <span>Harga per jamaah (All In)</span>
             <div className="admin-input-prefix">
               <span>Rp</span>
-              <input name="price" type="number" min="1000" step="1000" defaultValue={field(values, "price")} placeholder="33900000" required />
+              <input
+                type="text"
+                inputMode="numeric"
+                value={displayPrice}
+                onChange={handlePriceChange}
+                placeholder="33.000.000"
+                style={{ fontSize: "1.15rem", fontWeight: "600", letterSpacing: "0.03em" }}
+                required
+              />
             </div>
-            <small className="admin-field-hint">Masukkan angka saja, contoh 33900000.</small>
+            <input type="hidden" name="price" value={rawDigits} />
+            
+            {rawDigits ? (
+              <div className="admin-price-badge">
+                <span>💰 Terbaca: <strong>Rp {displayPrice}</strong></span>
+                {terbilangText ? <small>({terbilangText})</small> : null}
+              </div>
+            ) : (
+              <small className="admin-field-hint">
+                Ketik angka saja, titik pemisah ribuan otomatis muncul (contoh: ketik 33000000 otomatis jadi 33.000.000).
+              </small>
+            )}
+
+            <div className="admin-quick-prices">
+              <span>Preset cepat:</span>
+              {[30_000_000, 32_500_000, 33_900_000, 35_000_000, 36_900_000, 38_500_000].map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => setDisplayPrice(formatRupiahInput(preset))}
+                  className="admin-price-chip"
+                >
+                  Rp {formatRupiahInput(preset)}
+                </button>
+              ))}
+            </div>
             {error("price") ? <small className="admin-upload-error">{error("price")}</small> : null}
           </label>
         </div>

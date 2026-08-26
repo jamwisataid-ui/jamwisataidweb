@@ -33,7 +33,20 @@ export async function getDashboardData() {
   };
 }
 export async function listPackagesAdmin() {
-  return requireDatabase().select().from(packages).orderBy(desc(packages.createdAt));
+  const database = requireDatabase();
+  const packageList = await database.select().from(packages).orderBy(desc(packages.createdAt));
+  if (!packageList.length) return [];
+  const allDepartures = await database.select().from(departures).orderBy(asc(departures.departureDate));
+
+  return packageList.map((pkg) => {
+    const dep = allDepartures.find((d) => d.packageId === pkg.id);
+    return {
+      ...pkg,
+      price: dep?.price ? Number(dep.price) : null,
+      airline: dep?.airline ?? null,
+      dateLabel: dep?.dateLabel ?? null,
+    };
+  });
 }
 
 export async function getPackageAdmin(id: string) {

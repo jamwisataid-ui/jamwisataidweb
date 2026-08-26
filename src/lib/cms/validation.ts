@@ -29,7 +29,10 @@ export const packageFormSchema = z.object({
   airline: z.string().trim().min(2, "Maskapai wajib diisi."),
   departureAirport: z.string().trim().min(2, "Bandara keberangkatan wajib diisi."),
   arrivalAirport: z.string().trim().optional(),
-  price: z.coerce.number().int().positive("Harga harus lebih dari 0."),
+  price: z.preprocess(
+    (val) => (typeof val === "string" ? Number(val.replace(/\D/g, "")) : typeof val === "number" ? val : NaN),
+    z.number().int().positive("Harga harus lebih dari 0.")
+  ),
   capacity: z.union([z.coerce.number().int().positive(), z.literal(""), z.null()]).optional(),
   availableSeats: z.union([z.coerce.number().int().min(0), z.literal(""), z.null()]).optional(),
   departureStatus: z.enum(["open", "limited", "full", "closed", "coming-soon"]).default("open"),
