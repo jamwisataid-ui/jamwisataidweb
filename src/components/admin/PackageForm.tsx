@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { CheckCircle2, ImageIcon, UploadCloud } from "lucide-react";
+import { CheckCircle2, ImageIcon, Loader2, UploadCloud } from "lucide-react";
 
 import { savePackageAction } from "@/lib/cms/actions";
 import { cleanRupiahInput, formatRupiahInput, terbilangRupiah } from "@/lib/cms/utils";
@@ -197,16 +197,37 @@ export function PackageForm({ values = {} }: { values?: Values }) {
         </div>
       </section>
 
+      {pending ? (
+        <div className="admin-saving-banner" role="status">
+          <Loader2 className="admin-spinner" />
+          <span>Sedang memproses dan menyimpan data paket ke server, mohon tunggu sebentar...</span>
+        </div>
+      ) : null}
+
       <div className="admin-package-note">
         <UploadCloud aria-hidden />
         <p><strong>Tidak perlu mengatur hal teknis.</strong><span>Link halaman, tulisan tanggal, dan pesan WhatsApp dibuat otomatis.</span></p>
       </div>
       <div className="admin-form-actions">
         <button name="intent" value="draft" className="admin-secondary-button" disabled={pending}>
-          {pending ? "Menyimpan..." : "Simpan dulu"}
+          {pending ? (
+            <>
+              <Loader2 className="admin-spinner" style={{ width: 14, height: 14, marginRight: 6, display: "inline-block" }} />
+              Menyimpan...
+            </>
+          ) : (
+            "Simpan dulu"
+          )}
         </button>
         <button name="intent" value="publish" className="admin-primary-button" disabled={pending}>
-          {pending ? "Menyimpan..." : "Tampilkan di website"}
+          {pending ? (
+            <>
+              <Loader2 className="admin-spinner" style={{ width: 14, height: 14, marginRight: 6, display: "inline-block" }} />
+              Menyimpan...
+            </>
+          ) : (
+            "Tampilkan di website"
+          )}
         </button>
       </div>
     </form>
