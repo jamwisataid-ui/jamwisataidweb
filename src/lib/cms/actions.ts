@@ -376,3 +376,91 @@ export async function setPublicationStatusAction(formData: FormData) {
     console.error("Gagal mengubah status publikasi:", error);
   }
 }
+
+export async function deletePackageAction(formData: FormData): Promise<ActionState> {
+  try {
+    const session = await requireAdminSession();
+    const id = value(formData, "id");
+    if (!id) return { ok: false, message: "ID paket tidak ditemukan." };
+
+    const database = requireDatabase();
+    const pkg = await database.query.packages.findFirst({
+      where: eq(packages.id, id),
+    });
+
+    if (!pkg) {
+      return { ok: false, message: "Paket tidak ditemukan atau sudah dihapus." };
+    }
+
+    await database.delete(contentDrafts).where(
+      and(eq(contentDrafts.entityType, "package"), eq(contentDrafts.entityId, id))
+    );
+    await database.delete(departures).where(eq(departures.packageId, id));
+    await database.delete(packageItems).where(eq(packageItems.packageId, id));
+    await database.delete(itineraryDays).where(eq(itineraryDays.packageId, id));
+    await database.delete(packages).where(eq(packages.id, id));
+
+    await writeAudit(session.user.id, "delete", "package", id, `Menghapus paket: ${pkg.name}`);
+    invalidate("packages", `/paket/${pkg.slug}`);
+
+    return { ok: true, message: `Paket "${pkg.name}" berhasil dihapus.`, redirectTo: "/admin/paket" };
+  } catch (error) {
+    console.error("Gagal menghapus paket:", error);
+    return { ok: false, message: error instanceof Error ? error.message : "Gagal menghapus paket dari database." };
+  }
+}
+
+export async function deleteArticleAction(formData: FormData): Promise<ActionState> {
+  try {
+    const session = await requireAdminSession();
+    const id = value(formData, "id");
+    if (!id) return { ok: false, message: "ID artikel tidak ditemukan." };
+
+    const database = requireDatabase();
+    const article = await database.query.articles.findFirst({
+      where: eq(articles.id, id),
+    });
+    if (!article) return { ok: false, message: "Artikel tidak ditemukan." };
+
+    await database.delete(contentDrafts).where(
+      and(eq(contentDrafts.entityType, "article"), eq(contentDrafts.entityId, id))
+    );
+    await database.delete(articles).where(eq(articles.id, id));
+
+    await writeAudit(session.user.id, "delete", "article", id, `Menghapus artikel: ${article.title}`);
+    invalidate("articles", `/artikel/${article.slug}`);
+
+    return { ok: true, message: `Artikel "${article.title}" berhasil dihapus.`, redirectTo: "/admin/artikel" };
+  } catch (error) {
+    console.error("Gagal menghapus artikel:", error);
+    return { ok: false, message: error instanceof Error ? error.message : "Gagal menghapus artikel." };
+  }
+}
+
+export async function deleteEntryAction(formData: FormData): Promise<ActionState> {
+  try {
+    const session = await requireAdminSession();
+    const id = value(formData, "id");
+    const type = value(formData, "type");
+    if (!id) return { ok: false, message: "ID konten tidak ditemukan." };
+
+    const database = requireDatabase();
+    const entry = await database.query.contentEntries.findFirst({
+      where: eq(contentEntries.id, id),
+    });
+    if (!entry) return { ok: false, message: "Konten tidak ditemukan." };
+
+    await database.delete(contentDrafts).where(
+      and(eq(contentDrafts.entityType, entry.type), eq(contentDrafts.entityId, id))
+    );
+    await database.delete(contentEntries).where(eq(contentEntries.id, id));
+
+    await writeAudit(session.user.id, "delete", entry.type, id, `Menghapus ${entry.title}`);
+    invalidate("entries");
+
+    return { ok: true, message: `Konten "${entry.title}" berhasil dihapus.`, redirectTo: `/admin/konten/${type || entry.type}` };
+  } catch (error) {
+    console.error("Gagal menghapus konten:", error);
+    return { ok: false, message: error instanceof Error ? error.message : "Gagal menghapus konten." };
+  }
+}

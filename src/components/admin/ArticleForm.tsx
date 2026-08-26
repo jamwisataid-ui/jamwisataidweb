@@ -9,6 +9,7 @@ import { CheckCircle2, ImageIcon, Loader2 } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
 import { saveArticleAction } from "@/lib/cms/actions";
 import { type ActionState } from "@/lib/cms/validation";
+import { DeleteButton } from "./DeleteButton";
 import { FormFeedback } from "./FormFeedback";
 
 type Values = Record<string, unknown>;
@@ -73,26 +74,36 @@ export function ArticleForm({ values = {} }: { values?: Values }) {
       ) : null}
 
       <div className="admin-form-actions">
-        <button name="intent" value="draft" className="admin-secondary-button" disabled={pending}>
-          {pending ? (
-            <>
-              <Loader2 className="admin-spinner" style={{ width: 14, height: 14, marginRight: 6, display: "inline-block" }} />
-              Menyimpan...
-            </>
-          ) : (
-            "Simpan dulu"
-          )}
-        </button>
-        <button name="intent" value="publish" className="admin-primary-button" disabled={pending}>
-          {pending ? (
-            <>
-              <Loader2 className="admin-spinner" style={{ width: 14, height: 14, marginRight: 6, display: "inline-block" }} />
-              Menyimpan...
-            </>
-          ) : (
-            "Tampilkan di website"
-          )}
-        </button>
+        {values.id ? (
+          <DeleteButton
+            id={String(values.id)}
+            name={value(values, "title") || "Artikel"}
+            type="article"
+            variant="form"
+          />
+        ) : null}
+        <div style={{ display: "flex", gap: "10px", marginLeft: "auto" }}>
+          <button name="intent" value="draft" className="admin-secondary-button" disabled={pending}>
+            {pending ? (
+              <>
+                <Loader2 className="admin-spinner" style={{ width: 14, height: 14, marginRight: 6, display: "inline-block" }} />
+                Menyimpan...
+              </>
+            ) : (
+              "Simpan dulu"
+            )}
+          </button>
+          <button name="intent" value="publish" className="admin-primary-button" disabled={pending}>
+            {pending ? (
+              <>
+                <Loader2 className="admin-spinner" style={{ width: 14, height: 14, marginRight: 6, display: "inline-block" }} />
+                Menyimpan...
+              </>
+            ) : (
+              "Tampilkan di website"
+            )}
+          </button>
+        </div>
       </div>
     </form>
   );

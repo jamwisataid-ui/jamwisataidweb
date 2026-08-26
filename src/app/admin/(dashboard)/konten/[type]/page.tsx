@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminEmptyState, AdminPageHeader, AdminStatus } from "@/components/admin/AdminUi";
+import { DeleteButton } from "@/components/admin/DeleteButton";
 import { listEntriesAdmin } from "@/lib/cms/admin";
 
 const contentConfig = {
@@ -21,13 +22,60 @@ export default async function ContentListPage({ params }: { params: Promise<{ ty
   const [title, description, actionLabel] = contentConfig[type];
   const items = await listEntriesAdmin(type);
 
-  return <>
-    <AdminPageHeader eyebrow="HOMEPAGE" title={title} description={description} action={{ href: `/admin/konten/${type}/baru`, label: actionLabel }} />
-    <section className="admin-panel admin-list-panel">
-      {items.length ? <div className="admin-table-wrap"><table className="admin-table">
-        <thead><tr><th>Nama</th><th>Status</th><th>Terakhir diubah</th><th></th></tr></thead>
-        <tbody>{items.map((item) => <tr key={item.id}><td data-label="Nama"><strong>{item.title}</strong></td><td data-label="Status"><AdminStatus status={item.status} /></td><td data-label="Diubah">{item.updatedAt.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</td><td data-label="Aksi"><Link href={`/admin/konten/${type}/${item.id}`}>Ubah</Link></td></tr>)}</tbody>
-      </table></div> : <AdminEmptyState title={`Belum ada ${title.toLowerCase()}`} description="Tekan tombol di bawah untuk menambahkan data pertama." href={`/admin/konten/${type}/baru`} action={actionLabel} />}
-    </section>
-  </>;
+  return (
+    <>
+      <AdminPageHeader
+        eyebrow="HOMEPAGE"
+        title={title}
+        description={description}
+        action={{ href: `/admin/konten/${type}/baru`, label: actionLabel }}
+      />
+      <section className="admin-panel admin-list-panel">
+        {items.length ? (
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Nama</th>
+                  <th>Status</th>
+                  <th>Terakhir diubah</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item) => (
+                  <tr key={item.id}>
+                    <td data-label="Nama">
+                      <strong>{item.title}</strong>
+                    </td>
+                    <td data-label="Status">
+                      <AdminStatus status={item.status} />
+                    </td>
+                    <td data-label="Diubah">
+                      {item.updatedAt.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                    </td>
+                    <td data-label="Aksi">
+                      <div className="admin-table-actions">
+                        <Link href={`/admin/konten/${type}/${item.id}`} className="admin-text-button">
+                          Ubah
+                        </Link>
+                        <DeleteButton id={item.id} name={item.title} type="entry" entryType={type} />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <AdminEmptyState
+            title={`Belum ada ${title.toLowerCase()}`}
+            description="Tekan tombol di bawah untuk menambahkan data pertama."
+            href={`/admin/konten/${type}/baru`}
+            action={actionLabel}
+          />
+        )}
+      </section>
+    </>
+  );
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AdminEmptyState, AdminPageHeader, AdminStatus } from "@/components/admin/AdminUi";
+import { DeleteButton } from "@/components/admin/DeleteButton";
 import { listPackagesAdmin } from "@/lib/cms/admin";
 import { formatRupiahInput } from "@/lib/cms/utils";
 
@@ -56,9 +57,12 @@ export default async function PackagesAdminPage() {
                       {item.updatedAt.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                     </td>
                     <td data-label="Aksi">
-                      <Link href={`/admin/paket/${item.id}`} className="admin-text-button">
-                        Ubah paket
-                      </Link>
+                      <div className="admin-table-actions">
+                        <Link href={`/admin/paket/${item.id}`} className="admin-text-button">
+                          Ubah
+                        </Link>
+                        <DeleteButton id={item.id} name={item.name} type="package" />
+                      </div>
                     </td>
                   </tr>
                 ))}
