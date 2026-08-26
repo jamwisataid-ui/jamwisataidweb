@@ -14,6 +14,7 @@ import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/roo
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
 import { whatsappHref } from "@/data/jamwisata";
+import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Legalitas & Izin PPIU Resmi Travel Umroh | Jam Wisata",
@@ -22,14 +23,31 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/legalitas",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+    },
+  },
   openGraph: {
     title: "Legalitas & Izin PPIU Resmi Travel Umroh | Jam Wisata",
     description:
       "Jam Wisata Brand of Fajar Indah Gemilang PPIU Nomor 534 Tahun 2019 menyelenggarakan perjalanan ibadah umroh amanah, nyaman, dan berlandaskan sunnah.",
-    url: "https://jamwisata.id/legalitas",
+    url: `${SITE_URL}/legalitas`,
     siteName: "Jam Wisata",
     locale: "id_ID",
     type: "website",
+    images: defaultOpenGraphImages,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Legalitas & Izin PPIU Resmi Travel Umroh | Jam Wisata",
+    description:
+      "Jam Wisata Brand of Fajar Indah Gemilang PPIU Nomor 534 Tahun 2019 menyelenggarakan perjalanan ibadah umroh amanah, nyaman, dan berlandaskan sunnah.",
+    images: defaultTwitterImages,
   },
 };
 

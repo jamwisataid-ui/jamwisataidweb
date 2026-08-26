@@ -14,6 +14,7 @@ import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/roo
 import { formatIDR, whatsappHref } from "@/data/jamwisata";
 import { getPublishedPackages } from "@/lib/cms/public";
 import type { TravelPackage } from "@/types/jamwisata";
+import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Jadwal Keberangkatan Umroh 2026 – 2027 | Jam Wisata",
@@ -22,14 +23,31 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/jadwal-umroh",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+    },
+  },
   openGraph: {
     title: "Jadwal Keberangkatan Umroh 2026 – 2027 | Jam Wisata",
     description:
       "Informasi tanggal pasti keberangkatan umroh musim 2026–2027 bersama Jam Wisata Bandung. Cek sisa kuota dan jadwal manasik.",
-    url: "https://jamwisata.id/jadwal-umroh",
+    url: `${SITE_URL}/jadwal-umroh`,
     siteName: "Jam Wisata",
     locale: "id_ID",
     type: "website",
+    images: defaultOpenGraphImages,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Jadwal Keberangkatan Umroh 2026 – 2027 | Jam Wisata",
+    description:
+      "Informasi tanggal pasti keberangkatan umroh musim 2026–2027 bersama Jam Wisata Bandung. Cek sisa kuota dan jadwal manasik.",
+    images: defaultTwitterImages,
   },
 };
 

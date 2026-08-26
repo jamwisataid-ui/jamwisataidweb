@@ -13,6 +13,8 @@ import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/roo
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
 
+import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/seo";
+
 export const metadata: Metadata = {
   title: "Panduan, Syarat & Tata Cara Umroh Sesuai Sunnah | Jam Wisata",
   description:
@@ -20,14 +22,31 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/panduan-umroh",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+    },
+  },
   openGraph: {
     title: "Panduan, Syarat & Tata Cara Umroh Sesuai Sunnah | Jam Wisata",
     description:
       "Pelajari tata cara ibadah umroh yang benar sesuai tuntunan Rasulullah ﷺ, rukun, wajib, larangan ihram, dan checklist perlengkapan jamaah.",
-    url: "https://jamwisata.id/panduan-umroh",
+    url: `${SITE_URL}/panduan-umroh`,
     siteName: "Jam Wisata",
     locale: "id_ID",
     type: "website",
+    images: defaultOpenGraphImages,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Panduan, Syarat & Tata Cara Umroh Sesuai Sunnah | Jam Wisata",
+    description:
+      "Pelajari tata cara ibadah umroh yang benar sesuai tuntunan Rasulullah ﷺ, rukun, wajib, larangan ihram, dan checklist perlengkapan jamaah.",
+    images: defaultTwitterImages,
   },
 };
 

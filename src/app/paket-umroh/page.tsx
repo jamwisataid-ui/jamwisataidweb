@@ -18,6 +18,7 @@ import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/roo
 import { formatIDR, whatsappHref } from "@/data/jamwisata";
 import { getPublishedPackages } from "@/lib/cms/public";
 import type { TravelPackage } from "@/types/jamwisata";
+import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Paket Umroh 2026 – 2027 All In & Berlandaskan Sunnah",
@@ -26,14 +27,31 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/paket-umroh",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+    },
+  },
   openGraph: {
     title: "Paket Umroh 2026 – 2027 All In & Berlandaskan Sunnah | Jam Wisata",
     description:
       "Temukan jadwal keberangkatan, rincian biaya All In, fasilitas hotel bintang 5, maskapai penerbangan, dan bimbingan sunnah bersama Jam Wisata.",
-    url: "https://jamwisata.id/paket-umroh",
+    url: `${SITE_URL}/paket-umroh`,
     siteName: "Jam Wisata",
     locale: "id_ID",
     type: "website",
+    images: defaultOpenGraphImages,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Paket Umroh 2026 – 2027 All In & Berlandaskan Sunnah | Jam Wisata",
+    description:
+      "Temukan jadwal keberangkatan, rincian biaya All In, fasilitas hotel bintang 5, maskapai penerbangan, dan bimbingan sunnah bersama Jam Wisata.",
+    images: defaultTwitterImages,
   },
 };
 

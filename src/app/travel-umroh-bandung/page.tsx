@@ -24,6 +24,7 @@ import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
 import { formatIDR, whatsappHref } from "@/data/jamwisata";
 import { getPublishedPackages } from "@/lib/cms/public";
+import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Travel Umroh Bandung Terpercaya & Berlandaskan Sunnah",
@@ -32,14 +33,31 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/travel-umroh-bandung",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+    },
+  },
   openGraph: {
     title: "Travel Umroh Bandung Terpercaya & Berlandaskan Sunnah | Jam Wisata",
     description:
       "Layanan biro travel umroh terpercaya untuk warga Bandung & Jawa Barat. Jadwal pasti 2026–2027, harga All In transparan, dan pendampingan bimbingan sunnah.",
-    url: "https://jamwisata.id/travel-umroh-bandung",
+    url: `${SITE_URL}/travel-umroh-bandung`,
     siteName: "Jam Wisata",
     locale: "id_ID",
     type: "website",
+    images: defaultOpenGraphImages,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Travel Umroh Bandung Terpercaya & Berlandaskan Sunnah | Jam Wisata",
+    description:
+      "Layanan biro travel umroh terpercaya untuk warga Bandung & Jawa Barat. Jadwal pasti 2026–2027, harga All In transparan, dan pendampingan bimbingan sunnah.",
+    images: defaultTwitterImages,
   },
 };
 

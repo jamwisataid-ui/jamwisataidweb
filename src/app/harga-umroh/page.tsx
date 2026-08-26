@@ -15,6 +15,7 @@ import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
 import { formatIDR, whatsappHref } from "@/data/jamwisata";
 import { getPublishedPackages } from "@/lib/cms/public";
+import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Biaya & Harga Paket Umroh 2026 – 2027 All In | Jam Wisata",
@@ -23,14 +24,31 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/harga-umroh",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+    },
+  },
   openGraph: {
     title: "Biaya & Harga Paket Umroh 2026 – 2027 All In | Jam Wisata",
     description:
       "Transparansi biaya umroh 2026–2027. Perbedaan harga kamar Quad, Triple, Double dan rincian fasilitas All In tanpa biaya siluman.",
-    url: "https://jamwisata.id/harga-umroh",
+    url: `${SITE_URL}/harga-umroh`,
     siteName: "Jam Wisata",
     locale: "id_ID",
     type: "website",
+    images: defaultOpenGraphImages,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Biaya & Harga Paket Umroh 2026 – 2027 All In | Jam Wisata",
+    description:
+      "Transparansi biaya umroh 2026–2027. Perbedaan harga kamar Quad, Triple, Double dan rincian fasilitas All In tanpa biaya siluman.",
+    images: defaultTwitterImages,
   },
 };
 

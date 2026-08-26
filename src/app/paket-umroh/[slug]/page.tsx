@@ -20,6 +20,7 @@ import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
 import { formatIDR, whatsappHref } from "@/data/jamwisata";
 import { getPublishedPackages } from "@/lib/cms/public";
+import { resolveAbsoluteImageUrl, SITE_URL } from "@/lib/seo";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -45,6 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = `Paket ${pkg.name} (${pkg.departureDate}) | Jam Wisata`;
   const description = `Paket ${pkg.name} Jam Wisata berangkat ${pkg.departureDate} via ${pkg.airline}. Hotel Makkah: ${pkg.makkahHotel?.name}, Hotel Madinah: ${pkg.madinahHotel?.name}. Harga All In Rp ${formatIDR(pkg.priceFrom ?? 0)} /pax.`;
+  const imageUrl = resolveAbsoluteImageUrl(pkg.image);
 
   return {
     title,
@@ -52,19 +54,36 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: `/paket-umroh/${pkg.slug}`,
     },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+      },
+    },
     openGraph: {
       title,
       description,
-      url: `https://jamwisata.id/paket-umroh/${pkg.slug}`,
+      url: `${SITE_URL}/paket-umroh/${pkg.slug}`,
       siteName: "Jam Wisata",
       locale: "id_ID",
       type: "website",
       images: [
         {
-          url: `https://jamwisata.id${pkg.image}`,
-          alt: pkg.name,
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: `Foto Paket ${pkg.name} Jam Wisata`,
         },
       ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [imageUrl],
     },
   };
 }
