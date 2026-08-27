@@ -13,7 +13,10 @@ function renderNode(node: Node, key: number | string): ReactNode {
     return <span key={key}>{content}</span>;
   }
   const children = node.content?.map((child, index) => renderNode(child, `${key}-${index}`));
-  if (node.type === "heading") { const level = Number(node.attrs?.level ?? 2); return level === 3 ? <h3 key={key}>{children}</h3> : <h2 key={key}>{children}</h2>; }
+  if (node.type === "heading") {
+    const level = Number(node.attrs?.level ?? 2);
+    return level === 3 ? <h3 key={key}>{children}</h3> : <h2 key={key}>{children}</h2>;
+  }
   if (node.type === "bulletList") return <ul key={key}>{children}</ul>;
   if (node.type === "orderedList") return <ol key={key}>{children}</ol>;
   if (node.type === "listItem") return <li key={key}>{children}</li>;

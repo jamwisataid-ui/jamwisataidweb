@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleContent } from "@/components/site/ArticleContent";
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
@@ -33,22 +34,37 @@ export default async function ArticlePage({ params }: Props) {
   const article = await getPublishedArticleBySlug((await params).slug);
   if (!article) notFound();
   const publishedDate = formatArticleDate(article.publishedAt);
+  const whatsappText = encodeURIComponent(`Assalamu'alaikum Jam Wisata, saya membaca artikel "${article.title}" dan ingin konsultasi.`);
 
   return (
-    <main className="jam-page min-h-screen">
+    <main className="jam-page min-h-screen article-detail-page">
       <PremiumHeader />
-      <article className="article-detail">
-        <header>
-          <p>ARTIKEL & INFORMASI</p>
-          <h1>{article.title}</h1>
-          {publishedDate ? <span>{publishedDate}</span> : null}
-        </header>
-        {article.coverUrl ? (
-          <div className="article-cover">
-            <Image src={article.coverUrl} alt={article.title} fill priority sizes="(min-width: 900px) 1000px, 100vw" />
+      <article>
+        <section className="article-detail-hero">
+          <div className="article-detail-hero-copy">
+            <Link href="/artikel" className="article-back-link">Kembali ke artikel</Link>
+            <p>ARTIKEL JAM WISATA</p>
+            <h1>{article.title}</h1>
+            <span>{article.excerpt}</span>
+            <div className="article-detail-meta">
+              {publishedDate ? <time dateTime={article.publishedAt ? new Date(article.publishedAt).toISOString() : undefined}>{publishedDate}</time> : null}
+              <a href={`https://wa.me/6281222500200?text=${whatsappText}`} target="_blank" rel="noopener noreferrer">Konsultasi via WhatsApp</a>
+            </div>
           </div>
-        ) : null}
-        <ArticleContent document={article.content} />
+          {article.coverUrl ? (
+            <div className="article-detail-cover">
+              <Image src={article.coverUrl} alt={article.title} fill priority sizes="(min-width: 1024px) 46vw, 100vw" />
+            </div>
+          ) : null}
+        </section>
+
+        <section className="article-reading-wrap">
+          <aside className="article-reading-note">
+            <span>Panduan ringkas</span>
+            <p>Disusun untuk membantu jamaah memahami persiapan perjalanan dengan bahasa yang lebih tenang dan mudah dibaca.</p>
+          </aside>
+          <ArticleContent document={article.content} />
+        </section>
       </article>
       <ModernProofFooter />
     </main>
