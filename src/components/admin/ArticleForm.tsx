@@ -5,10 +5,10 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import LinkExtension from "@tiptap/extension-link";
 import ImageExtension from "@tiptap/extension-image";
-import { CheckCircle2, ImageIcon, Loader2 } from "lucide-react";
-import { UploadButton } from "@/lib/uploadthing";
+import { Loader2 } from "lucide-react";
 import { saveArticleAction } from "@/lib/cms/actions";
 import { type ActionState } from "@/lib/cms/validation";
+import { AdminImageUpload } from "./AdminImageUpload";
 import { DeleteButton } from "./DeleteButton";
 import { FormFeedback } from "./FormFeedback";
 
@@ -39,29 +39,14 @@ export function ArticleForm({ values = {} }: { values?: Values }) {
         <div className="admin-form-grid">
           <label className="admin-span-2"><span>Judul artikel</span><input name="title" defaultValue={value(values, "title")} required /></label>
           <label className="admin-span-2"><span>Ringkasan</span><textarea name="excerpt" rows={3} maxLength={300} defaultValue={value(values, "excerpt")} required /></label>
-          <div className="admin-simple-upload admin-span-2">
-            <input type="hidden" name="coverUrl" value={coverUrl} />
-            <span className="admin-simple-upload-icon"><ImageIcon aria-hidden /></span>
-            <div><strong>Foto sampul</strong><small>{coverUrl ? "Foto sudah dipilih." : "Pilih foto landscape untuk artikel."}</small></div>
-            {coverUrl ? <span className="admin-upload-ready"><CheckCircle2 aria-hidden /> Siap</span> : null}
-            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", width: "100%", flexWrap: "wrap", marginTop: "0.5rem" }}>
-              <input
-                type="text"
-                value={coverUrl}
-                onChange={(e) => setCoverUrl(e.target.value)}
-                placeholder="Atau tempel URL gambar langsung (https://...)"
-                style={{ flex: 1, minWidth: "240px", fontSize: "0.875rem", padding: "0.4rem 0.6rem", borderRadius: "0.375rem", border: "1px solid #d1d5db" }}
-              />
-              <UploadButton
-                endpoint="cmsImage"
-                content={{ button: coverUrl ? "Ganti foto" : "Pilih foto", allowedContent: "JPG, PNG, atau WebP" }}
-                onClientUploadComplete={(files) => {
-                  const uploaded = files[0]?.ufsUrl ?? files[0]?.url;
-                  if (uploaded) setCoverUrl(uploaded);
-                }}
-              />
-            </div>
-          </div>
+          <AdminImageUpload
+            name="coverUrl"
+            label="Foto sampul"
+            value={coverUrl}
+            onChange={setCoverUrl}
+            description="Pilih foto landscape untuk artikel atau tempel URL gambar."
+            replaceLabel="Ganti foto"
+          />
           <div className="admin-span-2"><span className="admin-field-label">Tulisan artikel</span><div className="admin-editor-toolbar"><button type="button" onClick={() => editor?.chain().focus().toggleBold().run()}>Tebal</button><button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}>Judul bagian</button><button type="button" onClick={() => editor?.chain().focus().toggleBulletList().run()}>Daftar</button><button type="button" onClick={() => editor?.chain().focus().toggleBlockquote().run()}>Kutipan</button></div><EditorContent editor={editor} className="admin-rich-editor" /></div>
         </div>
       </section>

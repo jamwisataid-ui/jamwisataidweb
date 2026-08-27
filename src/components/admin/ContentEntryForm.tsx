@@ -1,10 +1,10 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { CheckCircle2, ImageIcon, Loader2 } from "lucide-react";
-import { UploadButton } from "@/lib/uploadthing";
+import { Loader2 } from "lucide-react";
 import { saveEntryAction } from "@/lib/cms/actions";
 import { type ActionState } from "@/lib/cms/validation";
+import { AdminImageUpload } from "./AdminImageUpload";
 import { DeleteButton } from "./DeleteButton";
 import { FormFeedback } from "./FormFeedback";
 
@@ -45,29 +45,15 @@ export function ContentEntryForm({ type, values = {} }: { type: EntryType; value
             if (kind === "textarea") return <label className="admin-span-2" key={name}><span>{label}</span><textarea name={name} rows={5} defaultValue={fieldValue} required={required} /></label>;
             if (kind === "image") {
               return (
-                <div className="admin-simple-upload admin-span-2" key={name}>
-                  <input type="hidden" name={name} value={fieldValue} required={required} />
-                  <span className="admin-simple-upload-icon"><ImageIcon aria-hidden /></span>
-                  <div><strong>{label}</strong><small>{fieldValue ? "Foto sudah dipilih." : "Tekan tombol untuk memilih foto atau tempel URL gambar."}</small></div>
-                  {fieldValue ? <span className="admin-upload-ready"><CheckCircle2 aria-hidden /> Siap</span> : null}
-                  <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", width: "100%", flexWrap: "wrap", marginTop: "0.5rem" }}>
-                    <input
-                      type="text"
-                      value={fieldValue}
-                      onChange={(e) => setUploads((current) => ({ ...current, [name]: e.target.value }))}
-                      placeholder="Atau tempel URL gambar langsung (https://...)"
-                      style={{ flex: 1, minWidth: "240px", fontSize: "0.875rem", padding: "0.4rem 0.6rem", borderRadius: "0.375rem", border: "1px solid #d1d5db" }}
-                    />
-                    <UploadButton
-                      endpoint="cmsImage"
-                      content={{ button: fieldValue ? "Ganti foto" : "Pilih foto", allowedContent: "JPG, PNG, atau WebP" }}
-                      onClientUploadComplete={(files) => {
-                        const uploaded = files[0]?.ufsUrl ?? files[0]?.url;
-                        if (uploaded) setUploads((current) => ({ ...current, [name]: uploaded }));
-                      }}
-                    />
-                  </div>
-                </div>
+                <AdminImageUpload
+                  key={name}
+                  name={name}
+                  label={label}
+                  value={fieldValue}
+                  onChange={(nextValue) => setUploads((current) => ({ ...current, [name]: nextValue }))}
+                  required={required}
+                  replaceLabel="Ganti foto"
+                />
               );
             }
             return <label className="admin-span-2" key={name}><span>{label}</span><input name={name} defaultValue={fieldValue} required={required} /></label>;

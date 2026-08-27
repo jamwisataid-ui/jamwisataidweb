@@ -1,12 +1,12 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { CheckCircle2, ImageIcon, Loader2, UploadCloud } from "lucide-react";
+import { Loader2, UploadCloud } from "lucide-react";
 
 import { savePackageAction } from "@/lib/cms/actions";
 import { cleanRupiahInput, formatRupiahInput, terbilangRupiah } from "@/lib/cms/utils";
 import type { ActionState } from "@/lib/cms/validation";
-import { UploadButton } from "@/lib/uploadthing";
+import { AdminImageUpload } from "./AdminImageUpload";
 import { DeleteButton } from "./DeleteButton";
 import { FormFeedback } from "./FormFeedback";
 
@@ -97,36 +97,16 @@ export function PackageForm({ values = {} }: { values?: Values }) {
             <span>Badge <em>opsional</em></span>
             <input name="badge" defaultValue={field(values, "badge")} placeholder="Contoh: Pilihan Jamaah" />
           </label>
-          <div className="admin-simple-upload admin-span-2">
-            <input type="hidden" name="imageUrl" value={imageUrl} />
-            <span className="admin-simple-upload-icon"><ImageIcon aria-hidden /></span>
-            <div>
-              <strong>Foto paket</strong>
-              <small>{imageUrl ? "Gambar sudah dipilih dan siap digunakan." : "Upload foto landscape atau masukkan link foto untuk kartu paket."}</small>
-            </div>
-            {imageUrl ? <span className="admin-upload-ready"><CheckCircle2 aria-hidden /> Siap</span> : null}
-            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", width: "100%", flexWrap: "wrap", marginTop: "0.5rem" }}>
-              <input
-                type="text"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="Atau tempel URL gambar langsung (https://...)"
-                style={{ flex: 1, minWidth: "240px", fontSize: "0.875rem", padding: "0.4rem 0.6rem", borderRadius: "0.375rem", border: "1px solid #d1d5db" }}
-              />
-              <UploadButton
-                endpoint="cmsImage"
-                content={{ button: imageUrl ? "Ganti gambar" : "Upload file", allowedContent: "JPG, PNG, atau WebP" }}
-                onClientUploadComplete={(files) => {
-                  const uploaded = files[0]?.ufsUrl ?? files[0]?.url;
-                  if (uploaded) setImageUrl(uploaded);
-                }}
-                onUploadError={(uploadError) => {
-                  console.error("Upload error:", uploadError);
-                }}
-              />
-            </div>
-            {error("imageUrl") ? <small className="admin-upload-error">{error("imageUrl")}</small> : null}
-          </div>
+          <AdminImageUpload
+            name="imageUrl"
+            label="Foto paket"
+            value={imageUrl}
+            onChange={setImageUrl}
+            description="Upload foto landscape untuk kartu paket atau tempel URL gambar."
+            error={error("imageUrl")}
+            idleLabel="Upload file"
+            replaceLabel="Ganti gambar"
+          />
         </div>
       </section>
 
