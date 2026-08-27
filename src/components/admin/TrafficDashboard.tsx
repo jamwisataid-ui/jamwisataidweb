@@ -52,6 +52,8 @@ export function TrafficDashboard({ initialSnapshot }: { initialSnapshot: Traffic
     };
   }, [refresh]);
 
+  if (snapshot.liveVisitors < 1) return null;
+
   const maxTimeline = Math.max(1, ...snapshot.timeline.map((point) => point.value));
   const topPageViews = Math.max(1, snapshot.popularPages[0]?.views ?? 0);
   const totalDevices = snapshot.devices.reduce((total, item) => total + item.visitors, 0);

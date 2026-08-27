@@ -18,11 +18,11 @@ export default async function DashboardPage() {
       <h1>Selamat datang, ini kondisi website hari ini.</h1>
       <p>Pantau kunjungan secara langsung, lalu kelola paket dan konten dari satu tempat.</p>
     </section>
-    <TrafficDashboard initialSnapshot={traffic} />
     <div className="admin-section-heading"><p className="admin-eyebrow">KELOLA WEBSITE</p><h2>Mau mengubah apa hari ini?</h2></div>
     <section className="admin-simple-actions" aria-label="Pilihan pengelolaan website">
       {actions.map(([title, description, Icon, href]) => <Link href={href} key={title}><span><Icon aria-hidden /></span><div><strong>{title}</strong><p>{description}</p></div><ArrowRight aria-hidden /></Link>)}
     </section>
+    <TrafficDashboard initialSnapshot={traffic} />
     <aside className="admin-help-note"><strong>Cara menggunakan dashboard</strong><p>1. Pilih bagian yang ingin diubah. &nbsp; 2. Tekan tombol tambah atau ubah. &nbsp; 3. Tekan “Tampilkan di website” jika sudah benar.</p></aside>
   </>;
 }
