@@ -23,6 +23,8 @@ function renderNode(node: Node, key: number | string): ReactNode {
 }
 
 export function ArticleContent({ document }: { document: Record<string, unknown> }) {
-  const root = document as Node;
-  return <div className="article-content">{root.content?.map((node, index) => renderNode(node, index))}</div>;
+  const root = document as Node | null;
+  const blocks = Array.isArray(root?.content) ? root.content : [];
+  if (!blocks.length) return <div className="article-content"><p>Artikel sedang dipersiapkan.</p></div>;
+  return <div className="article-content">{blocks.map((node, index) => renderNode(node, index))}</div>;
 }
