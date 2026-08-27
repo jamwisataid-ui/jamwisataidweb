@@ -31,6 +31,8 @@ export function PackageForm({ values = {} }: { values?: Values }) {
   const [imageUrl, setImageUrl] = useState(field(values, "imageUrl"));
   const [displayPrice, setDisplayPrice] = useState(() => formatRupiahInput(field(values, "price")));
   const [durationDays, setDurationDays] = useState(() => field(values, "durationDays", "9"));
+  const isPublished = field(values, "status") === "published";
+  const hasDraftChanges = values.hasDraftChanges === true;
 
   const rawDigits = cleanRupiahInput(displayPrice);
   const terbilangText = terbilangRupiah(rawDigits);
@@ -187,7 +189,14 @@ export function PackageForm({ values = {} }: { values?: Values }) {
 
       <div className="admin-package-note">
         <UploadCloud aria-hidden />
-        <p><strong>Tidak perlu mengatur hal teknis.</strong><span>Link halaman, tulisan tanggal, dan pesan WhatsApp dibuat otomatis.</span></p>
+        <p>
+          <strong>{hasDraftChanges ? "Ada perubahan draft yang belum tampil di website." : "Tidak perlu mengatur hal teknis."}</strong>
+          <span>
+            {hasDraftChanges
+              ? "Klik Simpan & update website supaya perubahan harga, hotel, maskapai, dan tanggal muncul di website publik."
+              : "Link halaman, tulisan tanggal, dan pesan WhatsApp dibuat otomatis."}
+          </span>
+        </p>
       </div>
       <div className="admin-form-actions">
         {values.id ? (
@@ -206,7 +215,7 @@ export function PackageForm({ values = {} }: { values?: Values }) {
                 Menyimpan...
               </>
             ) : (
-              "Simpan dulu"
+              isPublished ? "Simpan draft saja" : "Simpan draft"
             )}
           </button>
           <button name="intent" value="publish" className="admin-primary-button" disabled={pending}>
@@ -216,7 +225,7 @@ export function PackageForm({ values = {} }: { values?: Values }) {
                 Menyimpan...
               </>
             ) : (
-              "Tampilkan di website"
+              isPublished ? "Simpan & update website" : "Tampilkan di website"
             )}
           </button>
         </div>

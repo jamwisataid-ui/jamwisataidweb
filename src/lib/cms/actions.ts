@@ -160,7 +160,13 @@ export async function savePackageAction(_state: ActionState, formData: FormData)
         set: { payload: data, updatedBy: session.user.id, updatedAt: new Date() },
       });
       await writeAudit(session.user.id, "save-draft", "package", data.id, `Draft ${data.name} disimpan`);
-      return { ok: true, message: "Draft paket berhasil disimpan.", redirectTo: `/admin/paket/${data.id}` };
+      return {
+        ok: true,
+        message: existing?.status === "published"
+          ? "Draft perubahan berhasil disimpan. Website belum berubah sampai klik tombol Simpan & update website."
+          : "Draft paket berhasil disimpan. Paket belum tampil di website sampai diterbitkan.",
+        redirectTo: `/admin/paket/${data.id}`,
+      };
     }
 
     if (existing && existing.slug !== data.slug) {
@@ -324,7 +330,13 @@ export async function saveEntryAction(_state: ActionState, formData: FormData): 
         set: { payload: { ...input, data }, updatedBy: session.user.id, updatedAt: new Date() },
       });
       await writeAudit(session.user.id, "save-draft", input.type, entryId, `Draft ${input.title} disimpan`);
-      return { ok: true, message: "Perubahan berhasil disimpan.", redirectTo: `/admin/konten/${input.type}/${entryId}` };
+      return {
+        ok: true,
+        message: existing?.status === "published"
+          ? "Draft perubahan berhasil disimpan. Website belum berubah sampai klik tombol Simpan & update website."
+          : "Draft konten berhasil disimpan. Konten belum tampil di website sampai diterbitkan.",
+        redirectTo: `/admin/konten/${input.type}/${entryId}`,
+      };
     }
 
     await database.insert(contentEntries).values({ id: entryId, type: input.type, key: input.key, title: input.title, data, status: "published", sortOrder, publishedAt: new Date(), createdBy: session.user.id, updatedBy: session.user.id }).onConflictDoUpdate({
@@ -347,7 +359,9 @@ export async function saveArticleAction(_state: ActionState, formData: FormData)
     const intent = value(formData, "intent") === "publish" ? "publish" : "draft";
     const raw = Object.fromEntries(formData.entries());
     const parsed = articleFormSchema.safeParse({ ...raw, slug: value(formData, "slug") || slugify(value(formData, "title")) });
-    if (!parsed.success) return { ok: false, message: "Periksa kembali artikel.", errors: parsed.error.flatten().fieldErrors };
+    if (!parsed.success) {
+      return { ok: false, message: "Artikel belum bisa disimpan. Perbaiki field yang ditandai di bawah.", errors: parsed.error.flatten().fieldErrors };
+    }
     const input = parsed.data;
     const database = requireDatabase();
     const id = input.id ?? randomUUID();
@@ -359,7 +373,7 @@ export async function saveArticleAction(_state: ActionState, formData: FormData)
       return { ok: false, message: "Isi artikel tidak valid." };
     }
     if (articleTextLength(content) < 8) {
-      return { ok: false, message: "Periksa kembali artikel.", errors: { contentJson: ["Tulisan artikel minimal 8 karakter."] } };
+      return { ok: false, message: "Artikel belum bisa disimpan. Perbaiki field yang ditandai di bawah.", errors: { contentJson: ["Tulisan artikel minimal 8 karakter."] } };
     }
 
     if (intent === "draft") {

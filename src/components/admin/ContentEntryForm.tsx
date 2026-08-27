@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Info, Loader2 } from "lucide-react";
 import { saveEntryAction } from "@/lib/cms/actions";
 import { type ActionState } from "@/lib/cms/validation";
 import { AdminImageUpload } from "./AdminImageUpload";
@@ -28,6 +28,8 @@ export function ContentEntryForm({ type, values = {} }: { type: EntryType; value
   const [state, action, pending] = useActionState(saveEntryAction, initial);
   const [uploads, setUploads] = useState<Record<string, string>>({});
   const details = config[type];
+  const isPublished = text(values, "status") === "published";
+  const hasDraftChanges = values.hasDraftChanges === true;
 
   return (
     <form action={action} className="admin-editor-form">
@@ -68,6 +70,18 @@ export function ContentEntryForm({ type, values = {} }: { type: EntryType; value
         </div>
       ) : null}
 
+      <div className="admin-package-note">
+        <Info aria-hidden />
+        <p>
+          <strong>{hasDraftChanges ? "Ada perubahan draft yang belum tampil di website." : "Konten publik butuh tombol publish."}</strong>
+          <span>
+            {hasDraftChanges
+              ? "Klik Simpan & update website supaya video/foto/konten terbaru muncul di website publik."
+              : "Simpan draft hanya menyimpan di admin. Gunakan tombol utama jika konten harus tampil di website."}
+          </span>
+        </p>
+      </div>
+
       <div className="admin-form-actions">
         {values.id && type !== "site-settings" ? (
           <DeleteButton
@@ -86,7 +100,7 @@ export function ContentEntryForm({ type, values = {} }: { type: EntryType; value
                 Menyimpan...
               </>
             ) : (
-              "Simpan dulu"
+              isPublished ? "Simpan draft saja" : "Simpan draft"
             )}
           </button>
           <button name="intent" value="publish" className="admin-primary-button" disabled={pending}>
@@ -96,7 +110,7 @@ export function ContentEntryForm({ type, values = {} }: { type: EntryType; value
                 Menyimpan...
               </>
             ) : (
-              "Tampilkan di website"
+              isPublished ? "Simpan & update website" : "Tampilkan di website"
             )}
           </button>
         </div>

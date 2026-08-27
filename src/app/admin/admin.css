@@ -191,6 +191,13 @@
 .admin-input-prefix input { padding-left: 39px; }
 .admin-input-suffix input { padding-right: 48px; }
 .admin-field-hint { color: #7d8592 !important; font-size: 10px !important; font-weight: 500; }
+.admin-form-error { display: grid; gap: 10px; padding: 14px 15px; border: 1px solid rgba(165,61,53,.28); border-radius: 10px; background: #fff4f2; color: #91352f; }
+.admin-form-error > strong { display: inline-flex; align-items: center; gap: 8px; color: #812b26; font-size: 13px; line-height: 1.45; }
+.admin-form-error > strong svg { width: 16px; height: 16px; flex: 0 0 auto; }
+.admin-form-error ul { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
+.admin-form-error li { display: grid; gap: 2px; padding: 9px 10px; border-radius: 7px; background: rgba(255,255,255,.68); }
+.admin-form-error li span { color: #6f251f; font-size: 11px; font-weight: 800; }
+.admin-form-error li small { color: #9a413a; font-size: 11px; line-height: 1.45; }
 .admin-simple-upload { display: grid; grid-template-columns: 44px minmax(0,1fr) auto auto; align-items: center; gap: 12px; padding: 15px; border: 1px dashed #c8c2b3; border-radius: 9px; background: #faf8f2; }
 .admin-simple-upload-icon { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 9px; background: #f0e7d1; color: #956a08; }
 .admin-simple-upload-icon svg { width: 20px; }
@@ -280,7 +287,7 @@
 .admin-auth-success.is-error { background: #f9ecea; }
 .admin-auth-success.is-error > svg { color: #9a4039; }
 .admin-login-card > footer { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 34px; padding-top: 18px; border-top: 1px solid #e7e3da; color: #8b929d; font-size: 10px; }
-.admin-form-error { padding: 10px 12px; border-left: 2px solid #a23f38; border-radius: 4px; background: #f9ecea; color: #8d3731; font-size: 11px; }
+.admin-login-card .admin-form-error { padding: 10px 12px; border-left: 2px solid #a23f38; border-radius: 4px; background: #f9ecea; color: #8d3731; font-size: 11px; }
 
 @keyframes admin-rise { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .admin-stat-grid > a { animation: none; } .admin-shell *, .admin-login-page * { scroll-behavior: auto !important; transition-duration: .01ms !important; } }

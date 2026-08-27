@@ -92,6 +92,7 @@ const hargaFaqs = [
 
 export default async function HargaUmrohPage() {
   const umrahPackages = await getPublishedPackages();
+  const displayedPackages = umrahPackages.slice(0, 10);
   return (
     <main className="jam-page min-h-screen bg-white text-[#333333]">
       <JsonLd schema={hargaSchema} />
@@ -144,7 +145,7 @@ export default async function HargaUmrohPage() {
       <section className="bg-white py-16 sm:py-20 border-b border-[#061A2F]/8">
         <div className="jam-container">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {umrahPackages.map((pkg) => (
+            {displayedPackages.map((pkg) => (
               <div
                 key={pkg.id}
                 className="rounded-2xl border border-[#061A2F]/12 bg-white p-6 sm:p-7 shadow-xs hover:border-[#D5A12B]/40 hover:shadow-lg transition flex flex-col justify-between"

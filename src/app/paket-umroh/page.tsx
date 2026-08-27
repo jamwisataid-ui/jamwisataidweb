@@ -106,9 +106,10 @@ const hubFaqs = [
 
 export default async function PaketUmrohHubPage() {
   const umrahPackages = await getPublishedPackages();
+  const displayedPackages = umrahPackages.slice(0, 10);
   return (
     <main className="jam-page min-h-screen bg-white text-[#333333]">
-      <JsonLd schema={packageHubSchema(umrahPackages)} />
+      <JsonLd schema={packageHubSchema(displayedPackages)} />
       <PremiumHeader />
 
       {/* Hero Section */}
@@ -171,7 +172,7 @@ export default async function PaketUmrohHubPage() {
       <section className="bg-white py-16 sm:py-20 border-b border-[#061A2F]/8">
         <div className="jam-container">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {umrahPackages.map((pkg) => (
+            {displayedPackages.map((pkg) => (
               <article
                 key={pkg.id}
                 className="flex flex-col justify-between rounded-2xl border border-[#061A2F]/12 bg-white overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300"
@@ -280,7 +281,7 @@ export default async function PaketUmrohHubPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {umrahPackages.map((pkg) => (
+                {displayedPackages.map((pkg) => (
                   <tr key={pkg.id} className="hover:bg-slate-50/80 transition">
                     <td className="p-4 font-bold text-[#061A2F]">{pkg.name}</td>
                     <td className="p-4 text-[#59616D]">{pkg.durationDays} Hari</td>

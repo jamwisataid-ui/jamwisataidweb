@@ -86,9 +86,10 @@ const jadwalSchema = (umrahPackages: TravelPackage[]) => ({
 
 export default async function JadwalUmrohPage() {
   const umrahPackages = await getPublishedPackages();
+  const displayedPackages = umrahPackages.slice(0, 10);
   return (
     <main className="jam-page min-h-screen bg-white text-[#333333]">
-      <JsonLd schema={jadwalSchema(umrahPackages)} />
+      <JsonLd schema={jadwalSchema(displayedPackages)} />
       <PremiumHeader />
 
       {/* Hero */}
@@ -138,7 +139,7 @@ export default async function JadwalUmrohPage() {
       <section className="bg-white py-16 sm:py-20 border-b border-[#061A2F]/8">
         <div className="jam-container">
           <div className="space-y-6">
-            {umrahPackages.map((pkg) => (
+            {displayedPackages.map((pkg) => (
               <div
                 key={pkg.id}
                 className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 rounded-2xl border border-[#061A2F]/12 bg-white p-6 sm:p-7 shadow-xs hover:border-[#D5A12B]/40 hover:shadow-md transition"

@@ -5,7 +5,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import LinkExtension from "@tiptap/extension-link";
 import ImageExtension from "@tiptap/extension-image";
-import { Loader2 } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { saveArticleAction } from "@/lib/cms/actions";
 import { type ActionState } from "@/lib/cms/validation";
 import { AdminImageUpload } from "./AdminImageUpload";
@@ -19,6 +19,15 @@ const TITLE_MIN = 5;
 const EXCERPT_MIN = 20;
 const BODY_MIN = 8;
 const value = (values: Values, key: string) => String(values[key] ?? "");
+const articleFieldLabels: Record<string, string> = {
+  title: "Judul artikel",
+  excerpt: "Ringkasan",
+  coverUrl: "Foto sampul",
+  contentJson: "Tulisan artikel",
+  slug: "Slug artikel",
+  seoTitle: "SEO title",
+  seoDescription: "SEO description",
+};
 
 export function ArticleForm({ values = {} }: { values?: Values }) {
   const [state, action, pending] = useActionState(saveArticleAction, initial);
@@ -44,6 +53,12 @@ export function ArticleForm({ values = {} }: { values?: Values }) {
   const isTitleValid = titleCount >= TITLE_MIN;
   const isExcerptValid = excerptCount >= EXCERPT_MIN;
   const isBodyValid = bodyCount >= BODY_MIN;
+  const localIssues = [
+    !isTitleValid ? `Judul kurang ${TITLE_MIN - titleCount} karakter lagi.` : "",
+    !isExcerptValid ? `Ringkasan kurang ${EXCERPT_MIN - excerptCount} karakter lagi.` : "",
+    !isBodyValid ? `Tulisan artikel kurang ${BODY_MIN - bodyCount} karakter lagi.` : "",
+  ].filter(Boolean);
+  const clientIssueEntries = Object.entries(clientErrors).filter(([, message]) => Boolean(message));
 
   useEffect(() => {
     if (restoredDraft.current) return;
@@ -103,7 +118,20 @@ export function ArticleForm({ values = {} }: { values?: Values }) {
 
   return (
     <form action={action} className="admin-editor-form" onSubmit={validateBeforeSubmit}>
-      <FormFeedback state={state} />
+      <FormFeedback state={state} fieldLabels={articleFieldLabels} />
+      {clientIssueEntries.length ? (
+        <div className="admin-form-error admin-form-error-detailed" role="alert">
+          <strong><AlertCircle aria-hidden /> Artikel belum bisa disimpan. Perbaiki bagian berikut:</strong>
+          <ul>
+            {clientIssueEntries.map(([key, message]) => (
+              <li key={key}>
+                <span>{articleFieldLabels[key] ?? key}</span>
+                <small>{message}</small>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
       {values.id ? <input type="hidden" name="id" value={value(values, "id")} /> : null}
       <input type="hidden" name="contentJson" value={contentJson} />
       <input type="hidden" name="slug" value={value(values, "slug")} />
@@ -165,8 +193,10 @@ export function ArticleForm({ values = {} }: { values?: Values }) {
             {error("contentJson") ? <small className="admin-upload-error">{error("contentJson")}</small> : null}
           </div>
           <div className={`admin-article-readiness admin-span-2 ${isTitleValid && isExcerptValid && isBodyValid ? "is-ready" : "is-waiting"}`} role="status">
-            <strong>{isTitleValid && isExcerptValid && isBodyValid ? "Artikel siap disimpan" : "Lengkapi bagian yang masih merah"}</strong>
-            <span>Draft tersimpan otomatis di browser.</span>
+            <strong>{isTitleValid && isExcerptValid && isBodyValid ? "Artikel siap disimpan" : "Artikel belum lengkap"}</strong>
+            <span>
+              {localIssues.length ? localIssues.join(" ") : "Semua syarat utama sudah terpenuhi. Draft tersimpan otomatis di browser."}
+            </span>
           </div>
         </div>
       </section>

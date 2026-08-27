@@ -150,6 +150,7 @@ const bandungFaqs = [
 
 export default async function TravelUmrohBandungPage() {
   const umrahPackages = await getPublishedPackages();
+  const displayedPackages = umrahPackages.slice(0, 10);
   return (
     <main className="jam-page min-h-screen bg-white text-[#333333]">
       <JsonLd schema={bandungSchema} />
@@ -349,7 +350,7 @@ export default async function TravelUmrohBandungPage() {
           </div>
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {umrahPackages.map((pkg) => (
+            {displayedPackages.map((pkg) => (
               <article
                 key={pkg.id}
                 className="flex flex-col justify-between rounded-2xl border border-[#061A2F]/10 bg-white overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300"

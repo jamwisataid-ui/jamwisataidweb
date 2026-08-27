@@ -86,8 +86,9 @@ export default async function Home() {
     getPublishedEntries("gallery"),
     getPublishedEntries("faq"),
   ]);
+  const displayedPackages = packages.slice(0, 10);
 
-  const testimonials = testimonialsData.map((item) => ({
+  const testimonials = testimonialsData.slice(0, 15).map((item) => ({
     id: item.id,
     youtubeId: String(item.data.youtubeId ?? ""),
     title: item.title,
@@ -109,7 +110,7 @@ export default async function Home() {
     <main className="jam-page min-h-screen">
       <JsonLd schema={homepageSchema} />
       <PremiumHeader />
-      <HeroPackages packages={packages} />
+      <HeroPackages packages={displayedPackages} />
       <ModernProofFooter
         testimonials={testimonials.length ? testimonials : undefined}
         gallery={gallery.length ? gallery : undefined}

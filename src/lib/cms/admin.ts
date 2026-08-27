@@ -51,12 +51,12 @@ export async function listPackagesAdmin() {
 
 export async function getPackageAdmin(id: string) {
   const database = requireDatabase();
+  const item = await database.query.packages.findFirst({ where: eq(packages.id, id) });
   const draft = await database.query.contentDrafts.findFirst({
     where: and(eq(contentDrafts.entityType, "package"), eq(contentDrafts.entityId, id)),
   });
-  if (draft) return draft.payload;
+  if (draft) return { ...(draft.payload as Record<string, unknown>), status: item?.status ?? "draft", hasDraftChanges: true };
 
-  const item = await database.query.packages.findFirst({ where: eq(packages.id, id) });
   if (!item) return null;
   const [departure, children, itinerary] = await Promise.all([
     database.query.departures.findFirst({ where: eq(departures.packageId, id), orderBy: [asc(departures.departureDate)] }),
@@ -86,6 +86,8 @@ export async function getPackageAdmin(id: string) {
     seoDescription: item.seoDescription ?? "",
     featured: item.featured,
     sortOrder: item.sortOrder,
+    status: item.status,
+    hasDraftChanges: false,
     departureDate: departure?.departureDate ?? "",
     departureLabel: departure?.dateLabel ?? "",
     returnDate: departure?.returnDate ?? "",
@@ -119,9 +121,9 @@ export async function listEntriesAdmin(type: typeof contentEntries.$inferSelect.
 
 export async function getEntryAdmin(type: string, id: string) {
   const database = requireDatabase();
-  const draft = await database.query.contentDrafts.findFirst({ where: and(eq(contentDrafts.entityType, type), eq(contentDrafts.entityId, id)) });
-  if (draft) return draft.payload;
   const entry = await database.query.contentEntries.findFirst({ where: eq(contentEntries.id, id) });
+  const draft = await database.query.contentDrafts.findFirst({ where: and(eq(contentDrafts.entityType, type), eq(contentDrafts.entityId, id)) });
+  if (draft) return { ...(draft.payload as Record<string, unknown>), status: entry?.status ?? "draft", hasDraftChanges: true };
   if (!entry) return null;
   const data = entry.data;
   const mapped = {
@@ -133,7 +135,19 @@ export async function getEntryAdmin(type: string, id: string) {
     homepage: [String(data.eyebrow ?? ""), String(data.headline ?? ""), String(data.description ?? ""), String(data.imageUrl ?? "")],
     "site-settings": [String(data.brandName ?? ""), String(data.whatsapp ?? ""), String(data.email ?? ""), String(data.address ?? "")],
   }[type] ?? ["", "", "", ""];
-  return { id: entry.id, type: entry.type, key: entry.key, title: entry.title, sortOrder: entry.sortOrder, primary: mapped[0], secondary: mapped[1], tertiary: mapped[2], quaternary: mapped[3] };
+  return {
+    id: entry.id,
+    type: entry.type,
+    key: entry.key,
+    title: entry.title,
+    sortOrder: entry.sortOrder,
+    status: entry.status,
+    hasDraftChanges: false,
+    primary: mapped[0],
+    secondary: mapped[1],
+    tertiary: mapped[2],
+    quaternary: mapped[3],
+  };
 }
 
 export async function listArticlesAdmin() {
