@@ -483,7 +483,23 @@ function VideoSection({ testimonialVideos }: { testimonialVideos: TestimonialVid
 }
 
 function GallerySection({ gallery }: { gallery: GalleryItem[] }) {
-  const galleryRows = [gallery.slice(0, Math.ceil(gallery.length / 2)), gallery.slice(Math.ceil(gallery.length / 2))];
+  const galleryRows = (() => {
+    const rows = gallery.reduce<Array<Array<GalleryItem & { originalIndex: number }>>>(
+      (acc, item, index) => {
+        acc[index % 2].push({ ...item, originalIndex: index });
+        return acc;
+      },
+      [[], []],
+    );
+    if (!rows[1].length) rows[1] = [...rows[0]];
+
+    return rows.map((row) => {
+      if (!row.length) return row;
+      const extended = [...row];
+      while (extended.length < 6) extended.push(...row);
+      return extended.slice(0, Math.max(6, row.length));
+    });
+  })();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const touchStart = useRef(0);
   const close = useCallback(() => setActiveIndex(null), []);
@@ -538,13 +554,12 @@ function GallerySection({ gallery }: { gallery: GalleryItem[] }) {
                   className="marquee-group"
                 >
                   {row.map((item, itemIndex) => {
-                    const originalIndex = rowIndex * 5 + itemIndex;
                     return (
                       <button
                         type="button"
-                        key={`${copy}-${item.image}`}
+                        key={`${copy}-${item.originalIndex}-${itemIndex}-${item.image}`}
                         tabIndex={copy === 1 ? -1 : 0}
-                        onClick={() => setActiveIndex(originalIndex)}
+                        onClick={() => setActiveIndex(item.originalIndex)}
                         className={`group relative h-[145px] shrink-0 overflow-hidden rounded-[16px] bg-slate-100 text-left ring-1 ring-[#0A1D3A]/8 transition-all duration-500 hover:ring-[#D4AF37]/45 hover:shadow-[0_18px_38px_rgba(10,29,58,.22)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C0C0C0] sm:h-[195px] ${item.width}`}
                       >
                         <Image
