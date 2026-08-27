@@ -104,6 +104,7 @@ export function ArticleForm({ values = {} }: { values?: Values }) {
   };
 
   const validateBeforeSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const form = event.currentTarget;
     const nextErrors: Record<string, string> = {};
     if (!isTitleValid) nextErrors.title = `Judul artikel minimal ${TITLE_MIN} karakter.`;
     if (!isExcerptValid) nextErrors.excerpt = `Ringkasan minimal ${EXCERPT_MIN} karakter.`;
@@ -112,12 +113,14 @@ export function ArticleForm({ values = {} }: { values?: Values }) {
     setClientErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
       event.preventDefault();
-      event.currentTarget.querySelector(".admin-upload-error")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      window.setTimeout(() => {
+        form.querySelector(".admin-form-error-detailed")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 0);
     }
   };
 
   return (
-    <form action={action} className="admin-editor-form" onSubmit={validateBeforeSubmit}>
+    <form action={action} className="admin-editor-form" onSubmit={validateBeforeSubmit} noValidate>
       <FormFeedback state={state} fieldLabels={articleFieldLabels} />
       {clientIssueEntries.length ? (
         <div className="admin-form-error admin-form-error-detailed" role="alert">
@@ -225,7 +228,7 @@ export function ArticleForm({ values = {} }: { values?: Values }) {
                 Menyimpan...
               </>
             ) : (
-              "Simpan dulu"
+              "Simpan draft"
             )}
           </button>
           <button name="intent" value="publish" className="admin-primary-button" disabled={pending}>
