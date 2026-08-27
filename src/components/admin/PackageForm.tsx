@@ -208,16 +208,18 @@ export function PackageForm({ values = {} }: { values?: Values }) {
           />
         ) : null}
         <div style={{ display: "flex", gap: "10px", marginLeft: "auto" }}>
-          <button name="intent" value="draft" className="admin-secondary-button" disabled={pending}>
-            {pending ? (
-              <>
-                <Loader2 className="admin-spinner" style={{ width: 14, height: 14, marginRight: 6, display: "inline-block" }} />
-                Menyimpan...
-              </>
-            ) : (
-              isPublished ? "Simpan draft saja" : "Simpan draft"
-            )}
-          </button>
+          {!isPublished ? (
+            <button name="intent" value="draft" className="admin-secondary-button" disabled={pending}>
+              {pending ? (
+                <>
+                  <Loader2 className="admin-spinner" style={{ width: 14, height: 14, marginRight: 6, display: "inline-block" }} />
+                  Menyimpan...
+                </>
+              ) : (
+                "Simpan draft"
+              )}
+            </button>
+          ) : null}
           <button name="intent" value="publish" className="admin-primary-button" disabled={pending}>
             {pending ? (
               <>

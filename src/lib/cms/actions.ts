@@ -133,8 +133,9 @@ export async function savePackageAction(_state: ActionState, formData: FormData)
     const data = parsed.data;
     data.slug = await resolveUniquePackageSlug(database, data.slug, data.id);
     const existing = await database.query.packages.findFirst({ where: eq(packages.id, data.id) });
+    const effectiveIntent = existing?.status === "published" ? "publish" : intent;
 
-    if (intent === "draft") {
+    if (effectiveIntent === "draft") {
       if (!existing) {
         await database.insert(packages).values({
           id: data.id,
