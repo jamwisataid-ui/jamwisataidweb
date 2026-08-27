@@ -18,17 +18,44 @@ const value = (values: Values, key: string) => String(values[key] ?? "");
 
 export function ArticleForm({ values = {} }: { values?: Values }) {
   const [state, action, pending] = useActionState(saveArticleAction, initial);
+  const [title, setTitle] = useState(value(values, "title"));
+  const [excerpt, setExcerpt] = useState(value(values, "excerpt"));
   const [coverUrl, setCoverUrl] = useState(value(values, "coverUrl"));
   const [contentJson, setContentJson] = useState(value(values, "contentJson") || JSON.stringify({ type: "doc", content: [{ type: "paragraph" }] }));
-  const error = (key: string) => state.errors?.[key]?.[0];
+  const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
   const editor = useEditor({
     extensions: [StarterKit, LinkExtension.configure({ openOnClick: false }), ImageExtension],
     content: JSON.parse(contentJson),
     immediatelyRender: false,
-    onUpdate: ({ editor: current }) => setContentJson(JSON.stringify(current.getJSON())),
+    onUpdate: ({ editor: current }) => {
+      setContentJson(JSON.stringify(current.getJSON()));
+      setClientErrors((errors) => ({ ...errors, contentJson: "" }));
+    },
   });
+
+  const error = (key: string) => {
+    if (clientErrors[key]) return clientErrors[key];
+    if (key === "title" && title.trim().length >= 5) return undefined;
+    if (key === "excerpt" && excerpt.trim().length >= 20) return undefined;
+    if (key === "contentJson" && (editor?.getText().trim().length ?? 0) >= 8) return undefined;
+    return state.errors?.[key]?.[0];
+  };
+
+  const validateBeforeSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const nextErrors: Record<string, string> = {};
+    if (title.trim().length < 5) nextErrors.title = "Judul artikel minimal 5 karakter.";
+    if (excerpt.trim().length < 20) nextErrors.excerpt = "Ringkasan minimal 20 karakter.";
+    if ((editor?.getText().trim().length ?? 0) < 8) nextErrors.contentJson = "Tulisan artikel minimal 8 karakter.";
+
+    setClientErrors(nextErrors);
+    if (Object.keys(nextErrors).length) {
+      event.preventDefault();
+      event.currentTarget.querySelector(".admin-upload-error")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
   return (
-    <form action={action} className="admin-editor-form">
+    <form action={action} className="admin-editor-form" onSubmit={validateBeforeSubmit}>
       <FormFeedback state={state} />
       {values.id ? <input type="hidden" name="id" value={value(values, "id")} /> : null}
       <input type="hidden" name="contentJson" value={contentJson} />
@@ -40,12 +67,30 @@ export function ArticleForm({ values = {} }: { values?: Values }) {
         <div className="admin-form-grid">
           <label className="admin-span-2">
             <span>Judul artikel</span>
-            <input name="title" defaultValue={value(values, "title")} required />
+            <input
+              name="title"
+              value={title}
+              onChange={(event) => {
+                setTitle(event.target.value);
+                setClientErrors((current) => ({ ...current, title: "" }));
+              }}
+              required
+            />
             {error("title") ? <small className="admin-upload-error">{error("title")}</small> : null}
           </label>
           <label className="admin-span-2">
             <span>Ringkasan</span>
-            <textarea name="excerpt" rows={3} maxLength={300} defaultValue={value(values, "excerpt")} required />
+            <textarea
+              name="excerpt"
+              rows={3}
+              maxLength={300}
+              value={excerpt}
+              onChange={(event) => {
+                setExcerpt(event.target.value);
+                setClientErrors((current) => ({ ...current, excerpt: "" }));
+              }}
+              required
+            />
             {error("excerpt") ? <small className="admin-upload-error">{error("excerpt")}</small> : null}
           </label>
           <AdminImageUpload

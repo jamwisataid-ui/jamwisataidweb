@@ -96,6 +96,16 @@ function formatSafeDepartureLabel(dateStr: string): string {
   return dateStr;
 }
 
+function articleTextLength(content: unknown): number {
+  if (!content || typeof content !== "object") return 0;
+  const node = content as { text?: unknown; content?: unknown };
+  const ownText = typeof node.text === "string" ? node.text : "";
+  const childText = Array.isArray(node.content)
+    ? node.content.reduce((total, child) => total + articleTextLength(child), 0)
+    : 0;
+  return ownText.trim().length + childText;
+}
+
 export async function savePackageAction(_state: ActionState, formData: FormData): Promise<ActionState> {
   try {
     const session = await requireAdminSession();
@@ -347,6 +357,9 @@ export async function saveArticleAction(_state: ActionState, formData: FormData)
       content = JSON.parse(input.contentJson) as Record<string, unknown>;
     } catch {
       return { ok: false, message: "Isi artikel tidak valid." };
+    }
+    if (articleTextLength(content) < 8) {
+      return { ok: false, message: "Periksa kembali artikel.", errors: { contentJson: ["Tulisan artikel minimal 8 karakter."] } };
     }
 
     if (intent === "draft") {
