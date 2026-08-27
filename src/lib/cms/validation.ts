@@ -66,10 +66,10 @@ export const entryFormSchema = z.object({
 export const articleFormSchema = z.object({
   id: z.string().uuid().optional(),
   slug,
-  title: z.string().trim().min(5),
-  excerpt: z.string().trim().min(20).max(300),
+  title: z.string().trim().min(5, "Judul artikel minimal 5 karakter."),
+  excerpt: z.string().trim().min(20, "Ringkasan minimal 20 karakter.").max(300, "Ringkasan maksimal 300 karakter."),
   coverUrl: z.string().trim().optional(),
-  contentJson: z.string().min(2),
+  contentJson: z.string().min(2, "Isi artikel wajib diisi."),
   seoTitle: z.string().trim().max(70).optional(),
   seoDescription: z.string().trim().max(170).optional(),
 });

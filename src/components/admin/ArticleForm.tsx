@@ -20,6 +20,7 @@ export function ArticleForm({ values = {} }: { values?: Values }) {
   const [state, action, pending] = useActionState(saveArticleAction, initial);
   const [coverUrl, setCoverUrl] = useState(value(values, "coverUrl"));
   const [contentJson, setContentJson] = useState(value(values, "contentJson") || JSON.stringify({ type: "doc", content: [{ type: "paragraph" }] }));
+  const error = (key: string) => state.errors?.[key]?.[0];
   const editor = useEditor({
     extensions: [StarterKit, LinkExtension.configure({ openOnClick: false }), ImageExtension],
     content: JSON.parse(contentJson),
@@ -37,17 +38,31 @@ export function ArticleForm({ values = {} }: { values?: Values }) {
       <section className="admin-form-section">
         <div><p>Isi artikel</p><span>Tulis judul, ringkasan, dan isi artikel. Pengaturan teknis dibuat otomatis.</span></div>
         <div className="admin-form-grid">
-          <label className="admin-span-2"><span>Judul artikel</span><input name="title" defaultValue={value(values, "title")} required /></label>
-          <label className="admin-span-2"><span>Ringkasan</span><textarea name="excerpt" rows={3} maxLength={300} defaultValue={value(values, "excerpt")} required /></label>
+          <label className="admin-span-2">
+            <span>Judul artikel</span>
+            <input name="title" defaultValue={value(values, "title")} required />
+            {error("title") ? <small className="admin-upload-error">{error("title")}</small> : null}
+          </label>
+          <label className="admin-span-2">
+            <span>Ringkasan</span>
+            <textarea name="excerpt" rows={3} maxLength={300} defaultValue={value(values, "excerpt")} required />
+            {error("excerpt") ? <small className="admin-upload-error">{error("excerpt")}</small> : null}
+          </label>
           <AdminImageUpload
             name="coverUrl"
             label="Foto sampul"
             value={coverUrl}
             onChange={setCoverUrl}
             description="Pilih foto landscape untuk artikel atau tempel URL gambar."
+            error={error("coverUrl")}
             replaceLabel="Ganti foto"
           />
-          <div className="admin-span-2"><span className="admin-field-label">Tulisan artikel</span><div className="admin-editor-toolbar"><button type="button" onClick={() => editor?.chain().focus().toggleBold().run()}>Tebal</button><button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}>Judul bagian</button><button type="button" onClick={() => editor?.chain().focus().toggleBulletList().run()}>Daftar</button><button type="button" onClick={() => editor?.chain().focus().toggleBlockquote().run()}>Kutipan</button></div><EditorContent editor={editor} className="admin-rich-editor" /></div>
+          <div className="admin-span-2">
+            <span className="admin-field-label">Tulisan artikel</span>
+            <div className="admin-editor-toolbar"><button type="button" onClick={() => editor?.chain().focus().toggleBold().run()}>Tebal</button><button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}>Judul bagian</button><button type="button" onClick={() => editor?.chain().focus().toggleBulletList().run()}>Daftar</button><button type="button" onClick={() => editor?.chain().focus().toggleBlockquote().run()}>Kutipan</button></div>
+            <EditorContent editor={editor} className="admin-rich-editor" />
+            {error("contentJson") ? <small className="admin-upload-error">{error("contentJson")}</small> : null}
+          </div>
         </div>
       </section>
 

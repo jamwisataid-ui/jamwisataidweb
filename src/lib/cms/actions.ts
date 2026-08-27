@@ -61,6 +61,23 @@ async function resolveUniquePackageSlug(database: ReturnType<typeof requireDatab
   }
 }
 
+async function resolveUniqueArticleSlug(database: ReturnType<typeof requireDatabase>, desiredSlug: string, excludeId?: string): Promise<string> {
+  const baseSlug = desiredSlug || "artikel";
+  let candidate = baseSlug;
+  let count = 1;
+  while (true) {
+    const existing = await database.query.articles.findFirst({
+      where: eq(articles.slug, candidate),
+      columns: { id: true },
+    });
+    if (!existing || (excludeId && existing.id === excludeId)) {
+      return candidate;
+    }
+    count++;
+    candidate = `${baseSlug}-${count}`;
+  }
+}
+
 function formatSafeDepartureLabel(dateStr: string): string {
   if (!dateStr) return "";
   try {
@@ -324,6 +341,7 @@ export async function saveArticleAction(_state: ActionState, formData: FormData)
     const input = parsed.data;
     const database = requireDatabase();
     const id = input.id ?? randomUUID();
+    input.slug = await resolveUniqueArticleSlug(database, input.slug, id);
     let content: Record<string, unknown>;
     try {
       content = JSON.parse(input.contentJson) as Record<string, unknown>;
