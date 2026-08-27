@@ -1051,3 +1051,164 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Senior-readable admin typography override */
+.admin-shell { font-size: 18px; }
+
+.admin-nav a,
+.admin-view-site,
+.admin-account-link { min-height: 58px; font-size: 18px; }
+
+.admin-nav section > p,
+.admin-brand > span,
+.admin-eyebrow { font-size: 13px; }
+
+.admin-profile strong { font-size: 16px; }
+.admin-profile small { font-size: 13px; }
+
+.admin-page-header h1 { font-size: clamp(36px, 4.4vw, 50px); }
+.admin-page-header > div > p:last-child,
+.admin-simple-welcome > p:last-child,
+.admin-help-note p { font-size: 19px; line-height: 1.72; }
+
+.admin-section-heading h2,
+.admin-panel-heading h2 { font-size: 29px; }
+
+.admin-simple-actions strong { font-size: 22px; }
+.admin-simple-actions p,
+.admin-help-note strong { font-size: 18px; line-height: 1.62; }
+
+.admin-primary-button,
+.admin-secondary-button {
+  min-height: 60px;
+  padding-inline: 26px;
+  border-radius: 12px;
+  font-size: 18px;
+}
+
+.admin-table { font-size: 17px; }
+.admin-table th { height: 58px; font-size: 15px; }
+.admin-table td { min-height: 86px; font-size: 18px; line-height: 1.55; }
+.admin-table td strong,
+.admin-table td:first-child strong { font-size: 20px; }
+.admin-table td small,
+.admin-table td:first-child small { font-size: 16px; line-height: 1.45; }
+.admin-table td:last-child a,
+.admin-text-button { font-size: 18px; }
+.admin-status { min-height: 40px; padding-inline: 14px; font-size: 16px; }
+
+.admin-empty-state h2 { font-size: 30px; }
+.admin-empty-state p { font-size: 19px; line-height: 1.7; }
+
+.admin-editor-form { max-width: 1120px; gap: 24px; }
+.admin-form-section {
+  grid-template-columns: minmax(220px, .42fr) minmax(0, 1.58fr);
+  gap: 42px;
+  padding: 34px;
+}
+.admin-package-simple-form .admin-form-section {
+  grid-template-columns: minmax(220px, .42fr) minmax(0, 1.58fr);
+}
+.admin-form-section > div:first-child > p { font-size: 23px; line-height: 1.35; }
+.admin-form-section > div:first-child > span { font-size: 18px; line-height: 1.7; }
+.admin-form-grid { gap: 26px; }
+
+.admin-form-grid label > span,
+.admin-field-label,
+.admin-smart-field-head > span { font-size: 19px; }
+
+.admin-smart-field-head > small,
+.admin-form-grid label > small,
+.admin-field-hint,
+.admin-upload-error,
+.admin-image-upload .admin-upload-error {
+  font-size: 16px !important;
+  line-height: 1.55;
+}
+
+.admin-form-grid input,
+.admin-form-grid select,
+.admin-form-grid textarea,
+.admin-smart-field input,
+.admin-smart-field textarea,
+.admin-day-card input,
+.admin-day-card textarea {
+  min-height: 64px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  font-size: 19px;
+  line-height: 1.55;
+}
+
+.admin-form-grid textarea,
+.admin-smart-field textarea { min-height: 150px; }
+
+.admin-input-prefix > span,
+.admin-input-suffix > span { font-size: 18px; }
+
+.admin-checkbox { min-height: 58px; font-size: 18px; }
+.admin-checkbox input { width: 20px !important; min-height: 20px !important; }
+
+.admin-editor-toolbar button { min-height: 50px; padding-inline: 16px; font-size: 17px; }
+.admin-rich-editor { min-height: 360px; padding: 22px; font-size: 20px; line-height: 1.78; }
+.admin-rich-editor .ProseMirror { min-height: 320px; }
+
+.admin-article-readiness { padding: 18px 20px; }
+.admin-article-readiness strong { font-size: 19px; }
+.admin-article-readiness span { font-size: 17px; line-height: 1.55; }
+
+.admin-package-note strong,
+.admin-package-note span { font-size: 17px; line-height: 1.65; }
+
+.admin-form-error > strong { font-size: 18px; }
+.admin-form-error li span,
+.admin-form-error li small { font-size: 16px; }
+
+.admin-image-upload-title,
+.admin-simple-upload > div strong { font-size: 19px; }
+.admin-image-upload-description,
+.admin-image-upload-hint,
+.admin-simple-upload > div small,
+.admin-upload-ready { font-size: 16px; line-height: 1.55; }
+
+.admin-image-upload [data-ut-element="button"],
+.admin-simple-upload [data-ut-element="button"] { min-height: 56px; font-size: 17px; }
+
+.admin-price-badge span { font-size: 18px; }
+.admin-price-badge small { font-size: 16px; }
+
+.admin-modal-title { font-size: 25px; }
+.admin-modal-desc,
+.admin-modal-warning-box,
+.admin-modal-cancel-btn,
+.admin-modal-confirm-btn { font-size: 17px; }
+.admin-modal-cancel-btn,
+.admin-modal-confirm-btn { min-height: 54px; }
+
+.traffic-board-heading > div > p:last-child,
+.traffic-live-card > p,
+.traffic-refresh,
+.traffic-metric-card small,
+.traffic-chart-card header > small,
+.traffic-pages-card li strong,
+.traffic-pages-card li em,
+.traffic-empty p,
+.traffic-devices strong,
+.traffic-devices small,
+.traffic-devices > p,
+.traffic-connection { font-size: 15px; }
+
+.traffic-chart-card h3,
+.traffic-pages-card h3 { font-size: 21px; }
+
+@media (max-width: 620px) {
+  .admin-page-header h1 { font-size: 34px; }
+  .admin-page-header > div > p:last-child,
+  .admin-form-section > div:first-child > span { font-size: 18px; }
+  .admin-form-section { padding: 24px 18px; }
+  .admin-form-grid input,
+  .admin-form-grid select,
+  .admin-form-grid textarea,
+  .admin-smart-field input,
+  .admin-smart-field textarea { font-size: 18px; }
+}
