@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Clock3,
   ExternalLink,
@@ -31,8 +32,10 @@ export function PremiumHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [active, setActive] = useState("beranda");
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
+  const articlesActive = pathname?.startsWith("/artikel");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -157,6 +160,17 @@ export function PremiumHeader() {
                 {label}
               </a>
             ))}
+            <Link
+              href="/artikel"
+              aria-current={articlesActive ? "page" : undefined}
+              className={`relative px-3 py-1.5 text-[13px] font-semibold tracking-wide transition-colors after:absolute after:inset-x-3 after:bottom-0 after:h-[2px] after:origin-left after:rounded-full after:bg-gradient-gold-rich after:transition-transform ${
+                articlesActive
+                  ? "text-[#E8C967] font-bold after:scale-x-100"
+                  : "text-white/85 after:scale-x-0 hover:text-white hover:after:scale-x-100"
+              }`}
+            >
+              Artikel
+            </Link>
           </nav>
 
           {/* CTA Area */}
@@ -229,6 +243,18 @@ export function PremiumHeader() {
                   <span className="text-xs text-white/40">↗</span>
                 </a>
               ))}
+              <Link
+                href="/artikel"
+                onClick={closeMenu}
+                className={`flex items-center justify-between rounded-xl px-3 py-3 text-sm font-semibold transition ${
+                  articlesActive
+                    ? "bg-[#D5A12B]/20 text-[#E8C967] font-bold"
+                    : "text-white/80 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                Artikel
+                <span className="text-xs text-white/40">↗</span>
+              </Link>
             </nav>
 
             <div className="mt-auto rounded-2xl border border-[#D5A12B]/20 bg-[#0A2745]/60 p-4 text-xs">

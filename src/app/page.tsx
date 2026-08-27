@@ -1,9 +1,11 @@
+import Image from "next/image";
+import Link from "next/link";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { HeroPackages } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/HeroPackages";
 import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/ModernProofFooter";
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
-import { getPublishedEntries, getPublishedPackages } from "@/lib/cms/public";
+import { getPublishedArticles, getPublishedEntries, getPublishedPackages } from "@/lib/cms/public";
 import { SITE_URL } from "@/lib/seo";
 
 const homepageSchema = {
@@ -80,13 +82,15 @@ const homepageSchema = {
 };
 
 export default async function Home() {
-  const [packages, testimonialsData, galleryData, faqData] = await Promise.all([
+  const [packages, testimonialsData, galleryData, faqData, articlesData] = await Promise.all([
     getPublishedPackages(),
     getPublishedEntries("testimonial"),
     getPublishedEntries("gallery"),
     getPublishedEntries("faq"),
+    getPublishedArticles(),
   ]);
   const displayedPackages = packages.slice(0, 10);
+  const articles = articlesData.slice(0, 3);
 
   const testimonials = testimonialsData.slice(0, 15).map((item) => ({
     id: item.id,
@@ -111,6 +115,35 @@ export default async function Home() {
       <JsonLd schema={homepageSchema} />
       <PremiumHeader />
       <HeroPackages packages={displayedPackages} />
+      {articles.length ? (
+        <section id="artikel" className="home-articles-section">
+          <div className="jam-container">
+            <div className="home-articles-head">
+              <div>
+                <span>Artikel & Panduan</span>
+                <h2>Bekal ilmu sebelum berangkat ke Tanah Suci</h2>
+                <p>Informasi ringkas untuk membantu jamaah memahami persiapan, manasik, dan perjalanan umroh dengan lebih tenang.</p>
+              </div>
+              <Link href="/artikel">Lihat semua artikel</Link>
+            </div>
+            <div className="home-articles-grid">
+              {articles.map((article) => (
+                <Link href={`/artikel/${article.slug}`} key={article.id} className="home-article-card">
+                  {article.coverUrl ? (
+                    <div>
+                      <Image src={article.coverUrl} alt={article.title} fill sizes="(min-width: 900px) 33vw, 100vw" />
+                    </div>
+                  ) : null}
+                  <small>PANDUAN UMRAH</small>
+                  <h3>{article.title}</h3>
+                  <p>{article.excerpt}</p>
+                  <span>Baca artikel →</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
       <ModernProofFooter
         testimonials={testimonials.length ? testimonials : undefined}
         gallery={gallery.length ? gallery : undefined}
