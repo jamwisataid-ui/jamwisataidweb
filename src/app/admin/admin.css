@@ -1052,6 +1052,148 @@
   }
 }
 
+/* Dual workspace navigation — CMS and internal operations share one Jam Wisata shell */
+.admin-mode-switch {
+  position: relative;
+  z-index: 1;
+  padding: 16px 4px 0;
+}
+
+.admin-mode-switch > p {
+  margin: 0 8px 8px;
+  color: rgba(255,255,255,.48);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.admin-mode-switch > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  padding: 5px;
+  border: 1px solid rgba(234,211,154,.15);
+  border-radius: 12px;
+  background: rgba(255,255,255,.045);
+}
+
+.admin-mode-switch a {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 8px;
+  color: rgba(235,240,247,.64);
+  font-size: 13px;
+  font-weight: 700;
+  transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+}
+
+.admin-mode-switch a:hover {
+  color: white;
+}
+
+.admin-mode-switch a.active {
+  background: linear-gradient(145deg, #d6b65e, #a9780b);
+  color: var(--admin-navy);
+  box-shadow: 0 7px 18px rgba(0,0,0,.18), inset 0 1px rgba(255,255,255,.42);
+}
+
+.admin-mode-switch svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.8;
+}
+
+.admin-sidebar.is-management .admin-nav {
+  gap: 14px;
+  padding-top: 17px;
+}
+
+.admin-sidebar.is-management .admin-nav section {
+  gap: 4px;
+}
+
+.admin-sidebar.is-management .admin-nav a {
+  min-height: 46px;
+  font-size: 14px;
+}
+
+.admin-management-empty {
+  min-height: clamp(390px, 55vh, 600px);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  overflow: hidden;
+  padding: clamp(36px, 7vw, 84px);
+  text-align: center;
+  background:
+    linear-gradient(rgba(255,254,250,.95), rgba(255,254,250,.95)),
+    repeating-linear-gradient(135deg, rgba(189,141,27,.1) 0 1px, transparent 1px 18px);
+}
+
+.admin-management-empty > span {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  place-items: center;
+  margin-bottom: 22px;
+  border: 1px solid rgba(189,141,27,.22);
+  border-radius: 20px;
+  background: #f5eedc;
+  color: #956a08;
+  box-shadow: 0 12px 32px rgba(7,26,53,.07);
+}
+
+.admin-management-empty > span svg {
+  width: 31px;
+  height: 31px;
+  stroke-width: 1.55;
+}
+
+.admin-management-empty > p {
+  color: #916707;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.admin-management-empty h2 {
+  max-width: 620px;
+  margin: 10px 0 12px;
+  color: var(--admin-navy);
+  font-family: var(--font-cinzel), Georgia, serif;
+  font-size: clamp(23px, 2.5vw, 32px);
+  font-weight: 600;
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.admin-management-empty small {
+  max-width: 650px;
+  color: var(--admin-muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+@media (max-width: 620px) {
+  .admin-mode-switch {
+    padding-top: 14px;
+  }
+
+  .admin-management-empty {
+    min-height: 400px;
+    padding: 42px 20px;
+  }
+
+  .admin-management-empty small {
+    font-size: 14px;
+  }
+}
+
 /* Senior-readable admin typography override */
 .admin-shell { font-size: 18px; }
 
