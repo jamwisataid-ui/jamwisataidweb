@@ -1056,7 +1056,8 @@
 .admin-mode-switch {
   position: relative;
   z-index: 1;
-  padding: 16px 4px 0;
+  padding: 16px 4px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
 }
 
 .admin-mode-switch > p {
@@ -1182,6 +1183,7 @@
 @media (max-width: 620px) {
   .admin-mode-switch {
     padding-top: 14px;
+    padding-bottom: 14px;
   }
 
   .admin-management-empty {
