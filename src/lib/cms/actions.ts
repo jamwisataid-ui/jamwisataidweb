@@ -380,7 +380,7 @@ export async function saveArticleAction(_state: ActionState, formData: FormData)
     if (intent === "draft") {
       const existing = input.id ? await database.query.articles.findFirst({ where: eq(articles.id, input.id) }) : null;
       if (!existing) await database.insert(articles).values({ id, slug: input.slug, title: input.title, excerpt: input.excerpt, content, coverUrl: input.coverUrl || null, status: "draft", createdBy: session.user.id, updatedBy: session.user.id });
-      await database.insert(contentDrafts).values({ entityType: "article", entityId: id, payload: { ...input, content }, updatedBy: session.user.id }).onConflictDoUpdate({ target: [contentDrafts.entityType, contentDrafts.entityId], set: { payload: { ...input, content }, updatedBy: session.user.id, updatedAt: new Date() } });
+      await database.insert(contentDrafts).values({ entityType: "article", entityId: id, payload: { ...input, id, content }, updatedBy: session.user.id }).onConflictDoUpdate({ target: [contentDrafts.entityType, contentDrafts.entityId], set: { payload: { ...input, id, content }, updatedBy: session.user.id, updatedAt: new Date() } });
       await writeAudit(session.user.id, "save-draft", "article", id, `Draft ${input.title} disimpan`);
       return { ok: true, message: "Draft artikel berhasil disimpan.", redirectTo: `/admin/artikel/${id}` };
     }

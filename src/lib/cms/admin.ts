@@ -159,7 +159,7 @@ export async function getArticleAdmin(id: string) {
   const draft = await database.query.contentDrafts.findFirst({ where: and(eq(contentDrafts.entityType, "article"), eq(contentDrafts.entityId, id)) });
   if (draft) {
     const payload = draft.payload;
-    return { ...payload, contentJson: JSON.stringify(payload.content ?? {}, null, 2) };
+    return { ...payload, id, contentJson: JSON.stringify(payload.content ?? {}, null, 2) };
   }
   const article = await database.query.articles.findFirst({ where: eq(articles.id, id) });
   if (!article) return null;
