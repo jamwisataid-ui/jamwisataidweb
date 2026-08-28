@@ -133,11 +133,9 @@ export function PackageForm({ values = {} }: { values?: Values }) {
           <label>
             <span>Bintang hotel Makkah</span>
             <select name="makkahStar" defaultValue={field(values, "makkahStar", "5")} required>
-              <option value="5">★★★★★ — Bintang 5</option>
-              <option value="4">★★★★ — Bintang 4</option>
-              <option value="3">★★★ — Bintang 3</option>
-              <option value="2">★★ — Bintang 2</option>
-              <option value="1">★ — Bintang 1</option>
+              <option value="5">Bintang 5</option>
+              <option value="4">Bintang 4</option>
+              <option value="3">Bintang 3</option>
             </select>
             {error("makkahStar") ? <small className="admin-upload-error">{error("makkahStar")}</small> : null}
           </label>
@@ -149,11 +147,9 @@ export function PackageForm({ values = {} }: { values?: Values }) {
           <label>
             <span>Bintang hotel Madinah</span>
             <select name="madinahStar" defaultValue={field(values, "madinahStar", "4")} required>
-              <option value="5">★★★★★ — Bintang 5</option>
-              <option value="4">★★★★ — Bintang 4</option>
-              <option value="3">★★★ — Bintang 3</option>
-              <option value="2">★★ — Bintang 2</option>
-              <option value="1">★ — Bintang 1</option>
+              <option value="5">Bintang 5</option>
+              <option value="4">Bintang 4</option>
+              <option value="3">Bintang 3</option>
             </select>
             {error("madinahStar") ? <small className="admin-upload-error">{error("madinahStar")}</small> : null}
           </label>

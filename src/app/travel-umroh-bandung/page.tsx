@@ -19,18 +19,13 @@ import {
 } from "lucide-react";
 
 import { JsonLd } from "@/components/seo/JsonLd";
+import { HotelStarRating } from "@/components/HotelStarRating";
 import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/ModernProofFooter";
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
 import { formatIDR, whatsappHref } from "@/data/jamwisata";
 import { getPublishedPackages } from "@/lib/cms/public";
 import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/seo";
-
-function HotelStarBadge({ value }: { value?: number }) {
-  if (!value) return null;
-  const stars = "★★★★★".slice(0, Math.min(Math.max(value, 1), 5));
-  return <span className="inline-flex shrink-0 rounded-full bg-[#F8EFD2] px-2 py-0.5 text-[12px] font-black leading-none tracking-[0.08em] text-[#B8860B]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
-}
 
 export const metadata: Metadata = {
   title: "Travel Umroh Bandung Terpercaya & Berlandaskan Sunnah",
@@ -392,14 +387,14 @@ export default async function TravelUmrohBandungPage() {
                         <Hotel className="size-3.5 text-[#D5A12B] shrink-0" />
                         <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
                           <span className="min-w-0">Makkah: <strong>{pkg.makkahHotel?.name}</strong></span>
-                          <HotelStarBadge value={pkg.makkahHotel?.star} />
+                          <HotelStarRating rating={pkg.makkahHotel?.star} />
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Hotel className="size-3.5 text-[#D5A12B] shrink-0" />
                         <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
                           <span className="min-w-0">Madinah: <strong>{pkg.madinahHotel?.name}</strong></span>
-                          <HotelStarBadge value={pkg.madinahHotel?.star} />
+                          <HotelStarRating rating={pkg.madinahHotel?.star} />
                         </span>
                       </div>
                     </div>

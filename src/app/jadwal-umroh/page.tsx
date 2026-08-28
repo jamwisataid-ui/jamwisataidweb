@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import { JsonLd } from "@/components/seo/JsonLd";
+import { HotelStarRating } from "@/components/HotelStarRating";
 import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/ModernProofFooter";
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
@@ -15,12 +16,6 @@ import { formatIDR, whatsappHref } from "@/data/jamwisata";
 import { getPublishedPackages } from "@/lib/cms/public";
 import type { TravelPackage } from "@/types/jamwisata";
 import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/seo";
-
-function HotelStarBadge({ value }: { value?: number }) {
-  if (!value) return null;
-  const stars = "★★★★★".slice(0, Math.min(Math.max(value, 1), 5));
-  return <span className="ml-1 inline-flex align-baseline rounded-full bg-[#F8EFD2] px-2 py-0.5 text-[12px] font-black leading-none tracking-[0.08em] text-[#B8860B]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
-}
 
 export const metadata: Metadata = {
   title: "Jadwal Keberangkatan Umroh 2026 – 2027 | Jam Wisata",
@@ -159,7 +154,7 @@ export default async function JadwalUmrohPage() {
                     {pkg.name} ({pkg.durationDays} Hari)
                   </h2>
                   <p className="text-xs text-[#59616D]">
-                    Maskapai: <strong>{pkg.airline}</strong> | Hotel Makkah: <strong>{pkg.makkahHotel?.name}<HotelStarBadge value={pkg.makkahHotel?.star} /></strong> | Hotel Madinah: <strong>{pkg.madinahHotel?.name}<HotelStarBadge value={pkg.madinahHotel?.star} /></strong>
+                    Maskapai: <strong>{pkg.airline}</strong> | Hotel Makkah: <strong>{pkg.makkahHotel?.name}</strong> <HotelStarRating rating={pkg.makkahHotel?.star} /> | Hotel Madinah: <strong>{pkg.madinahHotel?.name}</strong> <HotelStarRating rating={pkg.madinahHotel?.star} />
                   </p>
                 </div>
 

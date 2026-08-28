@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
+import { HotelStarRating } from "@/components/HotelStarRating";
 import { formatIDR, whatsappHref } from "@/data/jamwisata";
 import type { TravelPackage } from "@/types/jamwisata";
 
@@ -43,12 +44,6 @@ const monthLabel = (value: string) => {
   const [year, month] = value.split("-").map(Number);
   return new Intl.DateTimeFormat("id-ID", { month: "long", year: "numeric" }).format(new Date(year, month - 1, 1));
 };
-
-function HotelStarBadge({ value }: { value?: number }) {
-  if (!value) return null;
-  const stars = "★★★★★".slice(0, Math.min(Math.max(value, 1), 5));
-  return <span className="inline-flex shrink-0 rounded-full border border-[#F5D97A]/35 bg-[#F5D97A]/12 px-2 py-0.5 text-[12px] font-black leading-none tracking-[0.08em] text-[#F5D97A]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
-}
 
 function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
   const whatsappText =
@@ -101,7 +96,7 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
                 <span className="block text-[10px] uppercase font-bold tracking-wider text-[#D5A12B]">Hotel Makkah</span>
                 <span className="flex items-center justify-between gap-3 font-semibold text-white">
                   <span className="min-w-0">{travelPackage.makkahHotel?.name ?? "Hotel Bintang 5 Makkah"}</span>
-                  <HotelStarBadge value={travelPackage.makkahHotel?.star} />
+                  <HotelStarRating rating={travelPackage.makkahHotel?.star} variant="dark" />
                 </span>
               </div>
             </div>
@@ -113,7 +108,7 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
                 <span className="block text-[10px] uppercase font-bold tracking-wider text-[#D5A12B]">Hotel Madinah</span>
                 <span className="flex items-center justify-between gap-3 font-semibold text-white">
                   <span className="min-w-0">{travelPackage.madinahHotel?.name ?? "Hotel Bintang 5 Madinah"}</span>
-                  <HotelStarBadge value={travelPackage.madinahHotel?.star} />
+                  <HotelStarRating rating={travelPackage.madinahHotel?.star} variant="dark" />
                 </span>
               </div>
             </div>

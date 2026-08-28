@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { JsonLd } from "@/components/seo/JsonLd";
+import { HotelStarRating } from "@/components/HotelStarRating";
 import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/ModernProofFooter";
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
@@ -19,12 +20,6 @@ import { formatIDR, whatsappHref } from "@/data/jamwisata";
 import { getPublishedPackages } from "@/lib/cms/public";
 import type { TravelPackage } from "@/types/jamwisata";
 import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/seo";
-
-function HotelStarBadge({ value }: { value?: number }) {
-  if (!value) return null;
-  const stars = "★★★★★".slice(0, Math.min(Math.max(value, 1), 5));
-  return <span className="inline-flex shrink-0 rounded-full bg-[#F8EFD2] px-2 py-0.5 text-[12px] font-black leading-none tracking-[0.08em] text-[#B8860B]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
-}
 
 export const metadata: Metadata = {
   title: "Paket Umroh 2026 – 2027 All In & Berlandaskan Sunnah",
@@ -217,14 +212,14 @@ export default async function PaketUmrohHubPage() {
                         <Hotel className="size-4 text-[#D5A12B] shrink-0" />
                         <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
                           <span className="min-w-0">Makkah: <strong>{pkg.makkahHotel?.name}</strong></span>
-                          <HotelStarBadge value={pkg.makkahHotel?.star} />
+                          <HotelStarRating rating={pkg.makkahHotel?.star} />
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Hotel className="size-4 text-[#D5A12B] shrink-0" />
                         <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
                           <span className="min-w-0">Madinah: <strong>{pkg.madinahHotel?.name}</strong></span>
-                          <HotelStarBadge value={pkg.madinahHotel?.star} />
+                          <HotelStarRating rating={pkg.madinahHotel?.star} />
                         </span>
                       </div>
                     </div>
@@ -299,8 +294,8 @@ export default async function PaketUmrohHubPage() {
                     <td className="p-4 text-[#59616D]">{pkg.durationDays} Hari</td>
                     <td className="p-4 text-[#59616D] whitespace-nowrap">{pkg.departureDate}</td>
                     <td className="p-4 text-[#59616D]">{pkg.airline}</td>
-                    <td className="p-4 text-[#59616D]">{pkg.makkahHotel?.name}<HotelStarBadge value={pkg.makkahHotel?.star} /></td>
-                    <td className="p-4 text-[#59616D]">{pkg.madinahHotel?.name}<HotelStarBadge value={pkg.madinahHotel?.star} /></td>
+                    <td className="p-4 text-[#59616D]"><span className="flex items-center justify-between gap-3">{pkg.makkahHotel?.name}<HotelStarRating rating={pkg.makkahHotel?.star} /></span></td>
+                    <td className="p-4 text-[#59616D]"><span className="flex items-center justify-between gap-3">{pkg.madinahHotel?.name}<HotelStarRating rating={pkg.madinahHotel?.star} /></span></td>
                     <td className="p-4 font-extrabold text-[#061A2F] whitespace-nowrap">
                       Rp {formatIDR(pkg.priceFrom ?? 0)}
                     </td>
