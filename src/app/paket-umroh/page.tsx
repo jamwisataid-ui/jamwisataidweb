@@ -20,6 +20,12 @@ import { getPublishedPackages } from "@/lib/cms/public";
 import type { TravelPackage } from "@/types/jamwisata";
 import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/seo";
 
+function HotelStarBadge({ value }: { value?: number }) {
+  if (!value) return null;
+  const stars = "★★★★★".slice(0, Math.min(Math.max(value, 1), 5));
+  return <span className="ml-1 inline-flex align-baseline text-[10px] font-bold tracking-[0.08em] text-[#D5A12B]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
+}
+
 export const metadata: Metadata = {
   title: "Paket Umroh 2026 – 2027 All In & Berlandaskan Sunnah",
   description:
@@ -209,11 +215,11 @@ export default async function PaketUmrohHubPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Hotel className="size-4 text-[#D5A12B] shrink-0" />
-                        <span>Makkah: <strong>{pkg.makkahHotel?.name}</strong></span>
+                        <span>Makkah: <strong>{pkg.makkahHotel?.name}<HotelStarBadge value={pkg.makkahHotel?.star} /></strong></span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Hotel className="size-4 text-[#D5A12B] shrink-0" />
-                        <span>Madinah: <strong>{pkg.madinahHotel?.name}</strong></span>
+                        <span>Madinah: <strong>{pkg.madinahHotel?.name}<HotelStarBadge value={pkg.madinahHotel?.star} /></strong></span>
                       </div>
                     </div>
                   </div>
@@ -287,8 +293,8 @@ export default async function PaketUmrohHubPage() {
                     <td className="p-4 text-[#59616D]">{pkg.durationDays} Hari</td>
                     <td className="p-4 text-[#59616D] whitespace-nowrap">{pkg.departureDate}</td>
                     <td className="p-4 text-[#59616D]">{pkg.airline}</td>
-                    <td className="p-4 text-[#59616D]">{pkg.makkahHotel?.name}</td>
-                    <td className="p-4 text-[#59616D]">{pkg.madinahHotel?.name}</td>
+                    <td className="p-4 text-[#59616D]">{pkg.makkahHotel?.name}<HotelStarBadge value={pkg.makkahHotel?.star} /></td>
+                    <td className="p-4 text-[#59616D]">{pkg.madinahHotel?.name}<HotelStarBadge value={pkg.madinahHotel?.star} /></td>
                     <td className="p-4 font-extrabold text-[#061A2F] whitespace-nowrap">
                       Rp {formatIDR(pkg.priceFrom ?? 0)}
                     </td>

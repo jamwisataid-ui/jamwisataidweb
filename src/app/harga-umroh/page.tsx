@@ -17,6 +17,12 @@ import { formatIDR, whatsappHref } from "@/data/jamwisata";
 import { getPublishedPackages } from "@/lib/cms/public";
 import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/seo";
 
+function HotelStarBadge({ value }: { value?: number }) {
+  if (!value) return null;
+  const stars = "★★★★★".slice(0, Math.min(Math.max(value, 1), 5));
+  return <span className="ml-1 inline-flex align-baseline text-[10px] font-bold tracking-[0.08em] text-[#D5A12B]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
+}
+
 export const metadata: Metadata = {
   title: "Biaya & Harga Paket Umroh 2026 – 2027 All In | Jam Wisata",
   description:
@@ -174,10 +180,10 @@ export default async function HargaUmrohPage() {
                       <CheckCircle2 className="size-3.5 text-[#D5A12B]" /> Maskapai: {pkg.airline}
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="size-3.5 text-[#D5A12B]" /> Makkah: {pkg.makkahHotel?.name}
+                      <CheckCircle2 className="size-3.5 text-[#D5A12B]" /> Makkah: {pkg.makkahHotel?.name}<HotelStarBadge value={pkg.makkahHotel?.star} />
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="size-3.5 text-[#D5A12B]" /> Madinah: {pkg.madinahHotel?.name}
+                      <CheckCircle2 className="size-3.5 text-[#D5A12B]" /> Madinah: {pkg.madinahHotel?.name}<HotelStarBadge value={pkg.madinahHotel?.star} />
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle2 className="size-3.5 text-[#D5A12B]" /> Bimbingan Manasik Intensif

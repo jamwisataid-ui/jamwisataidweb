@@ -44,6 +44,12 @@ const monthLabel = (value: string) => {
   return new Intl.DateTimeFormat("id-ID", { month: "long", year: "numeric" }).format(new Date(year, month - 1, 1));
 };
 
+function HotelStarBadge({ value }: { value?: number }) {
+  if (!value) return null;
+  const stars = "★★★★★".slice(0, Math.min(Math.max(value, 1), 5));
+  return <span className="ml-1.5 inline-flex align-baseline text-[10px] font-bold tracking-[0.08em] text-[#F5D97A]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
+}
+
 function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
   const whatsappText =
     travelPackage.whatsappMessage ||
@@ -61,8 +67,8 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
       />
 
       {/* Cinematic Gradient Overlay from Left & Bottom for Superior Readability */}
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,18,36,0.85)_0%,rgba(2,18,36,0.70)_35%,rgba(2,18,36,0.92)_72%,rgba(2,18,36,0.98)_100%)] sm:bg-[linear-gradient(135deg,rgba(2,18,36,0.96)_0%,rgba(2,18,36,0.88)_45%,rgba(2,18,36,0.58)_80%,rgba(2,18,36,0.30)_100%)] transition-opacity duration-500" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,transparent_30%,rgba(2,18,36,0.65)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,18,36,0.58)_0%,rgba(2,18,36,0.42)_35%,rgba(2,18,36,0.76)_72%,rgba(2,18,36,0.88)_100%)] sm:bg-[linear-gradient(135deg,rgba(2,18,36,0.74)_0%,rgba(2,18,36,0.56)_45%,rgba(2,18,36,0.28)_80%,rgba(2,18,36,0.12)_100%)] transition-opacity duration-500" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,transparent_38%,rgba(2,18,36,0.36)_100%)]" />
 
       {/* Content Container (Top to Bottom structure) */}
       <div className="relative z-10 flex flex-col h-full justify-between">
@@ -87,13 +93,13 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
           </h3>
 
           {/* 3. List poin-poin kebawah: Hotel Makkah, Hotel Madinah, Maskapai */}
-          <div className="mt-4 space-y-2.5 rounded-2xl border border-white/12 bg-[#061A2F]/70 p-4 backdrop-blur-md">
+          <div className="mt-4 space-y-2.5 rounded-2xl border border-white/14 bg-[#061A2F]/52 p-4 backdrop-blur-md">
             {/* Hotel Makkah */}
             <div className="flex items-start gap-2.5 text-xs text-slate-200">
               <Hotel className="size-4 shrink-0 text-[#E8C967] mt-0.5" />
               <div className="leading-tight">
                 <span className="block text-[10px] uppercase font-bold tracking-wider text-[#D5A12B]">Hotel Makkah</span>
-                <span className="font-semibold text-white">{travelPackage.makkahHotel?.name ?? "Hotel Bintang 5 Makkah"}</span>
+                <span className="font-semibold text-white">{travelPackage.makkahHotel?.name ?? "Hotel Bintang 5 Makkah"}<HotelStarBadge value={travelPackage.makkahHotel?.star} /></span>
               </div>
             </div>
 
@@ -102,7 +108,7 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
               <Building2 className="size-4 shrink-0 text-[#E8C967] mt-0.5" />
               <div className="leading-tight">
                 <span className="block text-[10px] uppercase font-bold tracking-wider text-[#D5A12B]">Hotel Madinah</span>
-                <span className="font-semibold text-white">{travelPackage.madinahHotel?.name ?? "Hotel Bintang 5 Madinah"}</span>
+                <span className="font-semibold text-white">{travelPackage.madinahHotel?.name ?? "Hotel Bintang 5 Madinah"}<HotelStarBadge value={travelPackage.madinahHotel?.star} /></span>
               </div>
             </div>
 

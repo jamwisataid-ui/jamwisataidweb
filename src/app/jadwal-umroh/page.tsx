@@ -16,6 +16,12 @@ import { getPublishedPackages } from "@/lib/cms/public";
 import type { TravelPackage } from "@/types/jamwisata";
 import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/seo";
 
+function HotelStarBadge({ value }: { value?: number }) {
+  if (!value) return null;
+  const stars = "★★★★★".slice(0, Math.min(Math.max(value, 1), 5));
+  return <span className="ml-1 inline-flex align-baseline text-[10px] font-bold tracking-[0.08em] text-[#D5A12B]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
+}
+
 export const metadata: Metadata = {
   title: "Jadwal Keberangkatan Umroh 2026 – 2027 | Jam Wisata",
   description:
@@ -153,7 +159,7 @@ export default async function JadwalUmrohPage() {
                     {pkg.name} ({pkg.durationDays} Hari)
                   </h2>
                   <p className="text-xs text-[#59616D]">
-                    Maskapai: <strong>{pkg.airline}</strong> | Hotel Makkah: <strong>{pkg.makkahHotel?.name}</strong> | Hotel Madinah: <strong>{pkg.madinahHotel?.name}</strong>
+                    Maskapai: <strong>{pkg.airline}</strong> | Hotel Makkah: <strong>{pkg.makkahHotel?.name}<HotelStarBadge value={pkg.makkahHotel?.star} /></strong> | Hotel Madinah: <strong>{pkg.madinahHotel?.name}<HotelStarBadge value={pkg.madinahHotel?.star} /></strong>
                   </p>
                 </div>
 

@@ -26,6 +26,12 @@ import { formatIDR, whatsappHref } from "@/data/jamwisata";
 import { getPublishedPackages } from "@/lib/cms/public";
 import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/seo";
 
+function HotelStarBadge({ value }: { value?: number }) {
+  if (!value) return null;
+  const stars = "★★★★★".slice(0, Math.min(Math.max(value, 1), 5));
+  return <span className="ml-1 inline-flex align-baseline text-[10px] font-bold tracking-[0.08em] text-[#D5A12B]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
+}
+
 export const metadata: Metadata = {
   title: "Travel Umroh Bandung Terpercaya & Berlandaskan Sunnah",
   description:
@@ -384,7 +390,11 @@ export default async function TravelUmrohBandungPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Hotel className="size-3.5 text-[#D5A12B] shrink-0" />
-                        <span>Makkah: <strong>{pkg.makkahHotel?.name}</strong></span>
+                        <span>Makkah: <strong>{pkg.makkahHotel?.name}<HotelStarBadge value={pkg.makkahHotel?.star} /></strong></span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Hotel className="size-3.5 text-[#D5A12B] shrink-0" />
+                        <span>Madinah: <strong>{pkg.madinahHotel?.name}<HotelStarBadge value={pkg.madinahHotel?.star} /></strong></span>
                       </div>
                     </div>
                   </div>

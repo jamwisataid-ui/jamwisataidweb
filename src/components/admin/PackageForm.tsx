@@ -20,8 +20,8 @@ const preservedFields = [
   ["seoTitle", ""], ["seoDescription", ""], ["returnDate", ""],
   ["manasikDate", ""], ["departureAirport", "Jakarta"], ["arrivalAirport", ""],
   ["capacity", ""], ["availableSeats", ""], ["departureStatus", "open"],
-  ["makkahStar", "5"], ["makkahDistance", ""], ["madinahStar", "4"],
-  ["madinahDistance", ""], ["facilities", ""], ["highlights", ""],
+  ["makkahDistance", ""], ["madinahDistance", ""],
+  ["facilities", ""], ["highlights", ""],
   ["includes", ""], ["excludes", ""], ["terms", ""],
   ["destinations", ""], ["itinerary", "[]"],
 ] as const;
@@ -131,9 +131,31 @@ export function PackageForm({ values = {} }: { values?: Values }) {
             {error("makkahHotel") ? <small className="admin-upload-error">{error("makkahHotel")}</small> : null}
           </label>
           <label>
+            <span>Bintang hotel Makkah</span>
+            <select name="makkahStar" defaultValue={field(values, "makkahStar", "5")} required>
+              <option value="5">★★★★★ — Bintang 5</option>
+              <option value="4">★★★★ — Bintang 4</option>
+              <option value="3">★★★ — Bintang 3</option>
+              <option value="2">★★ — Bintang 2</option>
+              <option value="1">★ — Bintang 1</option>
+            </select>
+            {error("makkahStar") ? <small className="admin-upload-error">{error("makkahStar")}</small> : null}
+          </label>
+          <label>
             <span>Hotel Madinah</span>
             <input name="madinahHotel" defaultValue={field(values, "madinahHotel")} placeholder="Nama hotel di Madinah" required />
             {error("madinahHotel") ? <small className="admin-upload-error">{error("madinahHotel")}</small> : null}
+          </label>
+          <label>
+            <span>Bintang hotel Madinah</span>
+            <select name="madinahStar" defaultValue={field(values, "madinahStar", "4")} required>
+              <option value="5">★★★★★ — Bintang 5</option>
+              <option value="4">★★★★ — Bintang 4</option>
+              <option value="3">★★★ — Bintang 3</option>
+              <option value="2">★★ — Bintang 2</option>
+              <option value="1">★ — Bintang 1</option>
+            </select>
+            {error("madinahStar") ? <small className="admin-upload-error">{error("madinahStar")}</small> : null}
           </label>
           <label className="admin-span-2">
             <span>Harga per jamaah (All In)</span>
