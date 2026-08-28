@@ -64,7 +64,7 @@ export function AdminSidebar({ name, email }: { name: string; email: string }) {
         <button type="button" aria-label={open ? "Tutup menu" : "Buka menu"} aria-expanded={open} onClick={() => setOpen((value) => !value)}>{open ? <X /> : <Menu />}</button>
       </header>
       {open ? <button className="admin-sidebar-backdrop" aria-label="Tutup menu" onClick={() => setOpen(false)} /> : null}
-      <aside className={`admin-sidebar ${managementMode ? "is-management" : ""} ${open ? "is-open" : ""}`}>
+      <aside className={`admin-sidebar ${open ? "is-open" : ""}`}>
       <button className="admin-sidebar-close" type="button" aria-label="Tutup menu" onClick={() => setOpen(false)}><X /></button>
       <div className="admin-brand">
         <Image src="/images/admin-logo.webp" alt="Jam Wisata" width={640} height={278} priority />

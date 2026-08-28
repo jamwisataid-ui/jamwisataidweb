@@ -1123,20 +1123,6 @@
   margin-top: 0;
 }
 
-.admin-sidebar.is-management .admin-nav {
-  gap: 14px;
-  padding-top: 17px;
-}
-
-.admin-sidebar.is-management .admin-nav section {
-  gap: 4px;
-}
-
-.admin-sidebar.is-management .admin-nav a {
-  min-height: 46px;
-  font-size: 14px;
-}
-
 .admin-management-empty {
   min-height: clamp(390px, 55vh, 600px);
   display: grid;
@@ -1736,56 +1722,56 @@
   }
 }
 
-/* Keep the shorter CMS navigation fully visible on standard desktop heights. */
+/* Keep both dashboard modes visually identical and efficient on desktop. */
 @media (min-width: 881px) {
-  .admin-sidebar:not(.is-management) .admin-brand {
+  .admin-sidebar .admin-brand {
     gap: 6px;
     padding-bottom: 12px;
   }
 
-  .admin-sidebar:not(.is-management) .admin-brand img {
+  .admin-sidebar .admin-brand img {
     width: 180px;
   }
 
-  .admin-sidebar:not(.is-management) .admin-mode-switch {
+  .admin-sidebar .admin-mode-switch {
     padding-block: 10px;
   }
 
-  .admin-sidebar:not(.is-management) .admin-mode-switch > p {
+  .admin-sidebar .admin-mode-switch > p {
     margin-bottom: 6px;
   }
 
-  .admin-sidebar:not(.is-management) .admin-mode-switch a {
+  .admin-sidebar .admin-mode-switch a {
     min-height: 38px;
   }
 
-  .admin-sidebar:not(.is-management) .admin-nav {
+  .admin-sidebar .admin-nav {
     gap: 10px;
     padding-block: 12px 8px;
   }
 
-  .admin-sidebar:not(.is-management) .admin-nav section {
+  .admin-sidebar .admin-nav section {
     gap: 3px;
   }
 
-  .admin-sidebar:not(.is-management) .admin-nav section > p {
+  .admin-sidebar .admin-nav section > p {
     margin-bottom: 4px;
   }
 
-  .admin-sidebar:not(.is-management) .admin-nav a {
+  .admin-sidebar .admin-nav a {
     min-height: 44px;
   }
 
-  .admin-sidebar:not(.is-management) .admin-sidebar-utility {
+  .admin-sidebar .admin-sidebar-utility {
     gap: 4px;
     padding-top: 10px;
   }
 
-  .admin-sidebar:not(.is-management) .admin-sidebar-utility a {
+  .admin-sidebar .admin-sidebar-utility a {
     min-height: 44px;
   }
 
-  .admin-sidebar:not(.is-management) .admin-profile {
+  .admin-sidebar .admin-profile {
     margin-top: 9px;
     padding-top: 11px;
   }
