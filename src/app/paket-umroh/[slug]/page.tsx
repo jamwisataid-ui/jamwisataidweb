@@ -29,7 +29,7 @@ interface Props {
 function HotelStarBadge({ value }: { value?: number }) {
   if (!value) return null;
   const stars = "★★★★★".slice(0, Math.min(Math.max(value, 1), 5));
-  return <span className="ml-1.5 inline-flex align-baseline text-[11px] font-bold tracking-[0.08em] text-[#F5D97A]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
+  return <span className="inline-flex shrink-0 rounded-full border border-[#F5D97A]/35 bg-[#F5D97A]/12 px-2 py-0.5 text-[12px] font-black leading-none tracking-[0.08em] text-[#F5D97A]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
 }
 
 export async function generateStaticParams() {
@@ -352,11 +352,11 @@ export default async function PackageDetailPage({ params }: Props) {
                   </div>
                   <div className="flex justify-between py-1 border-b border-white/5">
                     <span className="text-slate-400">Hotel Makkah</span>
-                    <span className="font-semibold text-white">{pkg.makkahHotel?.name}<HotelStarBadge value={pkg.makkahHotel?.star} /></span>
+                    <span className="ml-4 flex min-w-0 items-center justify-end gap-3 text-right font-semibold text-white"><span>{pkg.makkahHotel?.name}</span><HotelStarBadge value={pkg.makkahHotel?.star} /></span>
                   </div>
                   <div className="flex justify-between py-1">
                     <span className="text-slate-400">Hotel Madinah</span>
-                    <span className="font-semibold text-white">{pkg.madinahHotel?.name}<HotelStarBadge value={pkg.madinahHotel?.star} /></span>
+                    <span className="ml-4 flex min-w-0 items-center justify-end gap-3 text-right font-semibold text-white"><span>{pkg.madinahHotel?.name}</span><HotelStarBadge value={pkg.madinahHotel?.star} /></span>
                   </div>
                 </div>
 

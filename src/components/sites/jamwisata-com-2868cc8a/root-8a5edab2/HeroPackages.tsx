@@ -47,7 +47,7 @@ const monthLabel = (value: string) => {
 function HotelStarBadge({ value }: { value?: number }) {
   if (!value) return null;
   const stars = "★★★★★".slice(0, Math.min(Math.max(value, 1), 5));
-  return <span className="ml-1.5 inline-flex align-baseline text-[10px] font-bold tracking-[0.08em] text-[#F5D97A]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
+  return <span className="inline-flex shrink-0 rounded-full border border-[#F5D97A]/35 bg-[#F5D97A]/12 px-2 py-0.5 text-[12px] font-black leading-none tracking-[0.08em] text-[#F5D97A]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
 }
 
 function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
@@ -97,18 +97,24 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
             {/* Hotel Makkah */}
             <div className="flex items-start gap-2.5 text-xs text-slate-200">
               <Hotel className="size-4 shrink-0 text-[#E8C967] mt-0.5" />
-              <div className="leading-tight">
+              <div className="min-w-0 flex-1 leading-tight">
                 <span className="block text-[10px] uppercase font-bold tracking-wider text-[#D5A12B]">Hotel Makkah</span>
-                <span className="font-semibold text-white">{travelPackage.makkahHotel?.name ?? "Hotel Bintang 5 Makkah"}<HotelStarBadge value={travelPackage.makkahHotel?.star} /></span>
+                <span className="flex items-center justify-between gap-3 font-semibold text-white">
+                  <span className="min-w-0">{travelPackage.makkahHotel?.name ?? "Hotel Bintang 5 Makkah"}</span>
+                  <HotelStarBadge value={travelPackage.makkahHotel?.star} />
+                </span>
               </div>
             </div>
 
             {/* Hotel Madinah */}
             <div className="flex items-start gap-2.5 text-xs text-slate-200">
               <Building2 className="size-4 shrink-0 text-[#E8C967] mt-0.5" />
-              <div className="leading-tight">
+              <div className="min-w-0 flex-1 leading-tight">
                 <span className="block text-[10px] uppercase font-bold tracking-wider text-[#D5A12B]">Hotel Madinah</span>
-                <span className="font-semibold text-white">{travelPackage.madinahHotel?.name ?? "Hotel Bintang 5 Madinah"}<HotelStarBadge value={travelPackage.madinahHotel?.star} /></span>
+                <span className="flex items-center justify-between gap-3 font-semibold text-white">
+                  <span className="min-w-0">{travelPackage.madinahHotel?.name ?? "Hotel Bintang 5 Madinah"}</span>
+                  <HotelStarBadge value={travelPackage.madinahHotel?.star} />
+                </span>
               </div>
             </div>
 

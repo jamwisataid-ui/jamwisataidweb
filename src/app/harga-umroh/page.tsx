@@ -20,7 +20,7 @@ import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/se
 function HotelStarBadge({ value }: { value?: number }) {
   if (!value) return null;
   const stars = "★★★★★".slice(0, Math.min(Math.max(value, 1), 5));
-  return <span className="ml-1 inline-flex align-baseline text-[10px] font-bold tracking-[0.08em] text-[#D5A12B]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
+  return <span className="ml-auto inline-flex shrink-0 rounded-full bg-[#F8EFD2] px-2 py-0.5 text-[12px] font-black leading-none tracking-[0.08em] text-[#B8860B]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
 }
 
 export const metadata: Metadata = {
@@ -180,10 +180,10 @@ export default async function HargaUmrohPage() {
                       <CheckCircle2 className="size-3.5 text-[#D5A12B]" /> Maskapai: {pkg.airline}
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="size-3.5 text-[#D5A12B]" /> Makkah: {pkg.makkahHotel?.name}<HotelStarBadge value={pkg.makkahHotel?.star} />
+                      <CheckCircle2 className="size-3.5 text-[#D5A12B]" /> <span className="min-w-0">Makkah: {pkg.makkahHotel?.name}</span><HotelStarBadge value={pkg.makkahHotel?.star} />
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="size-3.5 text-[#D5A12B]" /> Madinah: {pkg.madinahHotel?.name}<HotelStarBadge value={pkg.madinahHotel?.star} />
+                      <CheckCircle2 className="size-3.5 text-[#D5A12B]" /> <span className="min-w-0">Madinah: {pkg.madinahHotel?.name}</span><HotelStarBadge value={pkg.madinahHotel?.star} />
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle2 className="size-3.5 text-[#D5A12B]" /> Bimbingan Manasik Intensif

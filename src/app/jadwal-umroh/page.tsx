@@ -19,7 +19,7 @@ import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/se
 function HotelStarBadge({ value }: { value?: number }) {
   if (!value) return null;
   const stars = "★★★★★".slice(0, Math.min(Math.max(value, 1), 5));
-  return <span className="ml-1 inline-flex align-baseline text-[10px] font-bold tracking-[0.08em] text-[#D5A12B]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
+  return <span className="ml-1 inline-flex align-baseline rounded-full bg-[#F8EFD2] px-2 py-0.5 text-[12px] font-black leading-none tracking-[0.08em] text-[#B8860B]" aria-label={`hotel bintang ${value}`}>{stars}</span>;
 }
 
 export const metadata: Metadata = {
