@@ -83,8 +83,10 @@ export function AdminSidebar({ name, email }: { name: string; email: string }) {
           return <Link onClick={() => setOpen(false)} key={href} href={href} className={active ? "active" : ""}><Icon aria-hidden /><span>{label}</span>{active ? <i /> : null}</Link>;
         })}</section>)}
       </nav>
-      <Link className="admin-account-link" onClick={() => setOpen(false)} href="/admin/ganti-password"><KeyRound aria-hidden /><span>Ganti kata sandi</span></Link>
-      <a className="admin-view-site" href="/" target="_blank" rel="noreferrer"><SquareArrowOutUpRight aria-hidden /><span>Buka website</span></a>
+      <div className="admin-sidebar-utility">
+        <Link className="admin-account-link" onClick={() => setOpen(false)} href="/admin/ganti-password"><KeyRound aria-hidden /><span>Ganti kata sandi</span></Link>
+        <a className="admin-view-site" href="/" target="_blank" rel="noreferrer"><SquareArrowOutUpRight aria-hidden /><span>Buka website</span></a>
+      </div>
       <div className="admin-profile">
         <span>{name.slice(0, 1).toUpperCase()}</span>
         <div><strong>{name}</strong><small>{email}</small></div>
