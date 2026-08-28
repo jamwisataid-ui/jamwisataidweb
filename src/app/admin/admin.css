@@ -1108,6 +1108,17 @@
   stroke-width: 1.8;
 }
 
+.admin-account-link::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: rgba(255,255,255,.1);
+  pointer-events: none;
+}
+
 .admin-sidebar.is-management .admin-nav {
   gap: 14px;
   padding-top: 17px;
