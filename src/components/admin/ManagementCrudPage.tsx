@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangle, Download, ExternalLink } from "lucide-react";
+import { AlertTriangle, CheckCircle2, CircleAlert, Download } from "lucide-react";
 
 import type { getManagementContext } from "@/lib/management/data";
 import { rupiah } from "@/lib/management/domain";
@@ -21,6 +21,7 @@ import {
   StockForm,
 } from "./ManagementForms";
 import { PilgrimDocumentUpload } from "./PilgrimDocumentUpload";
+import { PrivateDocumentPreview } from "./PrivateDocumentPreview";
 
 type Context = Awaited<ReturnType<typeof getManagementContext>>;
 
@@ -32,7 +33,6 @@ const labels: Record<string, string> = {
   "agen-referral": "Agen & Referral",
   stok: "Stok Perlengkapan",
   "manifest-room-list": "Manifest & Room List",
-  dokumen: "Dokumen Jamaah",
   "invoice-kwitansi": "Invoice & Kwitansi",
 };
 
@@ -46,6 +46,32 @@ function DetailGrid({ rows }: { rows: Array<[string, React.ReactNode]> }) {
 
 function DateText({ value }: { value: Date | string | null | undefined }) {
   return <>{value ? new Intl.DateTimeFormat("id-ID", { dateStyle: "long", timeZone: "Asia/Jakarta" }).format(new Date(value)) : "—"}</>;
+}
+
+function PilgrimValue({ children }: { children: React.ReactNode }) {
+  return children ? <>{children}</> : <span className="management-missing-value">Belum diisi</span>;
+}
+
+function PilgrimDocumentChecklist({ documents }: { documents: Context["pilgrimDocuments"] }) {
+  const requirements = [
+    ["ktp", "KTP", "Wajib"],
+    ["kk", "Kartu Keluarga", "Wajib"],
+    ["akta_lahir", "Akta Lahir", "Minimal salah satu dokumen pendukung"],
+    ["buku_nikah", "Buku Nikah", "Minimal salah satu dokumen pendukung"],
+    ["ijazah", "Ijazah", "Minimal salah satu dokumen pendukung"],
+    ["paspor", "Paspor", "Lengkapi saat sudah tersedia"],
+  ] as const;
+  const supportingComplete = documents.some((document) => ["akta_lahir", "buku_nikah", "ijazah"].includes(document.kind));
+  const additional = documents.filter((document) => document.kind === "other");
+  return <div className="management-document-checklist">
+    <div className={`management-document-group-status ${supportingComplete ? "complete" : "missing"}`}>{supportingComplete ? <CheckCircle2 /> : <CircleAlert />}<span><strong>Dokumen pendukung</strong><small>{supportingComplete ? "Syarat minimal Akta Lahir, Buku Nikah, atau Ijazah sudah terpenuhi." : "Belum ada. Upload minimal salah satu: Akta Lahir, Buku Nikah, atau Ijazah."}</small></span></div>
+    {requirements.map(([kind, label, note]) => {
+      const matches = documents.filter((document) => document.kind === kind);
+      const document = matches[0];
+      return <div className={`management-document-check ${document ? "complete" : "missing"}`} key={kind}><span className="management-document-check-icon">{document ? <CheckCircle2 /> : <CircleAlert />}</span><span><strong>{label}</strong><small>{document ? `${document.originalName}${matches.length > 1 ? ` · ${matches.length} file` : ""}` : note}</small></span>{document ? <div className="management-document-check-actions"><PrivateDocumentPreview id={document.id} name={document.originalName} mimeType={document.mimeType} /><a href={`/api/admin/management/documents/${document.id}`}><Download /> Download</a></div> : <i>Belum diunggah</i>}</div>;
+    })}
+    {additional.map((document) => <div className="management-document-check complete" key={document.id}><span className="management-document-check-icon"><CheckCircle2 /></span><span><strong>Dokumen tambahan</strong><small>{document.originalName}</small></span><div className="management-document-check-actions"><PrivateDocumentPreview id={document.id} name={document.originalName} mimeType={document.mimeType} /><a href={`/api/admin/management/documents/${document.id}`}><Download /> Download</a></div></div>)}
+  </div>;
 }
 
 export function ManagementCreatePage({ module, data, kind }: { module: string; data: Context; kind?: string }) {
@@ -64,7 +90,6 @@ export function ManagementCreatePage({ module, data, kind }: { module: string; d
   if (module === "stok" && kind === "pergerakan") return <>{header}<Panel title="Pergerakan stok"><StockForm items={data.inventory.filter((item) => item.status === "active").map(({ id, name, currentStock }) => ({ id, name, currentStock }))} /></Panel></>;
   if (module === "stok") return <>{header}<Panel title="Barang baru"><InventoryItemForm /></Panel></>;
   if (module === "manifest-room-list") return <>{header}<Panel title="Atur kamar jamaah"><RoomListForm registrations={data.registrations.map((item) => ({ id: item.id, pilgrimName: item.pilgrim?.fullName ?? "Jamaah", gender: item.pilgrim?.gender ?? null, packageName: item.package?.name ?? "Paket" }))} /></Panel></>;
-  if (module === "dokumen") return <>{header}<Panel title="Upload dokumen"><PilgrimDocumentUpload pilgrims={data.pilgrims.filter((item) => item.status === "active").map(({ id, fullName }) => ({ id, fullName }))} /></Panel></>;
   if (module === "invoice-kwitansi") return <>{header}<div className="management-settings-grid"><Panel title="Format nomor invoice"><SequenceForm kind="invoice" /></Panel><Panel title="Format nomor kwitansi"><SequenceForm kind="receipt" /></Panel></div><Panel title="Pilih transaksi"><div className="management-document-actions">{data.bookings.map((booking) => <article key={booking.id}><span><strong>{booking.bookingNumber} · {booking.payerName}</strong><small>{String(booking.packageSnapshot.name ?? "Paket")} · {booking.registrations.length} jamaah</small></span><div><IssueDocumentButton kind="invoice" bookingId={booking.id} />{data.payments.filter((payment) => payment.bookingId === booking.id && payment.status === "confirmed").map((payment) => <IssueDocumentButton key={payment.id} kind="receipt" bookingId={booking.id} paymentId={payment.id} />)}</div></article>)}</div></Panel></>;
   return <>{header}<div className="management-warning"><AlertTriangle /><span>Modul ini tidak memiliki form tambah data.</span></div></>;
 }
@@ -73,9 +98,12 @@ export function ManagementDetailPage({ module, id, data }: { module: string; id:
   const backHref = `/admin/manajemen/${module}`;
   if (module === "jamaah") {
     const item = data.pilgrims.find((row) => row.id === id); if (!item) return null;
-    const docs = data.pilgrimDocuments.filter((row) => row.pilgrimId === id);
+    const docs = data.pilgrimDocuments.filter((row) => row.pilgrimId === id && row.reviewStatus !== "rejected");
     const history = data.registrations.filter((row) => row.pilgrimId === id);
-    return <><AdminPageHeader eyebrow="DETAIL JAMAAH" title={item.fullName} description="Edit profil, lihat dokumen, paket, dan riwayat pembayaran jamaah." backHref={backHref} /><Panel title="Edit data jamaah"><PilgrimForm values={item} /></Panel><div className="management-detail-columns"><Panel title={`Dokumen (${docs.length})`}><div className="management-mini-list">{docs.map((doc) => <a key={doc.id} href={`/api/admin/management/documents/${doc.id}`}><span><strong>{doc.kind.replaceAll("_", " ")}</strong><small>{doc.originalName}</small></span><ExternalLink /></a>)}</div><Link className="management-secondary-link" href={`/admin/manajemen/dokumen/${item.id}`}>Kelola dokumen</Link></Panel><Panel title={`Riwayat paket (${history.length})`}><div className="management-mini-list">{history.map((row) => <Link key={row.id} href={`/admin/manajemen/keberangkatan/${row.bookingId}`}><span><strong>{row.package?.name}</strong><small>{row.booking?.bookingNumber} · {row.payment.status}</small></span><strong>{rupiah(row.payment.outstanding)}</strong></Link>)}</div></Panel></div><RecordStatusForm entity="pilgrim" id={item.id} status={item.status} /></>;
+    const kinds = new Set(docs.map((doc) => doc.kind));
+    const documentsComplete = kinds.has("ktp") && kinds.has("kk") && (kinds.has("akta_lahir") || kinds.has("buku_nikah") || kinds.has("ijazah"));
+    const missingFields = [item.email, item.gender, item.birthDate, item.passportNumber, item.passportExpiry].filter((value) => !value).length;
+    return <><AdminPageHeader eyebrow="DETAIL JAMAAH" title={item.fullName} description="Data pribadi, dokumen, paket, dan pembayaran jamaah tersimpan dalam satu halaman." backHref={backHref} actions={[{ href: `/admin/manajemen/jamaah/${item.id}/edit`, label: "Edit data", secondary: true, icon: "edit" }, { href: `/admin/manajemen/jamaah/${item.id}/dokumen/baru`, label: "Upload dokumen", icon: "upload" }]} /><Panel title="Data pribadi" description={missingFields ? `${missingFields} data masih belum diisi dan perlu dilengkapi.` : "Semua data utama jamaah sudah diisi."}><DetailGrid rows={[["Nama lengkap", <PilgrimValue key="name">{item.fullName}</PilgrimValue>], ["WhatsApp", <PilgrimValue key="whatsapp">{item.whatsapp}</PilgrimValue>], ["Email", <PilgrimValue key="email">{item.email}</PilgrimValue>], ["Jenis kelamin", <PilgrimValue key="gender">{item.gender}</PilgrimValue>], ["Tanggal lahir", item.birthDate ? <DateText key="birth" value={item.birthDate} /> : <PilgrimValue key="birth-missing">{null}</PilgrimValue>], ["Kewarganegaraan", <PilgrimValue key="nationality">{item.nationality}</PilgrimValue>], ["Nomor paspor", <PilgrimValue key="passport-number">{item.passportNumber}</PilgrimValue>], ["Masa berlaku paspor", item.passportExpiry ? <DateText key="passport" value={item.passportExpiry} /> : <PilgrimValue key="passport-missing">{null}</PilgrimValue>], ["Status data", item.status === "active" ? "Aktif" : "Diarsipkan"], ["Catatan", <PilgrimValue key="notes">{item.notes}</PilgrimValue>]]} /></Panel><Panel title={`Kelengkapan dokumen (${docs.length} file)`} description={documentsComplete ? "KTP, KK, dan dokumen pendukung minimal sudah lengkap." : "Item berwarna merah menunjukkan dokumen yang perlu ditagih ke jamaah."}><PilgrimDocumentChecklist documents={docs} /></Panel><Panel title={`Riwayat paket & pembayaran (${history.length})`}>{history.length ? <div className="management-mini-list">{history.map((row) => <Link key={row.id} href={`/admin/manajemen/keberangkatan/${row.bookingId}`}><span><strong>{row.package?.name}</strong><small>{row.booking?.bookingNumber} · {row.payment.status} · terbayar {rupiah(row.payment.netPaid)}</small></span><strong>Sisa {rupiah(row.payment.outstanding)}</strong></Link>)}</div> : <p className="management-form-note">Jamaah ini belum terdaftar pada paket keberangkatan.</p>}</Panel></>;
   }
   if (module === "keberangkatan") {
     const item = data.bookings.find((row) => row.id === id); if (!item) return null;
@@ -106,13 +134,22 @@ export function ManagementDetailPage({ module, id, data }: { module: string; id:
     const item = data.registrations.find((row) => row.id === id); if (!item) return null;
     return <><AdminPageHeader eyebrow="ATUR ROOM LIST" title={item.pilgrim?.fullName ?? "Jamaah"} description={`${item.package?.name ?? "Paket"} · ${item.pilgrim?.gender ?? "Jenis kelamin belum diisi"}`} backHref={backHref} /><Panel title="Penempatan kamar"><RoomListForm registrations={[{ id: item.id, pilgrimName: item.pilgrim?.fullName ?? "Jamaah", gender: item.pilgrim?.gender ?? null, packageName: item.package?.name ?? "Paket" }]} /></Panel></>;
   }
-  if (module === "dokumen") {
-    const pilgrim = data.pilgrims.find((row) => row.id === id); if (!pilgrim) return null; const docs = data.pilgrimDocuments.filter((row) => row.pilgrimId === id);
-    return <><AdminPageHeader eyebrow="DOKUMEN JAMAAH" title={pilgrim.fullName} description="Dokumen tersimpan privat dan link download akan kedaluwarsa otomatis." backHref={backHref} /><Panel title="Upload dokumen baru"><PilgrimDocumentUpload pilgrims={[{ id: pilgrim.id, fullName: pilgrim.fullName }]} /></Panel><Panel title={`File tersimpan (${docs.length})`}><div className="management-report-links">{docs.map((doc) => <div key={doc.id}><span><strong>{doc.kind.replaceAll("_", " ")}</strong><small>{doc.originalName} · {doc.reviewStatus}</small></span><a href={`/api/admin/management/documents/${doc.id}`}><Download /> Download</a></div>)}</div></Panel></>;
-  }
   if (module === "invoice-kwitansi") {
     const item = data.documents.find((row) => row.id === id); if (!item) return null;
     return <><AdminPageHeader eyebrow="DETAIL DOKUMEN" title={item.number} description="PDF ini memakai snapshot transaksi saat diterbitkan sehingga tidak berubah." backHref={backHref} /><Panel title={item.kind === "invoice" ? "Invoice" : "Kwitansi"}><DetailGrid rows={[["Nomor", item.number], ["Jenis", item.kind === "invoice" ? "Invoice" : "Kwitansi"], ["Tanggal terbit", <DateText key="date" value={item.issuedAt} />], ["Status", item.status]]} /><a className="management-create-link" href={`/api/admin/management/issued-documents/${item.id}`}><Download /> Download PDF</a></Panel></>;
   }
   return null;
+}
+
+export function ManagementPilgrimEditPage({ id, data }: { id: string; data: Context }) {
+  const item = data.pilgrims.find((row) => row.id === id);
+  if (!item) return null;
+  const detailHref = `/admin/manajemen/jamaah/${item.id}`;
+  return <><AdminPageHeader eyebrow="EDIT JAMAAH" title={item.fullName} description="Perbarui data jamaah pada form ini. Dokumen dikelola dari halaman detail jamaah." backHref={detailHref} /><Panel title="Edit data jamaah"><PilgrimForm values={item} /></Panel><RecordStatusForm entity="pilgrim" id={item.id} status={item.status} /></>;
+}
+
+export function ManagementPilgrimDocumentCreatePage({ id, data }: { id: string; data: Context }) {
+  const item = data.pilgrims.find((row) => row.id === id);
+  if (!item) return null;
+  return <><AdminPageHeader eyebrow="UPLOAD DOKUMEN" title={item.fullName} description="Pilih jenis dan file dokumen. Setelah tersimpan, Anda akan kembali ke detail jamaah." backHref={`/admin/manajemen/jamaah/${item.id}`} /><Panel title="Dokumen baru"><PilgrimDocumentUpload pilgrims={[{ id: item.id, fullName: item.fullName }]} /></Panel></>;
 }

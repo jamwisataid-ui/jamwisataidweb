@@ -6,12 +6,6 @@ export const managementModules = [
     description: "Profil jamaah, paket yang diikuti, status pembayaran, dan seluruh riwayatnya akan dikelola dari halaman ini.",
   },
   {
-    slug: "dokumen",
-    title: "Dokumen Jamaah",
-    eyebrow: "KELENGKAPAN DOKUMEN",
-    description: "Pantau kelengkapan, verifikasi, dan riwayat dokumen setiap jamaah dalam satu tempat.",
-  },
-  {
     slug: "keberangkatan",
     title: "Keberangkatan",
     eyebrow: "OPERASIONAL PERJALANAN",

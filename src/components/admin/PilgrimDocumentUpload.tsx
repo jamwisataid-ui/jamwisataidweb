@@ -107,7 +107,7 @@ export function PilgrimDocumentUpload({ pilgrims }: { pilgrims: Array<{ id: stri
       window.localStorage.removeItem(DRAFT_KEY);
       if (inputRef.current) inputRef.current.value = "";
       toast.success("Dokumen berhasil diunggah.");
-      router.replace(`/admin/manajemen/dokumen/${pilgrimId}`);
+      router.replace(`/admin/manajemen/jamaah/${pilgrimId}`);
       router.refresh();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Upload gagal. File belum tersimpan.";

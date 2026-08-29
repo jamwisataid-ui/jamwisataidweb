@@ -2028,6 +2028,50 @@
 .management-detail-grid > div:nth-child(odd) { border-right: 1px solid #e3ded2; }
 .management-detail-grid dt { margin-bottom: 5px; color: #747b89; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
 .management-detail-grid dd { margin: 0; color: #0b2344; font-size: 16px; font-weight: 700; overflow-wrap: anywhere; }
+.management-missing-value { display: inline-flex; align-items: center; padding: 5px 9px; border-radius: 999px; background: #fff0ed; color: #a43127; font-size: 12px; font-weight: 750; }
+.management-clickable-row { position: relative; cursor: pointer; transition: background .18s ease; }
+.management-clickable-row:hover { background: #fffaf0; }
+.management-row-main { color: inherit; text-decoration: none; }
+.management-row-main::after { position: absolute; z-index: 1; inset: 0; content: ""; }
+.management-clickable-row .management-row-link { text-decoration: none; }
+.management-document-checklist { display: grid; gap: 10px; margin-top: 16px; }
+.management-document-group-status { display: flex; align-items: flex-start; gap: 11px; padding: 13px 14px; border-radius: 10px; }
+.management-document-group-status.complete { background: #edf8f1; color: #236a3e; }
+.management-document-group-status.missing { background: #fff3ef; color: #9f3028; }
+.management-document-group-status > svg { width: 20px; flex: 0 0 auto; }
+.management-document-group-status span { display: grid; gap: 3px; }
+.management-document-group-status small { font-size: 12px; font-weight: 550; line-height: 1.45; }
+.management-document-check { display: grid; grid-template-columns: 28px minmax(180px,1fr) auto; align-items: center; gap: 12px; min-height: 68px; padding: 11px 13px; border: 1px solid #e1ddd4; border-radius: 10px; background: #fff; }
+.management-document-check.missing { border-color: #ecc9c3; background: #fffafa; }
+.management-document-check-icon { display: grid; place-items: center; color: #25804a; }
+.management-document-check.missing .management-document-check-icon { color: #b43a30; }
+.management-document-check-icon svg { width: 20px; }
+.management-document-check > span:nth-child(2) { display: grid; min-width: 0; gap: 4px; }
+.management-document-check > span:nth-child(2) strong { color: #102a4c; font-size: 14px; }
+.management-document-check > span:nth-child(2) small { overflow: hidden; color: #748093; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.management-document-check > i { padding: 6px 9px; border-radius: 999px; background: #fae2df; color: #a22e26; font-size: 11px; font-style: normal; font-weight: 750; }
+.management-document-check-actions { display: flex; align-items: center; gap: 8px; }
+.management-document-check-actions > a,.management-document-preview-trigger { display: inline-flex; min-height: 40px; align-items: center; justify-content: center; gap: 7px; padding: 8px 11px; border: 1px solid #c9b16e; border-radius: 8px; background: #fff; color: #755409; font-size: 12px; font-weight: 750; text-decoration: none; cursor: pointer; }
+.management-document-check-actions svg { width: 16px; }
+.management-document-preview-trigger.has-thumbnail { padding: 4px 9px 4px 4px; }
+.management-document-preview-trigger > span { position: relative; width: 34px; height: 34px; overflow: hidden; border-radius: 6px; background: #edf1f6; }
+.management-document-preview-trigger > span img { object-fit: cover; }
+.management-document-preview-trigger > span svg { position: absolute; inset: 9px; }
+.management-document-preview-trigger > i { display: inline-flex; align-items: center; gap: 6px; font-style: normal; }
+.management-document-preview-modal { position: fixed; z-index: 200; inset: 0; display: grid; place-items: center; padding: 24px; background: rgba(5,18,37,.78); backdrop-filter: blur(5px); }
+.management-document-preview-modal > div { display: grid; grid-template-rows: auto minmax(0,1fr) auto; width: min(1050px,100%); height: min(820px,92vh); overflow: hidden; border: 1px solid rgba(212,175,55,.4); border-radius: 16px; background: #f8f7f3; box-shadow: 0 30px 80px rgba(0,0,0,.35); }
+.management-document-preview-modal header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 15px 18px; border-bottom: 1px solid #dfdbd1; background: #fff; }
+.management-document-preview-modal header span { display: grid; min-width: 0; gap: 2px; }
+.management-document-preview-modal header strong { color: #102a4c; }
+.management-document-preview-modal header small { overflow: hidden; color: #727f91; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.management-document-preview-modal header button { display: grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border: 1px solid #d9d5cb; border-radius: 9px; background: #fff; color: #102a4c; cursor: pointer; }
+.management-document-preview-modal header button svg { width: 19px; }
+.management-document-preview-modal section { position: relative; min-height: 0; background: #e9e7e1; }
+.management-document-preview-modal section > img { object-fit: contain; padding: 18px; }
+.management-document-preview-modal iframe { width: 100%; height: 100%; border: 0; background: #fff; }
+.management-document-preview-modal footer { display: flex; justify-content: flex-end; padding: 12px 18px; border-top: 1px solid #dfdbd1; background: #fff; }
+.management-document-preview-modal footer a { display: inline-flex; min-height: 42px; align-items: center; gap: 7px; padding: 9px 14px; border-radius: 8px; background: #102a4c; color: #fff; font-size: 13px; font-weight: 750; text-decoration: none; }
+.management-document-preview-modal footer svg { width: 17px; }
 .management-status-form { display: flex; justify-content: flex-end; margin-top: 18px; }
 .management-status-form > button { display: inline-flex; min-height: 42px; align-items: center; gap: 8px; padding: 9px 15px; border: 1px solid #b9bec7; border-radius: 9px; background: #fff; color: #4f5664; font-weight: 700; cursor: pointer; }
 .management-status-form > button:disabled { cursor: wait; opacity: .65; }
@@ -2067,4 +2111,10 @@
   .admin-page-actions .admin-primary-button,.admin-page-actions .admin-secondary-button { width: 100%; }
   .management-detail-columns,.management-detail-grid { grid-template-columns: 1fr; }
   .management-detail-grid > div:nth-child(odd) { border-right: 0; }
+  .management-document-check { grid-template-columns: 26px minmax(0,1fr); }
+  .management-document-check-actions,.management-document-check > i { grid-column: 1/-1; width: 100%; }
+  .management-document-check-actions > a,.management-document-preview-trigger { flex: 1; }
+  .management-document-preview-modal { padding: 10px; }
+  .management-document-preview-modal > div { height: 94vh; border-radius: 12px; }
+  .management-document-preview-modal footer a { width: 100%; justify-content: center; }
 }
