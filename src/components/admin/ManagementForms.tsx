@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useMemo, useState } from "react";
+import type { ChangeEvent } from "react";
 import { CheckCircle2, CircleAlert, Sparkles } from "lucide-react";
 
 import {
@@ -9,7 +10,6 @@ import {
   createAgentAction,
   createBookingAction,
   createPilgrimAction,
-  managementInitialState,
   recordCashAction,
   recordPaymentAction,
   recordRefundAction,
@@ -17,10 +17,17 @@ import {
   payCommissionAction,
   saveSequenceAction,
   saveManagementSettingsAction,
+  saveInventoryItemAction,
   seedManagementDefaultsAction,
+  setManagementRecordStatusAction,
+  updateAccountAction,
+  updateAgentAction,
+  updatePilgrimAction,
 } from "@/lib/management/actions";
 import { rupiah } from "@/lib/management/domain";
 import type { ManagementActionState } from "@/lib/management/validation";
+
+const managementInitialState: ManagementActionState = { ok: false, message: "" };
 
 function Feedback({ state }: { state: ManagementActionState }) {
   if (!state.message) return null;
@@ -41,36 +48,42 @@ export function InitializeManagementButton() {
   return <form action={action} className="management-inline-action"><Feedback state={state} /><button disabled={pending} className="management-primary-button" type="submit"><Sparkles />{pending ? "Menyiapkan…" : "Siapkan data awal"}</button></form>;
 }
 
-export function PilgrimForm() {
-  const [state, action, pending] = useActionState(createPilgrimAction, managementInitialState);
-  return <form action={action} className="management-form">
+type PilgrimValues = { id: string; fullName: string; whatsapp: string; email: string | null; gender: string | null; birthDate: string | null; nationality: string; passportNumber: string | null; passportExpiry: string | null; notes: string | null };
+
+export function PilgrimForm({ values }: { values?: PilgrimValues }) {
+  const [state, action, pending] = useActionState(values ? updatePilgrimAction : createPilgrimAction, managementInitialState);
+  const [form, setForm] = useState({ fullName: values?.fullName ?? "", whatsapp: values?.whatsapp ?? "", email: values?.email ?? "", gender: values?.gender ?? "", birthDate: values?.birthDate ?? "", nationality: values?.nationality ?? "Indonesia", passportNumber: values?.passportNumber ?? "", passportExpiry: values?.passportExpiry ?? "", notes: values?.notes ?? "" });
+  const change = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
+  return <form action={action} className="management-form">{values ? <input type="hidden" name="id" value={values.id} /> : null}
     <Feedback state={state} />
     <div className="management-form-grid two">
-      <label><span>Nama lengkap *</span><input name="fullName" autoComplete="name" required /><ErrorText state={state} name="fullName" /></label>
-      <label><span>Nomor WhatsApp *</span><input name="whatsapp" inputMode="tel" autoComplete="tel" placeholder="08xxxxxxxxxx" required /><ErrorText state={state} name="whatsapp" /></label>
-      <label><span>Email <i>opsional</i></span><input name="email" type="email" autoComplete="email" /><ErrorText state={state} name="email" /></label>
-      <label><span>Jenis kelamin</span><select name="gender" defaultValue=""><option value="">Belum diisi</option><option>Laki-laki</option><option>Perempuan</option></select></label>
-      <label><span>Tanggal lahir</span><input name="birthDate" type="date" /></label>
-      <label><span>Kewarganegaraan</span><input name="nationality" defaultValue="Indonesia" /></label>
-      <label><span>Nomor paspor</span><input name="passportNumber" /></label>
-      <label><span>Masa berlaku paspor</span><input name="passportExpiry" type="date" /></label>
+      <label><span>Nama lengkap *</span><input name="fullName" autoComplete="name" value={form.fullName} onChange={change} required /><ErrorText state={state} name="fullName" /></label>
+      <label><span>Nomor WhatsApp *</span><input name="whatsapp" inputMode="tel" autoComplete="tel" placeholder="08xxxxxxxxxx" value={form.whatsapp} onChange={change} required /><ErrorText state={state} name="whatsapp" /></label>
+      <label><span>Email <i>opsional</i></span><input name="email" type="email" autoComplete="email" value={form.email} onChange={change} /><ErrorText state={state} name="email" /></label>
+      <label><span>Jenis kelamin</span><select name="gender" value={form.gender} onChange={change}><option value="">Belum diisi</option><option>Laki-laki</option><option>Perempuan</option></select></label>
+      <label><span>Tanggal lahir</span><input name="birthDate" type="date" value={form.birthDate} onChange={change} /></label>
+      <label><span>Kewarganegaraan</span><input name="nationality" value={form.nationality} onChange={change} /></label>
+      <label><span>Nomor paspor</span><input name="passportNumber" value={form.passportNumber} onChange={change} /></label>
+      <label><span>Masa berlaku paspor</span><input name="passportExpiry" type="date" value={form.passportExpiry} onChange={change} /></label>
     </div>
-    <label><span>Catatan</span><textarea name="notes" rows={3} /></label>
-    <SubmitButton>{pending ? "Menyimpan…" : "Simpan jamaah"}</SubmitButton>
+    <label><span>Catatan</span><textarea name="notes" rows={3} value={form.notes} onChange={change} /></label>
+    <SubmitButton>{pending ? "Menyimpan…" : values ? "Simpan perubahan" : "Simpan jamaah"}</SubmitButton>
   </form>;
 }
 
-export function AgentForm() {
-  const [state, action, pending] = useActionState(createAgentAction, managementInitialState);
-  return <form action={action} className="management-form"><Feedback state={state} />
+type AgentValues = { id: string; name: string; whatsapp: string; email: string | null; referralCode: string; defaultCommission: number };
+
+export function AgentForm({ values }: { values?: AgentValues }) {
+  const [state, action, pending] = useActionState(values ? updateAgentAction : createAgentAction, managementInitialState);
+  return <form action={action} className="management-form">{values ? <input type="hidden" name="id" value={values.id} /> : null}<Feedback state={state} />
     <div className="management-form-grid two">
-      <label><span>Nama agen *</span><input name="name" required /><ErrorText state={state} name="name" /></label>
-      <label><span>WhatsApp *</span><input name="whatsapp" inputMode="tel" required /><ErrorText state={state} name="whatsapp" /></label>
-      <label><span>Email <i>opsional</i></span><input name="email" type="email" /><ErrorText state={state} name="email" /></label>
-      <label><span>Kode link referral *</span><input name="referralCode" placeholder="nama-agen" required /><ErrorText state={state} name="referralCode" /></label>
-      <label><span>Komisi default</span><select name="defaultCommission" defaultValue="500000"><option value="500000">Rp500.000 / jamaah</option><option value="1000000">Rp1.000.000 / jamaah</option></select></label>
+      <label><span>Nama agen *</span><input name="name" defaultValue={values?.name} required /><ErrorText state={state} name="name" /></label>
+      <label><span>WhatsApp *</span><input name="whatsapp" inputMode="tel" defaultValue={values?.whatsapp} required /><ErrorText state={state} name="whatsapp" /></label>
+      <label><span>Email <i>opsional</i></span><input name="email" type="email" defaultValue={values?.email ?? ""} /><ErrorText state={state} name="email" /></label>
+      <label><span>Kode link referral *</span><input name="referralCode" placeholder="nama-agen" defaultValue={values?.referralCode} required /><ErrorText state={state} name="referralCode" /></label>
+      <label><span>Komisi default</span><select name="defaultCommission" defaultValue={String(values?.defaultCommission ?? 500000)}><option value="500000">Rp500.000 / jamaah</option><option value="1000000">Rp1.000.000 / jamaah</option></select></label>
     </div>
-    <SubmitButton>{pending ? "Menyimpan…" : "Simpan agen"}</SubmitButton>
+    <SubmitButton>{pending ? "Menyimpan…" : values ? "Simpan perubahan" : "Simpan agen"}</SubmitButton>
   </form>;
 }
 
@@ -156,19 +169,36 @@ export function StockForm({ items }: { items: Array<{ id: string; name: string; 
   return <form action={action} className="management-form"><Feedback state={state} /><div className="management-form-grid two">
     <label><span>Barang *</span><select name="itemId" required>{items.map((item) => <option value={item.id} key={item.id}>{item.name} — tersedia {item.currentStock}</option>)}</select></label>
     <label><span>Pergerakan</span><select name="kind"><option value="in">Stok masuk</option><option value="out">Stok keluar</option><option value="adjustment">Sesuaikan saldo menjadi</option></select></label>
-    <label><span>Jumlah *</span><input name="quantity" type="number" min="1" required /></label>
+    <label><span>Jumlah *</span><input name="quantity" type="number" min="0" required /></label>
     <label><span>Tanggal *</span><input name="movedAt" type="datetime-local" defaultValue={localNow} required /></label>
     <label className="span-two"><span>Catatan</span><input name="note" /></label>
   </div><SubmitButton>{pending ? "Menyimpan…" : "Perbarui stok"}</SubmitButton></form>;
 }
 
-export function AccountForm() {
-  const [state, action, pending] = useActionState(createAccountAction, managementInitialState);
-  return <form action={action} className="management-form"><Feedback state={state} /><div className="management-form-grid two">
-    <label><span>Nama rekening/kas *</span><input name="name" required /></label><label><span>Jenis</span><select name="type"><option value="bank">Rekening bank</option><option value="cash">Kas tunai</option></select></label>
-    <label><span>Nama bank</span><input name="bankName" /></label><label><span>Nomor rekening</span><input name="accountNumber" /></label><label><span>Atas nama</span><input name="accountHolder" /></label>
-    <label className="management-check"><input type="checkbox" name="showOnInvoice" /><span>Tampilkan pada invoice</span></label>
-  </div><SubmitButton>{pending ? "Menyimpan…" : "Tambah rekening/kas"}</SubmitButton></form>;
+type AccountValues = { id: string; name: string; type: string; bankName: string | null; accountNumber: string | null; accountHolder: string | null; showOnInvoice: boolean };
+
+export function AccountForm({ values }: { values?: AccountValues }) {
+  const [state, action, pending] = useActionState(values ? updateAccountAction : createAccountAction, managementInitialState);
+  return <form action={action} className="management-form">{values ? <input type="hidden" name="id" value={values.id} /> : null}<Feedback state={state} /><div className="management-form-grid two">
+    <label><span>Nama rekening/kas *</span><input name="name" defaultValue={values?.name} required /></label><label><span>Jenis</span><select name="type" defaultValue={values?.type ?? "bank"}><option value="bank">Rekening bank</option><option value="cash">Kas tunai</option></select></label>
+    <label><span>Nama bank</span><input name="bankName" defaultValue={values?.bankName ?? ""} /></label><label><span>Nomor rekening</span><input name="accountNumber" defaultValue={values?.accountNumber ?? ""} /></label><label><span>Atas nama</span><input name="accountHolder" defaultValue={values?.accountHolder ?? ""} /></label>
+    <label className="management-check"><input type="checkbox" name="showOnInvoice" defaultChecked={values?.showOnInvoice} /><span>Tampilkan pada invoice</span></label>
+  </div><SubmitButton>{pending ? "Menyimpan…" : values ? "Simpan perubahan" : "Tambah rekening/kas"}</SubmitButton></form>;
+}
+
+export function InventoryItemForm({ values }: { values?: { id: string; name: string; unit: string; minimumStock: number } }) {
+  const [state, action, pending] = useActionState(saveInventoryItemAction, managementInitialState);
+  return <form action={action} className="management-form">{values ? <input type="hidden" name="id" value={values.id} /> : null}<Feedback state={state} /><div className="management-form-grid two">
+    <label><span>Nama barang *</span><input name="name" defaultValue={values?.name} required /></label>
+    <label><span>Satuan *</span><input name="unit" defaultValue={values?.unit ?? "pcs"} required /></label>
+    <label><span>Batas stok minimum *</span><input name="minimumStock" type="number" min="0" defaultValue={values?.minimumStock ?? 5} required /></label>
+  </div><SubmitButton>{pending ? "Menyimpan…" : values ? "Simpan perubahan" : "Tambah barang"}</SubmitButton></form>;
+}
+
+export function RecordStatusForm({ entity, id, status }: { entity: "pilgrim" | "agent" | "account" | "inventory"; id: string; status: "active" | "archived" }) {
+  const [state, action, pending] = useActionState(setManagementRecordStatusAction, managementInitialState);
+  const next = status === "active" ? "archived" : "active";
+  return <form action={action} className="management-status-form"><input type="hidden" name="entity" value={entity} /><input type="hidden" name="id" value={id} /><input type="hidden" name="status" value={next} /><Feedback state={state} /><button type="submit" disabled={pending}>{pending ? "Memproses…" : status === "active" ? "Arsipkan data" : "Aktifkan kembali"}</button></form>;
 }
 
 export function SequenceForm({ kind }: { kind: "invoice" | "receipt" }) {

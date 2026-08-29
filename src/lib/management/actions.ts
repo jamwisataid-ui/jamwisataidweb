@@ -29,9 +29,6 @@ import { requireAdminSession } from "@/lib/admin-session";
 import { paymentStatus } from "./domain";
 import { agentSchema, bookingSchema, cashSchema, fields, type ManagementActionState, paymentSchema, pilgrimSchema, stockMovementSchema } from "./validation";
 
-const initialState: ManagementActionState = { ok: false, message: "" };
-export { initialState as managementInitialState };
-
 function raw(formData: FormData) {
   return Object.fromEntries(formData.entries());
 }
@@ -88,6 +85,23 @@ export async function createPilgrimAction(_state: ManagementActionState, formDat
   } catch (error) { return failure(error); }
 }
 
+export async function updatePilgrimAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
+  const id = String(formData.get("id") ?? "");
+  const parsed = pilgrimSchema.safeParse(raw(formData));
+  if (!id || !parsed.success) return { ok: false, message: "Periksa bagian yang ditandai.", errors: parsed.success ? undefined : fields(parsed.error) };
+  try {
+    const session = await requireAdminSession();
+    await withManagementTransaction(async (tx) => {
+      const existing = await tx.query.pilgrims.findFirst({ where: eq(pilgrims.id, id) });
+      if (!existing) throw new Error("Data jamaah tidak ditemukan.");
+      await tx.update(pilgrims).set({ ...parsed.data, email: parsed.data.email || null, gender: parsed.data.gender || null, birthDate: parsed.data.birthDate || null, passportNumber: parsed.data.passportNumber || null, passportExpiry: parsed.data.passportExpiry || null, notes: parsed.data.notes || null, updatedBy: session.user.id, updatedAt: new Date() }).where(eq(pilgrims.id, id));
+      await tx.insert(auditLogs).values({ actorId: session.user.id, action: "update", entityType: "pilgrim", entityId: id, summary: `Data jamaah ${parsed.data.fullName} diperbarui` });
+    });
+    refresh();
+    return { ok: true, message: "Perubahan data jamaah berhasil disimpan." };
+  } catch (error) { return failure(error); }
+}
+
 export async function createAgentAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
   const parsed = agentSchema.safeParse(raw(formData));
   if (!parsed.success) return { ok: false, message: "Periksa bagian yang ditandai.", errors: fields(parsed.error) };
@@ -100,6 +114,42 @@ export async function createAgentAction(_state: ManagementActionState, formData:
     });
     refresh();
     return { ok: true, message: "Agen dan link referral berhasil dibuat." };
+  } catch (error) { return failure(error); }
+}
+
+export async function updateAgentAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
+  const id = String(formData.get("id") ?? "");
+  const parsed = agentSchema.safeParse(raw(formData));
+  if (!id || !parsed.success) return { ok: false, message: "Periksa bagian yang ditandai.", errors: parsed.success ? undefined : fields(parsed.error) };
+  try {
+    const session = await requireAdminSession();
+    await withManagementTransaction(async (tx) => {
+      const existing = await tx.query.agents.findFirst({ where: eq(agents.id, id) });
+      if (!existing) throw new Error("Agen tidak ditemukan.");
+      await tx.update(agents).set({ ...parsed.data, email: parsed.data.email || null, updatedAt: new Date() }).where(eq(agents.id, id));
+      await tx.insert(auditLogs).values({ actorId: session.user.id, action: "update", entityType: "agent", entityId: id, summary: `Agen ${parsed.data.name} diperbarui` });
+    });
+    refresh();
+    return { ok: true, message: "Perubahan agen berhasil disimpan." };
+  } catch (error) { return failure(error); }
+}
+
+export async function setManagementRecordStatusAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
+  const id = String(formData.get("id") ?? "");
+  const entity = String(formData.get("entity") ?? "");
+  const status = formData.get("status") === "archived" ? "archived" : "active";
+  if (!id || !["pilgrim", "agent", "account", "inventory"].includes(entity)) return { ok: false, message: "Data yang akan diubah tidak valid." };
+  try {
+    const session = await requireAdminSession();
+    await withManagementTransaction(async (tx) => {
+      if (entity === "pilgrim") await tx.update(pilgrims).set({ status, updatedBy: session.user.id, updatedAt: new Date() }).where(eq(pilgrims.id, id));
+      if (entity === "agent") await tx.update(agents).set({ status, updatedAt: new Date() }).where(eq(agents.id, id));
+      if (entity === "account") await tx.update(financialAccounts).set({ status, updatedAt: new Date() }).where(eq(financialAccounts.id, id));
+      if (entity === "inventory") await tx.update(inventoryItems).set({ status, updatedAt: new Date() }).where(eq(inventoryItems.id, id));
+      await tx.insert(auditLogs).values({ actorId: session.user.id, action: status === "archived" ? "archive" : "restore", entityType: entity, entityId: id, summary: `Status ${entity} diubah menjadi ${status}` });
+    });
+    refresh();
+    return { ok: true, message: status === "archived" ? "Data berhasil diarsipkan." : "Data berhasil diaktifkan kembali." };
   } catch (error) { return failure(error); }
 }
 
@@ -242,6 +292,47 @@ export async function createAccountAction(_state: ManagementActionState, formDat
     });
     refresh();
     return { ok: true, message: "Rekening/kas berhasil ditambahkan." };
+  } catch (error) { return failure(error); }
+}
+
+export async function updateAccountAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
+  const id = String(formData.get("id") ?? "");
+  const name = String(formData.get("name") ?? "").trim();
+  if (!id || name.length < 2) return { ok: false, message: "Nama rekening/kas wajib diisi." };
+  try {
+    const session = await requireAdminSession();
+    await withManagementTransaction(async (tx) => {
+      const existing = await tx.query.financialAccounts.findFirst({ where: eq(financialAccounts.id, id) });
+      if (!existing) throw new Error("Rekening atau kas tidak ditemukan.");
+      await tx.update(financialAccounts).set({ name, type: formData.get("type") === "cash" ? "cash" : "bank", bankName: String(formData.get("bankName") || "") || null, accountNumber: String(formData.get("accountNumber") || "") || null, accountHolder: String(formData.get("accountHolder") || "") || null, showOnInvoice: formData.get("showOnInvoice") === "on", updatedAt: new Date() }).where(eq(financialAccounts.id, id));
+      await tx.insert(auditLogs).values({ actorId: session.user.id, action: "update", entityType: "financial_account", entityId: id, summary: `Akun ${name} diperbarui` });
+    });
+    refresh();
+    return { ok: true, message: "Rekening/kas berhasil diperbarui." };
+  } catch (error) { return failure(error); }
+}
+
+export async function saveInventoryItemAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
+  const id = String(formData.get("id") ?? "");
+  const name = String(formData.get("name") ?? "").trim();
+  const unit = String(formData.get("unit") ?? "pcs").trim();
+  const minimumStock = Number(formData.get("minimumStock"));
+  if (name.length < 2 || unit.length < 1 || !Number.isInteger(minimumStock) || minimumStock < 0) return { ok: false, message: "Nama, satuan, atau batas minimum stok tidak valid." };
+  try {
+    const session = await requireAdminSession();
+    const entityId = id || randomUUID();
+    await withManagementTransaction(async (tx) => {
+      if (id) {
+        const existing = await tx.query.inventoryItems.findFirst({ where: eq(inventoryItems.id, id) });
+        if (!existing) throw new Error("Barang tidak ditemukan.");
+        await tx.update(inventoryItems).set({ name, unit, minimumStock, updatedAt: new Date() }).where(eq(inventoryItems.id, id));
+      } else {
+        await tx.insert(inventoryItems).values({ id: entityId, name, unit, minimumStock });
+      }
+      await tx.insert(auditLogs).values({ actorId: session.user.id, action: id ? "update" : "create", entityType: "inventory_item", entityId, summary: `Barang ${name} ${id ? "diperbarui" : "ditambahkan"}` });
+    });
+    refresh();
+    return { ok: true, message: id ? "Data barang berhasil diperbarui." : "Barang berhasil ditambahkan." };
   } catch (error) { return failure(error); }
 }
 

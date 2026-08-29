@@ -1991,6 +1991,27 @@
 .management-import > a { display: inline-flex; width: fit-content; align-items: center; gap: 7px; color: #815d09; font-size: 14px; font-weight: 750; }.management-import > a svg { width: 17px; }
 .management-import > label { display: grid; gap: 7px; color: #233d5c; font-size: 14px; font-weight: 700; }.management-import > label input { min-height: 52px; padding: 10px; border: 1px dashed #bcb49f; border-radius: 9px; }
 .management-import > div:last-child { display: flex; gap: 9px; }.management-import > div:last-child button { display: inline-flex; min-height: 47px; align-items: center; gap: 7px; padding: 10px 16px; border: 1px solid #b89034; border-radius: 8px; background: #fff; color: #755409; font-weight: 750; cursor: pointer; }.management-import > div:last-child button:last-child { border-color: #102a4c; background: #102a4c; color: white; }.management-import button:disabled { cursor: not-allowed; opacity: .5; }.management-import button svg { width: 17px; }.management-import .management-feedback small { display: block; margin-top: 5px; font-weight: 500; line-height: 1.45; }
+.management-list-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 18px; margin-bottom: 18px; border: 1px solid #ded8ca; border-radius: 14px; background: #fffdf8; }
+.management-list-toolbar > p { margin: 0; color: #5f6674; }
+.management-list-toolbar > div { display: flex; flex-wrap: wrap; gap: 9px; }
+.management-create-link { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; border-radius: 10px; background: #0b2344; color: #fff !important; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.management-create-link svg { width: 18px; height: 18px; }
+.management-create-link:hover { background: #b98729; }
+.management-row-link,.management-secondary-link { color: #76500d; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.management-record-card { display: block; height: 100%; color: inherit; text-decoration: none; border-radius: 14px; }
+.management-record-card:hover article { border-color: #c89a43; box-shadow: 0 10px 28px rgba(11,35,68,.08); transform: translateY(-1px); }
+.management-record-card article { height: 100%; transition: border-color .18s ease,box-shadow .18s ease,transform .18s ease; }
+.management-mini-link { color: inherit; text-decoration: none; }
+.management-crud-panel { max-width: 980px; margin-inline: auto; }
+.management-crud-panel > header p { margin: 6px 0 0; color: #6a7180; }
+.management-detail-columns { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; }
+.management-detail-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0; margin: 0; border: 1px solid #e3ded2; border-radius: 12px; overflow: hidden; }
+.management-detail-grid > div { min-width: 0; padding: 16px 18px; border-bottom: 1px solid #e3ded2; }
+.management-detail-grid > div:nth-child(odd) { border-right: 1px solid #e3ded2; }
+.management-detail-grid dt { margin-bottom: 5px; color: #747b89; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.management-detail-grid dd { margin: 0; color: #0b2344; font-size: 16px; font-weight: 700; overflow-wrap: anywhere; }
+.management-status-form { display: flex; justify-content: flex-end; margin-top: 18px; }
+.management-status-form > button { min-height: 42px; padding: 9px 15px; border: 1px solid #b9bec7; border-radius: 9px; background: #fff; color: #4f5664; font-weight: 700; cursor: pointer; }
 
 @media (max-width: 1180px) {
   .management-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
@@ -2018,4 +2039,8 @@
   .management-table tr { margin-bottom: 10px; padding: 10px; border: 1px solid #e5e0d5; border-radius: 11px; background: #fff; }
   .management-table td { display: flex; min-height: 44px; align-items: center; justify-content: space-between; gap: 12px; padding: 9px; text-align: right; }
   .management-table td:first-child { display: block; text-align: left; }
+  .management-list-toolbar { align-items: stretch; flex-direction: column; }
+  .management-list-toolbar > div,.management-list-toolbar .management-create-link { width: 100%; }
+  .management-detail-columns,.management-detail-grid { grid-template-columns: 1fr; }
+  .management-detail-grid > div:nth-child(odd) { border-right: 0; }
 }
