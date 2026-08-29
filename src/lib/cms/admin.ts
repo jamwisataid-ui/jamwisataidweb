@@ -88,6 +88,7 @@ export async function getPackageAdmin(id: string) {
     sortOrder: item.sortOrder,
     status: item.status,
     hasDraftChanges: false,
+    departureId: departure?.id ?? "",
     departureDate: departure?.departureDate ?? "",
     departureLabel: departure?.dateLabel ?? "",
     returnDate: departure?.returnDate ?? "",

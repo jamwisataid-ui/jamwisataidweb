@@ -28,6 +28,7 @@ import {
   SquareArrowOutUpRight,
   UsersRound,
   WalletCards,
+  Settings2,
   X,
 } from "lucide-react";
 
@@ -38,9 +39,10 @@ const cmsNav = [
 
 const managementNav = [
   { label: "Ringkasan", items: [["/admin/manajemen", "Ringkasan", LayoutDashboard]] },
-  { label: "Operasional", items: [["/admin/manajemen/jamaah", "Data Jamaah", UsersRound], ["/admin/manajemen/dokumen", "Dokumen Jamaah", FileCheck2], ["/admin/manajemen/keberangkatan", "Keberangkatan", PlaneTakeoff], ["/admin/manajemen/manifest-rooming", "Manifest & Rooming", ClipboardCheck]] },
+  { label: "Operasional", items: [["/admin/manajemen/jamaah", "Data Jamaah", UsersRound], ["/admin/manajemen/dokumen", "Dokumen Jamaah", FileCheck2], ["/admin/manajemen/keberangkatan", "Keberangkatan", PlaneTakeoff], ["/admin/manajemen/manifest-room-list", "Manifest & Room List", ClipboardCheck]] },
   { label: "Keuangan", items: [["/admin/manajemen/pembayaran", "Pembayaran", WalletCards], ["/admin/manajemen/invoice-kwitansi", "Invoice & Kwitansi", ReceiptText], ["/admin/manajemen/keuangan", "Kas & Keuangan", BadgeDollarSign], ["/admin/manajemen/laporan", "Pusat Laporan", ChartNoAxesCombined]] },
   { label: "Pemasaran & logistik", items: [["/admin/manajemen/agen-referral", "Agen & Referral", ContactRound], ["/admin/manajemen/stok", "Stok Perlengkapan", Boxes]] },
+  { label: "Sistem", items: [["/admin/manajemen/pengaturan", "Pengaturan", Settings2]] },
 ] as const;
 
 export function AdminSidebar({ name, email }: { name: string; email: string }) {

@@ -2,19 +2,21 @@
 
 import { randomUUID } from "node:crypto";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 
 import { requireDatabase } from "@/db";
 import {
   accommodations,
   articles,
   auditLogs,
+  bookings,
   contentDrafts,
   contentEntries,
   departures,
   itineraryDays,
   packageItems,
   packages,
+  registrations,
   slugRedirects,
 } from "@/db/schema";
 import { requireAdminSession } from "@/lib/admin-session";
@@ -221,12 +223,13 @@ export async function savePackageAction(_state: ActionState, formData: FormData)
       },
     });
 
-    await database.delete(departures).where(eq(departures.packageId, data.id));
     await database.delete(packageItems).where(eq(packageItems.packageId, data.id));
     await database.delete(itineraryDays).where(eq(itineraryDays.packageId, data.id));
 
-    const [departure] = await database.insert(departures).values({
-      packageId: data.id,
+    const existingDeparture = data.departureId
+      ? await database.query.departures.findFirst({ where: and(eq(departures.id, data.departureId), eq(departures.packageId, data.id)) })
+      : await database.query.departures.findFirst({ where: eq(departures.packageId, data.id) });
+    const departureValues = {
       departureDate: data.departureDate,
       returnDate: data.returnDate || null,
       manasikDate: data.manasikDate || null,
@@ -238,7 +241,13 @@ export async function savePackageAction(_state: ActionState, formData: FormData)
       capacity: (data.capacity === "" || data.capacity === null || data.capacity === undefined) ? null : Number(data.capacity),
       availableSeats: (data.availableSeats === "" || data.availableSeats === null || data.availableSeats === undefined) ? null : Number(data.availableSeats),
       status: data.departureStatus,
-    }).returning({ id: departures.id });
+      updatedAt: new Date(),
+    } as const;
+    const departure = existingDeparture
+      ? (await database.update(departures).set(departureValues).where(eq(departures.id, existingDeparture.id)).returning({ id: departures.id }))[0]
+      : (await database.insert(departures).values({ packageId: data.id, ...departureValues }).returning({ id: departures.id }))[0];
+
+    await database.delete(accommodations).where(eq(accommodations.departureId, departure.id));
 
     await database.insert(accommodations).values([
       { departureId: departure.id, city: "Makkah", hotelName: data.makkahHotel, star: data.makkahStar, distance: data.makkahDistance || null, sortOrder: 0 },
@@ -436,6 +445,19 @@ export async function deletePackageAction(formData: FormData): Promise<ActionSta
 
     if (!pkg) {
       return { ok: false, message: "Paket tidak ditemukan atau sudah dihapus." };
+    }
+
+    const relatedDepartures = await database.select({ id: departures.id }).from(departures).where(eq(departures.packageId, id));
+    const referenced = relatedDepartures.length
+      ? await database.select({ id: registrations.id }).from(registrations).where(inArray(registrations.bookingId,
+          database.select({ id: bookings.id }).from(bookings).where(inArray(bookings.departureId, relatedDepartures.map((item) => item.id))),
+        )).limit(1)
+      : [];
+    if (referenced.length) {
+      await database.update(packages).set({ status: "archived", updatedBy: session.user.id, updatedAt: new Date() }).where(eq(packages.id, id));
+      await writeAudit(session.user.id, "archive", "package", id, `Mengarsipkan paket yang sudah memiliki pendaftaran: ${pkg.name}`);
+      invalidate("packages", `/paket-umroh/${pkg.slug}`);
+      return { ok: true, message: `Paket "${pkg.name}" sudah memiliki jamaah, jadi diarsipkan tanpa menghapus riwayat.`, redirectTo: "/admin/paket" };
     }
 
     await database.delete(contentDrafts).where(

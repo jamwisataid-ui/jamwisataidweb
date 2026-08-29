@@ -1,0 +1,2 @@
+DROP INDEX "document_sequences_active_kind_idx";--> statement-breakpoint
+CREATE UNIQUE INDEX "document_sequences_active_kind_idx" ON "document_sequences" USING btree ("kind") WHERE "document_sequences"."active" = true;

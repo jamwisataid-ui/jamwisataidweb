@@ -8,6 +8,7 @@ const slug = z
 
 export const packageFormSchema = z.object({
   id: z.string().trim().min(3),
+  departureId: z.string().uuid().optional().or(z.literal("")),
   slug,
   name: z.string().trim().min(3, "Nama paket minimal 3 karakter."),
   category: z.enum(["umrah", "hajj", "halal-tour"]).default("umrah"),

@@ -15,7 +15,7 @@ const initialState: ActionState = { ok: false, message: "" };
 const field = (values: Values, key: string, fallback = "") => String(values[key] ?? fallback);
 
 const preservedFields = [
-  ["id", ""], ["slug", ""], ["category", "umrah"], ["summary", ""],
+  ["id", ""], ["departureId", ""], ["slug", ""], ["category", "umrah"], ["summary", ""],
   ["featured", "false"], ["sortOrder", "0"], ["detailUrl", ""],
   ["seoTitle", ""], ["seoDescription", ""], ["returnDate", ""],
   ["manasikDate", ""], ["departureAirport", "Jakarta"], ["arrivalAirport", ""],

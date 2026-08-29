@@ -43,6 +43,27 @@
       "when": 1787751655308,
       "tag": "0005_flimsy_karen_page",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1787974251233,
+      "tag": "0006_tan_sister_grimm",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1787974267365,
+      "tag": "0007_volatile_baron_strucker",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787975372405,
+      "tag": "0008_seed_management_defaults",
+      "breakpoints": true
     }
   ]
 }

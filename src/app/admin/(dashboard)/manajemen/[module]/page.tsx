@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ManagementPlaceholder } from "@/components/admin/ManagementPlaceholder";
+import { ManagementWorkspace } from "@/components/admin/ManagementWorkspace";
+import { getManagementContext } from "@/lib/management/data";
 import { getManagementModule, managementModules } from "@/lib/management/modules";
 
 export function generateStaticParams() {
@@ -18,5 +19,5 @@ export default async function ManagementModulePage({ params }: { params: Promise
   const selectedModule = getManagementModule(slug);
   if (!selectedModule) notFound();
 
-  return <ManagementPlaceholder eyebrow={selectedModule.eyebrow} title={selectedModule.title} description={selectedModule.description} />;
+  return <ManagementWorkspace module={slug} data={await getManagementContext()} />;
 }

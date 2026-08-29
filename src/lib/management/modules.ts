@@ -18,10 +18,10 @@ export const managementModules = [
     description: "Kelola jadwal, kuota, paket, serta daftar jamaah untuk setiap keberangkatan.",
   },
   {
-    slug: "manifest-rooming",
-    title: "Manifest & Rooming",
+    slug: "manifest-room-list",
+    title: "Manifest & Room List",
     eyebrow: "KELOMPOK KEBERANGKATAN",
-    description: "Susun manifest perjalanan dan pembagian kamar berdasarkan keberangkatan yang dipilih.",
+    description: "Susun manifest dan Room List Quad, Triple, atau Double dengan pemisahan jamaah laki-laki dan perempuan.",
   },
   {
     slug: "pembayaran",
@@ -58,6 +58,12 @@ export const managementModules = [
     title: "Pusat Laporan",
     eyebrow: "REKAP BISNIS",
     description: "Buka dan ekspor laporan jamaah, paket, transaksi, keuangan, agen, dan persediaan per periode.",
+  },
+  {
+    slug: "pengaturan",
+    title: "Pengaturan Internal",
+    eyebrow: "PENGATURAN",
+    description: "Atur identitas perusahaan, DP, batas pelunasan, rekening, dan penandatangan dokumen.",
   },
 ] as const;
 
