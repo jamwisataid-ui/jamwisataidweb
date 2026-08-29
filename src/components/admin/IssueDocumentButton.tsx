@@ -14,9 +14,9 @@ export function IssueDocumentButton({ kind, bookingId, paymentId }: { kind: "inv
       const response = await fetch("/api/admin/management/issued-documents", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind, bookingId, paymentId }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "PDF gagal dibuat.");
+      router.push(`/admin/manajemen/invoice-kwitansi/${data.id}`);
       router.refresh();
-      window.open(`/api/admin/management/issued-documents/${data.id}`, "_blank", "noopener,noreferrer");
     } catch (reason) { setError(reason instanceof Error ? reason.message : "PDF gagal dibuat."); } finally { setBusy(false); }
   }
-  return <span className="management-issue-action"><button type="button" disabled={busy} onClick={issue}>{busy ? <LoaderCircle /> : <FileDown />}{busy ? "Membuat…" : kind === "invoice" ? "Buat invoice" : "Buat kwitansi"}</button>{error ? <small>{error}</small> : null}</span>;
+  return <span className="management-issue-action"><button type="button" disabled={busy} onClick={issue}>{busy ? <LoaderCircle className="spin" /> : <FileDown />}{busy ? "Membuat…" : kind === "invoice" ? "Buat invoice" : "Buat kwitansi"}</button>{error ? <small>{error}</small> : null}</span>;
 }

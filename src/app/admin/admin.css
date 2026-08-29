@@ -1919,6 +1919,7 @@
 .management-primary-button:hover { background: #173960; }
 .management-primary-button:disabled { cursor: wait; opacity: .65; }
 .management-primary-button svg { width: 18px; }
+.management-primary-button .spin,.management-issue-action .spin,.management-import .spin,.management-status-form .spin { animation: spin .8s linear infinite; }
 .management-feedback { display: flex; align-items: center; gap: 9px; padding: 12px 14px; border-radius: 9px; font-size: 14px; font-weight: 650; }
 .management-feedback svg { width: 18px; flex: 0 0 auto; }
 .management-feedback.success { background: #e8f8ee; color: #216d3d; }
@@ -2009,7 +2010,9 @@
 .management-detail-grid dt { margin-bottom: 5px; color: #747b89; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
 .management-detail-grid dd { margin: 0; color: #0b2344; font-size: 16px; font-weight: 700; overflow-wrap: anywhere; }
 .management-status-form { display: flex; justify-content: flex-end; margin-top: 18px; }
-.management-status-form > button { min-height: 42px; padding: 9px 15px; border: 1px solid #b9bec7; border-radius: 9px; background: #fff; color: #4f5664; font-weight: 700; cursor: pointer; }
+.management-status-form > button { display: inline-flex; min-height: 42px; align-items: center; gap: 8px; padding: 9px 15px; border: 1px solid #b9bec7; border-radius: 9px; background: #fff; color: #4f5664; font-weight: 700; cursor: pointer; }
+.management-status-form > button:disabled { cursor: wait; opacity: .65; }
+.management-status-form > button svg { width: 17px; }
 
 @media (max-width: 1180px) {
   .management-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }

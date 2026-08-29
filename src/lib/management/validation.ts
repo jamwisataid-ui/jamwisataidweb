@@ -65,7 +65,7 @@ export const stockMovementSchema = z.object({
   note: z.string().trim().optional(),
 });
 
-export type ManagementActionState = { ok: boolean; message: string; errors?: Record<string, string[]> };
+export type ManagementActionState = { ok: boolean; message: string; errors?: Record<string, string[]>; redirectTo?: string };
 
 export function fields(error: z.ZodError) {
   return error.flatten().fieldErrors as Record<string, string[]>;

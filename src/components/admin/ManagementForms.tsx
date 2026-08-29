@@ -1,8 +1,11 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useState } from "react";
 import type { ChangeEvent } from "react";
-import { CheckCircle2, CircleAlert, Sparkles } from "lucide-react";
+import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
+import { CheckCircle2, CircleAlert, LoaderCircle, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
 import {
   createAccountAction,
@@ -30,6 +33,16 @@ import type { ManagementActionState } from "@/lib/management/validation";
 const managementInitialState: ManagementActionState = { ok: false, message: "" };
 
 function Feedback({ state }: { state: ManagementActionState }) {
+  const router = useRouter();
+  useEffect(() => {
+    if (!state.message) return;
+    if (state.ok) toast.success(state.message);
+    else toast.error(state.message);
+    if (state.ok && state.redirectTo) {
+      router.replace(state.redirectTo);
+      router.refresh();
+    }
+  }, [router, state]);
   if (!state.message) return null;
   return <div className={`management-feedback ${state.ok ? "success" : "error"}`} role="status">{state.ok ? <CheckCircle2 /> : <CircleAlert />}<span>{state.message}</span></div>;
 }
@@ -40,12 +53,13 @@ function ErrorText({ state, name }: { state: ManagementActionState; name: string
 }
 
 function SubmitButton({ children }: { children: React.ReactNode }) {
-  return <button className="management-primary-button" type="submit">{children}</button>;
+  const { pending } = useFormStatus();
+  return <button className="management-primary-button" type="submit" disabled={pending}>{pending ? <LoaderCircle className="spin" aria-hidden /> : null}{pending ? "Menyimpan…" : children}</button>;
 }
 
 export function InitializeManagementButton() {
   const [state, action, pending] = useActionState(async () => seedManagementDefaultsAction(), managementInitialState);
-  return <form action={action} className="management-inline-action"><Feedback state={state} /><button disabled={pending} className="management-primary-button" type="submit"><Sparkles />{pending ? "Menyiapkan…" : "Siapkan data awal"}</button></form>;
+  return <form action={action} className="management-inline-action"><Feedback state={state} /><button disabled={pending} className="management-primary-button" type="submit">{pending ? <LoaderCircle className="spin" /> : <Sparkles />}{pending ? "Menyiapkan…" : "Siapkan data awal"}</button></form>;
 }
 
 type PilgrimValues = { id: string; fullName: string; whatsapp: string; email: string | null; gender: string | null; birthDate: string | null; nationality: string; passportNumber: string | null; passportExpiry: string | null; notes: string | null };
@@ -198,7 +212,7 @@ export function InventoryItemForm({ values }: { values?: { id: string; name: str
 export function RecordStatusForm({ entity, id, status }: { entity: "pilgrim" | "agent" | "account" | "inventory"; id: string; status: "active" | "archived" }) {
   const [state, action, pending] = useActionState(setManagementRecordStatusAction, managementInitialState);
   const next = status === "active" ? "archived" : "active";
-  return <form action={action} className="management-status-form"><input type="hidden" name="entity" value={entity} /><input type="hidden" name="id" value={id} /><input type="hidden" name="status" value={next} /><Feedback state={state} /><button type="submit" disabled={pending}>{pending ? "Memproses…" : status === "active" ? "Arsipkan data" : "Aktifkan kembali"}</button></form>;
+  return <form action={action} className="management-status-form"><input type="hidden" name="entity" value={entity} /><input type="hidden" name="id" value={id} /><input type="hidden" name="status" value={next} /><Feedback state={state} /><button type="submit" disabled={pending}>{pending ? <LoaderCircle className="spin" /> : null}{pending ? "Memproses…" : status === "active" ? "Arsipkan data" : "Aktifkan kembali"}</button></form>;
 }
 
 export function SequenceForm({ kind }: { kind: "invoice" | "receipt" }) {

@@ -37,6 +37,11 @@ function refresh() {
   revalidatePath("/admin/manajemen", "layout");
 }
 
+function managementRecordPath(entity: string, id: string) {
+  const routeSegment = { pilgrim: "jamaah", agent: "agen-referral", account: "keuangan", inventory: "stok" }[entity];
+  return routeSegment ? `/admin/manajemen/${routeSegment}/${id}` : "/admin/manajemen";
+}
+
 function failure(error: unknown): ManagementActionState {
   console.error("Management action failed:", error);
   return { ok: false, message: error instanceof Error ? error.message : "Terjadi kesalahan. Data belum disimpan." };
@@ -56,7 +61,7 @@ export async function seedManagementDefaultsAction(): Promise<ManagementActionSt
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "initialize", entityType: "management", entityId: "default", summary: "Fondasi manajemen internal disiapkan" });
     });
     refresh();
-    return { ok: true, message: "Data awal berhasil disiapkan." };
+    return { ok: true, message: "Data awal berhasil disiapkan.", redirectTo: "/admin/manajemen" };
   } catch (error) { return failure(error); }
 }
 
@@ -81,7 +86,7 @@ export async function createPilgrimAction(_state: ManagementActionState, formDat
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "create", entityType: "pilgrim", entityId: id, summary: `Jamaah ${parsed.data.fullName} ditambahkan` });
     });
     refresh();
-    return { ok: true, message: "Data jamaah berhasil disimpan." };
+    return { ok: true, message: "Data jamaah berhasil disimpan.", redirectTo: `/admin/manajemen/jamaah/${id}` };
   } catch (error) { return failure(error); }
 }
 
@@ -98,7 +103,7 @@ export async function updatePilgrimAction(_state: ManagementActionState, formDat
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "update", entityType: "pilgrim", entityId: id, summary: `Data jamaah ${parsed.data.fullName} diperbarui` });
     });
     refresh();
-    return { ok: true, message: "Perubahan data jamaah berhasil disimpan." };
+    return { ok: true, message: "Perubahan data jamaah berhasil disimpan.", redirectTo: `/admin/manajemen/jamaah/${id}` };
   } catch (error) { return failure(error); }
 }
 
@@ -113,7 +118,7 @@ export async function createAgentAction(_state: ManagementActionState, formData:
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "create", entityType: "agent", entityId: id, summary: `Agen ${parsed.data.name} ditambahkan` });
     });
     refresh();
-    return { ok: true, message: "Agen dan link referral berhasil dibuat." };
+    return { ok: true, message: "Agen dan link referral berhasil dibuat.", redirectTo: `/admin/manajemen/agen-referral/${id}` };
   } catch (error) { return failure(error); }
 }
 
@@ -130,7 +135,7 @@ export async function updateAgentAction(_state: ManagementActionState, formData:
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "update", entityType: "agent", entityId: id, summary: `Agen ${parsed.data.name} diperbarui` });
     });
     refresh();
-    return { ok: true, message: "Perubahan agen berhasil disimpan." };
+    return { ok: true, message: "Perubahan agen berhasil disimpan.", redirectTo: `/admin/manajemen/agen-referral/${id}` };
   } catch (error) { return failure(error); }
 }
 
@@ -149,7 +154,7 @@ export async function setManagementRecordStatusAction(_state: ManagementActionSt
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: status === "archived" ? "archive" : "restore", entityType: entity, entityId: id, summary: `Status ${entity} diubah menjadi ${status}` });
     });
     refresh();
-    return { ok: true, message: status === "archived" ? "Data berhasil diarsipkan." : "Data berhasil diaktifkan kembali." };
+    return { ok: true, message: status === "archived" ? "Data berhasil diarsipkan." : "Data berhasil diaktifkan kembali.", redirectTo: managementRecordPath(entity, id) };
   } catch (error) { return failure(error); }
 }
 
@@ -158,13 +163,13 @@ export async function createBookingAction(_state: ManagementActionState, formDat
   if (!parsed.success) return { ok: false, message: "Periksa bagian yang ditandai.", errors: fields(parsed.error) };
   try {
     const session = await requireAdminSession();
+    const bookingId = randomUUID();
     await withManagementTransaction(async (tx) => {
       const departure = await tx.query.departures.findFirst({ where: eq(departures.id, parsed.data.departureId) });
       if (!departure) throw new Error("Paket keberangkatan tidak ditemukan.");
       const pkg = await tx.query.packages.findFirst({ where: eq(packages.id, departure.packageId) });
       if (!pkg) throw new Error("Paket tidak ditemukan.");
       const settings = await tx.query.managementSettings.findFirst({ where: eq(managementSettings.id, "default") });
-      const bookingId = randomUUID();
       const bookingNumber = `REG-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-${bookingId.slice(0, 6).toUpperCase()}`;
       const finalPrice = Math.max(0, parsed.data.agreedPrice - parsed.data.discountAmount);
       await tx.insert(bookings).values({
@@ -191,7 +196,7 @@ export async function createBookingAction(_state: ManagementActionState, formDat
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "create", entityType: "booking", entityId: bookingId, summary: `${bookingNumber} dibuat untuk ${registrationRows.length} jamaah` });
     });
     refresh();
-    return { ok: true, message: "Pendaftaran dan harga jamaah berhasil disimpan." };
+    return { ok: true, message: "Pendaftaran dan harga jamaah berhasil disimpan.", redirectTo: `/admin/manajemen/keberangkatan/${bookingId}` };
   } catch (error) { return failure(error); }
 }
 
@@ -204,6 +209,7 @@ export async function recordPaymentAction(_state: ManagementActionState, formDat
   if (allocatedTotal !== parsed.data.amount) return { ok: false, message: "Total alokasi harus sama dengan nominal pembayaran.", errors: { allocations: ["Periksa kembali pembagian nominal per jamaah."] } };
   try {
     const session = await requireAdminSession();
+    const paymentId = randomUUID();
     await withManagementTransaction(async (tx) => {
       const registrationIds = parsed.data.allocations.map((item) => item.registrationId);
       const registrationRows = await tx.select().from(registrations).where(and(eq(registrations.bookingId, parsed.data.bookingId), inArray(registrations.id, registrationIds)));
@@ -220,7 +226,6 @@ export async function recordPaymentAction(_state: ManagementActionState, formDat
         const current = paymentStatus({ agreedPrice: registration.agreedPrice, dpTarget: registration.dpTarget, paid, refunded });
         if (allocation.amount > current.outstanding) throw new Error(`Alokasi melebihi sisa tagihan salah satu jamaah (${current.outstanding.toLocaleString("id-ID")}).`);
       }
-      const paymentId = randomUUID();
       const paidAt = new Date(parsed.data.paidAt);
       await tx.insert(payments).values({ id: paymentId, bookingId: parsed.data.bookingId, accountId: parsed.data.accountId, paidAt, amount: parsed.data.amount, method: parsed.data.method, reference: parsed.data.reference || null, note: parsed.data.note || null, createdBy: session.user.id });
       await tx.insert(paymentAllocations).values(parsed.data.allocations.map((item) => ({ paymentId, ...item })));
@@ -236,7 +241,7 @@ export async function recordPaymentAction(_state: ManagementActionState, formDat
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "create", entityType: "payment", entityId: paymentId, summary: `Pembayaran Rp${parsed.data.amount.toLocaleString("id-ID")} dicatat` });
     });
     refresh();
-    return { ok: true, message: "Pembayaran berhasil dicatat dan saldo diperbarui." };
+    return { ok: true, message: "Pembayaran berhasil dicatat dan saldo diperbarui.", redirectTo: `/admin/manajemen/pembayaran/${paymentId}` };
   } catch (error) { return failure(error); }
 }
 
@@ -254,7 +259,7 @@ export async function recordCashAction(_state: ManagementActionState, formData: 
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "create", entityType: "cash_transaction", entityId: id, summary: `${parsed.data.direction === "in" ? "Kas masuk" : parsed.data.direction === "out" ? "Kas keluar" : "Transfer"} dicatat` });
     });
     refresh();
-    return { ok: true, message: "Transaksi kas berhasil dicatat." };
+    return { ok: true, message: "Transaksi kas berhasil dicatat.", redirectTo: `/admin/manajemen/keuangan/${id}` };
   } catch (error) { return failure(error); }
 }
 
@@ -276,7 +281,7 @@ export async function recordStockMovementAction(_state: ManagementActionState, f
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "create", entityType: "inventory_movement", entityId: id, summary: `Stok ${item.name} menjadi ${balanceAfter}` });
     });
     refresh();
-    return { ok: true, message: "Stok dan histori berhasil diperbarui." };
+    return { ok: true, message: "Stok dan histori berhasil diperbarui.", redirectTo: `/admin/manajemen/stok/${parsed.data.itemId}` };
   } catch (error) { return failure(error); }
 }
 
@@ -291,7 +296,7 @@ export async function createAccountAction(_state: ManagementActionState, formDat
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "create", entityType: "financial_account", entityId: id, summary: `Akun ${name} ditambahkan` });
     });
     refresh();
-    return { ok: true, message: "Rekening/kas berhasil ditambahkan." };
+    return { ok: true, message: "Rekening/kas berhasil ditambahkan.", redirectTo: `/admin/manajemen/keuangan/${id}` };
   } catch (error) { return failure(error); }
 }
 
@@ -308,7 +313,7 @@ export async function updateAccountAction(_state: ManagementActionState, formDat
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "update", entityType: "financial_account", entityId: id, summary: `Akun ${name} diperbarui` });
     });
     refresh();
-    return { ok: true, message: "Rekening/kas berhasil diperbarui." };
+    return { ok: true, message: "Rekening/kas berhasil diperbarui.", redirectTo: `/admin/manajemen/keuangan/${id}` };
   } catch (error) { return failure(error); }
 }
 
@@ -332,7 +337,7 @@ export async function saveInventoryItemAction(_state: ManagementActionState, for
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: id ? "update" : "create", entityType: "inventory_item", entityId, summary: `Barang ${name} ${id ? "diperbarui" : "ditambahkan"}` });
     });
     refresh();
-    return { ok: true, message: id ? "Data barang berhasil diperbarui." : "Barang berhasil ditambahkan." };
+    return { ok: true, message: id ? "Data barang berhasil diperbarui." : "Barang berhasil ditambahkan.", redirectTo: `/admin/manajemen/stok/${entityId}` };
   } catch (error) { return failure(error); }
 }
 
@@ -352,7 +357,7 @@ export async function saveSequenceAction(_state: ManagementActionState, formData
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "activate", entityType: "document_sequence", entityId: id, summary: `Format ${kind} diaktifkan` });
     });
     refresh();
-    return { ok: true, message: "Format nomor sudah aktif." };
+    return { ok: true, message: "Format nomor sudah aktif.", redirectTo: "/admin/manajemen/invoice-kwitansi/baru" };
   } catch (error) { return failure(error); }
 }
 
@@ -391,7 +396,7 @@ export async function recordRefundAction(_state: ManagementActionState, formData
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "refund", entityType: "payment", entityId: paymentId, summary: `Refund Rp${amount.toLocaleString("id-ID")} dicatat` });
     });
     refresh();
-    return { ok: true, message: "Refund berhasil dicatat dan status diperbarui." };
+    return { ok: true, message: "Refund berhasil dicatat dan status diperbarui.", redirectTo: `/admin/manajemen/pembayaran/${paymentId}` };
   } catch (error) { return failure(error); }
 }
 
@@ -401,9 +406,11 @@ export async function payCommissionAction(_state: ManagementActionState, formDat
   if (!commissionId || !accountId) return { ok: false, message: "Komisi dan rekening pembayaran wajib dipilih." };
   try {
     const session = await requireAdminSession();
+    let agentId = "";
     await withManagementTransaction(async (tx) => {
       const commission = await tx.query.commissions.findFirst({ where: and(eq(commissions.id, commissionId), eq(commissions.status, "earned")) });
       if (!commission) throw new Error("Komisi belum sah atau sudah dibayar.");
+      agentId = commission.agentId;
       const agent = await tx.query.agents.findFirst({ where: eq(agents.id, commission.agentId) });
       const transactionId = randomUUID();
       const paidAt = new Date();
@@ -412,7 +419,7 @@ export async function payCommissionAction(_state: ManagementActionState, formDat
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "pay", entityType: "commission", entityId: commission.id, summary: `Komisi ${agent?.name ?? "agen"} dibayar` });
     });
     refresh();
-    return { ok: true, message: "Komisi berhasil ditandai sudah dibayar." };
+    return { ok: true, message: "Komisi berhasil ditandai sudah dibayar.", redirectTo: agentId ? `/admin/manajemen/agen-referral/${agentId}` : "/admin/manajemen/agen-referral" };
   } catch (error) { return failure(error); }
 }
 
@@ -438,7 +445,7 @@ export async function saveManagementSettingsAction(_state: ManagementActionState
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "update", entityType: "management_settings", entityId: "default", summary: "Pengaturan manajemen diperbarui" });
     });
     refresh();
-    return { ok: true, message: "Pengaturan berhasil disimpan." };
+    return { ok: true, message: "Pengaturan berhasil disimpan.", redirectTo: "/admin/manajemen/pengaturan" };
   } catch (error) { return failure(error); }
 }
 
@@ -475,6 +482,6 @@ export async function assignRoomAction(_state: ManagementActionState, formData: 
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "assign-room", entityType: "registration", entityId: registration.id, summary: `${pilgrim.fullName} ditempatkan di kamar ${roomNumber} (${roomType})` });
     });
     refresh();
-    return { ok: true, message: "Room List berhasil diperbarui." };
+    return { ok: true, message: "Room List berhasil diperbarui.", redirectTo: `/admin/manajemen/manifest-room-list/${registrationId}` };
   } catch (error) { return failure(error); }
 }

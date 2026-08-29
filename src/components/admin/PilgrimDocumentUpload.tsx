@@ -27,6 +27,7 @@ export function PilgrimDocumentUpload({ pilgrims }: { pilgrims: Array<{ id: stri
       if (!completed.ok) throw new Error(completedData.error || "File terkirim tetapi gagal dicatat.");
       setProgress("done"); setMessage("Dokumen berhasil disimpan secara private.");
       if (inputRef.current) inputRef.current.value = "";
+      router.replace(`/admin/manajemen/dokumen/${payload.pilgrimId}`);
       router.refresh();
     } catch (error) { setProgress("error"); setMessage(error instanceof Error ? error.message : "Upload gagal."); }
   }
