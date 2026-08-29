@@ -1,6 +1,6 @@
 import "server-only";
 
-import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "node:crypto";
 
@@ -42,12 +42,6 @@ export function privateObjectKey(scope: "pilgrims" | "payments" | "documents" | 
   return `private/${scope}/${entityId}/${randomUUID()}.${safeExtension}`;
 }
 
-export async function createPrivateUploadUrl(objectKey: string, mimeType: string, sizeBytes: number) {
-  validatePrivateUpload(mimeType, sizeBytes);
-  const { s3, bucket } = client();
-  return getSignedUrl(s3, new PutObjectCommand({ Bucket: bucket, Key: objectKey, ContentType: mimeType, ContentLength: sizeBytes }), { expiresIn: 300 });
-}
-
 export async function createPrivateDownloadUrl(objectKey: string, fileName?: string) {
   const { s3, bucket } = client();
   return getSignedUrl(s3, new GetObjectCommand({
@@ -60,12 +54,6 @@ export async function createPrivateDownloadUrl(objectKey: string, fileName?: str
 export async function putPrivateObject(objectKey: string, body: Uint8Array, contentType: string) {
   const { s3, bucket } = client();
   await s3.send(new PutObjectCommand({ Bucket: bucket, Key: objectKey, Body: body, ContentType: contentType }));
-}
-
-export async function verifyPrivateObject(objectKey: string, expectedSize: number) {
-  const { s3, bucket } = client();
-  const result = await s3.send(new HeadObjectCommand({ Bucket: bucket, Key: objectKey }));
-  if (result.ContentLength !== expectedSize) throw new Error("Ukuran file yang diterima tidak sesuai.");
 }
 
 export async function deletePrivateObject(objectKey: string) {

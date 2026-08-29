@@ -1924,6 +1924,25 @@
 .management-feedback svg { width: 18px; flex: 0 0 auto; }
 .management-feedback.success { background: #e8f8ee; color: #216d3d; }
 .management-feedback.error { background: #fff0f0; color: #a62a2a; }
+.management-feedback.info { background: #edf4fb; color: #244f7e; }
+.management-document-upload { padding-top: 8px; }
+.management-upload-picker { display: grid !important; grid-template-columns: 52px minmax(0,1fr) auto; align-items: center !important; gap: 14px !important; min-height: 92px; padding: 16px; border: 1px dashed #aeb9c7; border-radius: 12px; background: #fafbfd; cursor: pointer; transition: border-color .2s,background .2s,box-shadow .2s; }
+.management-upload-picker:hover { border-color: #a77b18; background: #fffdf7; box-shadow: 0 0 0 3px rgba(183,139,34,.08); }
+.management-upload-picker.has-file { border-style: solid; border-color: #c9b16e; background: #fffdf7; }
+.management-upload-picker > input { position: absolute; width: 1px; height: 1px; min-height: 0; padding: 0; overflow: hidden; clip: rect(0,0,0,0); border: 0; white-space: nowrap; }
+.management-upload-icon { display: grid; width: 52px; height: 52px; place-items: center; border-radius: 12px; background: #102a4c; color: #d5ad45; }
+.management-upload-icon svg { width: 24px; height: 24px; }
+.management-upload-copy { display: grid; min-width: 0; gap: 5px; }
+.management-upload-copy strong { overflow: hidden; color: #142d4e; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+.management-upload-copy small { color: #6f7c8d; font-size: 12px; font-weight: 550; line-height: 1.45; }
+.management-upload-choose { padding: 9px 12px; border: 1px solid #c9b16e; border-radius: 8px; background: #fff; color: #755409; font-size: 13px; font-weight: 750; }
+.management-draft-status { display: flex; align-items: center; gap: 7px; color: #687689; font-size: 12px; font-weight: 600; }
+.management-draft-status svg { width: 15px; height: 15px; color: #9b7007; }
+.management-upload-progress { display: grid; gap: 9px; padding: 14px; border: 1px solid #d8e0ea; border-radius: 10px; background: #f7fafe; }
+.management-upload-progress > span { display: flex; align-items: center; justify-content: space-between; gap: 15px; color: #17395f; font-size: 13px; }
+.management-upload-progress small { color: #62738a; font-weight: 700; }
+.management-upload-progress > div { height: 8px; overflow: hidden; border-radius: 999px; background: #dce4ed; }
+.management-upload-progress i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#9b7007,#d8b952); transition: width .2s ease; }
 .management-choice-list { display: grid; gap: 7px; max-height: 310px; margin: 0; padding: 15px; overflow: auto; border: 1px solid #d8dde5; border-radius: 10px; }
 .management-choice-list legend { padding: 0 7px; color: #223b5b; font-size: 15px; font-weight: 750; }
 .management-choice-list label { display: flex; min-height: 55px; align-items: center; gap: 11px; padding: 8px 10px; border-radius: 8px; background: #f8f8f6; }
@@ -2027,6 +2046,10 @@
   .management-disclosure > summary { min-height: 82px; padding: 15px; }
   .management-disclosure > div { padding-inline: 15px; }
   .management-primary-button { width: 100%; min-height: 52px; }
+  .management-upload-picker { grid-template-columns: 46px minmax(0,1fr); padding: 14px; }
+  .management-upload-icon { width: 46px; height: 46px; }
+  .management-upload-choose { grid-column: 1/-1; text-align: center; }
+  .management-upload-progress > span { align-items: flex-start; flex-direction: column; gap: 3px; }
   .management-card-list article { align-items: flex-start; flex-direction: column; }
   .management-card-list dl { width: 100%; justify-content: space-between; }
   .management-card-list dl div { text-align: left; }
