@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, Inbox, Plus } from "lucide-react";
 
-export function AdminPageHeader({ eyebrow, title, description, action, backHref }: { eyebrow: string; title: string; description: string; action?: { href: string; label: string }; backHref?: string }) {
+export function AdminPageHeader({ eyebrow, title, description, action, actions, backHref }: { eyebrow: string; title: string; description: string; action?: { href: string; label: string }; actions?: Array<{ href: string; label: string; secondary?: boolean }>; backHref?: string }) {
   return <header className="admin-page-header">
     <div>
       {backHref ? <Link className="admin-back-link" href={backHref}><ArrowLeft aria-hidden /> Kembali</Link> : null}
@@ -9,7 +9,7 @@ export function AdminPageHeader({ eyebrow, title, description, action, backHref 
       <h1>{title}</h1>
       <p>{description}</p>
     </div>
-    {action ? <Link className="admin-primary-button" href={action.href}><Plus aria-hidden />{action.label}</Link> : null}
+    {actions?.length ? <div className="admin-page-actions">{actions.map((item) => <Link className={item.secondary ? "admin-secondary-button" : "admin-primary-button"} href={item.href} key={item.href}><Plus aria-hidden />{item.label}</Link>)}</div> : action ? <Link className="admin-primary-button" href={action.href}><Plus aria-hidden />{action.label}</Link> : null}
   </header>;
 }
 
