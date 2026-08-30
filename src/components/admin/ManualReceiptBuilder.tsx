@@ -34,7 +34,7 @@ export function ManualReceiptBuilder({ invoices, receiptNumber }: { invoices: Re
       try {
         const response = await fetch("/api/admin/management/issued-documents/preview", {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: { "content-type": "application/json", accept: "image/png" },
           body: JSON.stringify({ kind: "receipt", bookingId: selectedInvoice.bookingId, paymentId }),
           signal: controller.signal,
         });
@@ -87,7 +87,7 @@ export function ManualReceiptBuilder({ invoices, receiptNumber }: { invoices: Re
       </div>
       <div className="management-document-preview">
         <header><span><small>PREVIEW LIVE</small><strong>Kwitansi · {selectedInvoice?.payerName}</strong></span>{previewBusy ? <i><LoaderCircle className="spin" /> Memuat</i> : previewUrl ? <i className="ready"><FileCheck2 /> Siap diperiksa</i> : null}</header>
-        <div className="landscape">{previewUrl ? <iframe title="Preview kwitansi" src={`${previewUrl}#toolbar=0&navpanes=0&view=FitH`} /> : previewError ? <div className="management-preview-state error"><RotateCw /><strong>Preview belum dapat ditampilkan</strong><p>{previewError}</p></div> : <div className="management-preview-state"><FileText /><strong>Menyiapkan preview kwitansi…</strong></div>}</div>
+        <div className="landscape">{previewUrl ? <div role="img" aria-label={`Preview kwitansi ${selectedInvoice?.payerName ?? ""}`} className="management-template-preview-image" style={{ backgroundImage: `url(${previewUrl})` }} /> : previewError ? <div className="management-preview-state error"><RotateCw /><strong>Preview belum dapat ditampilkan</strong><p>{previewError}</p></div> : <div className="management-preview-state"><FileText /><strong>Menyiapkan preview kwitansi…</strong></div>}</div>
       </div>
     </div>}
   </section>;

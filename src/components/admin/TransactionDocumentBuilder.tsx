@@ -35,7 +35,7 @@ export function TransactionDocumentBuilder({ bookings, invoiceNumber }: {
       try {
         const response = await fetch("/api/admin/management/issued-documents/preview", {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: { "content-type": "application/json", accept: "image/png" },
           body: JSON.stringify({ kind: "invoice", bookingId }),
           signal: controller.signal,
         });
@@ -96,7 +96,7 @@ export function TransactionDocumentBuilder({ bookings, invoiceNumber }: {
       <div className="management-document-preview">
         <header><span><small>PREVIEW LIVE</small><strong>Invoice · {selectedBooking?.payerName ?? "-"}</strong></span>{previewBusy ? <i><LoaderCircle className="spin" /> Memuat</i> : previewUrl ? <i className="ready"><FileCheck2 /> Siap diperiksa</i> : null}</header>
         <div className="portrait">
-          {previewUrl ? <iframe title="Preview invoice" src={`${previewUrl}#toolbar=0&navpanes=0&view=FitH`} /> : previewError ? <div className="management-preview-state error"><RotateCw /><strong>Preview belum dapat ditampilkan</strong><p>{previewError}</p></div> : <div className="management-preview-state"><LoaderCircle className={previewBusy ? "spin" : ""} /><strong>Menyiapkan preview PDF…</strong><p>Preview yang tampil sama dengan file invoice yang akan diterbitkan.</p></div>}
+          {previewUrl ? <div role="img" aria-label={`Preview invoice ${selectedBooking?.payerName ?? ""}`} className="management-template-preview-image" style={{ backgroundImage: `url(${previewUrl})` }} /> : previewError ? <div className="management-preview-state error"><RotateCw /><strong>Preview belum dapat ditampilkan</strong><p>{previewError}</p></div> : <div className="management-preview-state"><LoaderCircle className={previewBusy ? "spin" : ""} /><strong>Menyiapkan preview template…</strong><p>Preview gambar ini menjadi sumber yang sama untuk PDF dan PNG.</p></div>}
         </div>
       </div>
     </section>

@@ -6,7 +6,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { auditLogs, bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, registrations } from "@/db/schema";
 import { withManagementTransaction } from "@/db/transaction";
 import { formatDocumentNumber } from "./domain";
-import { renderTransactionPdf, type TransactionPdfSnapshot } from "./pdf";
+import { renderTransactionPdf, type TransactionPdfSnapshot } from "./document-renderer";
 import { privateObjectKey, putPrivateObject } from "./storage";
 
 export async function issueTransactionDocument({ kind, bookingId, paymentId, actorId }: {

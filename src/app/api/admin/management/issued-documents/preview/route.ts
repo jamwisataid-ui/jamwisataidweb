@@ -5,7 +5,7 @@ import { requireDatabase } from "@/db";
 import { bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, registrations } from "@/db/schema";
 import { requireAdminSession } from "@/lib/admin-session";
 import { formatDocumentNumber } from "@/lib/management/domain";
-import { renderTransactionPdf, type TransactionPdfSnapshot } from "@/lib/management/pdf";
+import { renderTransactionPdf, renderTransactionPng, type TransactionPdfSnapshot } from "@/lib/management/document-renderer";
 
 export const dynamic = "force-dynamic";
 
@@ -71,11 +71,12 @@ export async function POST(request: Request) {
         signerTitle: settings?.financeSignerTitle ?? "Keuangan",
       },
     };
-    const pdf = await renderTransactionPdf(snapshot);
-    return new Response(new Uint8Array(pdf), {
+    const wantsPng = request.headers.get("accept")?.includes("image/png");
+    const document = wantsPng ? await renderTransactionPng(snapshot) : await renderTransactionPdf(snapshot);
+    return new Response(new Uint8Array(document), {
       headers: {
-        "content-type": "application/pdf",
-        "content-disposition": `inline; filename="preview-${kind}.pdf"`,
+        "content-type": wantsPng ? "image/png" : "application/pdf",
+        "content-disposition": `inline; filename="preview-${kind}.${wantsPng ? "png" : "pdf"}"`,
         "cache-control": "no-store",
       },
     });
