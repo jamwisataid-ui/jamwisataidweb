@@ -296,7 +296,7 @@ export async function createAccountAction(_state: ManagementActionState, formDat
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "create", entityType: "financial_account", entityId: id, summary: `Akun ${name} ditambahkan` });
     });
     refresh();
-    return { ok: true, message: "Rekening/kas berhasil ditambahkan.", redirectTo: `/admin/manajemen/keuangan/${id}` };
+    return { ok: true, message: "Rekening/kas berhasil ditambahkan.", redirectTo: "/admin/manajemen/keuangan" };
   } catch (error) { return failure(error); }
 }
 

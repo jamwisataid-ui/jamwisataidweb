@@ -19,6 +19,12 @@ describe("status pembayaran", () => {
 });
 
 describe("penomoran dokumen", () => {
+  it.each([
+    ["invoice", { pattern: "{seq}/jamw/300828", padding: 4, nextNumber: 9933, reset: "never" as const, currentPeriod: null }, "9933/jamw/300828", 9934],
+    ["kwitansi", { pattern: "{seq}/jamw/300826", padding: 4, nextNumber: 66, reset: "never" as const, currentPeriod: null }, "0066/jamw/300826", 67],
+  ])("menghasilkan nomor awal %s Jam Wisata dan menaikkan urutan", (_kind, config, number, nextNumber) => {
+    expect(formatDocumentNumber(config, new Date("2026-08-30T10:00:00+07:00"))).toMatchObject({ number, nextNumber });
+  });
   it("menghasilkan format existing yang configurable", () => {
     expect(formatDocumentNumber({ pattern: "{seq}/Jamw/{MM}{YY}", padding: 4, nextNumber: 9932, reset: "never", currentPeriod: null }, new Date("2026-08-29T10:00:00+07:00"))).toMatchObject({ number: "9932/Jamw/0826", nextNumber: 9933 });
   });

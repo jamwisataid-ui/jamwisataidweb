@@ -36,14 +36,17 @@ function fileSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function PilgrimDocumentUpload({ pilgrims }: { pilgrims: Array<{ id: string; fullName: string }> }) {
+const documentKinds = new Set(["ktp", "kk", "akta_lahir", "buku_nikah", "ijazah", "paspor", "other"]);
+
+export function PilgrimDocumentUpload({ pilgrims, initialKind }: { pilgrims: Array<{ id: string; fullName: string }>; initialKind?: string }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<UploadProgress>("idle");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [message, setMessage] = useState("");
   const [pilgrimId, setPilgrimId] = useState(pilgrims[0]?.id ?? "");
-  const [kind, setKind] = useState("ktp");
+  const selectedInitialKind = initialKind && documentKinds.has(initialKind) ? initialKind : "ktp";
+  const [kind, setKind] = useState(selectedInitialKind);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [restoredFileName, setRestoredFileName] = useState("");
   const [draftReady, setDraftReady] = useState(false);
@@ -61,14 +64,14 @@ export function PilgrimDocumentUpload({ pilgrims }: { pilgrims: Array<{ id: stri
     const restoreDraft = window.setTimeout(() => {
       if (draft) {
         if (draft.pilgrimId && pilgrims.some((item) => item.id === draft.pilgrimId)) setPilgrimId(draft.pilgrimId);
-        if (draft.kind) setKind(draft.kind);
+        if (!initialKind && draft.kind && documentKinds.has(draft.kind)) setKind(draft.kind);
         if (draft.fileName) setRestoredFileName(draft.fileName);
         if (draft.updatedAt) setDraftSavedAt(new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" }).format(new Date(draft.updatedAt)));
       }
       setDraftReady(true);
     }, 0);
     return () => window.clearTimeout(restoreDraft);
-  }, [pilgrims]);
+  }, [initialKind, pilgrims]);
 
   useEffect(() => {
     if (!draftReady || !draftDirty || status === "done") return;
