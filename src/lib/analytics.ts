@@ -23,6 +23,7 @@ export type TrafficSnapshot = {
   pagesPerVisit: number;
   updatedAt: string;
   timeline: Array<{ label: string; value: number }>;
+  history: Array<{ label: string; value: number }>;
   popularPages: Array<{ path: string; views: number }>;
   devices: Array<{ device: string; visitors: number }>;
   recentVisitors: Array<{ sessionId: string; path: string; device: string; lastSeenAt: string; utmSource: string | null; utmCampaign: string | null }>;
@@ -111,6 +112,7 @@ const emptySnapshot = (): TrafficSnapshot => ({
   pagesPerVisit: 0,
   updatedAt: new Date().toISOString(),
   timeline: Array.from({ length: 12 }, (_, index) => ({ label: `${(index - 11) * 5}m`, value: 0 })),
+  history: Array.from({ length: 30 }, (_, index) => ({ label: `H-${29 - index}`, value: 0 })),
   popularPages: [],
   devices: [],
   recentVisitors: [],
@@ -126,10 +128,12 @@ export async function getTrafficSnapshot(): Promise<TrafficSnapshot> {
   const todaySince = jakartaDayStart(now);
   const sevenDaysSince = new Date(now.getTime() - 7 * 86400000);
   const thirtyDaysSince = new Date(now.getTime() - 30 * 86400000);
+  const historySince = new Date(todaySince.getTime() - 29 * 86400000);
   const bucket = sql<Date>`date_bin('5 minutes', ${analyticsPageViews.createdAt}, TIMESTAMPTZ '2001-01-01 00:00:00+00')`;
+  const dayBucket = sql<string>`date_trunc('day', ${analyticsPageViews.createdAt} at time zone 'Asia/Jakarta')::date`;
   const viewCount = count();
 
-  const [liveRows, todayRows, sevenDayRows, thirtyDayRows, sessionRows, timelineRows, popularRows, deviceRows, recentRows] = await Promise.all([
+  const [liveRows, todayRows, sevenDayRows, thirtyDayRows, sessionRows, timelineRows, historyRows, popularRows, deviceRows, recentRows] = await Promise.all([
     database
       .select({ value: countDistinct(analyticsSessions.visitorId) })
       .from(analyticsSessions)
@@ -150,6 +154,12 @@ export async function getTrafficSnapshot(): Promise<TrafficSnapshot> {
       .where(gte(analyticsPageViews.createdAt, hourSince))
       .groupBy(bucket)
       .orderBy(bucket),
+    database
+      .select({ bucket: dayBucket, value: countDistinct(analyticsPageViews.visitorId) })
+      .from(analyticsPageViews)
+      .where(gte(analyticsPageViews.createdAt, historySince))
+      .groupBy(dayBucket)
+      .orderBy(dayBucket),
     database
       .select({ path: analyticsPageViews.path, views: viewCount })
       .from(analyticsPageViews)
@@ -176,6 +186,15 @@ export async function getTrafficSnapshot(): Promise<TrafficSnapshot> {
       value: bucketValues.get(time) ?? 0,
     };
   });
+  const historyValues = new Map(historyRows.map((row) => [String(row.bucket).slice(0, 10), Number(row.value)]));
+  const history = Array.from({ length: 30 }, (_, index) => {
+    const date = new Date(historySince.getTime() + index * 86400000);
+    const key = new Intl.DateTimeFormat("en-CA", { year: "numeric", month: "2-digit", day: "2-digit", timeZone: "Asia/Jakarta" }).format(date);
+    return {
+      label: new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", timeZone: "Asia/Jakarta" }).format(date),
+      value: historyValues.get(key) ?? 0,
+    };
+  });
 
   const visitorsToday = Number(todayRows[0]?.visitors ?? 0);
   const pageViewsToday = Number(todayRows[0]?.views ?? 0);
@@ -190,6 +209,7 @@ export async function getTrafficSnapshot(): Promise<TrafficSnapshot> {
     pagesPerVisit: sessionsToday ? pageViewsToday / sessionsToday : 0,
     updatedAt: now.toISOString(),
     timeline,
+    history,
     popularPages: popularRows.map((row) => ({ path: row.path, views: Number(row.views) })),
     devices: deviceRows.map((row) => ({ device: row.device, visitors: Number(row.visitors) })),
     recentVisitors: recentRows.map((row) => ({ ...row, lastSeenAt: row.lastSeenAt.toISOString() })),

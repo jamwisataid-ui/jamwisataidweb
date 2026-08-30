@@ -6,6 +6,7 @@ import { formatDocumentNumber, rupiah } from "@/lib/management/domain";
 import { AdminPageHeader } from "./AdminUi";
 import { TransactionDocumentBuilder } from "./TransactionDocumentBuilder";
 import { EnsureReceiptButton } from "./EnsureReceiptButton";
+import { ManualReceiptBuilder } from "./ManualReceiptBuilder";
 import {
   AccountForm,
   AgentForm,
@@ -99,10 +100,15 @@ export function ManagementCreatePage({ module, data, kind, initialBookingId }: {
     const invoiceSequence = data.sequences.find((sequence) => sequence.kind === "invoice" && sequence.active);
     const receiptSequence = data.sequences.find((sequence) => sequence.kind === "receipt" && sequence.active);
     const now = new Date();
+    const manualReceiptInvoices = data.documents.filter((document) => document.kind === "invoice" && document.status === "issued").filter((document, index, documents) => documents.findIndex((candidate) => candidate.bookingId === document.bookingId) === index).flatMap((invoice) => {
+      const booking = data.bookings.find((candidate) => candidate.id === invoice.bookingId);
+      const eligiblePayments = data.payments.filter((payment) => payment.bookingId === invoice.bookingId && payment.status === "confirmed" && !data.documents.some((document) => document.kind === "receipt" && document.paymentId === payment.id && document.status === "issued"));
+      return booking && eligiblePayments.length ? [{ id: invoice.id, bookingId: invoice.bookingId, number: invoice.number, payerName: booking.payerName, payments: eligiblePayments.map((payment) => ({ id: payment.id, amountLabel: rupiah(payment.amount), paidAtLabel: new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeZone: "Asia/Jakarta" }).format(new Date(payment.paidAt)), method: payment.method })) }] : [];
+    });
     return <>{header}<TransactionDocumentBuilder
       bookings={data.bookings.filter((booking) => !data.documents.some((document) => document.kind === "invoice" && document.bookingId === booking.id && document.status === "issued")).map((booking) => ({ id: booking.id, bookingNumber: booking.bookingNumber, payerName: booking.payerName, packageName: String(booking.packageSnapshot.name ?? "Paket umroh"), pilgrims: booking.registrations.length }))}
       invoiceNumber={invoiceSequence ? formatDocumentNumber(invoiceSequence, now).number : "Belum diatur"}
-    /><details className="management-disclosure management-numbering-settings"><summary><span><strong>Atur nomor dokumen</strong><small>Opsional — ubah nomor berikutnya jika memang diperlukan.</small></span><i>+</i></summary><div><div className="management-settings-grid"><Panel title="Nomor invoice"><SequenceForm kind="invoice" values={invoiceSequence} /></Panel><Panel title="Nomor kwitansi"><SequenceForm kind="receipt" values={receiptSequence} /></Panel></div></div></details></>;
+    /><ManualReceiptBuilder invoices={manualReceiptInvoices} receiptNumber={receiptSequence ? formatDocumentNumber(receiptSequence, now).number : "Belum diatur"} /><details className="management-disclosure management-numbering-settings"><summary><span><strong>Atur nomor dokumen</strong><small>Opsional — ubah nomor berikutnya jika memang diperlukan.</small></span><i>+</i></summary><div><div className="management-settings-grid"><Panel title="Nomor invoice"><SequenceForm kind="invoice" values={invoiceSequence} /></Panel><Panel title="Nomor kwitansi"><SequenceForm kind="receipt" values={receiptSequence} /></Panel></div></div></details></>;
   }
   return <>{header}<div className="management-warning"><AlertTriangle /><span>Modul ini tidak memiliki form tambah data.</span></div></>;
 }

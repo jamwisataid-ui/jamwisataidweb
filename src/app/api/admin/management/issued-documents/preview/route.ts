@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { and, eq } from "drizzle-orm";
 
 import { requireDatabase } from "@/db";
-import { bookings, documentSequences, financialAccounts, managementSettings, paymentAllocations, payments, registrations } from "@/db/schema";
+import { bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, registrations } from "@/db/schema";
 import { requireAdminSession } from "@/lib/admin-session";
 import { formatDocumentNumber } from "@/lib/management/domain";
 import { renderTransactionPdf, type TransactionPdfSnapshot } from "@/lib/management/pdf";
@@ -21,6 +21,10 @@ export async function POST(request: Request) {
     if (!sequence) throw new Error(`Format nomor ${kind === "invoice" ? "invoice" : "kwitansi"} belum diaktifkan.`);
     const booking = await db.query.bookings.findFirst({ where: eq(bookings.id, body.bookingId) });
     if (!booking) throw new Error("Booking tidak ditemukan.");
+    const linkedInvoice = kind === "receipt"
+      ? await db.query.issuedDocuments.findFirst({ where: and(eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.bookingId, booking.id), eq(issuedDocuments.status, "issued")) })
+      : undefined;
+    if (kind === "receipt" && !linkedInvoice) throw new Error("Kwitansi wajib terhubung ke invoice yang sudah diterbitkan.");
 
     const registrationRows = await db.select().from(registrations).where(eq(registrations.bookingId, booking.id));
     const settings = await db.query.managementSettings.findFirst({ where: eq(managementSettings.id, "default") });
@@ -56,6 +60,7 @@ export async function POST(request: Request) {
       total,
       method: payment?.method,
       reference: payment?.reference,
+      invoiceNumber: linkedInvoice?.number,
       accounts: accountRows.map(({ bankName, accountNumber, accountHolder }) => ({ bankName, accountNumber, accountHolder })),
       company: {
         name: settings?.companyName ?? "Jam Wisata",

@@ -13,6 +13,7 @@ export type TransactionPdfSnapshot = {
   total: number;
   method?: string;
   reference?: string | null;
+  invoiceNumber?: string;
   accounts: Array<{ bankName?: string | null; accountNumber?: string | null; accountHolder?: string | null }>;
   company: { name: string; address: string; phone: string; email: string; signerName: string; signerTitle: string };
 };
@@ -97,7 +98,7 @@ export async function renderTransactionPdf(data: TransactionPdfSnapshot) {
   const metaX = isReceipt ? 575 : 330;
   const metaLabelWidth = isReceipt ? 86 : 78;
   const metaValueWidth = width - margin - metaX - metaLabelWidth;
-  const metaRows = isReceipt ? [["TANGGAL", dateLabel], ["NO KWITANSI", data.number], ["METODE", data.method ?? "-"]] : [["TANGGAL", dateLabel], ["NO INVOICE", data.number]];
+  const metaRows = isReceipt ? [["TANGGAL", dateLabel], ["NO KWITANSI", data.number], ["INVOICE", data.invoiceNumber ?? "-"], ["METODE", data.method ?? "-"]] : [["TANGGAL", dateLabel], ["NO INVOICE", data.number]];
   metaRows.forEach(([label, value], index) => {
     const rowY = metaTop + 7 - index * 31;
     page.drawRectangle({ x: metaX, y: rowY - 21, width: width - margin - metaX, height: 27, borderColor: gold, borderWidth: .8 });
@@ -106,7 +107,7 @@ export async function renderTransactionPdf(data: TransactionPdfSnapshot) {
     drawText(page, value, metaX + metaLabelWidth + 9, rowY - 12, regular, isReceipt ? 10 : 9, navy, { width: metaValueWidth - 12, align: "left" });
   });
 
-  const tableTop = metaTop - (isReceipt ? 79 : 88);
+  const tableTop = metaTop - (isReceipt ? 110 : 88);
   const tableWidth = width - margin * 2;
   const cols = [0, isReceipt ? .56 : .50, isReceipt ? .65 : .61, isReceipt ? .82 : .80, 1].map((value) => margin + tableWidth * value);
   page.drawRectangle({ x: margin, y: tableTop - 28, width: tableWidth, height: 28, color: navy });

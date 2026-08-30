@@ -463,13 +463,17 @@
 .traffic-chart-card header, .traffic-pages-card header { display: flex; align-items: flex-start; justify-content: space-between; }
 .traffic-chart-card header span, .traffic-pages-card header span, .traffic-devices > span { color: #9b7a2c; font-size: 9px; font-weight: 800; letter-spacing: .15em; }
 .traffic-chart-card h3, .traffic-pages-card h3 { margin-top: 5px; color: var(--admin-navy); font-size: 17px; }
-.traffic-chart-card header > small { display: flex; align-items: center; gap: 7px; color: #7d8490; font-size: 10px; }
-.traffic-chart-card header > small i { width: 6px; height: 6px; border-radius: 50%; background: #49b77d; }
-.traffic-chart { display: grid; height: 205px; grid-template-columns: repeat(12,1fr); align-items: end; gap: clamp(5px,1vw,11px); margin-top: 23px; padding-top: 18px; border-bottom: 1px solid rgba(7,26,53,.12); background-image: linear-gradient(to bottom, rgba(7,26,53,.055) 1px, transparent 1px); background-size: 100% 25%; }
-.traffic-bar-column { display: grid; height: 100%; grid-template-rows: 16px minmax(0,1fr) 22px; align-items: end; justify-items: center; }
-.traffic-bar-column > i { width: min(28px,75%); min-height: 5px; border-radius: 4px 4px 1px 1px; background: linear-gradient(180deg,#d2ad54 0%,#9b7115 100%); box-shadow: 0 5px 14px rgba(155,113,21,.17); transition: height .5s cubic-bezier(.22,1,.36,1); }
-.traffic-bar-value { align-self: start; color: #6b7280; font-size: 9px; font-weight: 700; }
-.traffic-bar-column small { min-width: 42px; padding-top: 7px; color: #8a9099; font-size: 8px; text-align: center; }
+.traffic-range-filter { display: inline-flex; padding: 3px; border: 1px solid rgba(7,26,53,.12); border-radius: 999px; background: #fff; }
+.traffic-range-filter button { min-height: 32px; padding: 5px 12px; border: 0; border-radius: 999px; background: transparent; color: #687485; font-size: 11px; font-weight: 750; cursor: pointer; }
+.traffic-range-filter button.active { background: var(--admin-navy); color: #f0d58f; box-shadow: 0 4px 11px rgba(7,26,53,.15); }
+.traffic-wave-chart { height: 225px; margin-top: 16px; overflow: hidden; }
+.traffic-wave-chart svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.traffic-wave-grid { stroke: rgba(7,26,53,.075); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.traffic-wave-area { transition: d .35s ease; }
+.traffic-wave-line { fill: none; stroke: #a87a16; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; filter: drop-shadow(0 5px 7px rgba(156,113,18,.16)); transition: d .35s ease; }
+.traffic-wave-point { fill: #fff; stroke: #a87a16; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.traffic-wave-value { fill: #6d541b; font-size: 10px; font-weight: 800; }
+.traffic-wave-label { fill: #7d8490; font-size: 9px; font-weight: 650; }
 .traffic-pages-card ol { display: grid; gap: 17px; margin-top: 22px; }
 .traffic-pages-card li { display: grid; grid-template-columns: 24px minmax(0,1fr) auto; align-items: center; gap: 10px; }
 .traffic-pages-card li > span { color: #b7a67f; font-family: var(--font-cinzel),Georgia,serif; font-size: 11px; }
@@ -2204,6 +2208,18 @@
 .management-document-builder-empty svg { width: 32px; color: #a77b18; }
 .management-document-builder-empty strong { color: #173251; font-size: 17px; }
 .management-document-builder-empty p { max-width: 430px; margin: 0; font-size: 13px; line-height: 1.55; }
+.management-manual-receipt { margin: 0 0 20px; padding: 22px; border: 1px solid #e2dccf; border-radius: 16px; background: #f8f6f0; box-shadow: 0 10px 30px rgba(7,26,53,.04); }
+.management-manual-receipt > header { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
+.management-manual-receipt > header small { color: #9a6e09; font-size: 10px; font-weight: 850; letter-spacing: .13em; }
+.management-manual-receipt > header h2 { margin: 5px 0 3px; color: #102a4c; font-family: var(--font-cinzel),Georgia,serif; font-size: 22px; }
+.management-manual-receipt > header p { margin: 0; color: #6c7889; font-size: 13px; }
+.management-manual-receipt > header > svg { width: 38px; height: 38px; padding: 8px; border-radius: 10px; background: #102a4c; color: #d8b858; }
+.management-manual-receipt .management-document-builder { margin-bottom: 0; }
+.management-manual-receipt-empty { display: flex; min-height: 90px; align-items: center; gap: 14px; padding: 16px; border: 1px dashed #cfc7b8; border-radius: 11px; background: rgba(255,255,255,.72); color: #718095; }
+.management-manual-receipt-empty > svg { width: 24px; color: #9b7007; }
+.management-manual-receipt-empty span,.management-manual-receipt-empty strong,.management-manual-receipt-empty small { display: block; }
+.management-manual-receipt-empty strong { color: #173251; font-size: 14px; }
+.management-manual-receipt-empty small { margin-top: 4px; font-size: 12px; line-height: 1.45; }
 .management-payment-flow-note { display: grid; grid-template-columns: 46px minmax(0,1fr); align-items: center; gap: 13px; padding: 15px; border: 1px solid #dfcc91; border-radius: 11px; background: #fffbf0; color: #102a4c; }
 .management-payment-flow-note > svg { width: 23px; height: 23px; margin-inline: auto; color: #9a6e09; }
 .management-payment-flow-note span,.management-payment-flow-note small,.management-payment-flow-note strong { display: block; }
@@ -2268,6 +2284,8 @@
   .management-document-preview-modal > div { height: 94vh; border-radius: 12px; }
   .management-document-preview-modal footer a { width: 100%; justify-content: center; }
   .management-document-controls { padding: 17px 14px; }
+  .management-manual-receipt { padding: 17px 14px; }
+  .management-manual-receipt > header { align-items: flex-start; }
   .management-document-flow { grid-template-columns: 1fr; }
   .management-document-flow li { min-height: 67px; border-right: 0; border-bottom: 1px solid #e8e2d6; }
   .management-document-flow li:last-child { border-bottom: 0; }

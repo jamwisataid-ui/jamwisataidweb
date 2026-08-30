@@ -1,7 +1,7 @@
 "use client";
 
 import { Activity, CalendarDays, Eye, Monitor, RefreshCw, Smartphone, Tablet, Users } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import type { TrafficSnapshot } from "@/lib/analytics";
 
@@ -21,10 +21,34 @@ function pathLabel(path: string) {
     .join(" / ");
 }
 
+function waveGeometry(values: number[]) {
+  const width = 720;
+  const height = 220;
+  const padding = { top: 22, right: 14, bottom: 38, left: 14 };
+  const baseline = height - padding.bottom;
+  const max = Math.max(1, ...values);
+  const points = values.map((value, index) => ({
+    x: padding.left + (index / Math.max(1, values.length - 1)) * (width - padding.left - padding.right),
+    y: padding.top + (1 - value / max) * (baseline - padding.top),
+    value,
+  }));
+  if (!points.length) return { width, height, baseline, max, points, line: "", area: "" };
+  let line = `M ${points[0].x} ${points[0].y}`;
+  for (let index = 1; index < points.length; index++) {
+    const previous = points[index - 1];
+    const current = points[index];
+    const middle = (previous.x + current.x) / 2;
+    line += ` C ${middle} ${previous.y}, ${middle} ${current.y}, ${current.x} ${current.y}`;
+  }
+  return { width, height, baseline, max, points, line, area: `${line} L ${points.at(-1)!.x} ${baseline} L ${points[0].x} ${baseline} Z` };
+}
+
 export function TrafficDashboard({ initialSnapshot }: { initialSnapshot: TrafficSnapshot }) {
   const [snapshot, setSnapshot] = useState(initialSnapshot);
+  const [range, setRange] = useState<7 | 30>(7);
   const [status, setStatus] = useState<"live" | "refreshing" | "error">("live");
   const activeRequest = useRef<AbortController | null>(null);
+  const gradientId = useId().replaceAll(":", "");
 
   const refresh = useCallback(async () => {
     activeRequest.current?.abort();
@@ -52,7 +76,8 @@ export function TrafficDashboard({ initialSnapshot }: { initialSnapshot: Traffic
     };
   }, [refresh]);
 
-  const maxTimeline = Math.max(1, ...snapshot.timeline.map((point) => point.value));
+  const chartData = snapshot.history.slice(-range);
+  const wave = waveGeometry(chartData.map((point) => point.value));
   const topPageViews = Math.max(1, snapshot.popularPages[0]?.views ?? 0);
   const totalDevices = snapshot.devices.reduce((total, item) => total + item.visitors, 0);
   const updatedTime = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(new Date(snapshot.updatedAt));
@@ -94,15 +119,16 @@ export function TrafficDashboard({ initialSnapshot }: { initialSnapshot: Traffic
 
       <div className="traffic-detail-grid">
         <article className="traffic-chart-card">
-          <header><div><span>60 MENIT TERAKHIR</span><h3>Irama kunjungan</h3></div><small><i aria-hidden /> Data langsung</small></header>
-          <div className="traffic-chart" role="img" aria-label={`Grafik kunjungan 60 menit terakhir, tertinggi ${maxTimeline} tampilan per 5 menit`}>
-            {snapshot.timeline.map((point, index) => (
-              <div className="traffic-bar-column" key={`${point.label}-${index}`}>
-                <span className="traffic-bar-value">{point.value || ""}</span>
-                <i style={{ height: `${Math.max(5, (point.value / maxTimeline) * 100)}%` }} />
-                <small>{index % 3 === 0 || index === snapshot.timeline.length - 1 ? point.label : ""}</small>
-              </div>
-            ))}
+          <header><div><span>{range} HARI TERAKHIR</span><h3>Tren pengunjung</h3></div><div className="traffic-range-filter" aria-label="Pilih rentang grafik"><button type="button" className={range === 7 ? "active" : ""} onClick={() => setRange(7)}>7 hari</button><button type="button" className={range === 30 ? "active" : ""} onClick={() => setRange(30)}>30 hari</button></div></header>
+          <div className="traffic-wave-chart" role="img" aria-label={`Grafik pengunjung ${range} hari terakhir, tertinggi ${wave.max} pengunjung per hari`}>
+            <svg viewBox={`0 0 ${wave.width} ${wave.height}`} preserveAspectRatio="none" aria-hidden>
+              <defs><linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#d4ad4f" stopOpacity=".42" /><stop offset="100%" stopColor="#d4ad4f" stopOpacity=".025" /></linearGradient></defs>
+              {[.25,.5,.75,1].map((ratio) => <line key={ratio} x1="14" x2="706" y1={22 + (wave.baseline - 22) * ratio} y2={22 + (wave.baseline - 22) * ratio} className="traffic-wave-grid" />)}
+              <path d={wave.area} fill={`url(#${gradientId})`} className="traffic-wave-area" />
+              <path d={wave.line} className="traffic-wave-line" />
+              {wave.points.map((point, index) => <g key={`${chartData[index]?.label}-${index}`}><circle cx={point.x} cy={point.y} r={range === 7 ? 4.5 : 2.7} className="traffic-wave-point"><title>{`${chartData[index]?.label}: ${point.value} pengunjung`}</title></circle>{range === 7 && point.value ? <text x={point.x} y={point.y - 11} textAnchor="middle" className="traffic-wave-value">{point.value}</text> : null}</g>)}
+              {chartData.map((point, index) => index === 0 || index === chartData.length - 1 || index % (range === 7 ? 1 : 5) === 0 ? <text key={`label-${point.label}-${index}`} x={wave.points[index]?.x} y="211" textAnchor={index === 0 ? "start" : index === chartData.length - 1 ? "end" : "middle"} className="traffic-wave-label">{point.label}</text> : null)}
+            </svg>
           </div>
         </article>
 
