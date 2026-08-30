@@ -2134,11 +2134,71 @@
 .management-status-form > button:disabled { cursor: wait; opacity: .65; }
 .management-status-form > button svg { width: 17px; }
 
+.management-document-builder { display: grid; grid-template-columns: minmax(300px,.68fr) minmax(500px,1.32fr); gap: 20px; align-items: start; margin-bottom: 20px; }
+.management-document-controls,.management-document-preview { overflow: hidden; border: 1px solid #e2dccf; border-radius: 16px; background: #fff; box-shadow: 0 12px 34px rgba(7,26,53,.055); }
+.management-document-controls { display: grid; gap: 18px; padding: 22px; }
+.management-document-controls > header { padding-bottom: 17px; border-bottom: 1px solid #ece7dc; }
+.management-document-controls > header small,.management-document-preview > header small { color: #9a6e09; font-size: 10px; font-weight: 850; letter-spacing: .13em; }
+.management-document-controls > header h2 { margin: 5px 0 4px; color: #102a4c; font-family: var(--font-cinzel),Georgia,serif; font-size: 23px; }
+.management-document-controls > header p { margin: 0; color: #6c7889; font-size: 13px; line-height: 1.5; }
+.management-document-kind { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; margin: 0; padding: 0; border: 0; }
+.management-document-kind legend,.management-document-select > span { display: block; grid-column: 1/-1; margin-bottom: 8px; color: #203a59; font-size: 14px; font-weight: 750; }
+.management-document-kind button { display: grid; grid-template-columns: 34px minmax(0,1fr); align-items: center; gap: 8px; min-height: 65px; padding: 10px; border: 1px solid #d7dce3; border-radius: 10px; background: #fff; color: #536277; text-align: left; cursor: pointer; transition: border-color .18s,background .18s,box-shadow .18s; }
+.management-document-kind button:hover { border-color: #c4aa64; }
+.management-document-kind button.active { border-color: #b58a22; background: #fffaf0; color: #102a4c; box-shadow: 0 0 0 2px rgba(181,138,34,.1); }
+.management-document-kind button > svg { width: 22px; color: #a27610; }
+.management-document-kind button span,.management-document-kind button strong,.management-document-kind button small { display: block; }
+.management-document-kind button strong { font-size: 14px; }
+.management-document-kind button small { margin-top: 2px; color: #788496; font-size: 11px; }
+.management-document-select { display: grid; color: #203a59; }
+.management-document-select select { width: 100%; min-height: 50px; padding: 11px 38px 11px 12px; border: 1px solid #cfd6df; border-radius: 9px; outline: 0; background: #fff; color: #142d4e; font: inherit; font-size: 14px; font-weight: 650; }
+.management-document-select select:focus { border-color: #a77b18; box-shadow: 0 0 0 3px rgba(183,139,34,.14); }
+.management-document-select > small { margin-top: 7px; color: #778395; font-size: 11px; line-height: 1.45; }
+.management-document-summary { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 13px; border-radius: 10px; background: #f6f7f8; }
+.management-document-summary span { min-width: 0; }
+.management-document-summary small,.management-document-summary strong { display: block; }
+.management-document-summary small { margin-bottom: 3px; color: #7c8795; font-size: 10px; font-weight: 750; text-transform: uppercase; }
+.management-document-summary strong { overflow: hidden; color: #173251; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.management-document-number { padding: 14px; border: 1px solid #dfcc91; border-radius: 10px; background: #fffbf0; }
+.management-document-number span,.management-document-number strong,.management-document-number small { display: block; }
+.management-document-number span { color: #78601f; font-size: 11px; font-weight: 700; }
+.management-document-number strong { margin: 5px 0; color: #102a4c; font-size: 17px; overflow-wrap: anywhere; }
+.management-document-number small { color: #7c7563; font-size: 11px; line-height: 1.45; }
+.management-document-error { margin: 0; padding: 11px 12px; border-radius: 8px; background: #fff0f0; color: #a62a2a; font-size: 12px; font-weight: 650; }
+.management-document-issue { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; gap: 9px; border: 0; border-radius: 10px; background: #102a4c; color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 18px rgba(7,26,53,.16); }
+.management-document-issue:hover { background: #173960; }
+.management-document-issue:disabled { cursor: not-allowed; opacity: .55; }
+.management-document-issue svg { width: 19px; }
+.management-document-issue .spin,.management-document-preview .spin { animation: spin .8s linear infinite; }
+.management-document-preview { position: sticky; top: 20px; }
+.management-document-preview > header { display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 15px; padding: 14px 17px; border-bottom: 1px solid #e5dfd3; }
+.management-document-preview > header span,.management-document-preview > header strong { display: block; }
+.management-document-preview > header strong { margin-top: 4px; color: #173251; font-size: 14px; }
+.management-document-preview > header i { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 6px; padding: 6px 9px; border-radius: 999px; background: #fff5da; color: #82600d; font-size: 10px; font-style: normal; font-weight: 750; }
+.management-document-preview > header i.ready { background: #eaf7ee; color: #297146; }
+.management-document-preview > header i svg { width: 14px; }
+.management-document-preview > div { position: relative; height: min(70vh,760px); min-height: 580px; padding: 15px; background: #e9e8e4; }
+.management-document-preview iframe { width: 100%; height: 100%; border: 0; border-radius: 6px; background: #fff; box-shadow: 0 3px 15px rgba(20,30,45,.12); }
+.management-preview-state { position: absolute; inset: 15px; display: grid; place-content: center; justify-items: center; gap: 8px; padding: 25px; border-radius: 6px; background: #f8f8f6; color: #718095; text-align: center; }
+.management-preview-state svg { width: 28px; color: #a77b18; }
+.management-preview-state strong { color: #233d5b; font-size: 15px; }
+.management-preview-state p { max-width: 330px; margin: 0; font-size: 12px; line-height: 1.5; }
+.management-preview-state.error svg { color: #a83a32; }
+.management-numbering-settings { max-width: none; }
+.management-numbering-settings .management-panel { margin: 18px 0 0; padding: 18px; box-shadow: none; }
+.management-numbering-settings .management-crud-panel { max-width: none; }
+.management-document-builder-empty { display: grid; min-height: 280px; place-content: center; justify-items: center; gap: 9px; margin-bottom: 20px; padding: 24px; border: 1px solid #e2dccf; border-radius: 16px; background: #fff; color: #718095; text-align: center; }
+.management-document-builder-empty svg { width: 32px; color: #a77b18; }
+.management-document-builder-empty strong { color: #173251; font-size: 17px; }
+.management-document-builder-empty p { max-width: 430px; margin: 0; font-size: 13px; line-height: 1.55; }
+
 @media (max-width: 1180px) {
   .management-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .management-dashboard-columns { grid-template-columns: 1fr; }
   .management-birthday-list { grid-template-columns: 1fr; }
   .management-account-grid,.management-inventory-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .management-document-builder { grid-template-columns: 1fr; }
+  .management-document-preview { position: static; }
 }
 @media (max-width: 720px) {
   .management-kpis,.management-form-grid.two,.management-settings-grid,.management-account-grid,.management-inventory-grid { grid-template-columns: 1fr; }
@@ -2180,4 +2240,9 @@
   .management-document-preview-modal { padding: 10px; }
   .management-document-preview-modal > div { height: 94vh; border-radius: 12px; }
   .management-document-preview-modal footer a { width: 100%; justify-content: center; }
+  .management-document-controls { padding: 17px 14px; }
+  .management-document-kind { grid-template-columns: 1fr; }
+  .management-document-preview > header { align-items: flex-start; flex-direction: column; }
+  .management-document-preview > div { height: 68vh; min-height: 460px; padding: 8px; }
+  .management-preview-state { inset: 8px; }
 }

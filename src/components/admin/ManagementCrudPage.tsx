@@ -2,9 +2,9 @@ import Link from "next/link";
 import { AlertTriangle, CheckCircle2, CircleAlert, Download, Upload } from "lucide-react";
 
 import type { getManagementContext } from "@/lib/management/data";
-import { rupiah } from "@/lib/management/domain";
+import { formatDocumentNumber, rupiah } from "@/lib/management/domain";
 import { AdminPageHeader } from "./AdminUi";
-import { IssueDocumentButton } from "./IssueDocumentButton";
+import { TransactionDocumentBuilder } from "./TransactionDocumentBuilder";
 import {
   AccountForm,
   AgentForm,
@@ -76,7 +76,7 @@ function PilgrimDocumentChecklist({ pilgrimId, documents }: { pilgrimId: string;
 
 export function ManagementCreatePage({ module, data, kind }: { module: string; data: Context; kind?: string }) {
   const backHref = `/admin/manajemen/${module}`;
-  const header = <AdminPageHeader eyebrow="TAMBAH DATA" title={`Tambah ${labels[module] ?? "data"}`} description="Isi data pada form di bawah lalu periksa kembali sebelum menyimpan." backHref={backHref} />;
+  const header = <AdminPageHeader eyebrow="TAMBAH DATA" title={`Tambah ${labels[module] ?? "data"}`} description={module === "invoice-kwitansi" ? "Pilih transaksi, periksa preview PDF, lalu terbitkan dokumen." : "Isi data pada form di bawah lalu periksa kembali sebelum menyimpan."} backHref={backHref} />;
 
   if (module === "jamaah") return <>{header}<Panel title="Data jamaah baru"><PilgrimForm /></Panel></>;
   if (module === "keberangkatan") return <>{header}<Panel title="Pendaftaran baru" description="Satu pembayar dapat mendaftarkan beberapa jamaah."><BookingForm pilgrims={data.pilgrims.filter((item) => item.status === "active").map(({ id, fullName, whatsapp }) => ({ id, fullName, whatsapp }))} departures={data.departures.map((item) => ({ id: item.id, departureDate: item.departureDate, price: item.price, package: item.package ? { name: item.package.name } : undefined }))} agents={data.agents.filter((item) => item.status === "active").map(({ id, name, defaultCommission }) => ({ id, name, defaultCommission }))} /></Panel></>;
@@ -90,7 +90,17 @@ export function ManagementCreatePage({ module, data, kind }: { module: string; d
   if (module === "stok" && kind === "pergerakan") return <>{header}<Panel title="Pergerakan stok"><StockForm items={data.inventory.filter((item) => item.status === "active").map(({ id, name, currentStock }) => ({ id, name, currentStock }))} /></Panel></>;
   if (module === "stok") return <>{header}<Panel title="Barang baru"><InventoryItemForm /></Panel></>;
   if (module === "manifest-room-list") return <>{header}<Panel title="Atur kamar jamaah"><RoomListForm registrations={data.registrations.map((item) => ({ id: item.id, pilgrimName: item.pilgrim?.fullName ?? "Jamaah", gender: item.pilgrim?.gender ?? null, packageName: item.package?.name ?? "Paket" }))} /></Panel></>;
-  if (module === "invoice-kwitansi") { const invoiceSequence = data.sequences.find((sequence) => sequence.kind === "invoice" && sequence.active); const receiptSequence = data.sequences.find((sequence) => sequence.kind === "receipt" && sequence.active); return <>{header}<div className="management-settings-grid"><Panel title="Nomor invoice" description="Nomor berikutnya dapat diedit manual dan akan naik otomatis setelah invoice diterbitkan."><SequenceForm kind="invoice" values={invoiceSequence} /></Panel><Panel title="Nomor kwitansi" description="Nomor berikutnya dapat diedit manual dan akan naik otomatis setelah kwitansi diterbitkan."><SequenceForm kind="receipt" values={receiptSequence} /></Panel></div><Panel title="Pilih transaksi"><div className="management-document-actions">{data.bookings.map((booking) => <article key={booking.id}><span><strong>{booking.bookingNumber} · {booking.payerName}</strong><small>{String(booking.packageSnapshot.name ?? "Paket")} · {booking.registrations.length} jamaah</small></span><div><IssueDocumentButton kind="invoice" bookingId={booking.id} />{data.payments.filter((payment) => payment.bookingId === booking.id && payment.status === "confirmed").map((payment) => <IssueDocumentButton key={payment.id} kind="receipt" bookingId={booking.id} paymentId={payment.id} />)}</div></article>)}</div></Panel></>; }
+  if (module === "invoice-kwitansi") {
+    const invoiceSequence = data.sequences.find((sequence) => sequence.kind === "invoice" && sequence.active);
+    const receiptSequence = data.sequences.find((sequence) => sequence.kind === "receipt" && sequence.active);
+    const now = new Date();
+    return <>{header}<TransactionDocumentBuilder
+      bookings={data.bookings.map((booking) => ({ id: booking.id, bookingNumber: booking.bookingNumber, payerName: booking.payerName, packageName: String(booking.packageSnapshot.name ?? "Paket umroh"), pilgrims: booking.registrations.length }))}
+      payments={data.payments.filter((payment) => payment.status === "confirmed").map((payment) => ({ id: payment.id, bookingId: payment.bookingId, amountLabel: rupiah(payment.amount), paidAtLabel: new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeZone: "Asia/Jakarta" }).format(new Date(payment.paidAt)), method: payment.method }))}
+      invoiceNumber={invoiceSequence ? formatDocumentNumber(invoiceSequence, now).number : "Belum diatur"}
+      receiptNumber={receiptSequence ? formatDocumentNumber(receiptSequence, now).number : "Belum diatur"}
+    /><details className="management-disclosure management-numbering-settings"><summary><span><strong>Atur nomor dokumen</strong><small>Opsional — ubah nomor berikutnya jika memang diperlukan.</small></span><i>+</i></summary><div><div className="management-settings-grid"><Panel title="Nomor invoice"><SequenceForm kind="invoice" values={invoiceSequence} /></Panel><Panel title="Nomor kwitansi"><SequenceForm kind="receipt" values={receiptSequence} /></Panel></div></div></details></>;
+  }
   return <>{header}<div className="management-warning"><AlertTriangle /><span>Modul ini tidak memiliki form tambah data.</span></div></>;
 }
 

@@ -75,7 +75,7 @@ export function AdminSidebar({ name, email }: { name: string; email: string }) {
         <p>Mode dashboard</p>
         <div>
           <Link onClick={() => setOpen(false)} href="/admin" className={managementMode ? "" : "active"} aria-current={managementMode ? undefined : "page"}><Globe2 aria-hidden /><span>CMS</span></Link>
-          <Link onClick={() => setOpen(false)} href="/admin/manajemen" className={managementMode ? "active" : ""} aria-current={managementMode ? "page" : undefined}><Building2 aria-hidden /><span>Internal</span></Link>
+          <Link onClick={() => setOpen(false)} href="/admin/manajemen" className={managementMode ? "active" : ""} aria-current={managementMode ? "page" : undefined}><Building2 aria-hidden /><span>INTERNAL</span></Link>
         </div>
       </section>
       <nav aria-label={managementMode ? "Navigasi manajemen internal" : "Navigasi CMS"} className="admin-nav">

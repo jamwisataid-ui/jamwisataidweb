@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 
-import { auditLogs, bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, pilgrims, registrations } from "@/db/schema";
+import { auditLogs, bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, registrations } from "@/db/schema";
 import { withManagementTransaction } from "@/db/transaction";
 import { requireAdminSession } from "@/lib/admin-session";
 import { formatDocumentNumber } from "@/lib/management/domain";
@@ -22,7 +22,6 @@ export async function POST(request: Request) {
       const booking = await tx.query.bookings.findFirst({ where: eq(bookings.id, body.bookingId!) });
       if (!booking) throw new Error("Booking tidak ditemukan.");
       const registrationRows = await tx.select().from(registrations).where(eq(registrations.bookingId, booking.id));
-      const pilgrimRows = registrationRows.length ? await tx.select().from(pilgrims).where(inArray(pilgrims.id, registrationRows.map((item) => item.pilgrimId))) : [];
       const settings = await tx.query.managementSettings.findFirst({ where: eq(managementSettings.id, "default") });
       const accountRows = await tx.select().from(financialAccounts).where(and(eq(financialAccounts.showOnInvoice, true), eq(financialAccounts.status, "active")));
       const issuedAt = new Date();
@@ -35,10 +34,9 @@ export async function POST(request: Request) {
         payment = await tx.query.payments.findFirst({ where: and(eq(payments.id, body.paymentId), eq(payments.bookingId, booking.id)) });
         if (!payment || payment.status !== "confirmed") throw new Error("Pembayaran belum terkonfirmasi.");
         const allocations = await tx.select().from(paymentAllocations).where(eq(paymentAllocations.paymentId, payment.id));
-        items = allocations.map((allocation) => {
-          const registration = registrationRows.find((row) => row.id === allocation.registrationId);
-          return { description: `Pembayaran ${String(booking.packageSnapshot.name ?? "paket umroh")} — ${pilgrimRows.find((p) => p.id === registration?.pilgrimId)?.fullName ?? "Jamaah"}`, qty: 1, unitPrice: allocation.amount, total: allocation.amount };
-        });
+        const equalAllocations = allocations.length > 0 && allocations.every((allocation) => allocation.amount === allocations[0].amount);
+        const qty = equalAllocations ? allocations.length : 1;
+        items = [{ description: `Pembayaran ${String(booking.packageSnapshot.name ?? "paket umroh")}${allocations.length ? ` untuk ${allocations.length} jamaah` : ""}`, qty, unitPrice: equalAllocations ? allocations[0].amount : payment.amount, total: payment.amount }];
         total = payment.amount;
       } else {
         const grouped = new Map<number, number>();

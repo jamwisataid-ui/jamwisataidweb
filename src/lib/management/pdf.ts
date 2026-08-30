@@ -67,34 +67,54 @@ export async function renderTransactionPdf(data: TransactionPdfSnapshot) {
   const height = isReceipt ? 576 : 864;
   const page = pdf.addPage([width, height]);
   const { regular, bold, italic, logo } = await assets(pdf);
-  const margin = 42;
-  const headerHeight = isReceipt ? 112 : 145;
+  const margin = isReceipt ? 38 : 32;
+  const headerHeight = isReceipt ? 104 : 174;
+  const dateLabel = new Intl.DateTimeFormat("id-ID", { dateStyle: "long", timeZone: "Asia/Jakarta" }).format(new Date(data.issuedAt));
 
   page.drawRectangle({ x: 0, y: height - headerHeight, width, height: headerHeight, color: navy });
-  page.drawRectangle({ x: 0, y: height - headerHeight, width, height: 7, color: gold });
-  const logoScale = 135 / logo.width;
-  page.drawImage(logo, { x: margin, y: height - 92, width: 135, height: logo.height * logoScale });
-  drawText(page, isReceipt ? "KWITANSI" : "INVOICE", width - margin - 190, height - 65, bold, 25, white, { width: 190, align: "right" });
-  drawText(page, `NO. ${data.number}`, width - margin - 190, height - 84, regular, 10, rgb(.9, .81, .54), { width: 190, align: "right" });
+  page.drawRectangle({ x: 0, y: height - headerHeight, width, height: 4, color: gold });
+  page.drawLine({ start: { x: 10, y: height - 12 }, end: { x: width - 10, y: height - 12 }, color: gold, thickness: 1.2 });
+  const logoWidth = isReceipt ? 292 : 270;
+  const logoScale = logoWidth / logo.width;
+  page.drawImage(logo, { x: isReceipt ? (width - logoWidth) / 2 : margin, y: height - headerHeight + (headerHeight - logo.height * logoScale) / 2 + 2, width: logoWidth, height: logo.height * logoScale });
+  if (!isReceipt) {
+    drawText(page, data.company.phone, width - margin - 210, height - 63, bold, 10, white, { width: 210, align: "right" });
+    drawText(page, data.company.email, width - margin - 210, height - 82, regular, 9, rgb(.9, .81, .54), { width: 210, align: "right" });
+    for (const [index, addressLine] of wrap(data.company.address, regular, 8, 190).slice(0, 2).entries()) drawText(page, addressLine, width - margin - 190, height - 105 - index * 11, regular, 8, white, { width: 190, align: "right" });
+  }
 
-  const metaTop = height - headerHeight - 35;
-  drawText(page, isReceipt ? "DITERIMA DARI" : "TAGIHAN KEPADA", margin, metaTop, bold, 8, gold);
-  drawText(page, data.customer.name, margin, metaTop - 23, bold, 16);
-  drawText(page, `${data.customer.whatsapp}${data.customer.email ? `  |  ${data.customer.email}` : ""}`, margin, metaTop - 40, regular, 9, gray);
-  const metaWidth = isReceipt ? 300 : 210;
-  drawText(page, "TANGGAL", width - margin - metaWidth, metaTop, bold, 8, gold, { width: metaWidth, align: "right" });
-  drawText(page, new Intl.DateTimeFormat("id-ID", { dateStyle: "long", timeZone: "Asia/Jakarta" }).format(new Date(data.issuedAt)), width - margin - metaWidth, metaTop - 23, bold, 13, navy, { width: metaWidth, align: "right" });
-  if (isReceipt) drawText(page, `Metode: ${data.method ?? "-"}${data.reference ? ` | ${data.reference}` : ""}`, width - margin - metaWidth, metaTop - 40, regular, 9, gray, { width: metaWidth, align: "right" });
+  const titleY = height - headerHeight - (isReceipt ? 53 : 56);
+  drawText(page, isReceipt ? "KWITANSI" : "INVOICE", margin, titleY, bold, isReceipt ? 34 : 38, navy);
+  page.drawLine({ start: { x: margin, y: titleY - 12 }, end: { x: isReceipt ? 360 : width - margin, y: titleY - 12 }, color: gold, thickness: 1.2 });
 
-  const tableTop = metaTop - 78;
+  const metaTop = titleY - (isReceipt ? 50 : 60);
+  const leftWidth = isReceipt ? 455 : 255;
+  drawText(page, isReceipt ? "TELAH DITERIMA DARI" : "INVOICE TO", margin, metaTop, bold, 8, navy);
+  drawText(page, data.customer.name, margin, metaTop - 25, isReceipt ? italic : regular, isReceipt ? 18 : 15, isReceipt ? gold : navy);
+  drawText(page, `${data.customer.whatsapp}${data.customer.email ? `  |  ${data.customer.email}` : ""}`, margin, metaTop - 43, regular, 8, gray);
+  page.drawLine({ start: { x: margin, y: metaTop - 50 }, end: { x: margin + leftWidth, y: metaTop - 50 }, color: gold, thickness: .8 });
+
+  const metaX = isReceipt ? 575 : 330;
+  const metaLabelWidth = isReceipt ? 86 : 78;
+  const metaValueWidth = width - margin - metaX - metaLabelWidth;
+  const metaRows = isReceipt ? [["TANGGAL", dateLabel], ["NO KWITANSI", data.number], ["METODE", data.method ?? "-"]] : [["TANGGAL", dateLabel], ["NO INVOICE", data.number]];
+  metaRows.forEach(([label, value], index) => {
+    const rowY = metaTop + 7 - index * 31;
+    page.drawRectangle({ x: metaX, y: rowY - 21, width: width - margin - metaX, height: 27, borderColor: gold, borderWidth: .8 });
+    page.drawRectangle({ x: metaX, y: rowY - 21, width: metaLabelWidth, height: 27, color: navy });
+    drawText(page, label, metaX + 8, rowY - 11, bold, 7, white);
+    drawText(page, value, metaX + metaLabelWidth + 9, rowY - 12, regular, isReceipt ? 10 : 9, navy, { width: metaValueWidth - 12, align: "left" });
+  });
+
+  const tableTop = metaTop - (isReceipt ? 79 : 88);
   const tableWidth = width - margin * 2;
-  const cols = [0, .55, .65, .825, 1].map((value) => margin + tableWidth * value);
+  const cols = [0, isReceipt ? .56 : .50, isReceipt ? .65 : .61, isReceipt ? .82 : .80, 1].map((value) => margin + tableWidth * value);
   page.drawRectangle({ x: margin, y: tableTop - 28, width: tableWidth, height: 28, color: navy });
   ["KETERANGAN", "QTY", "HARGA", "TOTAL"].forEach((label, index) => drawText(page, label, cols[index] + 8, tableTop - 18, bold, 8, white, { width: cols[index + 1] - cols[index] - 16, align: index ? "right" : "left" }));
   let y = tableTop - 28;
   for (const item of data.items) {
     const description = wrap(item.description, regular, 9, cols[1] - cols[0] - 16).slice(0, 2);
-    const rowHeight = Math.max(42, description.length * 12 + 18);
+    const rowHeight = Math.max(isReceipt ? 35 : 40, description.length * 11 + 15);
     page.drawRectangle({ x: margin, y: y - rowHeight, width: tableWidth, height: rowHeight, borderColor: line, borderWidth: 1 });
     description.forEach((lineText, index) => drawText(page, lineText, cols[0] + 8, y - 18 - index * 12, regular, 9));
     drawText(page, String(item.qty), cols[1] + 8, y - 24, regular, 9, navy, { width: cols[2] - cols[1] - 16, align: "right" });
@@ -102,29 +122,39 @@ export async function renderTransactionPdf(data: TransactionPdfSnapshot) {
     drawText(page, rupiah(item.total), cols[3] + 8, y - 24, regular, 9, navy, { width: cols[4] - cols[3] - 16, align: "right" });
     y -= rowHeight;
   }
-  const totalWidth = isReceipt ? 280 : 235;
-  page.drawRectangle({ x: width - margin - totalWidth, y: y - 48, width: totalWidth, height: 38, color: navy });
-  drawText(page, "TOTAL", width - margin - totalWidth + 12, y - 34, bold, 10, white);
-  drawText(page, rupiah(data.total), width - margin - totalWidth + 80, y - 35, bold, 13, white, { width: totalWidth - 92, align: "right" });
-  y -= 62;
+  const totalWidth = isReceipt ? 355 : 260;
+  page.drawRectangle({ x: width - margin - totalWidth, y: y - 46, width: totalWidth, height: 38, color: navy, borderColor: gold, borderWidth: 1.2 });
+  drawText(page, "TOTAL", width - margin - totalWidth + 15, y - 33, bold, 11, white);
+  drawText(page, rupiah(data.total), width - margin - totalWidth + 92, y - 34, bold, isReceipt ? 16 : 14, rgb(1,.75,.28), { width: totalWidth - 106, align: "right" });
+  y -= 58;
   if (isReceipt) {
-    page.drawRectangle({ x: margin, y: y - 42, width: tableWidth, height: 42, color: paleGold });
-    drawText(page, `Terbilang: ${terbilang(data.total)}`, margin + 13, y - 26, italic, 9, navy);
+    page.drawRectangle({ x: margin, y: y - 37, width: tableWidth * .56, height: 34, color: paleGold, borderColor: gold, borderWidth: .7 });
+    drawText(page, "TERBILANG", margin + 12, y - 24, bold, 8, navy);
+    drawText(page, `#${terbilang(data.total)}#`, margin + 82, y - 24, italic, 9, navy);
   }
 
-  const footerY = isReceipt ? 55 : 65;
-  const bankWidth = tableWidth * .58;
-  page.drawRectangle({ x: margin, y: footerY, width: bankWidth, height: 82, color: rgb(.965, .973, .98) });
-  drawText(page, isReceipt ? "KETERANGAN" : "REKENING PEMBAYARAN", margin + 13, footerY + 61, bold, 8, gold);
-  if (isReceipt) drawText(page, "Pembayaran telah diterima dan tercatat pada sistem Jam Wisata.", margin + 13, footerY + 41, regular, 8, gray);
-  else if (data.accounts.length) data.accounts.slice(0, 3).forEach((account, index) => drawText(page, `${account.bankName ?? "Bank"} | ${account.accountNumber ?? "-"} | a.n. ${account.accountHolder ?? data.company.name}`, margin + 13, footerY + 42 - index * 14, regular, 8, navy));
-  else drawText(page, "Hubungi Jam Wisata untuk informasi rekening pembayaran.", margin + 13, footerY + 41, regular, 8, gray);
-  const signerX = width - margin - tableWidth * .3;
-  drawText(page, data.company.signerTitle, signerX, footerY + 62, regular, 9, navy, { width: tableWidth * .3, align: "center" });
-  page.drawLine({ start: { x: signerX + 20, y: footerY + 16 }, end: { x: width - margin - 20, y: footerY + 16 }, color: navy, thickness: .8 });
-  drawText(page, data.company.signerName || "Jam Wisata", signerX, footerY + 3, bold, 9, navy, { width: tableWidth * .3, align: "center" });
-  page.drawRectangle({ x: 0, y: 0, width, height: 18, color: gold });
-  drawText(page, `${data.company.name}  |  ${data.company.address}  |  ${data.company.phone}  |  ${data.company.email}`, margin, 6, regular, 7, white, { width: width - margin * 2, align: "center" });
+  const footerY = isReceipt ? 28 : 50;
+  const bankWidth = tableWidth * (isReceipt ? .57 : .59);
+  if (!isReceipt) {
+    page.drawRectangle({ x: margin, y: footerY, width: bankWidth, height: 100, color: rgb(.978,.974,.956), borderColor: gold, borderWidth: .8 });
+    page.drawRectangle({ x: margin, y: footerY + 73, width: 150, height: 27, color: navy });
+    drawText(page, "REKENING PEMBAYARAN", margin + 12, footerY + 83, bold, 8, white);
+    if (data.accounts.length) data.accounts.slice(0, 3).forEach((account, index) => {
+      drawText(page, account.bankName ?? "Bank", margin + 13, footerY + 53 - index * 19, bold, 8, navy);
+      drawText(page, `${account.accountNumber ?? "-"}  a.n. ${account.accountHolder ?? data.company.name}`, margin + 74, footerY + 53 - index * 19, regular, 8, navy);
+    });
+    else drawText(page, "Hubungi Jam Wisata untuk informasi rekening pembayaran.", margin + 13, footerY + 48, regular, 8, gray);
+  } else {
+    drawText(page, data.company.address, margin, footerY + 36, regular, 9, navy);
+    drawText(page, data.company.phone, margin, footerY + 19, regular, 9, navy);
+  }
+  const signerWidth = tableWidth * .30;
+  const signerX = width - margin - signerWidth;
+  drawText(page, data.company.signerTitle || "Keuangan", signerX, footerY + 65, bold, 10, navy, { width: signerWidth, align: "center" });
+  page.drawLine({ start: { x: signerX + 18, y: footerY + 18 }, end: { x: width - margin - 18, y: footerY + 18 }, color: navy, thickness: .8 });
+  drawText(page, `( ${data.company.signerName || "Jam Wisata"} )`, signerX, footerY + 3, bold, 9, navy, { width: signerWidth, align: "center" });
+  page.drawRectangle({ x: 0, y: 0, width, height: 12, color: navy });
+  page.drawRectangle({ x: 0, y: 12, width, height: 3, color: gold });
   return Buffer.from(await pdf.save());
 }
 
