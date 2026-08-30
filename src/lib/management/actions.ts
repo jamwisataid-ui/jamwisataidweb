@@ -16,6 +16,7 @@ import {
   financialAccounts,
   inventoryItems,
   inventoryMovements,
+  issuedDocuments,
   managementSettings,
   packages,
   paymentAllocations,
@@ -26,6 +27,7 @@ import {
 } from "@/db/schema";
 import { withManagementTransaction } from "@/db/transaction";
 import { requireAdminSession } from "@/lib/admin-session";
+import { issueTransactionDocument } from "./issue-document";
 import { paymentStatus } from "./domain";
 import { agentSchema, bookingSchema, cashSchema, fields, type ManagementActionState, paymentSchema, pilgrimSchema, stockMovementSchema } from "./validation";
 
@@ -211,6 +213,8 @@ export async function recordPaymentAction(_state: ManagementActionState, formDat
     const session = await requireAdminSession();
     const paymentId = randomUUID();
     await withManagementTransaction(async (tx) => {
+      const invoice = await tx.query.issuedDocuments.findFirst({ where: and(eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.bookingId, parsed.data.bookingId), eq(issuedDocuments.status, "issued")) });
+      if (!invoice) throw new Error("Invoice belum diterbitkan. Buat invoice terlebih dahulu sebelum mencatat pembayaran.");
       const registrationIds = parsed.data.allocations.map((item) => item.registrationId);
       const registrationRows = await tx.select().from(registrations).where(and(eq(registrations.bookingId, parsed.data.bookingId), inArray(registrations.id, registrationIds)));
       if (registrationRows.length !== registrationIds.length) throw new Error("Ada alokasi jamaah yang tidak sesuai dengan booking.");
@@ -240,8 +244,17 @@ export async function recordPaymentAction(_state: ManagementActionState, formDat
       }
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "create", entityType: "payment", entityId: paymentId, summary: `Pembayaran Rp${parsed.data.amount.toLocaleString("id-ID")} dicatat` });
     });
+    let receipt: Awaited<ReturnType<typeof issueTransactionDocument>> | null = null;
+    let receiptError = "";
+    try {
+      receipt = await issueTransactionDocument({ kind: "receipt", bookingId: parsed.data.bookingId, paymentId, actorId: session.user.id });
+    } catch (error) {
+      console.error("Automatic receipt issue failed:", error);
+      receiptError = error instanceof Error ? error.message : "Kwitansi otomatis gagal dibuat.";
+    }
     refresh();
-    return { ok: true, message: "Pembayaran berhasil dicatat dan saldo diperbarui.", redirectTo: `/admin/manajemen/pembayaran/${paymentId}` };
+    if (receipt) return { ok: true, message: `Pembayaran berhasil dicatat. Kwitansi ${receipt.number} otomatis dibuat.`, redirectTo: `/admin/manajemen/invoice-kwitansi/${receipt.id}` };
+    return { ok: true, message: `Pembayaran berhasil dicatat, tetapi kwitansi belum dibuat: ${receiptError}`, redirectTo: `/admin/manajemen/pembayaran/${paymentId}` };
   } catch (error) { return failure(error); }
 }
 

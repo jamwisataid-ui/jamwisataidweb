@@ -2135,6 +2135,19 @@
 .management-status-form > button svg { width: 17px; }
 
 .management-document-builder { display: grid; grid-template-columns: minmax(300px,.68fr) minmax(500px,1.32fr); gap: 20px; align-items: start; margin-bottom: 20px; }
+.management-document-flow { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 0; margin: 0 0 18px; padding: 0; overflow: hidden; border: 1px solid #e2dccf; border-radius: 14px; background: #fff; list-style: none; box-shadow: 0 8px 24px rgba(7,26,53,.04); }
+.management-document-flow li { position: relative; display: grid; grid-template-columns: 40px minmax(0,1fr); align-items: center; gap: 11px; min-height: 76px; padding: 13px 18px; border-right: 1px solid #e8e2d6; color: #69788b; }
+.management-document-flow li:last-child { border-right: 0; }
+.management-document-flow li::after { position: absolute; z-index: 1; top: 50%; right: -7px; width: 13px; height: 13px; border-top: 1px solid #e1d8c8; border-right: 1px solid #e1d8c8; background: #fff; content: ""; transform: translateY(-50%) rotate(45deg); }
+.management-document-flow li:last-child::after { display: none; }
+.management-document-flow li.active { background: #fffaf0; color: #102a4c; }
+.management-document-flow li.active::after { background: #fffaf0; }
+.management-document-flow li > span { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 10px; background: #edf0f4; color: #64748a; }
+.management-document-flow li.active > span { background: #102a4c; color: #d8b858; }
+.management-document-flow li svg { width: 20px; }
+.management-document-flow small,.management-document-flow strong { display: block; }
+.management-document-flow small { margin-bottom: 3px; color: #9a6e09; font-size: 9px; font-weight: 850; letter-spacing: .1em; }
+.management-document-flow strong { color: inherit; font-size: 13px; }
 .management-document-controls,.management-document-preview { overflow: hidden; border: 1px solid #e2dccf; border-radius: 16px; background: #fff; box-shadow: 0 12px 34px rgba(7,26,53,.055); }
 .management-document-controls { display: grid; gap: 18px; padding: 22px; }
 .management-document-controls > header { padding-bottom: 17px; border-bottom: 1px solid #ece7dc; }
@@ -2191,6 +2204,20 @@
 .management-document-builder-empty svg { width: 32px; color: #a77b18; }
 .management-document-builder-empty strong { color: #173251; font-size: 17px; }
 .management-document-builder-empty p { max-width: 430px; margin: 0; font-size: 13px; line-height: 1.55; }
+.management-payment-flow-note { display: grid; grid-template-columns: 46px minmax(0,1fr); align-items: center; gap: 13px; padding: 15px; border: 1px solid #dfcc91; border-radius: 11px; background: #fffbf0; color: #102a4c; }
+.management-payment-flow-note > svg { width: 23px; height: 23px; margin-inline: auto; color: #9a6e09; }
+.management-payment-flow-note span,.management-payment-flow-note small,.management-payment-flow-note strong { display: block; }
+.management-payment-flow-note small { color: #8a6614; font-size: 9px; font-weight: 850; letter-spacing: .12em; }
+.management-payment-flow-note strong { margin: 3px 0; font-size: 17px; }
+.management-payment-flow-note p { margin: 0; color: #766d5b; font-size: 12px; line-height: 1.45; }
+.management-payment-document-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
+.management-payment-document-actions > a,.management-receipt-retry button { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 9px 14px; border: 1px solid #c9b16e; border-radius: 9px; background: #fffaf0; color: #755409; font-size: 13px; font-weight: 750; text-decoration: none; cursor: pointer; }
+.management-payment-document-actions svg,.management-receipt-retry svg { width: 17px; }
+.management-receipt-retry { display: grid; gap: 5px; }
+.management-receipt-retry button { border: 0; background: #102a4c; color: #fff; }
+.management-receipt-retry button:disabled { cursor: wait; opacity: .65; }
+.management-receipt-retry .spin { animation: spin .8s linear infinite; }
+.management-receipt-retry small { color: #b32f2f; font-size: 11px; }
 
 @media (max-width: 1180px) {
   .management-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
@@ -2241,8 +2268,13 @@
   .management-document-preview-modal > div { height: 94vh; border-radius: 12px; }
   .management-document-preview-modal footer a { width: 100%; justify-content: center; }
   .management-document-controls { padding: 17px 14px; }
+  .management-document-flow { grid-template-columns: 1fr; }
+  .management-document-flow li { min-height: 67px; border-right: 0; border-bottom: 1px solid #e8e2d6; }
+  .management-document-flow li:last-child { border-bottom: 0; }
+  .management-document-flow li::after { display: none; }
   .management-document-kind { grid-template-columns: 1fr; }
   .management-document-preview > header { align-items: flex-start; flex-direction: column; }
   .management-document-preview > div { height: 68vh; min-height: 460px; padding: 8px; }
   .management-preview-state { inset: 8px; }
+  .management-payment-document-actions,.management-payment-document-actions > a,.management-receipt-retry,.management-receipt-retry button { width: 100%; }
 }

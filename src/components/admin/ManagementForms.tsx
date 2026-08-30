@@ -4,7 +4,7 @@ import { useActionState, useEffect, useMemo, useState } from "react";
 import type { ChangeEvent } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, CircleAlert, LoaderCircle, Sparkles } from "lucide-react";
+import { CheckCircle2, CircleAlert, FileText, LoaderCircle, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -127,11 +127,11 @@ export function BookingForm({ pilgrims, departures, agents }: BookingFormProps) 
   </form>;
 }
 
-type PaymentBooking = { id: string; bookingNumber: string; payerName: string; registrations: Array<{ id: string; agreedPrice: number; payment: { outstanding: number }; pilgrim?: { fullName: string } }> };
+type PaymentBooking = { id: string; bookingNumber: string; invoiceNumber: string; payerName: string; registrations: Array<{ id: string; agreedPrice: number; payment: { outstanding: number }; pilgrim?: { fullName: string } }> };
 
-export function PaymentForm({ bookings, accounts }: { bookings: PaymentBooking[]; accounts: Array<{ id: string; name: string }> }) {
+export function PaymentForm({ bookings, accounts, initialBookingId }: { bookings: PaymentBooking[]; accounts: Array<{ id: string; name: string }>; initialBookingId?: string }) {
   const [state, action, pending] = useActionState(recordPaymentAction, managementInitialState);
-  const [bookingId, setBookingId] = useState(bookings[0]?.id ?? "");
+  const [bookingId, setBookingId] = useState(bookings.some((booking) => booking.id === initialBookingId) ? initialBookingId! : bookings[0]?.id ?? "");
   const [amount, setAmount] = useState("");
   const [allocations, setAllocations] = useState<Record<string, string>>({});
   const [localNow] = useState(() => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16));
@@ -148,8 +148,9 @@ export function PaymentForm({ bookings, accounts }: { bookings: PaymentBooking[]
     setAllocations(next);
   }
   return <form action={action} className="management-form"><Feedback state={state} /><input type="hidden" name="allocations" value={serialized} />
+    <div className="management-payment-flow-note"><FileText /><span><small>INVOICE YANG DIBAYAR</small><strong>{booking?.invoiceNumber ?? "Pilih invoice"}</strong><p>Setelah pembayaran tersimpan, kwitansi dibuat otomatis dan langsung ditampilkan.</p></span></div>
     <div className="management-form-grid two">
-      <label><span>Booking *</span><select name="bookingId" value={bookingId} onChange={(event) => { setBookingId(event.target.value); setAllocations({}); }} required>{bookings.map((item) => <option value={item.id} key={item.id}>{item.bookingNumber} — {item.payerName}</option>)}</select></label>
+      <label><span>Invoice *</span><select name="bookingId" value={bookingId} onChange={(event) => { setBookingId(event.target.value); setAllocations({}); }} required>{bookings.map((item) => <option value={item.id} key={item.id}>{item.invoiceNumber} — {item.payerName}</option>)}</select></label>
       <label><span>Masuk ke rekening/kas *</span><select name="accountId" required><option value="">Pilih rekening</option>{accounts.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
       <label><span>Tanggal pembayaran *</span><input name="paidAt" type="datetime-local" defaultValue={localNow} required /></label>
       <label><span>Metode</span><select name="method" defaultValue="transfer"><option value="transfer">Transfer</option><option value="cash">Tunai</option><option value="card">Kartu</option><option value="other">Lainnya</option></select></label>
@@ -158,7 +159,7 @@ export function PaymentForm({ bookings, accounts }: { bookings: PaymentBooking[]
     </div>
     <div className="management-allocation"><div><strong>Alokasi per jamaah</strong><button type="button" onClick={autoAllocate}>Alokasikan otomatis</button></div>{booking?.registrations.map((registration) => <label key={registration.id}><span><strong>{registration.pilgrim?.fullName}</strong><small>Sisa {rupiah(registration.payment.outstanding)}</small></span><input aria-label={`Alokasi ${registration.pilgrim?.fullName}`} inputMode="numeric" value={allocations[registration.id] ?? ""} onChange={(event) => setAllocations((current) => ({ ...current, [registration.id]: event.target.value.replace(/\D/g, "") }))} /></label>)}</div>
     <label><span>Catatan</span><textarea name="note" rows={2} /></label>
-    <SubmitButton>{pending ? "Mencatat…" : "Catat pembayaran"}</SubmitButton>
+    <SubmitButton>{pending ? "Mencatat…" : "Simpan pembayaran & buat kwitansi"}</SubmitButton>
   </form>;
 }
 

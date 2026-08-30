@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2, CircleAlert, Download, Upload } from "lucide-react";
+import { AlertTriangle, CheckCircle2, CircleAlert, Download, FileText, Upload } from "lucide-react";
 
 import type { getManagementContext } from "@/lib/management/data";
 import { formatDocumentNumber, rupiah } from "@/lib/management/domain";
 import { AdminPageHeader } from "./AdminUi";
 import { TransactionDocumentBuilder } from "./TransactionDocumentBuilder";
+import { EnsureReceiptButton } from "./EnsureReceiptButton";
 import {
   AccountForm,
   AgentForm,
@@ -74,15 +75,19 @@ function PilgrimDocumentChecklist({ pilgrimId, documents }: { pilgrimId: string;
   </div>;
 }
 
-export function ManagementCreatePage({ module, data, kind }: { module: string; data: Context; kind?: string }) {
+export function ManagementCreatePage({ module, data, kind, initialBookingId }: { module: string; data: Context; kind?: string; initialBookingId?: string }) {
   const backHref = `/admin/manajemen/${module}`;
-  const header = <AdminPageHeader eyebrow="TAMBAH DATA" title={`Tambah ${labels[module] ?? "data"}`} description={module === "invoice-kwitansi" ? "Pilih transaksi, periksa preview PDF, lalu terbitkan dokumen." : "Isi data pada form di bawah lalu periksa kembali sebelum menyimpan."} backHref={backHref} />;
+  const description = module === "invoice-kwitansi" ? "Terbitkan invoice terlebih dahulu. Kwitansi dibuat otomatis setelah pembayaran dicatat." : module === "pembayaran" ? "Pilih invoice, catat uang yang diterima, lalu sistem otomatis membuat kwitansi." : "Isi data pada form di bawah lalu periksa kembali sebelum menyimpan.";
+  const header = <AdminPageHeader eyebrow="TAMBAH DATA" title={`Tambah ${labels[module] ?? "data"}`} description={description} backHref={backHref} />;
 
   if (module === "jamaah") return <>{header}<Panel title="Data jamaah baru"><PilgrimForm /></Panel></>;
   if (module === "keberangkatan") return <>{header}<Panel title="Pendaftaran baru" description="Satu pembayar dapat mendaftarkan beberapa jamaah."><BookingForm pilgrims={data.pilgrims.filter((item) => item.status === "active").map(({ id, fullName, whatsapp }) => ({ id, fullName, whatsapp }))} departures={data.departures.map((item) => ({ id: item.id, departureDate: item.departureDate, price: item.price, package: item.package ? { name: item.package.name } : undefined }))} agents={data.agents.filter((item) => item.status === "active").map(({ id, name, defaultCommission }) => ({ id, name, defaultCommission }))} /></Panel></>;
   if (module === "pembayaran") {
-    const active = data.bookings.filter((item) => item.registrations.some((registration) => registration.payment.outstanding > 0));
-    return <>{header}<Panel title="Pembayaran baru"><PaymentForm bookings={active.map((booking) => ({ id: booking.id, bookingNumber: booking.bookingNumber, payerName: booking.payerName, registrations: booking.registrations.map((item) => ({ id: item.id, agreedPrice: item.agreedPrice, payment: item.payment, pilgrim: item.pilgrim ? { fullName: item.pilgrim.fullName } : undefined })) }))} accounts={data.accounts.filter((item) => item.status === "active").map(({ id, name }) => ({ id, name }))} /></Panel></>;
+    const active = data.bookings.flatMap((booking) => {
+      const invoice = data.documents.find((document) => document.kind === "invoice" && document.bookingId === booking.id && document.status === "issued");
+      return invoice && booking.registrations.some((registration) => registration.payment.outstanding > 0) ? [{ ...booking, invoiceNumber: invoice.number }] : [];
+    });
+    return <>{header}{active.length ? <Panel title="Pembayaran invoice" description="Setelah disimpan, kwitansi langsung dibuat dan ditampilkan untuk diunduh."><PaymentForm initialBookingId={initialBookingId} bookings={active.map((booking) => ({ id: booking.id, bookingNumber: booking.bookingNumber, invoiceNumber: booking.invoiceNumber, payerName: booking.payerName, registrations: booking.registrations.map((item) => ({ id: item.id, agreedPrice: item.agreedPrice, payment: item.payment, pilgrim: item.pilgrim ? { fullName: item.pilgrim.fullName } : undefined })) }))} accounts={data.accounts.filter((item) => item.status === "active").map(({ id, name }) => ({ id, name }))} /></Panel> : <div className="management-warning"><AlertTriangle /><span>Belum ada invoice aktif yang perlu dibayar. <Link href="/admin/manajemen/invoice-kwitansi/baru">Terbitkan invoice terlebih dahulu.</Link></span></div>}</>;
   }
   if (module === "keuangan" && kind === "transaksi") return <>{header}<Panel title="Transaksi kas baru"><CashForm accounts={data.accounts.filter((item) => item.status === "active").map(({ id, name }) => ({ id, name }))} packages={data.packages.map(({ id, name }) => ({ id, name }))} categories={data.categories.map(({ id, name }) => ({ id, name }))} /></Panel></>;
   if (module === "keuangan") return <>{header}<Panel title="Rekening atau kas baru"><AccountForm /></Panel></>;
@@ -95,10 +100,8 @@ export function ManagementCreatePage({ module, data, kind }: { module: string; d
     const receiptSequence = data.sequences.find((sequence) => sequence.kind === "receipt" && sequence.active);
     const now = new Date();
     return <>{header}<TransactionDocumentBuilder
-      bookings={data.bookings.map((booking) => ({ id: booking.id, bookingNumber: booking.bookingNumber, payerName: booking.payerName, packageName: String(booking.packageSnapshot.name ?? "Paket umroh"), pilgrims: booking.registrations.length }))}
-      payments={data.payments.filter((payment) => payment.status === "confirmed").map((payment) => ({ id: payment.id, bookingId: payment.bookingId, amountLabel: rupiah(payment.amount), paidAtLabel: new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeZone: "Asia/Jakarta" }).format(new Date(payment.paidAt)), method: payment.method }))}
+      bookings={data.bookings.filter((booking) => !data.documents.some((document) => document.kind === "invoice" && document.bookingId === booking.id && document.status === "issued")).map((booking) => ({ id: booking.id, bookingNumber: booking.bookingNumber, payerName: booking.payerName, packageName: String(booking.packageSnapshot.name ?? "Paket umroh"), pilgrims: booking.registrations.length }))}
       invoiceNumber={invoiceSequence ? formatDocumentNumber(invoiceSequence, now).number : "Belum diatur"}
-      receiptNumber={receiptSequence ? formatDocumentNumber(receiptSequence, now).number : "Belum diatur"}
     /><details className="management-disclosure management-numbering-settings"><summary><span><strong>Atur nomor dokumen</strong><small>Opsional — ubah nomor berikutnya jika memang diperlukan.</small></span><i>+</i></summary><div><div className="management-settings-grid"><Panel title="Nomor invoice"><SequenceForm kind="invoice" values={invoiceSequence} /></Panel><Panel title="Nomor kwitansi"><SequenceForm kind="receipt" values={receiptSequence} /></Panel></div></div></details></>;
   }
   return <>{header}<div className="management-warning"><AlertTriangle /><span>Modul ini tidak memiliki form tambah data.</span></div></>;
@@ -121,8 +124,10 @@ export function ManagementDetailPage({ module, id, data }: { module: string; id:
   }
   if (module === "pembayaran") {
     const item = data.payments.find((row) => row.id === id); if (!item) return null;
+    const invoice = data.documents.find((document) => document.kind === "invoice" && document.bookingId === item.bookingId && document.status === "issued");
+    const receipt = data.documents.find((document) => document.kind === "receipt" && document.paymentId === item.id && document.status === "issued");
     const refundPayments = [{ id: item.id, amount: item.amount, bookingNumber: item.booking?.bookingNumber ?? "Booking", allocations: item.allocations.map((allocation) => ({ ...allocation, pilgrimName: data.registrations.find((row) => row.id === allocation.registrationId)?.pilgrim?.fullName ?? "Jamaah" })) }];
-    return <><AdminPageHeader eyebrow="DETAIL PEMBAYARAN" title={rupiah(item.amount)} description="Pembayaran lama tidak diedit atau dihapus. Jika salah, catat refund sebagai histori koreksi." backHref={backHref} /><Panel title="Informasi pembayaran"><DetailGrid rows={[["Booking", item.booking?.bookingNumber], ["Pembayar", item.booking?.payerName], ["Tanggal", <DateText key="date" value={item.paidAt} />], ["Metode", item.method], ["Referensi", item.reference], ["Status", item.status]]} /></Panel>{item.status === "confirmed" ? <Panel title="Catat refund"><RefundForm payments={refundPayments} accounts={data.accounts.filter((row) => row.status === "active").map(({ id: accountId, name }) => ({ id: accountId, name }))} /></Panel> : null}</>;
+    return <><AdminPageHeader eyebrow="DETAIL PEMBAYARAN" title={rupiah(item.amount)} description="Pembayaran terhubung ke invoice dan kwitansi secara otomatis." backHref={backHref} /><Panel title="Informasi pembayaran"><DetailGrid rows={[["Invoice", invoice?.number ?? "—"], ["Booking", item.booking?.bookingNumber], ["Pembayar", item.booking?.payerName], ["Tanggal", <DateText key="date" value={item.paidAt} />], ["Metode", item.method], ["Referensi", item.reference], ["Status", item.status], ["Kwitansi", receipt?.number ?? "Belum dibuat"]]} /><div className="management-payment-document-actions">{invoice ? <Link href={`/admin/manajemen/invoice-kwitansi/${invoice.id}`}><FileText /> Lihat invoice</Link> : null}{receipt ? <Link href={`/admin/manajemen/invoice-kwitansi/${receipt.id}`}><Download /> Lihat kwitansi</Link> : item.status === "confirmed" ? <EnsureReceiptButton bookingId={item.bookingId} paymentId={item.id} /> : null}</div></Panel>{item.status === "confirmed" ? <Panel title="Catat refund"><RefundForm payments={refundPayments} accounts={data.accounts.filter((row) => row.status === "active").map(({ id: accountId, name }) => ({ id: accountId, name }))} /></Panel> : null}</>;
   }
   if (module === "keuangan") {
     const account = data.accounts.find((row) => row.id === id);
@@ -146,7 +151,13 @@ export function ManagementDetailPage({ module, id, data }: { module: string; id:
   }
   if (module === "invoice-kwitansi") {
     const item = data.documents.find((row) => row.id === id); if (!item) return null;
-    return <><AdminPageHeader eyebrow="DETAIL DOKUMEN" title={item.number} description="PDF ini memakai snapshot transaksi saat diterbitkan sehingga tidak berubah." backHref={backHref} /><Panel title={item.kind === "invoice" ? "Invoice" : "Kwitansi"}><DetailGrid rows={[["Nomor", item.number], ["Jenis", item.kind === "invoice" ? "Invoice" : "Kwitansi"], ["Tanggal terbit", <DateText key="date" value={item.issuedAt} />], ["Status", item.status]]} /><a className="management-create-link" href={`/api/admin/management/issued-documents/${item.id}`}><Download /> Download PDF</a></Panel></>;
+    const booking = data.bookings.find((row) => row.id === item.bookingId);
+    const paid = booking?.registrations.reduce((sum, registration) => sum + registration.payment.netPaid, 0) ?? 0;
+    const outstanding = booking?.registrations.reduce((sum, registration) => sum + registration.payment.outstanding, 0) ?? 0;
+    const paymentLabel = outstanding <= 0 ? "Lunas" : paid > 0 ? "Cicilan" : "Belum bayar";
+    const rows: Array<[string, React.ReactNode]> = [["Nomor", item.number], ["Jenis", item.kind === "invoice" ? "Invoice" : "Kwitansi"], ["Tanggal terbit", <DateText key="date" value={item.issuedAt} />], ["Status dokumen", item.status]];
+    if (item.kind === "invoice") rows.push(["Status pembayaran", paymentLabel], ["Sudah dibayar", rupiah(paid)], ["Sisa tagihan", rupiah(outstanding)]);
+    return <><AdminPageHeader eyebrow="DETAIL DOKUMEN" title={item.number} description={item.kind === "invoice" ? `Status pembayaran: ${paymentLabel}. Kwitansi dibuat otomatis setiap pembayaran diterima.` : "Kwitansi ini dibuat otomatis dari pembayaran yang diterima."} backHref={backHref} action={item.kind === "invoice" && outstanding > 0 ? { href: `/admin/manajemen/pembayaran/baru?booking=${item.bookingId}`, label: "Catat pembayaran" } : undefined} /><Panel title={item.kind === "invoice" ? "Invoice" : "Kwitansi"}><DetailGrid rows={rows} /><a className="management-create-link" href={`/api/admin/management/issued-documents/${item.id}`}><Download /> Download PDF</a></Panel></>;
   }
   return null;
 }
