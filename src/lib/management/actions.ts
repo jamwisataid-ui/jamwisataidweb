@@ -345,19 +345,22 @@ export async function saveSequenceAction(_state: ManagementActionState, formData
   try {
     const session = await requireAdminSession();
     const kind = formData.get("kind") === "receipt" ? "receipt" : "invoice";
-    const pattern = String(formData.get("pattern") ?? "").trim();
-    if (!pattern.includes("{seq}")) return { ok: false, message: "Format nomor wajib memiliki token {seq}." };
-    const nextNumber = Number(formData.get("nextNumber"));
-    const padding = Number(formData.get("padding"));
-    if (!Number.isInteger(nextNumber) || nextNumber < 1 || !Number.isInteger(padding) || padding < 1 || padding > 12) return { ok: false, message: "Nomor berikutnya atau jumlah digit tidak valid." };
+    const fullNumber = String(formData.get("nextDocumentNumber") ?? "").trim();
+    const numberParts = /^(\d{1,12})(.+)$/.exec(fullNumber);
+    if (!numberParts) return { ok: false, message: `Nomor ${kind === "invoice" ? "invoice" : "kwitansi"} harus diawali angka, contohnya ${kind === "invoice" ? "9933/jamw/300828" : "0066/jamw/300826"}.` };
+    const [, sequenceDigits, suffix] = numberParts;
+    const nextNumber = Number(sequenceDigits);
+    const padding = sequenceDigits.length;
+    const pattern = `{seq}${suffix}`;
+    if (!Number.isSafeInteger(nextNumber) || nextNumber < 1 || fullNumber.length > 100) return { ok: false, message: "Nomor berikutnya tidak valid." };
     await withManagementTransaction(async (tx) => {
       await tx.update(documentSequences).set({ active: false, updatedAt: new Date() }).where(eq(documentSequences.kind, kind));
       const id = randomUUID();
-      await tx.insert(documentSequences).values({ id, kind, name: kind === "invoice" ? "Nomor invoice aktif" : "Nomor kwitansi aktif", pattern, padding, nextNumber, reset: formData.get("reset") === "monthly" ? "monthly" : formData.get("reset") === "yearly" ? "yearly" : "never", active: true });
-      await tx.insert(auditLogs).values({ actorId: session.user.id, action: "activate", entityType: "document_sequence", entityId: id, summary: `Format ${kind} diaktifkan` });
+      await tx.insert(documentSequences).values({ id, kind, name: kind === "invoice" ? "Nomor invoice aktif" : "Nomor kwitansi aktif", pattern, padding, nextNumber, reset: "never", active: true });
+      await tx.insert(auditLogs).values({ actorId: session.user.id, action: "activate", entityType: "document_sequence", entityId: id, summary: `Nomor ${kind} berikutnya diatur ke ${fullNumber}` });
     });
     refresh();
-    return { ok: true, message: "Format nomor sudah aktif.", redirectTo: "/admin/manajemen/invoice-kwitansi/baru" };
+    return { ok: true, message: `Nomor ${kind === "invoice" ? "invoice" : "kwitansi"} berikutnya berhasil disimpan.`, redirectTo: "/admin/manajemen/invoice-kwitansi/baru" };
   } catch (error) { return failure(error); }
 }
 

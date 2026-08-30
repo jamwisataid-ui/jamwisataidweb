@@ -27,7 +27,7 @@ import {
   updateAgentAction,
   updatePilgrimAction,
 } from "@/lib/management/actions";
-import { rupiah } from "@/lib/management/domain";
+import { formatDocumentNumber, rupiah } from "@/lib/management/domain";
 import type { ManagementActionState } from "@/lib/management/validation";
 
 const managementInitialState: ManagementActionState = { ok: false, message: "" };
@@ -215,16 +215,14 @@ export function RecordStatusForm({ entity, id, status }: { entity: "pilgrim" | "
   return <form action={action} className="management-status-form"><input type="hidden" name="entity" value={entity} /><input type="hidden" name="id" value={id} /><input type="hidden" name="status" value={next} /><Feedback state={state} /><button type="submit" disabled={pending}>{pending ? <LoaderCircle className="spin" /> : null}{pending ? "Memproses…" : status === "active" ? "Arsipkan data" : "Aktifkan kembali"}</button></form>;
 }
 
-type SequenceValues = { pattern: string; nextNumber: number; padding: number; reset: "never" | "monthly" | "yearly" };
+type SequenceValues = { pattern: string; nextNumber: number; padding: number; reset: "never" | "monthly" | "yearly"; currentPeriod: string | null };
 
 export function SequenceForm({ kind, values }: { kind: "invoice" | "receipt"; values?: SequenceValues }) {
   const [state, action, pending] = useActionState(saveSequenceAction, managementInitialState);
-  return <form action={action} className="management-form compact"><Feedback state={state} /><input type="hidden" name="kind" value={kind} /><div className="management-form-grid two">
-    <label><span>Format nomor *</span><input name="pattern" defaultValue={values?.pattern ?? (kind === "invoice" ? "{seq}/jamw/300828" : "{seq}/jamw/300826")} required /><small>Otomatis: gunakan {'{seq}'}. Token tanggal: {'{DD}'}, {'{MM}'}, {'{YY}'}, {'{YYYY}'}</small></label>
-    <label><span>Nomor berikutnya *</span><input name="nextNumber" type="number" min="1" defaultValue={values?.nextNumber ?? (kind === "invoice" ? 9933 : 66)} required /><small>Boleh diedit manual. Setelah terbit, angka naik otomatis.</small></label>
-    <label><span>Jumlah digit urutan</span><input name="padding" type="number" min="1" max="12" defaultValue={values?.padding ?? 4} /></label>
-    <label><span>Mulai ulang urutan</span><select name="reset" defaultValue={values?.reset ?? "never"}><option value="never">Tidak pernah</option><option value="monthly">Setiap bulan</option><option value="yearly">Setiap tahun</option></select></label>
-  </div><SubmitButton>{pending ? "Menyimpan…" : values ? `Simpan penomoran ${kind === "invoice" ? "invoice" : "kwitansi"}` : `Aktifkan penomoran ${kind === "invoice" ? "invoice" : "kwitansi"}`}</SubmitButton></form>;
+  const nextDocumentNumber = values ? formatDocumentNumber(values, new Date()).number : kind === "invoice" ? "9933/jamw/300828" : "0066/jamw/300826";
+  return <form action={action} className="management-form compact"><Feedback state={state} /><input type="hidden" name="kind" value={kind} /><div className="management-form-grid">
+    <label><span>Nomor {kind === "invoice" ? "invoice" : "kwitansi"} berikutnya *</span><input name="nextDocumentNumber" defaultValue={nextDocumentNumber} required /><small>Nomor ini boleh diedit manual. Setelah dokumen diterbitkan, angka depannya naik otomatis.</small></label>
+  </div><SubmitButton>{pending ? "Menyimpan…" : `Simpan nomor ${kind === "invoice" ? "invoice" : "kwitansi"}`}</SubmitButton></form>;
 }
 
 export function RefundForm({ payments, accounts }: { payments: Array<{ id: string; amount: number; bookingNumber: string; allocations: Array<{ registrationId: string; amount: number; pilgrimName: string }> }>; accounts: Array<{ id: string; name: string }> }) {
