@@ -29,6 +29,7 @@ import { withManagementTransaction } from "@/db/transaction";
 import { requireAdminSession } from "@/lib/admin-session";
 import { issueTransactionDocument } from "./issue-document";
 import { paymentStatus } from "./domain";
+import { deletePrivateObject } from "./storage";
 import { agentSchema, bookingSchema, cashSchema, fields, type ManagementActionState, paymentSchema, pilgrimSchema, stockMovementSchema } from "./validation";
 
 function raw(formData: FormData) {
@@ -522,5 +523,43 @@ export async function assignRoomAction(_state: ManagementActionState, formData: 
     });
     refresh();
     return { ok: true, message: "Room List berhasil diperbarui.", redirectTo: `/admin/manajemen/manifest-room-list/${registrationId}` };
+  } catch (error) { return failure(error); }
+}
+
+export async function deleteIssuedDocumentAction(formData: FormData): Promise<ManagementActionState> {
+  const id = String(formData.get("id") ?? "").trim();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+    return { ok: false, message: "Dokumen tidak valid." };
+  }
+  try {
+    const session = await requireAdminSession();
+    let objectKey = "";
+    let label = "dokumen";
+    await withManagementTransaction(async (tx) => {
+      const document = await tx.query.issuedDocuments.findFirst({ where: eq(issuedDocuments.id, id) });
+      if (!document) throw new Error("Invoice atau kwitansi tidak ditemukan.");
+      if (document.kind === "invoice") {
+        const linkedReceipt = await tx.query.issuedDocuments.findFirst({
+          where: and(eq(issuedDocuments.kind, "receipt"), eq(issuedDocuments.bookingId, document.bookingId), eq(issuedDocuments.status, "issued")),
+        });
+        if (linkedReceipt) throw new Error(`Hapus kwitansi ${linkedReceipt.number} terlebih dahulu sebelum menghapus invoice ini.`);
+      }
+      objectKey = document.objectKey;
+      label = document.kind === "invoice" ? "Invoice" : "Kwitansi";
+      await tx.delete(issuedDocuments).where(eq(issuedDocuments.id, document.id));
+      await tx.insert(auditLogs).values({
+        actorId: session.user.id,
+        action: "delete",
+        entityType: "issued_document",
+        entityId: document.id,
+        summary: `${label} ${document.number} dihapus`,
+      });
+    });
+    if (objectKey) {
+      try { await deletePrivateObject(objectKey); }
+      catch (storageError) { console.error("Issued document object cleanup failed:", storageError); }
+    }
+    refresh();
+    return { ok: true, message: `${label} berhasil dihapus.`, redirectTo: "/admin/manajemen/invoice-kwitansi" };
   } catch (error) { return failure(error); }
 }

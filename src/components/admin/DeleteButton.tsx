@@ -6,11 +6,13 @@ import { AlertTriangle, Loader2, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { deleteArticleAction, deleteEntryAction, deletePackageAction } from "@/lib/cms/actions";
+import { deleteIssuedDocumentAction } from "@/lib/management/actions";
 
 interface DeleteButtonProps {
   id: string;
   name: string;
-  type: "package" | "article" | "entry";
+  type: "package" | "article" | "entry" | "document";
+  documentKind?: "invoice" | "receipt";
   entryType?: string;
   variant?: "table" | "form";
   className?: string;
@@ -21,6 +23,7 @@ export function DeleteButton({
   name,
   type,
   entryType,
+  documentKind,
   variant = "table",
   className = "",
 }: DeleteButtonProps) {
@@ -41,7 +44,7 @@ export function DeleteButton({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, isPending]);
 
-  const itemLabel = type === "package" ? "paket" : type === "article" ? "artikel" : "konten";
+  const itemLabel = type === "package" ? "paket" : type === "article" ? "artikel" : type === "document" ? (documentKind === "receipt" ? "kwitansi" : "invoice") : "konten";
 
   const confirmDelete = () => {
     startTransition(async () => {
@@ -54,8 +57,10 @@ export function DeleteButton({
         result = await deletePackageAction(formData);
       } else if (type === "article") {
         result = await deleteArticleAction(formData);
-      } else {
+      } else if (type === "entry") {
         result = await deleteEntryAction(formData);
+      } else {
+        result = await deleteIssuedDocumentAction(formData);
       }
 
       if (result.ok) {
@@ -81,7 +86,7 @@ export function DeleteButton({
           title="Hapus data ini secara permanen"
         >
           <Trash2 style={{ width: 15, height: 15, marginRight: 6, display: "inline-block" }} />
-          Hapus {type === "package" ? "paket ini" : type === "article" ? "artikel ini" : "konten ini"}
+          Hapus {itemLabel} ini
         </button>
       ) : (
         <button
@@ -131,7 +136,7 @@ export function DeleteButton({
             </p>
 
             <div className="admin-modal-warning-box">
-              <span>⚠️ Perhatian:</span> Data yang telah dihapus bersifat permanen dan tidak dapat dipulihkan kembali dari sistem.
+              <span>⚠️ Perhatian:</span> {type === "document" ? "Dokumen akan dihapus permanen. Booking, pembayaran, dan nomor urut tetap tersimpan." : "Data yang telah dihapus bersifat permanen dan tidak dapat dipulihkan kembali dari sistem."}
             </div>
 
             <div className="admin-modal-actions">

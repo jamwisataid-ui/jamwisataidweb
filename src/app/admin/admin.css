@@ -2237,6 +2237,7 @@
 .management-document-downloads { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
 .management-document-downloads .management-create-link { margin-top: 0; }
 .management-document-downloads .management-create-link.secondary { border: 1px solid #c9b16e; background: #fffaf0; color: #755409; }
+.management-document-downloads .admin-danger-button { min-height: 44px; }
 .management-payment-document-actions > a,.management-receipt-retry button { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 9px 14px; border: 1px solid #c9b16e; border-radius: 9px; background: #fffaf0; color: #755409; font-size: 13px; font-weight: 750; text-decoration: none; cursor: pointer; }
 .management-payment-document-actions svg,.management-receipt-retry svg { width: 17px; }
 .management-receipt-retry { display: grid; gap: 5px; }
