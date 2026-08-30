@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { documentPeriod, dueDate, formatDocumentNumber, paymentStatus, terbilang } from "../src/lib/management/domain";
+import { documentPeriod, dueDate, formatDocumentNumber, paymentStatus, terbilang, upcomingBirthday } from "../src/lib/management/domain";
 
 describe("status pembayaran", () => {
   it.each([
@@ -37,4 +37,14 @@ describe("penomoran dokumen", () => {
 describe("utilitas transaksi", () => {
   it("mengubah nominal menjadi teks Indonesia", () => expect(terbilang(31_500_000)).toBe("Tiga puluh satu juta lima ratus ribu rupiah"));
   it("menghitung jatuh tempo H-30 dalam zona Jakarta", () => expect(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(dueDate("2026-10-31", 30))).toBe("2026-10-01"));
+});
+
+describe("pengingat ulang tahun", () => {
+  it("menghitung ulang tahun hari ini dalam zona Jakarta", () => {
+    expect(upcomingBirthday("1990-08-30", new Date("2026-08-29T18:00:00Z"))).toMatchObject({ daysUntil: 0, age: 36, date: "2026-08-30" });
+  });
+
+  it("mengarah ke ulang tahun tahun depan bila tanggal sudah lewat", () => {
+    expect(upcomingBirthday("1990-08-29", new Date("2026-08-30T05:00:00Z"))).toMatchObject({ daysUntil: 364, age: 37, date: "2027-08-29" });
+  });
 });

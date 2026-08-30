@@ -25,7 +25,7 @@ import {
   refunds,
   registrations,
 } from "@/db/schema";
-import { dueDate, paymentStatus } from "./domain";
+import { dueDate, paymentStatus, upcomingBirthday } from "./domain";
 
 export async function getManagementContext() {
   const db = requireDatabase();
@@ -103,6 +103,12 @@ export async function getManagementContext() {
     return { packageId: pkg.id, packageName: pkg.name, income, refunded, expenses: directExpenses, commissions: paidCommissions, receivables, realizedProfit: income - refunded - directExpenses - paidCommissions };
   });
 
+  const upcomingBirthdays = pilgrimRows.flatMap((pilgrim) => {
+    if (!pilgrim.birthDate || pilgrim.status !== "active") return [];
+    const birthday = upcomingBirthday(pilgrim.birthDate);
+    return birthday && birthday.daysUntil <= 14 ? [{ id: pilgrim.id, fullName: pilgrim.fullName, whatsapp: pilgrim.whatsapp, birthDate: pilgrim.birthDate, ...birthday }] : [];
+  }).sort((a, b) => a.daysUntil - b.daysUntil || a.fullName.localeCompare(b.fullName));
+
   return {
     pilgrims: pilgrimRows,
     packages: packageRows,
@@ -124,6 +130,7 @@ export async function getManagementContext() {
     pilgrimDocuments: pilgrimDocumentRows,
     cashTransactions: cashRows,
     packageFinancials,
+    upcomingBirthdays,
     dashboard: {
       activePilgrims: pilgrimRows.filter((item) => item.status === "active").length,
       activePackages: packageRows.filter((item) => item.status === "published").length,

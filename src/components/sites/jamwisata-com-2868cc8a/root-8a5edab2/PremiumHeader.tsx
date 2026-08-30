@@ -15,9 +15,10 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import { whatsappHref } from "@/data/jamwisata";
+
 const assetRoot = "/sites/jamwisata-com-2868cc8a/root-8a5edab2";
-const whatsapp =
-  "https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20berkonsultasi%20mengenai%20paket%20perjalanan%20Jam%20Wisata.";
+const whatsapp = whatsappHref("Assalamu’alaikum, saya ingin berkonsultasi mengenai paket perjalanan Jam Wisata.", "Header Website");
 
 const links = [
   ["beranda", "Beranda"],

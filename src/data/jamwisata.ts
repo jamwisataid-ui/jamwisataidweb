@@ -191,5 +191,5 @@ export const umrahPackages: TravelPackage[] = [
 export const formatIDR = (value: number) =>
   new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(value);
 
-export const whatsappHref = (message: string, source: string) =>
-  `https://wa.me/6281809627499?text=${encodeURIComponent(`${message}\n\nSumber: jamwisata.id — ${source}`)}`;
+export const whatsappHref = (message: string, source: string, phone = "6281809627499") =>
+  `https://wa.me/${phone}?text=${encodeURIComponent(`${message}\n\nSaya melihat informasi ini di website Jam Wisata.\nSumber halaman: jamwisata.id — ${source}`)}`;

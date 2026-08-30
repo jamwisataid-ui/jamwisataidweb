@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, Eye, Monitor, MousePointerClick, RefreshCw, Smartphone, Tablet, Users } from "lucide-react";
+import { Activity, CalendarDays, Eye, Monitor, RefreshCw, Smartphone, Tablet, Users } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { TrafficSnapshot } from "@/lib/analytics";
@@ -52,8 +52,6 @@ export function TrafficDashboard({ initialSnapshot }: { initialSnapshot: Traffic
     };
   }, [refresh]);
 
-  if (snapshot.liveVisitors < 1) return null;
-
   const maxTimeline = Math.max(1, ...snapshot.timeline.map((point) => point.value));
   const topPageViews = Math.max(1, snapshot.popularPages[0]?.views ?? 0);
   const totalDevices = snapshot.devices.reduce((total, item) => total + item.visitors, 0);
@@ -63,9 +61,9 @@ export function TrafficDashboard({ initialSnapshot }: { initialSnapshot: Traffic
     <section className="traffic-board" aria-labelledby="traffic-title">
       <div className="traffic-board-heading">
         <div>
-          <p className="admin-eyebrow">TRAFFIC WEBSITE • REALTIME</p>
-          <h2 id="traffic-title">Jamaah sedang melihat website</h2>
-          <p>Aktivitas diperbarui otomatis setiap 15 detik.</p>
+          <p className="admin-eyebrow">ANALYTICS WEBSITE</p>
+          <h2 id="traffic-title">Statistik pengunjung website</h2>
+          <p>Histori tetap tersedia meskipun sedang tidak ada pengunjung realtime.</p>
         </div>
         <button className="traffic-refresh" type="button" onClick={() => void refresh()} disabled={status === "refreshing"}>
           <RefreshCw aria-hidden className={status === "refreshing" ? "is-spinning" : ""} />
@@ -85,12 +83,12 @@ export function TrafficDashboard({ initialSnapshot }: { initialSnapshot: Traffic
           <div><small>Pengunjung hari ini</small><strong>{number.format(snapshot.visitorsToday)}</strong></div>
         </article>
         <article className="traffic-metric-card">
-          <span><Eye aria-hidden /></span>
-          <div><small>Halaman dilihat</small><strong>{number.format(snapshot.pageViewsToday)}</strong></div>
+          <span><CalendarDays aria-hidden /></span>
+          <div><small>7 hari terakhir</small><strong>{number.format(snapshot.visitors7Days)}</strong></div>
         </article>
         <article className="traffic-metric-card">
-          <span><MousePointerClick aria-hidden /></span>
-          <div><small>Halaman / kunjungan</small><strong>{snapshot.pagesPerVisit.toLocaleString("id-ID", { maximumFractionDigits: 1 })}</strong></div>
+          <span><CalendarDays aria-hidden /></span>
+          <div><small>30 hari terakhir</small><strong>{number.format(snapshot.visitors30Days)}</strong></div>
         </article>
       </div>
 
@@ -109,7 +107,7 @@ export function TrafficDashboard({ initialSnapshot }: { initialSnapshot: Traffic
         </article>
 
         <article className="traffic-pages-card">
-          <header><div><span>HARI INI</span><h3>Halaman populer</h3></div></header>
+          <header><div><span>HARI INI · {number.format(snapshot.pageViewsToday)} TAMPILAN</span><h3>Halaman populer</h3></div><small>{snapshot.pagesPerVisit.toLocaleString("id-ID", { maximumFractionDigits: 1 })} halaman/kunjungan</small></header>
           {snapshot.popularPages.length ? (
             <ol>
               {snapshot.popularPages.map((page, index) => (
@@ -123,6 +121,16 @@ export function TrafficDashboard({ initialSnapshot }: { initialSnapshot: Traffic
           ) : <div className="traffic-empty"><Eye aria-hidden /><p>Belum ada kunjungan hari ini.</p></div>}
         </article>
       </div>
+
+      <section className="traffic-recent" aria-label="Pengunjung terbaru">
+        <header><div><span>AKTIVITAS TERBARU</span><h3>Pengunjung terbaru</h3></div><small>Waktu Indonesia Barat</small></header>
+        {snapshot.recentVisitors.length ? <div>{snapshot.recentVisitors.map((visitor) => {
+          const details = deviceDetails[visitor.device as keyof typeof deviceDetails] ?? deviceDetails.desktop;
+          const Icon = details.icon;
+          const seen = new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta" }).format(new Date(visitor.lastSeenAt));
+          return <article key={visitor.sessionId}><span><Icon aria-hidden /></span><div><strong>{pathLabel(visitor.path)}</strong><small>{details.label} · {seen}</small></div>{visitor.utmSource || visitor.utmCampaign ? <em>{[visitor.utmSource, visitor.utmCampaign].filter(Boolean).join(" · ")}</em> : <em>Organik / langsung</em>}</article>;
+        })}</div> : <div className="traffic-empty compact"><Eye aria-hidden /><p>Belum ada histori kunjungan.</p></div>}
+      </section>
 
       <div className="traffic-devices" aria-label="Perangkat pengunjung hari ini">
         <span>PERANGKAT</span>

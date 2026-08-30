@@ -481,6 +481,20 @@
 .traffic-empty { display: grid; min-height: 190px; place-items: center; align-content: center; gap: 10px; color: #9aa0a9; text-align: center; }
 .traffic-empty svg { width: 26px; opacity: .55; }
 .traffic-empty p { font-size: 12px; }
+.traffic-empty.compact { min-height: 120px; }
+.traffic-recent { padding: 24px 28px; border-top: 1px solid rgba(7,26,53,.09); background: white; }
+.traffic-recent > header { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 13px; }
+.traffic-recent > header span { color: #9b7a2c; font-size: 9px; font-weight: 800; letter-spacing: .15em; }
+.traffic-recent > header h3 { margin-top: 5px; color: var(--admin-navy); font-size: 17px; }
+.traffic-recent > header small { color: #7d8490; font-size: 11px; }
+.traffic-recent > div { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1px 24px; }
+.traffic-recent article { display: grid; grid-template-columns: 34px minmax(0,1fr) auto; align-items: center; gap: 11px; min-height: 66px; border-bottom: 1px solid #eee9de; }
+.traffic-recent article > span { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 9px; background: #f5efe0; color: #987019; }
+.traffic-recent article svg { width: 16px; }
+.traffic-recent article strong,.traffic-recent article small { display: block; }
+.traffic-recent article strong { color: #173250; font-size: 13px; }
+.traffic-recent article small { margin-top: 3px; color: #78818d; font-size: 11px; }
+.traffic-recent article em { max-width: 150px; overflow: hidden; color: #86600c; font-size: 10px; font-style: normal; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
 .traffic-devices { display: flex; min-height: 62px; align-items: center; gap: 22px; padding: 13px 28px; border-top: 1px solid rgba(7,26,53,.09); background: white; }
 .traffic-devices > div:not(.traffic-connection) { display: flex; align-items: center; gap: 7px; color: #596273; }
 .traffic-devices svg { width: 14px; color: #987019; }
@@ -604,6 +618,11 @@
   .traffic-metric-card { padding: 20px; }
   .traffic-chart-card, .traffic-pages-card { min-height: 280px; padding: 22px 17px; }
   .traffic-chart { gap: 4px; }
+  .traffic-recent { padding: 20px 18px; }
+  .traffic-recent > header { align-items: start; flex-direction: column; gap: 4px; }
+  .traffic-recent > div { grid-template-columns: 1fr; }
+  .traffic-recent article { grid-template-columns: 34px minmax(0,1fr); padding-block: 8px; }
+  .traffic-recent article em { grid-column: 2; max-width: 100%; }
   .traffic-bar-column small { min-width: 30px; font-size: 7px; }
   .traffic-devices { flex-wrap: wrap; gap: 13px 17px; padding: 15px 18px; }
   .traffic-connection { width: 100%; margin-left: 0; }
@@ -1720,6 +1739,12 @@
   .admin-smart-field textarea {
     font-size: 16px;
   }
+
+  .traffic-board-heading { padding: 20px 18px; }
+  .traffic-metrics { grid-template-columns: 1fr; }
+  .traffic-live-card,.traffic-metric-card { min-height: 118px; }
+  .traffic-chart-card header,.traffic-pages-card header { flex-wrap: wrap; gap: 5px 12px; }
+  .traffic-chart-card header > small,.traffic-pages-card header > small { width: 100%; }
 }
 
 /* Keep both dashboard modes visually identical and efficient on desktop. */
@@ -1869,6 +1894,19 @@
 .management-action-list strong,.management-action-list small { display: block; }
 .management-action-list strong { font-size: 15px; }
 .management-action-list small { margin-top: 4px; color: #677589; font-size: 13px; line-height: 1.5; }
+.management-birthday-panel { margin-top: 20px; }
+.management-birthday-panel > header { align-items: center; }
+.management-birthday-panel > header p { margin: 6px 0 0; color: #6d7887; font-size: 13px; }
+.management-birthday-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px 18px; }
+.management-birthday-list article { display: grid; grid-template-columns: 42px minmax(0,1fr) auto; align-items: center; gap: 12px; min-height: 82px; padding: 11px 12px; border: 1px solid #ebe4d7; border-radius: 12px; background: #fffdf8; }
+.management-birthday-list article > span:first-child { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 11px; background: #f4edda; color: #a4760c; }
+.management-birthday-list article > span:first-child svg { width: 20px; }
+.management-birthday-list article strong,.management-birthday-list article small { display: block; }
+.management-birthday-list article strong { color: #173250; font-size: 15px; }
+.management-birthday-list article small { margin-top: 4px; color: #6f7b8a; font-size: 12px; }
+.management-birthday-list article > a { grid-column: 2/-1; display: inline-flex; min-height: 40px; align-items: center; justify-content: center; gap: 7px; border-radius: 9px; background: #0f725e; color: white; font-size: 12px; font-weight: 750; text-decoration: none; }
+.management-birthday-list article > a:hover { background: #095947; }
+.management-birthday-list article > a svg { width: 16px; }
 .management-mini-list { display: grid; }
 .management-mini-list > div { display: flex; min-height: 67px; align-items: center; justify-content: space-between; gap: 15px; border-bottom: 1px solid #eee9de; }
 .management-mini-list > div:last-child { border-bottom: 0; }
@@ -2099,6 +2137,7 @@
 @media (max-width: 1180px) {
   .management-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .management-dashboard-columns { grid-template-columns: 1fr; }
+  .management-birthday-list { grid-template-columns: 1fr; }
   .management-account-grid,.management-inventory-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 @media (max-width: 720px) {

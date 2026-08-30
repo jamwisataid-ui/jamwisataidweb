@@ -71,6 +71,13 @@
       "when": 1788062400000,
       "tag": "0009_seed_document_sequences",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1788066000000,
+      "tag": "0010_add_marketing_attribution",
+      "breakpoints": true
     }
   ]
 }

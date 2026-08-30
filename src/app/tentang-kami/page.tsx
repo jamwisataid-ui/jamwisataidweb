@@ -19,6 +19,7 @@ import { FounderLetterSection } from "@/components/sites/jamwisata-com-2868cc8a/
 import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/ModernProofFooter";
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
+import { whatsappHref } from "@/data/jamwisata";
 
 export const metadata: Metadata = {
   title: "Tentang Kami | Jam Wisata — Setiap Waktu Bernilai Ibadah",
@@ -399,7 +400,7 @@ export default function TentangKamiPage() {
 
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
               <a
-                href="https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20berkonsultasi%20mengenai%20paket%20ibadah%20umrah%20Jam%20Wisata."
+                href={whatsappHref("Assalamu’alaikum, saya ingin berkonsultasi mengenai paket ibadah umrah Jam Wisata.", "Tentang Kami")}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="lift-soft sheen-gold flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-gradient-gold-rich px-7 text-xs font-extrabold uppercase tracking-wider text-[#061A2F] shadow-md transition hover:scale-105"

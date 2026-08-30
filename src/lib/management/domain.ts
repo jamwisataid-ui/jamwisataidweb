@@ -74,3 +74,20 @@ export function dueDate(departureDate: string, days = 30) {
   date.setDate(date.getDate() - days);
   return date;
 }
+
+export const DEFAULT_BIRTHDAY_MESSAGE = "Assalamu'alaikum Kak [NAMA], selamat ulang tahun yang ke-[UMUR]. Semoga Allah senantiasa memberikan kesehatan, keberkahan usia, dan kemudahan dalam setiap ibadah. Salam hangat dari Jam Wisata.";
+
+export function upcomingBirthday(birthDate: string, now = new Date()) {
+  const [birthYear, birthMonth, birthDay] = birthDate.split("-").map(Number);
+  if (!birthYear || !birthMonth || !birthDay) return null;
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(now);
+  const current = Object.fromEntries(parts.map((part) => [part.type, Number(part.value)]));
+  const today = Date.UTC(current.year, current.month - 1, current.day);
+  let birthdayYear = current.year;
+  let nextBirthday = Date.UTC(birthdayYear, birthMonth - 1, birthDay);
+  if (nextBirthday < today) {
+    birthdayYear += 1;
+    nextBirthday = Date.UTC(birthdayYear, birthMonth - 1, birthDay);
+  }
+  return { daysUntil: Math.round((nextBirthday - today) / 86400000), age: birthdayYear - birthYear, date: new Date(nextBirthday).toISOString().slice(0, 10) };
+}

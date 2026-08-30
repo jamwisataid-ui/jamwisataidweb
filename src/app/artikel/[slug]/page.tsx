@@ -6,6 +6,7 @@ import { ArticleContent } from "@/components/site/ArticleContent";
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/ModernProofFooter";
 import { getPublishedArticleBySlug, getPublishedArticles } from "@/lib/cms/public";
+import { whatsappHref } from "@/data/jamwisata";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -34,7 +35,7 @@ export default async function ArticlePage({ params }: Props) {
   const article = await getPublishedArticleBySlug((await params).slug);
   if (!article) notFound();
   const publishedDate = formatArticleDate(article.publishedAt);
-  const whatsappText = encodeURIComponent(`Assalamu'alaikum Jam Wisata, saya membaca artikel "${article.title}" dan ingin konsultasi.`);
+  const whatsappLink = whatsappHref(`Assalamu'alaikum Jam Wisata, saya membaca artikel "${article.title}" dan ingin konsultasi.`, `Artikel — ${article.title}`, "6281222500200");
 
   return (
     <main className="jam-page min-h-screen article-detail-page">
@@ -48,7 +49,7 @@ export default async function ArticlePage({ params }: Props) {
             <span>{article.excerpt}</span>
             <div className="article-detail-meta">
               {publishedDate ? <time dateTime={article.publishedAt ? new Date(article.publishedAt).toISOString() : undefined}>{publishedDate}</time> : null}
-              <a href={`https://wa.me/6281222500200?text=${whatsappText}`} target="_blank" rel="noopener noreferrer">Konsultasi via WhatsApp</a>
+              <a href={whatsappLink} target="_blank" rel="noopener noreferrer">Konsultasi via WhatsApp</a>
             </div>
           </div>
           {article.coverUrl ? (

@@ -1,0 +1,10 @@
+ALTER TABLE "analytics_sessions" ADD COLUMN "utm_source" text;
+ALTER TABLE "analytics_sessions" ADD COLUMN "utm_campaign" text;
+ALTER TABLE "analytics_sessions" ADD COLUMN "utm_content" text;
+ALTER TABLE "analytics_page_views" ADD COLUMN "utm_source" text;
+ALTER TABLE "analytics_page_views" ADD COLUMN "utm_campaign" text;
+ALTER TABLE "analytics_page_views" ADD COLUMN "utm_content" text;
+ALTER TABLE "referral_leads" ADD COLUMN "utm_source" text;
+ALTER TABLE "referral_leads" ADD COLUMN "utm_campaign" text;
+ALTER TABLE "referral_leads" ADD COLUMN "utm_content" text;
+ALTER TABLE "management_settings" ADD COLUMN "birthday_message_template" text NOT NULL DEFAULT 'Assalamu''alaikum Kak [NAMA], selamat ulang tahun yang ke-[UMUR]. Semoga Allah senantiasa memberikan kesehatan, keberkahan usia, dan kemudahan dalam setiap ibadah. Salam hangat dari Jam Wisata.';

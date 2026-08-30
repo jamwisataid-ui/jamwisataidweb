@@ -48,6 +48,7 @@ export const managementSettings = pgTable("management_settings", {
   paymentDueDays: integer("payment_due_days").notNull().default(30),
   financeSignerName: text("finance_signer_name").notNull().default(""),
   financeSignerTitle: text("finance_signer_title").notNull().default("Keuangan"),
+  birthdayMessageTemplate: text("birthday_message_template").notNull().default("Assalamu'alaikum Kak [NAMA], selamat ulang tahun yang ke-[UMUR]. Semoga Allah senantiasa memberikan kesehatan, keberkahan usia, dan kemudahan dalam setiap ibadah. Salam hangat dari Jam Wisata."),
   signatureObjectKey: text("signature_object_key"),
   stampObjectKey: text("stamp_object_key"),
   ...timestamps,
@@ -123,6 +124,9 @@ export const referralLeads = pgTable("referral_leads", {
   status: leadStatus("status").notNull().default("new"),
   convertedPilgrimId: uuid("converted_pilgrim_id").references(() => pilgrims.id, { onDelete: "set null" }),
   sourcePath: text("source_path"),
+  utmSource: text("utm_source"),
+  utmCampaign: text("utm_campaign"),
+  utmContent: text("utm_content"),
   ...timestamps,
 }, (table) => [index("referral_leads_agent_created_idx").on(table.agentId, table.createdAt)]);
 

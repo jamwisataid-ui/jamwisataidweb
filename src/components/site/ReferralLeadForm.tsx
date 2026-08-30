@@ -3,13 +3,15 @@
 import { useState } from "react";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 
+import { readStoredCampaign } from "@/lib/marketing-attribution";
+
 export function ReferralLeadForm({ code, packages }: { code: string; packages: Array<{ id: string; name: string }> }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   async function submit(formData: FormData) {
     setBusy(true); setError("");
     try {
-      const response = await fetch("/api/referral-leads", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ referralCode: code, name: formData.get("name"), whatsapp: formData.get("whatsapp"), email: formData.get("email"), packageId: formData.get("packageId") }) });
+      const response = await fetch("/api/referral-leads", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ referralCode: code, name: formData.get("name"), whatsapp: formData.get("whatsapp"), email: formData.get("email"), packageId: formData.get("packageId"), ...readStoredCampaign(sessionStorage), sourcePath: window.location.pathname }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Data belum tersimpan.");
       window.location.href = data.redirectUrl;

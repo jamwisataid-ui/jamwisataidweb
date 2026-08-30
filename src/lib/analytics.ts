@@ -9,17 +9,23 @@ export type TrafficEvent = {
   visitorId: string;
   path: string;
   referrer?: string;
+  utmSource?: string;
+  utmCampaign?: string;
+  utmContent?: string;
 };
 
 export type TrafficSnapshot = {
   liveVisitors: number;
   visitorsToday: number;
+  visitors7Days: number;
+  visitors30Days: number;
   pageViewsToday: number;
   pagesPerVisit: number;
   updatedAt: string;
   timeline: Array<{ label: string; value: number }>;
   popularPages: Array<{ path: string; views: number }>;
   devices: Array<{ device: string; visitors: number }>;
+  recentVisitors: Array<{ sessionId: string; path: string; device: string; lastSeenAt: string; utmSource: string | null; utmCampaign: string | null }>;
 };
 
 const BOT_PATTERN = /bot|crawler|spider|headless|preview|facebookexternalhit|whatsapp|slurp/i;
@@ -62,6 +68,9 @@ export async function recordTrafficEvent(event: TrafficEvent, userAgent: string)
       visitorId: event.visitorId,
       currentPath: event.path,
       referrer: event.referrer || null,
+      utmSource: event.utmSource || null,
+      utmCampaign: event.utmCampaign || null,
+      utmContent: event.utmContent || null,
       device,
       pageViews: event.type === "pageview" ? 1 : 0,
       firstSeenAt: now,
@@ -73,6 +82,9 @@ export async function recordTrafficEvent(event: TrafficEvent, userAgent: string)
         currentPath: event.path,
         lastSeenAt: now,
         pageViews: nextPageViews,
+        utmSource: event.utmSource || undefined,
+        utmCampaign: event.utmCampaign || undefined,
+        utmContent: event.utmContent || undefined,
       },
     });
 
@@ -82,6 +94,9 @@ export async function recordTrafficEvent(event: TrafficEvent, userAgent: string)
       visitorId: event.visitorId,
       path: event.path,
       referrer: event.referrer || null,
+      utmSource: event.utmSource || null,
+      utmCampaign: event.utmCampaign || null,
+      utmContent: event.utmContent || null,
       createdAt: now,
     });
   }
@@ -90,12 +105,15 @@ export async function recordTrafficEvent(event: TrafficEvent, userAgent: string)
 const emptySnapshot = (): TrafficSnapshot => ({
   liveVisitors: 0,
   visitorsToday: 0,
+  visitors7Days: 0,
+  visitors30Days: 0,
   pageViewsToday: 0,
   pagesPerVisit: 0,
   updatedAt: new Date().toISOString(),
   timeline: Array.from({ length: 12 }, (_, index) => ({ label: `${(index - 11) * 5}m`, value: 0 })),
   popularPages: [],
   devices: [],
+  recentVisitors: [],
 });
 
 export async function getTrafficSnapshot(): Promise<TrafficSnapshot> {
@@ -106,10 +124,12 @@ export async function getTrafficSnapshot(): Promise<TrafficSnapshot> {
   const liveSince = new Date(now.getTime() - 5 * 60 * 1000);
   const hourSince = new Date(now.getTime() - 60 * 60 * 1000);
   const todaySince = jakartaDayStart(now);
+  const sevenDaysSince = new Date(now.getTime() - 7 * 86400000);
+  const thirtyDaysSince = new Date(now.getTime() - 30 * 86400000);
   const bucket = sql<Date>`date_bin('5 minutes', ${analyticsPageViews.createdAt}, TIMESTAMPTZ '2001-01-01 00:00:00+00')`;
   const viewCount = count();
 
-  const [liveRows, todayRows, sessionRows, timelineRows, popularRows, deviceRows] = await Promise.all([
+  const [liveRows, todayRows, sevenDayRows, thirtyDayRows, sessionRows, timelineRows, popularRows, deviceRows, recentRows] = await Promise.all([
     database
       .select({ value: countDistinct(analyticsSessions.visitorId) })
       .from(analyticsSessions)
@@ -118,6 +138,8 @@ export async function getTrafficSnapshot(): Promise<TrafficSnapshot> {
       .select({ visitors: countDistinct(analyticsPageViews.visitorId), views: count() })
       .from(analyticsPageViews)
       .where(gte(analyticsPageViews.createdAt, todaySince)),
+    database.select({ value: countDistinct(analyticsPageViews.visitorId) }).from(analyticsPageViews).where(gte(analyticsPageViews.createdAt, sevenDaysSince)),
+    database.select({ value: countDistinct(analyticsPageViews.visitorId) }).from(analyticsPageViews).where(gte(analyticsPageViews.createdAt, thirtyDaysSince)),
     database
       .select({ value: countDistinct(analyticsPageViews.sessionId) })
       .from(analyticsPageViews)
@@ -140,6 +162,7 @@ export async function getTrafficSnapshot(): Promise<TrafficSnapshot> {
       .from(analyticsSessions)
       .where(gte(analyticsSessions.lastSeenAt, todaySince))
       .groupBy(analyticsSessions.device),
+    database.select({ sessionId: analyticsSessions.sessionId, path: analyticsSessions.currentPath, device: analyticsSessions.device, lastSeenAt: analyticsSessions.lastSeenAt, utmSource: analyticsSessions.utmSource, utmCampaign: analyticsSessions.utmCampaign }).from(analyticsSessions).orderBy(desc(analyticsSessions.lastSeenAt)).limit(8),
   ]);
 
   const bucketValues = new Map(
@@ -161,11 +184,14 @@ export async function getTrafficSnapshot(): Promise<TrafficSnapshot> {
   return {
     liveVisitors: Number(liveRows[0]?.value ?? 0),
     visitorsToday,
+    visitors7Days: Number(sevenDayRows[0]?.value ?? 0),
+    visitors30Days: Number(thirtyDayRows[0]?.value ?? 0),
     pageViewsToday,
     pagesPerVisit: sessionsToday ? pageViewsToday / sessionsToday : 0,
     updatedAt: now.toISOString(),
     timeline,
     popularPages: popularRows.map((row) => ({ path: row.path, views: Number(row.views) })),
     devices: deviceRows.map((row) => ({ device: row.device, visitors: Number(row.visitors) })),
+    recentVisitors: recentRows.map((row) => ({ ...row, lastSeenAt: row.lastSeenAt.toISOString() })),
   };
 }

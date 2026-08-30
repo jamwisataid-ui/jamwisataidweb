@@ -430,19 +430,20 @@ export async function saveManagementSettingsAction(_state: ManagementActionState
   const companyName = String(formData.get("companyName") ?? "").trim();
   const defaultDpAmount = Number(String(formData.get("defaultDpAmount") ?? "").replace(/\D/g, ""));
   const paymentDueDays = Number(formData.get("paymentDueDays"));
-  if (companyName.length < 2 || !Number.isSafeInteger(defaultDpAmount) || defaultDpAmount <= 0 || !Number.isInteger(paymentDueDays) || paymentDueDays < 1 || paymentDueDays > 180) return { ok: false, message: "Nama perusahaan, nominal DP, atau batas pelunasan tidak valid." };
+  const birthdayMessageTemplate = String(formData.get("birthdayMessageTemplate") ?? "").trim();
+  if (companyName.length < 2 || !Number.isSafeInteger(defaultDpAmount) || defaultDpAmount <= 0 || !Number.isInteger(paymentDueDays) || paymentDueDays < 1 || paymentDueDays > 180 || birthdayMessageTemplate.length < 10 || birthdayMessageTemplate.length > 1000) return { ok: false, message: "Nama perusahaan, nominal DP, batas pelunasan, atau template ucapan tidak valid." };
   try {
     const session = await requireAdminSession();
     await withManagementTransaction(async (tx) => {
       await tx.insert(managementSettings).values({
-        id: "default", companyName, defaultDpAmount, paymentDueDays,
+        id: "default", companyName, defaultDpAmount, paymentDueDays, birthdayMessageTemplate,
         companyAddress: String(formData.get("companyAddress") ?? "").trim(),
         companyPhone: String(formData.get("companyPhone") ?? "").trim(),
         companyEmail: String(formData.get("companyEmail") ?? "").trim(),
         financeSignerName: String(formData.get("financeSignerName") ?? "").trim(),
         financeSignerTitle: String(formData.get("financeSignerTitle") ?? "Keuangan").trim(),
       }).onConflictDoUpdate({ target: managementSettings.id, set: {
-        companyName, defaultDpAmount, paymentDueDays,
+        companyName, defaultDpAmount, paymentDueDays, birthdayMessageTemplate,
         companyAddress: String(formData.get("companyAddress") ?? "").trim(), companyPhone: String(formData.get("companyPhone") ?? "").trim(), companyEmail: String(formData.get("companyEmail") ?? "").trim(), financeSignerName: String(formData.get("financeSignerName") ?? "").trim(), financeSignerTitle: String(formData.get("financeSignerTitle") ?? "Keuangan").trim(), updatedAt: new Date(),
       } });
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "update", entityType: "management_settings", entityId: "default", summary: "Pengaturan manajemen diperbarui" });

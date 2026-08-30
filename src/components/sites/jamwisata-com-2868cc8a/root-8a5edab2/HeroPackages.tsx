@@ -317,7 +317,7 @@ export function HeroPackages({ packages }: { packages: TravelPackage[] }) {
 
               {/* Secondary Dark/Gold Outline CTA */}
               <a
-                href="https://wa.me/6281809627499?text=Assalamu%E2%80%99alaikum%2C%20saya%20ingin%20berkonsultasi%20mengenai%20paket%20perjalanan%20Jam%20Wisata."
+                href={whatsappHref("Assalamu’alaikum, saya ingin berkonsultasi mengenai paket perjalanan Jam Wisata.", "Hero Website")}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="lift-soft inline-flex h-[44px] sm:h-[48px] lg:h-[50px] items-center justify-center gap-2 rounded-[8px] border border-[#D7A72B]/60 bg-[#061A2F]/60 px-4.5 sm:px-5 text-xs lg:text-[13px] font-bold uppercase tracking-wider text-[#FAF8F3] backdrop-blur-sm transition duration-300 hover:border-[#E8C967] hover:bg-[#061A2F]/85 hover:text-[#E8C967] active:scale-95"

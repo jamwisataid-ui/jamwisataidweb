@@ -11,6 +11,9 @@ const trafficEventSchema = z.object({
   visitorId: z.uuid(),
   path: z.string().startsWith("/").max(300).refine((path) => !path.startsWith("/admin")),
   referrer: z.string().max(160).optional(),
+  utmSource: z.string().max(160).optional(),
+  utmCampaign: z.string().max(160).optional(),
+  utmContent: z.string().max(160).optional(),
 });
 
 export async function POST(request: Request) {
