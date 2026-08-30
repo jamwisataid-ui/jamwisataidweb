@@ -31,6 +31,7 @@ export const bookingSchema = z.object({
   pilgrimIds: z.array(z.string().uuid()).min(1, "Pilih minimal satu jamaah."),
   agentId: z.union([z.literal(""), z.string().uuid()]).optional(),
   agreedPrice: money.positive("Harga kesepakatan wajib diisi."),
+  dpTarget: money.positive("Target DP wajib lebih dari nol."),
   discountAmount: money.default(0),
   commissionAmount: money.refine((value) => value === 0 || value === 500_000 || value === 1_000_000, "Komisi tidak valid."),
 });

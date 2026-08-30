@@ -12,6 +12,7 @@ import {
   assignRoomAction,
   createAgentAction,
   createBookingAction,
+  cancelBookingAction,
   createPilgrimAction,
   recordCashAction,
   recordPaymentAction,
@@ -105,9 +106,10 @@ type BookingFormProps = {
   pilgrims: Array<{ id: string; fullName: string; whatsapp: string }>;
   departures: Array<{ id: string; departureDate: string; price: string; package?: { name: string } }>;
   agents: Array<{ id: string; name: string; defaultCommission: number }>;
+  defaultDpAmount: number;
 };
 
-export function BookingForm({ pilgrims, departures, agents }: BookingFormProps) {
+export function BookingForm({ pilgrims, departures, agents, defaultDpAmount }: BookingFormProps) {
   const [state, action, pending] = useActionState(createBookingAction, managementInitialState);
   const [departureId, setDepartureId] = useState(departures[0]?.id ?? "");
   const selectedDeparture = departures.find((item) => item.id === departureId);
@@ -115,6 +117,7 @@ export function BookingForm({ pilgrims, departures, agents }: BookingFormProps) 
     <div className="management-form-grid two">
       <label><span>Paket keberangkatan *</span><select name="departureId" value={departureId} onChange={(event) => setDepartureId(event.target.value)} required><option value="">Pilih paket</option>{departures.map((item) => <option key={item.id} value={item.id}>{item.package?.name} — {item.departureDate}</option>)}</select></label>
       <label><span>Harga per jamaah *</span><input name="agreedPrice" inputMode="numeric" defaultValue={selectedDeparture ? Number(selectedDeparture.price) : ""} key={departureId} required /></label>
+      <label><span>Target DP per jamaah *</span><input name="dpTarget" inputMode="numeric" defaultValue={defaultDpAmount} required /><small>Default {rupiah(defaultDpAmount)}, tetapi boleh disesuaikan untuk pendaftaran ini.</small></label>
       <label><span>Nama pembayar *</span><input name="payerName" required /></label>
       <label><span>WhatsApp pembayar *</span><input name="payerWhatsapp" inputMode="tel" required /></label>
       <label><span>Email pembayar</span><input name="payerEmail" type="email" /></label>
@@ -127,7 +130,7 @@ export function BookingForm({ pilgrims, departures, agents }: BookingFormProps) 
   </form>;
 }
 
-type PaymentBooking = { id: string; bookingNumber: string; invoiceNumber: string; payerName: string; registrations: Array<{ id: string; agreedPrice: number; payment: { outstanding: number }; pilgrim?: { fullName: string } }> };
+type PaymentBooking = { id: string; bookingNumber: string; invoiceNumber: string; payerName: string; registrations: Array<{ id: string; agreedPrice: number; dpTarget: number; payment: { status: string; netPaid: number; outstanding: number }; pilgrim?: { fullName: string } }> };
 
 export function PaymentForm({ bookings, accounts, initialBookingId }: { bookings: PaymentBooking[]; accounts: Array<{ id: string; name: string }>; initialBookingId?: string }) {
   const [state, action, pending] = useActionState(recordPaymentAction, managementInitialState);
@@ -147,6 +150,19 @@ export function PaymentForm({ bookings, accounts, initialBookingId }: { bookings
     }
     setAllocations(next);
   }
+  function fillDp() {
+    const next = Object.fromEntries((booking?.registrations ?? []).flatMap((registration) => {
+      const value = Math.min(Math.max(0, registration.dpTarget - registration.payment.netPaid), registration.payment.outstanding);
+      return value > 0 ? [[registration.id, String(value)]] : [];
+    }));
+    setAllocations(next);
+    setAmount(String(Object.values(next).reduce((total, value) => total + Number(value), 0) || ""));
+  }
+  function fillSettlement() {
+    const next = Object.fromEntries((booking?.registrations ?? []).filter((registration) => registration.payment.outstanding > 0).map((registration) => [registration.id, String(registration.payment.outstanding)]));
+    setAllocations(next);
+    setAmount(String(Object.values(next).reduce((total, value) => total + Number(value), 0) || ""));
+  }
   return <form action={action} className="management-form"><Feedback state={state} /><input type="hidden" name="allocations" value={serialized} />
     <div className="management-payment-flow-note"><FileText /><span><small>INVOICE YANG DIBAYAR</small><strong>{booking?.invoiceNumber ?? "Pilih invoice"}</strong><p>Setelah pembayaran tersimpan, kwitansi dibuat otomatis dan langsung ditampilkan.</p></span></div>
     <div className="management-form-grid two">
@@ -157,10 +173,16 @@ export function PaymentForm({ bookings, accounts, initialBookingId }: { bookings
       <label><span>Nominal pembayaran *</span><input name="amount" inputMode="numeric" value={amount} onChange={(event) => setAmount(event.target.value.replace(/\D/g, ""))} required /></label>
       <label><span>Referensi <i>opsional</i></span><input name="reference" placeholder="Nomor transfer" /></label>
     </div>
-    <div className="management-allocation"><div><strong>Alokasi per jamaah</strong><button type="button" onClick={autoAllocate}>Alokasikan otomatis</button></div>{booking?.registrations.map((registration) => <label key={registration.id}><span><strong>{registration.pilgrim?.fullName}</strong><small>Sisa {rupiah(registration.payment.outstanding)}</small></span><input aria-label={`Alokasi ${registration.pilgrim?.fullName}`} inputMode="numeric" value={allocations[registration.id] ?? ""} onChange={(event) => setAllocations((current) => ({ ...current, [registration.id]: event.target.value.replace(/\D/g, "") }))} /></label>)}</div>
+    <div className="management-payment-presets"><span><strong>Isi nominal lebih cepat</strong><small>Pilihan ini hanya membantu mengisi. Nominal tetap bisa diubah manual.</small></span><div><button type="button" onClick={fillDp}>Sesuai target DP</button><button type="button" onClick={fillSettlement}>Pelunasan penuh</button></div></div>
+    <div className="management-allocation"><div><strong>Alokasi per jamaah</strong><button type="button" onClick={autoAllocate}>Alokasikan nominal custom</button></div>{booking?.registrations.map((registration) => <label key={registration.id}><span><strong>{registration.pilgrim?.fullName}</strong><small>{registration.payment.status} · target DP {rupiah(registration.dpTarget)} · sisa {rupiah(registration.payment.outstanding)}</small></span><input aria-label={`Alokasi ${registration.pilgrim?.fullName}`} inputMode="numeric" value={allocations[registration.id] ?? ""} onChange={(event) => setAllocations((current) => ({ ...current, [registration.id]: event.target.value.replace(/\D/g, "") }))} /></label>)}</div>
     <label><span>Catatan</span><textarea name="note" rows={2} /></label>
     <SubmitButton>{pending ? "Mencatat…" : "Simpan pembayaran & buat kwitansi"}</SubmitButton>
   </form>;
+}
+
+export function BookingCancellationForm({ bookingId }: { bookingId: string }) {
+  const [state, action, pending] = useActionState(cancelBookingAction, managementInitialState);
+  return <form action={action} className="management-form"><input type="hidden" name="bookingId" value={bookingId} /><Feedback state={state} /><label><span>Alasan pembatalan *</span><textarea name="reason" rows={3} required placeholder="Contoh: jamaah membatalkan keberangkatan" /></label><p className="management-form-note">Pembatalan tidak otomatis mengeluarkan uang. Jika sudah ada pembayaran, catat refund dari detail pembayaran agar kas dan riwayat tetap akurat.</p><SubmitButton>{pending ? "Membatalkan…" : "Konfirmasi pembatalan"}</SubmitButton></form>;
 }
 
 export function CashForm({ accounts, packages, categories }: { accounts: Array<{ id: string; name: string }>; packages: Array<{ id: string; name: string }>; categories: Array<{ id: string; name: string }> }) {

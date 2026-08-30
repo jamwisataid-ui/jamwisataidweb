@@ -188,7 +188,7 @@ export async function createBookingAction(_state: ManagementActionState, formDat
       const registrationRows = parsed.data.pilgrimIds.map((pilgrimId) => ({
         id: randomUUID(), bookingId, pilgrimId, agreedPrice: finalPrice,
         discountAmount: parsed.data.discountAmount,
-        dpTarget: settings?.defaultDpAmount ?? 5_000_000,
+        dpTarget: parsed.data.dpTarget || settings?.defaultDpAmount || 5_000_000,
         commissionAmount: parsed.data.agentId ? parsed.data.commissionAmount : 0,
       }));
       await tx.insert(registrations).values(registrationRows);
@@ -199,6 +199,25 @@ export async function createBookingAction(_state: ManagementActionState, formDat
     });
     refresh();
     return { ok: true, message: "Pendaftaran dan harga jamaah berhasil disimpan.", redirectTo: `/admin/manajemen/keberangkatan/${bookingId}` };
+  } catch (error) { return failure(error); }
+}
+
+export async function cancelBookingAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
+  const bookingId = String(formData.get("bookingId") ?? "");
+  const reason = String(formData.get("reason") ?? "").trim();
+  if (!bookingId || reason.length < 3) return { ok: false, message: "Alasan pembatalan wajib diisi minimal 3 karakter." };
+  try {
+    const session = await requireAdminSession();
+    await withManagementTransaction(async (tx) => {
+      const booking = await tx.query.bookings.findFirst({ where: eq(bookings.id, bookingId) });
+      if (!booking) throw new Error("Pendaftaran tidak ditemukan.");
+      if (booking.status !== "active") throw new Error("Pendaftaran ini sudah tidak aktif.");
+      await tx.update(bookings).set({ status: "cancelled", cancellationReason: reason, updatedAt: new Date() }).where(eq(bookings.id, bookingId));
+      await tx.update(registrations).set({ status: "cancelled", updatedAt: new Date() }).where(eq(registrations.bookingId, bookingId));
+      await tx.insert(auditLogs).values({ actorId: session.user.id, action: "cancel", entityType: "booking", entityId: bookingId, summary: `${booking.bookingNumber} dibatalkan: ${reason}` });
+    });
+    refresh();
+    return { ok: true, message: "Pendaftaran berhasil dibatalkan. Catat refund terpisah jika ada pembayaran yang dikembalikan.", redirectTo: `/admin/manajemen/keberangkatan/${bookingId}` };
   } catch (error) { return failure(error); }
 }
 
@@ -213,6 +232,9 @@ export async function recordPaymentAction(_state: ManagementActionState, formDat
     const session = await requireAdminSession();
     const paymentId = randomUUID();
     await withManagementTransaction(async (tx) => {
+      const booking = await tx.query.bookings.findFirst({ where: eq(bookings.id, parsed.data.bookingId) });
+      if (!booking) throw new Error("Pendaftaran tidak ditemukan.");
+      if (booking.status !== "active") throw new Error("Pembayaran tidak dapat dicatat karena pendaftaran sudah dibatalkan atau selesai.");
       const invoice = await tx.query.issuedDocuments.findFirst({ where: and(eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.bookingId, parsed.data.bookingId), eq(issuedDocuments.status, "issued")) });
       if (!invoice) throw new Error("Invoice belum diterbitkan. Buat invoice terlebih dahulu sebelum mencatat pembayaran.");
       const registrationIds = parsed.data.allocations.map((item) => item.registrationId);
