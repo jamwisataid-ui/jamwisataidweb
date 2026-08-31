@@ -74,9 +74,9 @@ export function ManualReceiptBuilder({ invoices, receiptNumber }: { invoices: Re
     }
   }
 
-  return <section className="management-manual-receipt">
-    <header><span><small>OPSIONAL / FALLBACK</small><h2>Buat kwitansi manual</h2><p>Kwitansi manual tetap wajib berasal dari invoice dan pembayaran yang terkonfirmasi.</p></span><ReceiptText /></header>
-    {!invoices.length ? <div className="management-manual-receipt-empty"><FileCheck2 /><span><strong>Tidak ada kwitansi yang perlu dibuat manual</strong><small>Belum ada pembayaran terkonfirmasi tanpa kwitansi, atau invoice belum diterbitkan.</small></span></div> : <div className="management-document-builder">
+  return <details className="management-manual-receipt">
+    <summary><span><ReceiptText /><span><small>CADANGAN</small><strong>Buat kwitansi secara manual</strong><p>Gunakan hanya jika pembayaran sudah diterima tetapi kwitansi otomatis belum tersedia.</p></span></span><i>+</i></summary>
+    <div className="management-manual-receipt-content">{!invoices.length ? <div className="management-manual-receipt-empty"><FileCheck2 /><span><strong>Tidak ada kwitansi yang perlu dibuat manual</strong><small>Semua pembayaran sudah memiliki kwitansi, atau belum ada pembayaran terkonfirmasi.</small></span></div> : <div className="management-document-builder">
       <div className="management-document-controls">
         <label className="management-document-select"><span>1. Pilih invoice</span><select value={invoiceId} onChange={(event) => { const nextInvoice = invoices.find((invoice) => invoice.id === event.target.value); setInvoiceId(event.target.value); setSelectedPaymentId(nextInvoice?.payments[0]?.id ?? ""); }}>{invoices.map((invoice) => <option value={invoice.id} key={invoice.id}>{invoice.number} · {invoice.payerName}</option>)}</select></label>
         <label className="management-document-select"><span>2. Pilih pembayaran terkonfirmasi</span><select value={paymentId} onChange={(event) => setSelectedPaymentId(event.target.value)}>{selectedInvoice?.payments.map((payment) => <option value={payment.id} key={payment.id}>{payment.paidAtLabel} · {payment.amountLabel} · {payment.method}</option>)}</select></label>
@@ -89,6 +89,6 @@ export function ManualReceiptBuilder({ invoices, receiptNumber }: { invoices: Re
         <header><span><small>PREVIEW LIVE</small><strong>Kwitansi · {selectedInvoice?.payerName}</strong></span>{previewBusy ? <i><LoaderCircle className="spin" /> Memuat</i> : previewUrl ? <i className="ready"><FileCheck2 /> Siap diperiksa</i> : null}</header>
         <div className="landscape">{previewUrl ? <div role="img" aria-label={`Preview kwitansi ${selectedInvoice?.payerName ?? ""}`} className="management-template-preview-image" style={{ backgroundImage: `url(${previewUrl})` }} /> : previewError ? <div className="management-preview-state error"><RotateCw /><strong>Preview belum dapat ditampilkan</strong><p>{previewError}</p></div> : <div className="management-preview-state"><FileText /><strong>Menyiapkan preview kwitansi…</strong></div>}</div>
       </div>
-    </div>}
-  </section>;
+    </div>}</div>
+  </details>;
 }
