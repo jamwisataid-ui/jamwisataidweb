@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
+import { unstable_rethrow } from "next/navigation";
 import { and, eq, inArray } from "drizzle-orm";
 
 import {
@@ -46,6 +47,10 @@ function managementRecordPath(entity: string, id: string) {
 }
 
 function failure(error: unknown): ManagementActionState {
+  // Next.js memakai exception khusus untuk redirect/notFound. Exception ini
+  // harus diteruskan agar sesi kedaluwarsa membuka halaman login, bukan
+  // ditampilkan kepada admin sebagai pesan teknis "NEXT_REDIRECT".
+  unstable_rethrow(error);
   console.error("Management action failed:", error);
   return { ok: false, message: error instanceof Error ? error.message : "Terjadi kesalahan. Data belum disimpan." };
 }
