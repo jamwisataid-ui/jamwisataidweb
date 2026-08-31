@@ -1991,6 +1991,42 @@
 .management-choice-list input { width: 20px; min-height: 20px; }
 .management-choice-list strong,.management-choice-list small { display: block; }
 .management-choice-list small { color: #778396; font-size: 12px; }
+.management-choice-list label { border: 1px solid transparent; transition: border-color .16s ease,background .16s ease; }
+.management-choice-list label.selected { border-color: #c7a552; background: #fffaf0; }
+.management-booking-help { overflow: hidden; border: 1px solid #d9c57e; border-radius: 12px; background: #fffbef; }
+.management-booking-help > summary { display: flex; min-height: 68px; align-items: center; justify-content: space-between; gap: 14px; padding: 13px 16px; cursor: pointer; list-style: none; }
+.management-booking-help > summary::-webkit-details-marker { display: none; }
+.management-booking-help > summary > span { display: flex; align-items: center; gap: 11px; }
+.management-booking-help > summary svg { width: 22px; color: #936a0b; }
+.management-booking-help > summary span span,.management-booking-help > summary strong,.management-booking-help > summary small { display: block; }
+.management-booking-help > summary strong { color: #183453; font-size: 15px; }
+.management-booking-help > summary small { margin-top: 3px; color: #756b55; font-size: 12px; font-weight: 550; }
+.management-booking-help > summary > i { display: grid; width: 32px; height: 32px; flex: 0 0 auto; place-items: center; border: 1px solid #cbae5a; border-radius: 50%; color: #815b05; font-size: 21px; font-style: normal; transition: transform .18s ease; }
+.management-booking-help[open] > summary > i { transform: rotate(45deg); }
+.management-booking-help ol { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0; margin: 0; padding: 8px 16px 16px 48px; border-top: 1px solid #eadfb9; }
+.management-booking-help li { padding: 11px 20px 11px 3px; color: #805d0c; }
+.management-booking-help li strong,.management-booking-help li span { display: block; }
+.management-booking-help li strong { color: #183453; font-size: 13px; }
+.management-booking-help li span { margin-top: 3px; color: #706753; font-size: 12px; line-height: 1.45; }
+.management-booking-step { display: grid; gap: 17px; padding: 18px; border: 1px solid #e1ddd4; border-radius: 12px; background: #fff; }
+.management-booking-step > header { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid #ece8df; }
+.management-booking-step > header > b { display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: #102a4c; color: #e2c46e; font-size: 14px; }
+.management-booking-step > header span,.management-booking-step > header strong,.management-booking-step > header small { display: block; }
+.management-booking-step > header strong { color: #173251; font-size: 16px; }
+.management-booking-step > header small { margin-top: 3px; color: #738092; font-size: 12px; font-weight: 550; }
+.management-booking-summary { display: grid; grid-template-columns: 48px minmax(0,1fr); align-items: start; gap: 14px; padding: 17px; border: 1px solid #c8aa5c; border-radius: 12px; background: #102a4c; color: #fff; }
+.management-booking-summary > svg { width: 25px; height: 25px; margin: 4px auto; color: #e5c66c; }
+.management-booking-summary small,.management-booking-summary strong,.management-booking-summary p,.management-booking-summary em { display: block; }
+.management-booking-summary small { color: #d9bd6f; font-size: 10px; font-weight: 850; letter-spacing: .1em; }
+.management-booking-summary strong { margin-top: 4px; font-size: 17px; }
+.management-booking-summary p { margin: 6px 0 0; color: #edf2f8; font-size: 13px; line-height: 1.5; }
+.management-booking-summary em { margin-top: 5px; color: #d7dfeb; font-size: 12px; font-style: normal; }
+.management-booking-submit { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.management-booking-submit > span { display: flex; align-items: center; gap: 10px; color: #243c5b; }
+.management-booking-submit > span > svg { width: 22px; color: #9a700d; }
+.management-booking-submit > span span,.management-booking-submit strong,.management-booking-submit small { display: block; }
+.management-booking-submit strong { font-size: 14px; }
+.management-booking-submit small { margin-top: 3px; color: #778294; font-size: 12px; }
 .management-check { display: flex !important; flex-direction: row; align-items: center !important; align-self: end; min-height: 50px; }
 .management-check input { width: 20px; min-height: 20px; }
 .management-allocation { display: grid; gap: 8px; padding: 15px; border: 1px solid #e0d8c7; border-radius: 11px; background: #faf8f3; }
@@ -2308,4 +2344,9 @@
   .management-document-preview > div { height: 68vh; min-height: 460px; padding: 8px; }
   .management-preview-state { inset: 8px; }
   .management-payment-document-actions,.management-payment-document-actions > a,.management-receipt-retry,.management-receipt-retry button { width: 100%; }
+  .management-booking-help ol { grid-template-columns: 1fr; padding-left: 42px; }
+  .management-booking-step { padding: 15px 13px; }
+  .management-booking-summary { grid-template-columns: 36px minmax(0,1fr); padding: 15px 13px; }
+  .management-booking-submit { align-items: stretch; flex-direction: column; }
+  .management-booking-submit > span { align-items: flex-start; }
 }
