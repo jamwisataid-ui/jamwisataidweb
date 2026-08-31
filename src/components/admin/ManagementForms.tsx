@@ -53,9 +53,9 @@ function ErrorText({ state, name }: { state: ManagementActionState; name: string
   return message ? <small className="management-field-error">{message}</small> : null;
 }
 
-function SubmitButton({ children }: { children: React.ReactNode }) {
+function SubmitButton({ children, disabled = false }: { children: React.ReactNode; disabled?: boolean }) {
   const { pending } = useFormStatus();
-  return <button className="management-primary-button" type="submit" disabled={pending}>{pending ? <LoaderCircle className="spin" aria-hidden /> : null}{pending ? "Menyimpan…" : children}</button>;
+  return <button className="management-primary-button" type="submit" disabled={pending || disabled}>{pending ? <LoaderCircle className="spin" aria-hidden /> : null}{pending ? "Menyimpan…" : children}</button>;
 }
 
 export function InitializeManagementButton() {
@@ -103,7 +103,7 @@ export function AgentForm({ values }: { values?: AgentValues }) {
 }
 
 type BookingFormProps = {
-  pilgrims: Array<{ id: string; fullName: string; whatsapp: string }>;
+  pilgrims: Array<{ id: string; fullName: string; whatsapp: string; email: string | null }>;
   departures: Array<{ id: string; departureDate: string; price: string; package?: { name: string } }>;
   agents: Array<{ id: string; name: string; defaultCommission: number }>;
   defaultDpAmount: number;
@@ -118,10 +118,20 @@ export function BookingForm({ pilgrims, departures, agents, defaultDpAmount }: B
   const [agentId, setAgentId] = useState("");
   const [commissionAmount, setCommissionAmount] = useState("0");
   const [pilgrimIds, setPilgrimIds] = useState<string[]>([]);
+  const [payerName, setPayerName] = useState("");
+  const [payerWhatsapp, setPayerWhatsapp] = useState("");
+  const [payerEmail, setPayerEmail] = useState("");
+  const [pilgrimSearch, setPilgrimSearch] = useState("");
   const selectedDeparture = departures.find((item) => item.id === departureId);
   const selectedAgent = agents.find((item) => item.id === agentId);
   const finalPrice = Math.max(0, Number(agreedPrice || 0) - Number(discountAmount || 0));
   const totalBill = finalPrice * pilgrimIds.length;
+  const filteredPilgrims = pilgrims.filter((item) => `${item.fullName} ${item.whatsapp}`.toLowerCase().includes(pilgrimSearch.toLowerCase().trim()));
+  const priceReady = Boolean(departureId && Number(agreedPrice) > 0 && Number(dpTarget) > 0 && finalPrice > 0);
+  const payerReady = payerName.trim().length >= 2 && payerWhatsapp.replace(/\D/g, "").length >= 8;
+  const pilgrimsReady = pilgrimIds.length > 0;
+  const formReady = priceReady && payerReady && pilgrimsReady;
+  const missing = [!priceReady && "paket dan nominal", !payerReady && "data pembayar", !pilgrimsReady && "jamaah yang berangkat"].filter(Boolean).join(", ");
   function selectDeparture(value: string) {
     setDepartureId(value);
     const departure = departures.find((item) => item.id === value);
@@ -135,33 +145,41 @@ export function BookingForm({ pilgrims, departures, agents, defaultDpAmount }: B
   function togglePilgrim(id: string, checked: boolean) {
     setPilgrimIds((current) => checked ? [...current, id] : current.filter((item) => item !== id));
   }
+  function copyPayer(id: string) {
+    const pilgrim = pilgrims.find((item) => item.id === id);
+    if (!pilgrim) return;
+    setPayerName(pilgrim.fullName);
+    setPayerWhatsapp(pilgrim.whatsapp);
+    setPayerEmail(pilgrim.email ?? "");
+  }
   return <form action={action} className="management-form"><Feedback state={state} />
-    <details className="management-booking-help">
-      <summary><span><BookOpen /><span><strong>Cara Penggunaan</strong><small>Buka panduan singkat pendaftaran keberangkatan.</small></span></span><i>+</i></summary>
-      <ol><li><strong>Pilih paket</strong><span>Harga paket otomatis masuk dan masih bisa disesuaikan.</span></li><li><strong>Atur DP dan diskon</strong><span>Nominal berlaku untuk setiap jamaah yang dipilih.</span></li><li><strong>Isi pembayar</strong><span>Pembayar boleh jamaah sendiri atau orang yang mewakili.</span></li><li><strong>Pilih agen bila ada</strong><span>Komisi otomatis mengikuti pengaturan agen, tetapi tetap bisa disesuaikan.</span></li><li><strong>Centang jamaah</strong><span>Satu pendaftaran dapat memuat beberapa jamaah.</span></li><li><strong>Periksa ringkasan</strong><span>Pastikan harga akhir dan jumlah jamaah sudah benar.</span></li><li><strong>Simpan</strong><span>Sistem menghubungkan seluruh data dan membuka detail pendaftaran.</span></li></ol>
+    <details className="management-booking-help" open>
+      <summary><span><BookOpen /><span><strong>Cara Penggunaan — ikuti dari nomor 1 sampai 4</strong><small>Panduan ini terbuka otomatis. Klik di sini jika ingin menutupnya.</small></span></span><i>+</i></summary>
+      <ol><li><strong>1. Pilih paket dan harga</strong><span>Harga masuk otomatis. Atur DP dan diskon bila ada.</span></li><li><strong>2. Isi orang yang membayar</strong><span>Bisa disalin dari data jamaah agar tidak perlu mengetik ulang.</span></li><li><strong>3. Pilih agen bila ada</strong><span>Jika bukan dari agen, biarkan “Tanpa agen”.</span></li><li><strong>4. Centang jamaah</strong><span>Periksa ringkasan, lalu tekan “Simpan pendaftaran”.</span></li></ol>
     </details>
 
     <section className="management-booking-step">
-      <header><b>1</b><span><strong>Paket & tagihan</strong><small>Tentukan keberangkatan dan nominal untuk setiap jamaah.</small></span></header>
+      <header><b>1</b><span><strong>Pilih paket & atur harga</strong><small>Semua nominal di bagian ini berlaku untuk satu jamaah.</small></span><em className={priceReady ? "complete" : "incomplete"}>{priceReady ? <CheckCircle2 /> : <CircleAlert />}{priceReady ? "Sudah lengkap" : "Belum lengkap"}</em></header>
       <div className="management-form-grid two">
         <label><span>Paket keberangkatan *</span><select name="departureId" value={departureId} onChange={(event) => selectDeparture(event.target.value)} required><option value="">Pilih paket keberangkatan</option>{departures.map((item) => <option key={item.id} value={item.id}>{item.package?.name} — {item.departureDate}</option>)}</select><small>Pilih jadwal yang akan diikuti oleh seluruh jamaah dalam pendaftaran ini.</small><ErrorText state={state} name="departureId" /></label>
-        <label><span>Harga per jamaah *</span><input name="agreedPrice" inputMode="numeric" value={agreedPrice} onChange={(event) => setAgreedPrice(event.target.value.replace(/\D/g, ""))} placeholder="Pilih paket terlebih dahulu" required /><small>{selectedDeparture ? `Harga awal paket ${rupiah(Number(selectedDeparture.price))}. Ubah hanya jika ada harga khusus.` : "Harga otomatis terisi setelah paket dipilih."}</small><ErrorText state={state} name="agreedPrice" /></label>
-        <label><span>Target DP per jamaah *</span><input name="dpTarget" inputMode="numeric" value={dpTarget} onChange={(event) => setDpTarget(event.target.value.replace(/\D/g, ""))} required /><small>Uang muka yang ditargetkan untuk setiap jamaah. Default sistem {rupiah(defaultDpAmount)}.</small><ErrorText state={state} name="dpTarget" /></label>
-        <label><span>Diskon per jamaah</span><input name="discountAmount" inputMode="numeric" value={discountAmount} onChange={(event) => setDiscountAmount(event.target.value.replace(/\D/g, ""))} /><small>Isi 0 jika tidak ada. Diskon dipotong dari harga setiap jamaah, bukan total rombongan.</small><ErrorText state={state} name="discountAmount" /></label>
+        <label><span>Harga per jamaah *</span><input name="agreedPrice" inputMode="numeric" value={agreedPrice} onChange={(event) => setAgreedPrice(event.target.value.replace(/\D/g, ""))} placeholder="Pilih paket terlebih dahulu" required /><output className="management-money-readable">Terbaca: <strong>{rupiah(Number(agreedPrice || 0))}</strong></output><small>{selectedDeparture ? `Harga awal paket ${rupiah(Number(selectedDeparture.price))}. Ubah hanya jika ada harga khusus.` : "Harga otomatis terisi setelah paket dipilih."}</small><ErrorText state={state} name="agreedPrice" /></label>
+        <label><span>Target DP per jamaah *</span><input name="dpTarget" inputMode="numeric" value={dpTarget} onChange={(event) => setDpTarget(event.target.value.replace(/\D/g, ""))} required /><output className="management-money-readable">Terbaca: <strong>{rupiah(Number(dpTarget || 0))}</strong></output><small>DP adalah uang muka yang perlu dibayar lebih dulu. Default sistem {rupiah(defaultDpAmount)}.</small><ErrorText state={state} name="dpTarget" /></label>
+        <label><span>Diskon per jamaah</span><input name="discountAmount" inputMode="numeric" value={discountAmount} onChange={(event) => setDiscountAmount(event.target.value.replace(/\D/g, ""))} /><output className="management-money-readable">Terbaca: <strong>{rupiah(Number(discountAmount || 0))}</strong></output><small>Isi angka 0 jika tidak ada diskon. Diskon dipotong dari harga setiap jamaah.</small><ErrorText state={state} name="discountAmount" />{Number(discountAmount) >= Number(agreedPrice) && Number(discountAmount) > 0 ? <small className="management-field-error">Diskon harus lebih kecil daripada harga jamaah.</small> : null}</label>
       </div>
     </section>
 
     <section className="management-booking-step">
-      <header><b>2</b><span><strong>Data pembayar</strong><small>Kontak utama untuk tagihan dan komunikasi pembayaran.</small></span></header>
+      <header><b>2</b><span><strong>Isi data orang yang membayar</strong><small>Ini adalah orang yang akan menerima informasi tagihan.</small></span><em className={payerReady ? "complete" : "incomplete"}>{payerReady ? <CheckCircle2 /> : <CircleAlert />}{payerReady ? "Sudah lengkap" : "Belum lengkap"}</em></header>
       <div className="management-form-grid two">
-        <label><span>Nama pembayar *</span><input name="payerName" autoComplete="name" placeholder="Nama orang yang bertanggung jawab membayar" required /><small>Boleh nama jamaah sendiri, kepala keluarga, atau pihak yang mewakili rombongan.</small><ErrorText state={state} name="payerName" /></label>
-        <label><span>WhatsApp pembayar *</span><input name="payerWhatsapp" inputMode="tel" autoComplete="tel" placeholder="08xxxxxxxxxx" required /><small>Nomor yang dapat dihubungi terkait invoice, DP, dan pelunasan.</small><ErrorText state={state} name="payerWhatsapp" /></label>
-        <label className="span-two"><span>Email pembayar <i>opsional</i></span><input name="payerEmail" type="email" autoComplete="email" placeholder="nama@email.com" /><small>Boleh dikosongkan jika pembayar tidak memiliki email.</small><ErrorText state={state} name="payerEmail" /></label>
+        <label className="span-two management-copy-payer"><span>Supaya lebih cepat: salin dari data jamaah</span><select aria-label="Salin data pembayar dari jamaah" defaultValue="" onChange={(event) => copyPayer(event.target.value)}><option value="">Pilih nama jamaah jika pembayar juga jamaah</option>{pilgrims.map((item) => <option value={item.id} key={item.id}>{item.fullName} — {item.whatsapp}</option>)}</select><small>Pilihan ini hanya membantu mengisi nama, WhatsApp, dan email. Data masih bisa diedit.</small></label>
+        <label><span>Nama pembayar *</span><input name="payerName" autoComplete="name" value={payerName} onChange={(event) => setPayerName(event.target.value)} placeholder="Contoh: Bapak Ahmad" required /><small>Boleh jamaah sendiri, kepala keluarga, atau orang yang mewakili.</small><ErrorText state={state} name="payerName" /></label>
+        <label><span>WhatsApp pembayar *</span><input name="payerWhatsapp" inputMode="tel" autoComplete="tel" value={payerWhatsapp} onChange={(event) => setPayerWhatsapp(event.target.value)} placeholder="Contoh: 081234567890" required /><small>Nomor yang akan dihubungi mengenai DP dan pelunasan.</small><ErrorText state={state} name="payerWhatsapp" /></label>
+        <label className="span-two"><span>Email pembayar <i>boleh dikosongkan</i></span><input name="payerEmail" type="email" autoComplete="email" value={payerEmail} onChange={(event) => setPayerEmail(event.target.value)} placeholder="Contoh: nama@email.com" /><small>Tidak wajib diisi jika pembayar tidak memiliki email.</small><ErrorText state={state} name="payerEmail" /></label>
       </div>
     </section>
 
     <section className="management-booking-step">
-      <header><b>3</b><span><strong>Agen & komisi</strong><small>Lewati bagian ini jika pendaftaran datang langsung tanpa agen.</small></span></header>
+      <header><b>3</b><span><strong>Apakah pendaftaran berasal dari agen?</strong><small>Jika tidak, biarkan pilihan “Tanpa agen”.</small></span><em className="optional">Opsional</em></header>
       <div className="management-form-grid two">
         <label><span>Agen <i>opsional</i></span><select name="agentId" value={agentId} onChange={(event) => selectAgent(event.target.value)}><option value="">Tanpa agen / pendaftaran langsung</option>{agents.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select><small>Pilih agen asal agar referral dan komisinya tercatat pada pendaftaran ini.</small><ErrorText state={state} name="agentId" /></label>
         <label><span>Komisi per jamaah</span><select name="commissionAmount" value={commissionAmount} onChange={(event) => setCommissionAmount(event.target.value)} disabled={!agentId}><option value="0">Tanpa komisi</option><option value="500000">Rp500.000</option><option value="1000000">Rp1.000.000</option></select>{!agentId ? <input type="hidden" name="commissionAmount" value="0" /> : null}<small>{selectedAgent ? `Otomatis mengikuti default ${selectedAgent.name}: ${rupiah(selectedAgent.defaultCommission)}. Komisi baru sah setelah jamaah lunas.` : "Aktif setelah agen dipilih. Tanpa agen, komisi otomatis Rp0."}</small><ErrorText state={state} name="commissionAmount" /></label>
@@ -169,12 +187,14 @@ export function BookingForm({ pilgrims, departures, agents, defaultDpAmount }: B
     </section>
 
     <section className="management-booking-step">
-      <header><b>4</b><span><strong>Jamaah yang berangkat</strong><small>Centang semua jamaah yang masuk dalam satu pendaftaran ini.</small></span></header>
-      <fieldset className="management-choice-list"><legend>{pilgrimIds.length ? `${pilgrimIds.length} jamaah dipilih` : "Pilih minimal satu jamaah *"}</legend>{pilgrims.length ? pilgrims.map((item) => <label className={pilgrimIds.includes(item.id) ? "selected" : ""} key={item.id}><input type="checkbox" name="pilgrimIds" value={item.id} checked={pilgrimIds.includes(item.id)} onChange={(event) => togglePilgrim(item.id, event.target.checked)} /><span><strong>{item.fullName}</strong><small>{item.whatsapp}</small></span></label>) : <p>Tambahkan data jamaah terlebih dahulu.</p>}<ErrorText state={state} name="pilgrimIds" /></fieldset>
+      <header><b>4</b><span><strong>Pilih jamaah yang akan berangkat</strong><small>Centang nama jamaah satu per satu.</small></span><em className={pilgrimsReady ? "complete" : "incomplete"}>{pilgrimsReady ? <CheckCircle2 /> : <CircleAlert />}{pilgrimsReady ? `${pilgrimIds.length} dipilih` : "Belum dipilih"}</em></header>
+      <label className="management-pilgrim-search"><span>Cari jamaah</span><input type="search" value={pilgrimSearch} onChange={(event) => setPilgrimSearch(event.target.value)} placeholder="Ketik nama atau nomor WhatsApp" /><small>{filteredPilgrims.length} nama ditemukan. Jamaah yang sudah dicentang tetap tersimpan saat pencarian diubah.</small></label>
+      {pilgrimIds.map((id) => <input key={id} type="hidden" name="pilgrimIds" value={id} />)}
+      <fieldset className="management-choice-list"><legend>{pilgrimIds.length ? `${pilgrimIds.length} jamaah sudah dipilih` : "Pilih minimal satu jamaah *"}</legend>{filteredPilgrims.length ? filteredPilgrims.map((item) => <label className={pilgrimIds.includes(item.id) ? "selected" : ""} key={item.id}><input type="checkbox" value={item.id} checked={pilgrimIds.includes(item.id)} onChange={(event) => togglePilgrim(item.id, event.target.checked)} /><span><strong>{item.fullName}</strong><small>{item.whatsapp}</small></span></label>) : <p className="management-no-search-result">Nama jamaah tidak ditemukan. Coba kata pencarian lain.</p>}<ErrorText state={state} name="pilgrimIds" /></fieldset>
     </section>
 
-    <div className="management-booking-summary"><WalletCards /><span><small>RINGKASAN PENDAFTARAN</small><strong>{selectedDeparture?.package?.name ?? "Paket belum dipilih"}</strong><p>{pilgrimIds.length} jamaah · harga akhir {rupiah(finalPrice)} / jamaah · total tagihan {rupiah(totalBill)}</p>{agentId ? <em>Agen {selectedAgent?.name} · komisi {rupiah(Number(commissionAmount))} / jamaah</em> : <em>Pendaftaran langsung tanpa agen</em>}</span></div>
-    <div className="management-booking-submit"><span><UsersRound /><span><strong>Siap membuat pendaftaran?</strong><small>Setelah disimpan, Anda langsung diarahkan ke detail pendaftaran.</small></span></span><SubmitButton>{pending ? "Menyimpan…" : "Simpan pendaftaran"}</SubmitButton></div>
+    <div className="management-booking-summary"><WalletCards /><span><small>PERIKSA SEBELUM DISIMPAN</small><strong>{selectedDeparture?.package?.name ?? "Paket belum dipilih"}</strong><dl><div><dt>Harga awal / jamaah</dt><dd>{rupiah(Number(agreedPrice || 0))}</dd></div><div><dt>Diskon / jamaah</dt><dd>− {rupiah(Number(discountAmount || 0))}</dd></div><div><dt>Harga akhir / jamaah</dt><dd>{rupiah(finalPrice)}</dd></div><div><dt>Jumlah jamaah</dt><dd>{pilgrimIds.length} orang</dd></div><div className="total"><dt>Total tagihan</dt><dd>{rupiah(totalBill)}</dd></div></dl>{agentId ? <em>Agen {selectedAgent?.name} · komisi {rupiah(Number(commissionAmount))} / jamaah</em> : <em>Pendaftaran langsung tanpa agen</em>}</span></div>
+    <div className={`management-booking-submit ${formReady ? "ready" : "not-ready"}`}><span><UsersRound /><span><strong>{formReady ? "Semua data utama sudah lengkap" : "Pendaftaran belum bisa disimpan"}</strong><small>{formReady ? "Periksa ringkasan sekali lagi, lalu simpan." : `Lengkapi terlebih dahulu: ${missing}.`}</small></span></span><SubmitButton disabled={!formReady}>{pending ? "Menyimpan…" : "Simpan pendaftaran"}</SubmitButton></div>
   </form>;
 }
 
