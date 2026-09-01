@@ -6,13 +6,14 @@ import { bookings, documentSequences, financialAccounts, issuedDocuments, manage
 import { requireAdminSession } from "@/lib/admin-session";
 import { formatDocumentNumber } from "@/lib/management/domain";
 import { renderTransactionPdf, renderTransactionPng, type TransactionPdfSnapshot } from "@/lib/management/document-renderer";
+import { buildInvoiceItems, invoiceTotals, resolveInvoiceAmount } from "@/lib/management/invoice";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
     await requireAdminSession();
-    const body = await request.json() as { kind?: string; bookingId?: string; paymentId?: string };
+    const body = await request.json() as { kind?: string; bookingId?: string; paymentId?: string; invoiceAmount?: number };
     const kind = body.kind === "receipt" ? "receipt" : body.kind === "invoice" ? "invoice" : null;
     if (!kind || !body.bookingId) return NextResponse.json({ error: "Jenis dokumen atau booking tidak valid." }, { status: 400 });
 
@@ -45,10 +46,14 @@ export async function POST(request: Request) {
       items = [{ description: `Pembayaran ${String(booking.packageSnapshot.name ?? "paket umroh")}${allocations.length ? ` untuk ${allocations.length} jamaah` : ""}`, qty, unitPrice: equalAllocations ? allocations[0].amount : payment.amount, total: payment.amount }];
       total = payment.amount;
     } else {
-      const grouped = new Map<number, number>();
-      for (const registration of registrationRows) grouped.set(registration.agreedPrice, (grouped.get(registration.agreedPrice) ?? 0) + 1);
-      items = Array.from(grouped, ([unitPrice, qty]) => ({ description: `${String(booking.packageSnapshot.name ?? "Paket umroh")} — ${String(booking.packageSnapshot.dateLabel ?? booking.packageSnapshot.departureDate ?? "")}`, qty, unitPrice, total: qty * unitPrice }));
-      total = items.reduce((sum, item) => sum + item.total, 0);
+      const totals = invoiceTotals(registrationRows);
+      total = resolveInvoiceAmount(body.invoiceAmount, totals.totalPrice);
+      items = buildInvoiceItems({
+        registrations: registrationRows,
+        invoiceAmount: total,
+        packageName: String(booking.packageSnapshot.name ?? "Paket umroh"),
+        departureLabel: String(booking.packageSnapshot.dateLabel ?? booking.packageSnapshot.departureDate ?? ""),
+      });
     }
 
     const snapshot: TransactionPdfSnapshot = {

@@ -198,25 +198,30 @@ export function BookingForm({ pilgrims, departures, agents, defaultDpAmount }: B
   </form>;
 }
 
-type PaymentBooking = { id: string; bookingNumber: string; invoiceNumber: string; payerName: string; registrations: Array<{ id: string; agreedPrice: number; dpTarget: number; payment: { status: string; netPaid: number; outstanding: number }; pilgrim?: { fullName: string } }> };
+type PaymentBooking = { id: string; bookingNumber: string; invoiceNumber: string; invoiceAmount: number; payerName: string; registrations: Array<{ id: string; agreedPrice: number; dpTarget: number; payment: { status: string; netPaid: number; outstanding: number }; pilgrim?: { fullName: string } }> };
+
+function allocatePayment(registrations: PaymentBooking["registrations"], amount: number) {
+  let remaining = amount;
+  const allocations: Record<string, string> = {};
+  for (const registration of registrations) {
+    const value = Math.min(remaining, registration.payment.outstanding);
+    if (value > 0) allocations[registration.id] = String(value);
+    remaining -= value;
+  }
+  return allocations;
+}
 
 export function PaymentForm({ bookings, accounts, initialBookingId }: { bookings: PaymentBooking[]; accounts: Array<{ id: string; name: string }>; initialBookingId?: string }) {
   const [state, action, pending] = useActionState(recordPaymentAction, managementInitialState);
-  const [bookingId, setBookingId] = useState(bookings.some((booking) => booking.id === initialBookingId) ? initialBookingId! : bookings[0]?.id ?? "");
-  const [amount, setAmount] = useState("");
-  const [allocations, setAllocations] = useState<Record<string, string>>({});
+  const initialBooking = bookings.find((booking) => booking.id === initialBookingId) ?? bookings[0];
+  const [bookingId, setBookingId] = useState(initialBooking?.id ?? "");
+  const [amount, setAmount] = useState(() => initialBooking?.invoiceAmount ? String(initialBooking.invoiceAmount) : "");
+  const [allocations, setAllocations] = useState<Record<string, string>>(() => allocatePayment(initialBooking?.registrations ?? [], initialBooking?.invoiceAmount ?? 0));
   const [localNow] = useState(() => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16));
   const booking = bookings.find((item) => item.id === bookingId);
   const serialized = useMemo(() => JSON.stringify(Object.entries(allocations).filter(([, value]) => Number(value) > 0).map(([registrationId, value]) => ({ registrationId, amount: Number(value) }))), [allocations]);
   function autoAllocate() {
-    let remaining = Number(amount) || 0;
-    const next: Record<string, string> = {};
-    for (const registration of booking?.registrations ?? []) {
-      const value = Math.min(remaining, registration.payment.outstanding);
-      if (value > 0) next[registration.id] = String(value);
-      remaining -= value;
-    }
-    setAllocations(next);
+    setAllocations(allocatePayment(booking?.registrations ?? [], Number(amount) || 0));
   }
   function fillDp() {
     const next = Object.fromEntries((booking?.registrations ?? []).flatMap((registration) => {
@@ -232,13 +237,13 @@ export function PaymentForm({ bookings, accounts, initialBookingId }: { bookings
     setAmount(String(Object.values(next).reduce((total, value) => total + Number(value), 0) || ""));
   }
   return <form action={action} className="management-form"><Feedback state={state} /><input type="hidden" name="allocations" value={serialized} />
-    <div className="management-payment-flow-note"><FileText /><span><small>INVOICE YANG DIBAYAR</small><strong>{booking?.invoiceNumber ?? "Pilih invoice"}</strong><p>Setelah pembayaran tersimpan, kwitansi dibuat otomatis dan langsung ditampilkan.</p></span></div>
+    <div className="management-payment-flow-note"><FileText /><span><small>INVOICE YANG DIBAYAR</small><strong>{booking?.invoiceNumber ?? "Pilih invoice"} · {rupiah(booking?.invoiceAmount ?? 0)}</strong><p>Nominal otomatis mengikuti invoice. Jika uang yang diterima berbeda, nominal masih bisa diubah.</p></span></div>
     <div className="management-form-grid two">
-      <label><span>Invoice *</span><select name="bookingId" value={bookingId} onChange={(event) => { setBookingId(event.target.value); setAllocations({}); }} required>{bookings.map((item) => <option value={item.id} key={item.id}>{item.invoiceNumber} — {item.payerName}</option>)}</select></label>
+      <label><span>Invoice *</span><select name="bookingId" value={bookingId} onChange={(event) => { const next = bookings.find((item) => item.id === event.target.value); setBookingId(event.target.value); setAmount(next?.invoiceAmount ? String(next.invoiceAmount) : ""); setAllocations(allocatePayment(next?.registrations ?? [], next?.invoiceAmount ?? 0)); }} required>{bookings.map((item) => <option value={item.id} key={item.id}>{item.invoiceNumber} — {item.payerName} — {rupiah(item.invoiceAmount)}</option>)}</select></label>
       <label><span>Masuk ke rekening/kas *</span><select name="accountId" required><option value="">Pilih rekening</option>{accounts.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
       <label><span>Tanggal pembayaran *</span><input name="paidAt" type="datetime-local" defaultValue={localNow} required /></label>
       <label><span>Metode</span><select name="method" defaultValue="transfer"><option value="transfer">Transfer</option><option value="cash">Tunai</option><option value="card">Kartu</option><option value="other">Lainnya</option></select></label>
-      <label><span>Nominal pembayaran *</span><input name="amount" inputMode="numeric" value={amount} onChange={(event) => setAmount(event.target.value.replace(/\D/g, ""))} required /></label>
+      <label><span>Nominal pembayaran *</span><input name="amount" inputMode="numeric" value={amount} onChange={(event) => { const value = event.target.value.replace(/\D/g, ""); setAmount(value); setAllocations(allocatePayment(booking?.registrations ?? [], Number(value) || 0)); }} required /><small>Terisi dari nominal invoice dan tetap dapat disesuaikan.</small></label>
       <label><span>Referensi <i>opsional</i></span><input name="reference" placeholder="Nomor transfer" /></label>
     </div>
     <div className="management-payment-presets"><span><strong>Isi nominal lebih cepat</strong><small>Pilihan ini hanya membantu mengisi. Nominal tetap bisa diubah manual.</small></span><div><button type="button" onClick={fillDp}>Sesuai target DP</button><button type="button" onClick={fillSettlement}>Pelunasan penuh</button></div></div>

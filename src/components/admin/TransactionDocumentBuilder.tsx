@@ -10,7 +10,16 @@ type BuilderBooking = {
   payerName: string;
   packageName: string;
   pilgrims: number;
+  totalPrice: number;
+  totalDp: number;
 };
+
+const currency = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 });
+
+function defaultInvoiceAmount(booking?: BuilderBooking) {
+  if (!booking) return "";
+  return String(booking.totalDp > 0 ? Math.min(booking.totalDp, booking.totalPrice) : booking.totalPrice);
+}
 
 export function TransactionDocumentBuilder({ bookings, invoiceNumber }: {
   bookings: BuilderBooking[];
@@ -18,15 +27,20 @@ export function TransactionDocumentBuilder({ bookings, invoiceNumber }: {
 }) {
   const router = useRouter();
   const [bookingId, setBookingId] = useState(bookings[0]?.id ?? "");
+  const [invoiceAmount, setInvoiceAmount] = useState(() => defaultInvoiceAmount(bookings[0]));
   const [previewUrl, setPreviewUrl] = useState("");
   const [previewError, setPreviewError] = useState("");
   const [previewBusy, setPreviewBusy] = useState(false);
   const [issueBusy, setIssueBusy] = useState(false);
   const [issueError, setIssueError] = useState("");
   const selectedBooking = bookings.find((booking) => booking.id === bookingId);
+  const numericInvoiceAmount = Number(invoiceAmount);
+  const amountValid = Boolean(selectedBooking && Number.isSafeInteger(numericInvoiceAmount) && numericInvoiceAmount > 0 && numericInvoiceAmount <= selectedBooking.totalPrice);
+  const amountError = numericInvoiceAmount > (selectedBooking?.totalPrice ?? 0) ? "Nominal invoice melebihi total harga pendaftaran." : "Isi nominal invoice lebih dari Rp0.";
 
   useEffect(() => {
     if (!bookingId) return;
+    if (!amountValid) return;
     const controller = new AbortController();
     let nextUrl = "";
     const timer = window.setTimeout(async () => {
@@ -36,7 +50,7 @@ export function TransactionDocumentBuilder({ bookings, invoiceNumber }: {
         const response = await fetch("/api/admin/management/issued-documents/preview", {
           method: "POST",
           headers: { "content-type": "application/json", accept: "image/png" },
-          body: JSON.stringify({ kind: "invoice", bookingId }),
+          body: JSON.stringify({ kind: "invoice", bookingId, invoiceAmount: numericInvoiceAmount }),
           signal: controller.signal,
         });
         if (!response.ok) {
@@ -52,17 +66,17 @@ export function TransactionDocumentBuilder({ bookings, invoiceNumber }: {
       }
     }, 250);
     return () => { window.clearTimeout(timer); controller.abort(); if (nextUrl) URL.revokeObjectURL(nextUrl); };
-  }, [bookingId]);
+  }, [amountValid, bookingId, numericInvoiceAmount, selectedBooking?.totalPrice]);
 
   async function issue() {
-    if (!bookingId) return;
+    if (!bookingId || !amountValid) return;
     setIssueBusy(true);
     setIssueError("");
     try {
       const response = await fetch("/api/admin/management/issued-documents", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ kind: "invoice", bookingId }),
+        body: JSON.stringify({ kind: "invoice", bookingId, invoiceAmount: numericInvoiceAmount }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Invoice gagal diterbitkan.");
@@ -86,17 +100,23 @@ export function TransactionDocumentBuilder({ bookings, invoiceNumber }: {
     <section className="management-document-builder">
       <div className="management-document-controls">
         <header><small>BUAT TAGIHAN</small><h2>Terbitkan invoice</h2><p>Pilih transaksi lalu periksa invoice sebelum diterbitkan.</p></header>
-        <label className="management-document-select"><span>1. Pilih transaksi yang belum memiliki invoice</span><select value={bookingId} onChange={(event) => setBookingId(event.target.value)}>{bookings.map((booking) => <option value={booking.id} key={booking.id}>{booking.bookingNumber} · {booking.payerName}</option>)}</select></label>
-        {selectedBooking ? <div className="management-document-summary"><span><small>Paket</small><strong>{selectedBooking.packageName}</strong></span><span><small>Jamaah</small><strong>{selectedBooking.pilgrims} orang</strong></span></div> : null}
+        <label className="management-document-select"><span>1. Pilih transaksi yang belum memiliki invoice</span><select value={bookingId} onChange={(event) => { const next = bookings.find((booking) => booking.id === event.target.value); setBookingId(event.target.value); setInvoiceAmount(defaultInvoiceAmount(next)); setIssueError(""); }}>{bookings.map((booking) => <option value={booking.id} key={booking.id}>{booking.bookingNumber} · {booking.payerName}</option>)}</select></label>
+        {selectedBooking ? <div className="management-document-summary"><span><small>Paket</small><strong>{selectedBooking.packageName}</strong></span><span><small>Jamaah</small><strong>{selectedBooking.pilgrims} orang</strong></span><span><small>Total harga pendaftaran</small><strong>{currency.format(selectedBooking.totalPrice)}</strong></span></div> : null}
+        <div className="management-invoice-amount">
+          <label><span>2. Tentukan nominal invoice *</span><input aria-label="Nominal invoice" inputMode="numeric" value={invoiceAmount} onChange={(event) => { setInvoiceAmount(event.target.value.replace(/\D/g, "")); setIssueError(""); }} /></label>
+          <output>Invoice akan dibuat senilai <strong>{currency.format(numericInvoiceAmount || 0)}</strong></output>
+          <div><button type="button" className={numericInvoiceAmount === selectedBooking?.totalDp ? "active" : ""} onClick={() => setInvoiceAmount(String(selectedBooking?.totalDp ?? 0))}>Tagih DP {selectedBooking ? currency.format(selectedBooking.totalDp) : ""}</button><button type="button" className={numericInvoiceAmount === selectedBooking?.totalPrice ? "active" : ""} onClick={() => setInvoiceAmount(String(selectedBooking?.totalPrice ?? 0))}>Tagih pelunasan penuh</button></div>
+          <small>Nominal ini hanya menentukan nilai tagihan invoice. Harga paket jamaah tetap tersimpan dan tidak berubah.</small>
+        </div>
         <div className="management-document-number"><span>Nomor invoice yang akan dipakai</span><strong>{invoiceNumber}</strong><small>Nomor baru dipakai dan dinaikkan setelah invoice diterbitkan.</small></div>
         <p className="management-form-note">Setelah invoice terbit, catat pembayarannya dari menu Pembayaran. Sistem langsung membuat kwitansi secara otomatis.</p>
         {issueError ? <p className="management-document-error">{issueError}</p> : null}
-        <button className="management-document-issue" type="button" disabled={!bookingId || issueBusy || previewBusy || Boolean(previewError)} onClick={issue}>{issueBusy ? <LoaderCircle className="spin" /> : <FileCheck2 />}{issueBusy ? "Menerbitkan invoice…" : "Terbitkan invoice"}</button>
+        <button className="management-document-issue" type="button" disabled={!bookingId || !amountValid || issueBusy || previewBusy || Boolean(previewError)} onClick={issue}>{issueBusy ? <LoaderCircle className="spin" /> : <FileCheck2 />}{issueBusy ? "Menerbitkan invoice…" : `Terbitkan invoice ${currency.format(numericInvoiceAmount || 0)}`}</button>
       </div>
       <div className="management-document-preview">
-        <header><span><small>PREVIEW LIVE</small><strong>Invoice · {selectedBooking?.payerName ?? "-"}</strong></span>{previewBusy ? <i><LoaderCircle className="spin" /> Memuat</i> : previewUrl ? <i className="ready"><FileCheck2 /> Siap diperiksa</i> : null}</header>
+        <header><span><small>PREVIEW LIVE</small><strong>Invoice · {selectedBooking?.payerName ?? "-"}</strong></span>{amountValid && previewBusy ? <i><LoaderCircle className="spin" /> Memuat</i> : amountValid && previewUrl ? <i className="ready"><FileCheck2 /> Siap diperiksa</i> : null}</header>
         <div className="portrait">
-          {previewUrl ? <div role="img" aria-label={`Preview invoice ${selectedBooking?.payerName ?? ""}`} className="management-template-preview-image" style={{ backgroundImage: `url(${previewUrl})` }} /> : previewError ? <div className="management-preview-state error"><RotateCw /><strong>Preview belum dapat ditampilkan</strong><p>{previewError}</p></div> : <div className="management-preview-state"><LoaderCircle className={previewBusy ? "spin" : ""} /><strong>Menyiapkan preview template…</strong><p>Preview gambar ini menjadi sumber yang sama untuk PDF dan PNG.</p></div>}
+          {amountValid && previewUrl ? <div role="img" aria-label={`Preview invoice ${selectedBooking?.payerName ?? ""}`} className="management-template-preview-image" style={{ backgroundImage: `url(${previewUrl})` }} /> : !amountValid || previewError ? <div className="management-preview-state error"><RotateCw /><strong>Preview belum dapat ditampilkan</strong><p>{amountValid ? previewError : amountError}</p></div> : <div className="management-preview-state"><LoaderCircle className={previewBusy ? "spin" : ""} /><strong>Menyiapkan preview template…</strong><p>Preview gambar ini menjadi sumber yang sama untuk PDF dan PNG.</p></div>}
         </div>
       </div>
     </section>

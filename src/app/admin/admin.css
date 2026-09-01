@@ -2237,11 +2237,23 @@
 .management-document-select select { width: 100%; min-height: 54px; padding: 11px 38px 11px 12px; border: 1px solid #c7d0dc; border-radius: 9px; outline: 0; background: #fff; color: #142d4e; font: inherit; font-size: 15px; font-weight: 700; }
 .management-document-select select:focus { border-color: #a77b18; box-shadow: 0 0 0 3px rgba(183,139,34,.14); }
 .management-document-select > small { margin-top: 7px; color: #778395; font-size: 11px; line-height: 1.45; }
-.management-document-summary { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 13px; border-radius: 10px; background: #f6f7f8; }
+.management-document-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 13px; border-radius: 10px; background: #f6f7f8; }
 .management-document-summary span { min-width: 0; }
+.management-document-summary span:last-child:nth-child(odd) { grid-column: 1/-1; padding-top: 10px; border-top: 1px solid #e1e5e9; }
 .management-document-summary small,.management-document-summary strong { display: block; }
 .management-document-summary small { margin-bottom: 3px; color: #7c8795; font-size: 10px; font-weight: 750; text-transform: uppercase; }
 .management-document-summary strong { overflow: hidden; color: #173251; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.management-invoice-amount { display: grid; gap: 10px; padding: 16px; border: 1px solid #c9d7e6; border-radius: 11px; background: #f7faff; }
+.management-invoice-amount label,.management-invoice-amount label > span,.management-invoice-amount output,.management-invoice-amount > small { display: block; }
+.management-invoice-amount label > span { margin-bottom: 8px; color: #173251; font-size: 15px; font-weight: 800; }
+.management-invoice-amount input { width: 100%; min-height: 52px; padding: 10px 13px; border: 1px solid #aebed0; border-radius: 9px; outline: none; background: #fff; color: #102a4c; font: inherit; font-size: 19px; font-weight: 800; }
+.management-invoice-amount input:focus { border-color: #a77b18; box-shadow: 0 0 0 3px rgba(183,139,34,.14); }
+.management-invoice-amount output { color: #596b81; font-size: 12px; }
+.management-invoice-amount output strong { color: #102a4c; font-size: 14px; }
+.management-invoice-amount > div { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.management-invoice-amount button { min-height: 43px; padding: 9px 10px; border: 1px solid #173d68; border-radius: 8px; background: #fff; color: #102f53; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
+.management-invoice-amount button:hover,.management-invoice-amount button.active { background: #102f53; color: #fff; }
+.management-invoice-amount > small { color: #65758a; font-size: 11px; line-height: 1.55; }
 .management-document-number { padding: 14px; border: 1px solid #dfcc91; border-radius: 10px; background: #fffbf0; }
 .management-document-number span,.management-document-number strong,.management-document-number small { display: block; }
 .management-document-number span { color: #78601f; font-size: 11px; font-weight: 700; }

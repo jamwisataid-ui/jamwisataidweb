@@ -7,12 +7,14 @@ import { auditLogs, bookings, documentSequences, financialAccounts, issuedDocume
 import { withManagementTransaction } from "@/db/transaction";
 import { formatDocumentNumber } from "./domain";
 import { renderTransactionPdf, type TransactionPdfSnapshot } from "./document-renderer";
+import { buildInvoiceItems, invoiceTotals, resolveInvoiceAmount } from "./invoice";
 import { privateObjectKey, putPrivateObject } from "./storage";
 
-export async function issueTransactionDocument({ kind, bookingId, paymentId, actorId }: {
+export async function issueTransactionDocument({ kind, bookingId, paymentId, invoiceAmount, actorId }: {
   kind: "invoice" | "receipt";
   bookingId: string;
   paymentId?: string;
+  invoiceAmount?: number;
   actorId: string;
 }) {
   return withManagementTransaction(async (tx) => {
@@ -48,10 +50,14 @@ export async function issueTransactionDocument({ kind, bookingId, paymentId, act
       items = [{ description: `Pembayaran ${String(booking.packageSnapshot.name ?? "paket umroh")}${allocations.length ? ` untuk ${allocations.length} jamaah` : ""}`, qty, unitPrice: equalAllocations ? allocations[0].amount : payment.amount, total: payment.amount }];
       total = payment.amount;
     } else {
-      const grouped = new Map<number, number>();
-      for (const registration of registrationRows) grouped.set(registration.agreedPrice, (grouped.get(registration.agreedPrice) ?? 0) + 1);
-      items = Array.from(grouped, ([unitPrice, qty]) => ({ description: `${String(booking.packageSnapshot.name ?? "Paket umroh")} — ${String(booking.packageSnapshot.dateLabel ?? booking.packageSnapshot.departureDate ?? "")}`, qty, unitPrice, total: qty * unitPrice }));
-      total = items.reduce((sum, item) => sum + item.total, 0);
+      const totals = invoiceTotals(registrationRows);
+      total = resolveInvoiceAmount(invoiceAmount, totals.totalPrice);
+      items = buildInvoiceItems({
+        registrations: registrationRows,
+        invoiceAmount: total,
+        packageName: String(booking.packageSnapshot.name ?? "Paket umroh"),
+        departureLabel: String(booking.packageSnapshot.dateLabel ?? booking.packageSnapshot.departureDate ?? ""),
+      });
     }
 
     const snapshot: TransactionPdfSnapshot = {
