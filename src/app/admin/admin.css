@@ -2304,6 +2304,11 @@
 .management-document-downloads .management-create-link { margin-top: 0; }
 .management-document-downloads .management-create-link.secondary { border: 1px solid #c9b16e; background: #fffaf0; color: #755409 !important; }
 .management-document-downloads .admin-danger-button { min-height: 44px; }
+.management-danger-zone { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 20px; padding: 17px 18px; border: 1px solid #efc7c3; border-radius: 12px; background: #fff8f7; }
+.management-danger-zone > span,.management-danger-zone strong,.management-danger-zone small { display: block; }
+.management-danger-zone strong { color: #8f2525; font-size: 15px; }
+.management-danger-zone small { max-width: 680px; margin-top: 4px; color: #786666; font-size: 12px; line-height: 1.5; }
+.management-danger-zone .admin-danger-button { flex: 0 0 auto; min-height: 44px; }
 .management-document-history { overflow: hidden; border: 1px solid #ded8cc; border-radius: 14px; background: #fff; box-shadow: 0 14px 36px rgba(7,26,53,.055); }
 .management-document-history > header { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; padding: 23px 24px 20px; border-bottom: 1px solid #e6e1d8; }
 .management-document-history > header small { color: #956b0d; font-size: 10px; font-weight: 850; letter-spacing: .13em; }
@@ -2419,6 +2424,8 @@
   .management-issued-document-preview > header { align-items: flex-start; flex-direction: column; }
   .management-issued-document-preview > div { height: 68vh; min-height: 480px; padding: 8px; }
   .management-payment-document-actions,.management-payment-document-actions > a,.management-receipt-retry,.management-receipt-retry button { width: 100%; }
+  .management-danger-zone { align-items: stretch; flex-direction: column; padding: 15px; }
+  .management-danger-zone .admin-danger-button { width: 100%; }
   .management-booking-help ol { grid-template-columns: 1fr; padding-left: 42px; }
   .management-booking-step { padding: 15px 13px; }
   .management-booking-step > header { align-items: flex-start; flex-wrap: wrap; }

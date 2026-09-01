@@ -6,12 +6,12 @@ import { AlertTriangle, Loader2, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { deleteArticleAction, deleteEntryAction, deletePackageAction } from "@/lib/cms/actions";
-import { deleteIssuedDocumentAction } from "@/lib/management/actions";
+import { deleteIssuedDocumentAction, deletePilgrimAction } from "@/lib/management/actions";
 
 interface DeleteButtonProps {
   id: string;
   name: string;
-  type: "package" | "article" | "entry" | "document";
+  type: "package" | "article" | "entry" | "document" | "pilgrim";
   documentKind?: "invoice" | "receipt";
   entryType?: string;
   variant?: "table" | "form";
@@ -44,7 +44,7 @@ export function DeleteButton({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, isPending]);
 
-  const itemLabel = type === "package" ? "paket" : type === "article" ? "artikel" : type === "document" ? (documentKind === "receipt" ? "kwitansi" : "invoice") : "konten";
+  const itemLabel = type === "package" ? "paket" : type === "article" ? "artikel" : type === "pilgrim" ? "jamaah" : type === "document" ? (documentKind === "receipt" ? "kwitansi" : "invoice") : "konten";
 
   const confirmDelete = () => {
     startTransition(async () => {
@@ -59,8 +59,10 @@ export function DeleteButton({
         result = await deleteArticleAction(formData);
       } else if (type === "entry") {
         result = await deleteEntryAction(formData);
-      } else {
+      } else if (type === "document") {
         result = await deleteIssuedDocumentAction(formData);
+      } else {
+        result = await deletePilgrimAction(formData);
       }
 
       if (result.ok) {
@@ -136,7 +138,7 @@ export function DeleteButton({
             </p>
 
             <div className="admin-modal-warning-box">
-              <span>⚠️ Perhatian:</span> {type === "document" ? "Dokumen akan dihapus permanen. Booking, pembayaran, dan nomor urut tetap tersimpan." : "Data yang telah dihapus bersifat permanen dan tidak dapat dipulihkan kembali dari sistem."}
+              <span>⚠️ Perhatian:</span> {type === "document" ? "Dokumen akan dihapus permanen. Booking, pembayaran, dan nomor urut tetap tersimpan." : type === "pilgrim" ? "Data pribadi dan seluruh file dokumen jamaah akan dihapus permanen. Jamaah yang sudah memiliki riwayat transaksi tidak dapat dihapus." : "Data yang telah dihapus bersifat permanen dan tidak dapat dipulihkan kembali dari sistem."}
             </div>
 
             <div className="admin-modal-actions">

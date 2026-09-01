@@ -22,6 +22,7 @@ import {
   packages,
   paymentAllocations,
   payments,
+  pilgrimDocuments,
   pilgrims,
   refunds,
   registrations,
@@ -112,6 +113,36 @@ export async function updatePilgrimAction(_state: ManagementActionState, formDat
     });
     refresh();
     return { ok: true, message: "Perubahan data jamaah berhasil disimpan.", redirectTo: `/admin/manajemen/jamaah/${id}` };
+  } catch (error) { return failure(error); }
+}
+
+export async function deletePilgrimAction(formData: FormData): Promise<ManagementActionState> {
+  const id = String(formData.get("id") ?? "");
+  if (!id) return { ok: false, message: "Data jamaah tidak ditemukan." };
+  try {
+    const session = await requireAdminSession();
+    const objectKeys = await withManagementTransaction(async (tx) => {
+      const pilgrim = await tx.query.pilgrims.findFirst({ where: eq(pilgrims.id, id) });
+      if (!pilgrim) throw new Error("Data jamaah tidak ditemukan atau sudah dihapus.");
+
+      const registration = await tx.query.registrations.findFirst({ where: eq(registrations.pilgrimId, id) });
+      if (registration) {
+        throw new Error("Jamaah sudah memiliki riwayat pendaftaran atau transaksi. Arsipkan data agar histori keuangan tetap aman.");
+      }
+
+      const documents = await tx.query.pilgrimDocuments.findMany({ where: eq(pilgrimDocuments.pilgrimId, id) });
+      await tx.delete(pilgrimDocuments).where(eq(pilgrimDocuments.pilgrimId, id));
+      await tx.delete(pilgrims).where(eq(pilgrims.id, id));
+      await tx.insert(auditLogs).values({ actorId: session.user.id, action: "delete", entityType: "pilgrim", entityId: id, summary: `Data jamaah ${pilgrim.fullName} dihapus permanen` });
+      return documents.map((document) => document.objectKey);
+    });
+
+    const cleanup = await Promise.allSettled(objectKeys.map((objectKey) => deletePrivateObject(objectKey)));
+    if (cleanup.some((result) => result.status === "rejected")) {
+      console.warn("Sebagian file jamaah gagal dibersihkan dari penyimpanan private.");
+    }
+    refresh();
+    return { ok: true, message: "Data jamaah dan dokumennya berhasil dihapus.", redirectTo: "/admin/manajemen/jamaah" };
   } catch (error) { return failure(error); }
 }
 
