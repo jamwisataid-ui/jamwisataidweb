@@ -22,7 +22,11 @@ describe("invoice management", () => {
     expect(buildInvoiceItems({ registrations, invoiceAmount: 7_500_000, packageName: "Umroh Premium", departureLabel: "" })[0]).toMatchObject({ qty: 1, unitPrice: 7_500_000, total: 7_500_000 });
   });
 
-  it("rejects invoice amounts above the booking total", () => {
-    expect(() => resolveInvoiceAmount(70_000_000, 67_800_000)).toThrow("tidak boleh melebihi");
+  it("rejects an invoice above the uninvoiced remainder", () => {
+    expect(() => resolveInvoiceAmount(58_000_001, 58_000_000)).toThrow("sisa harga");
+  });
+
+  it("supports a later settlement invoice using the remaining value", () => {
+    expect(resolveInvoiceAmount(57_800_000, 57_800_000)).toBe(57_800_000);
   });
 });

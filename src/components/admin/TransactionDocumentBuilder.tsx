@@ -12,13 +12,15 @@ type BuilderBooking = {
   pilgrims: number;
   totalPrice: number;
   totalDp: number;
+  alreadyInvoiced: number;
+  remainingPrice: number;
 };
 
 const currency = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 });
 
 function defaultInvoiceAmount(booking?: BuilderBooking) {
   if (!booking) return "";
-  return String(booking.totalDp > 0 ? Math.min(booking.totalDp, booking.totalPrice) : booking.totalPrice);
+  return String(booking.alreadyInvoiced > 0 ? booking.remainingPrice : Math.min(booking.totalDp || booking.remainingPrice, booking.remainingPrice));
 }
 
 export function TransactionDocumentBuilder({ bookings, invoiceNumber }: {
@@ -35,8 +37,8 @@ export function TransactionDocumentBuilder({ bookings, invoiceNumber }: {
   const [issueError, setIssueError] = useState("");
   const selectedBooking = bookings.find((booking) => booking.id === bookingId);
   const numericInvoiceAmount = Number(invoiceAmount);
-  const amountValid = Boolean(selectedBooking && Number.isSafeInteger(numericInvoiceAmount) && numericInvoiceAmount > 0 && numericInvoiceAmount <= selectedBooking.totalPrice);
-  const amountError = numericInvoiceAmount > (selectedBooking?.totalPrice ?? 0) ? "Nominal invoice melebihi total harga pendaftaran." : "Isi nominal invoice lebih dari Rp0.";
+  const amountValid = Boolean(selectedBooking && Number.isSafeInteger(numericInvoiceAmount) && numericInvoiceAmount > 0 && numericInvoiceAmount <= selectedBooking.remainingPrice);
+  const amountError = numericInvoiceAmount > (selectedBooking?.remainingPrice ?? 0) ? "Nominal invoice melebihi sisa harga yang belum ditagihkan." : "Isi nominal invoice lebih dari Rp0.";
 
   useEffect(() => {
     if (!bookingId) return;
@@ -66,7 +68,7 @@ export function TransactionDocumentBuilder({ bookings, invoiceNumber }: {
       }
     }, 250);
     return () => { window.clearTimeout(timer); controller.abort(); if (nextUrl) URL.revokeObjectURL(nextUrl); };
-  }, [amountValid, bookingId, numericInvoiceAmount, selectedBooking?.totalPrice]);
+  }, [amountValid, bookingId, numericInvoiceAmount, selectedBooking?.remainingPrice]);
 
   async function issue() {
     if (!bookingId || !amountValid) return;
@@ -101,11 +103,11 @@ export function TransactionDocumentBuilder({ bookings, invoiceNumber }: {
       <div className="management-document-controls">
         <header><small>BUAT TAGIHAN</small><h2>Terbitkan invoice</h2><p>Pilih transaksi lalu periksa invoice sebelum diterbitkan.</p></header>
         <label className="management-document-select"><span>1. Pilih transaksi yang belum memiliki invoice</span><select value={bookingId} onChange={(event) => { const next = bookings.find((booking) => booking.id === event.target.value); setBookingId(event.target.value); setInvoiceAmount(defaultInvoiceAmount(next)); setIssueError(""); }}>{bookings.map((booking) => <option value={booking.id} key={booking.id}>{booking.bookingNumber} · {booking.payerName}</option>)}</select></label>
-        {selectedBooking ? <div className="management-document-summary"><span><small>Paket</small><strong>{selectedBooking.packageName}</strong></span><span><small>Jamaah</small><strong>{selectedBooking.pilgrims} orang</strong></span><span><small>Total harga pendaftaran</small><strong>{currency.format(selectedBooking.totalPrice)}</strong></span></div> : null}
+        {selectedBooking ? <div className="management-document-summary"><span><small>Paket</small><strong>{selectedBooking.packageName}</strong></span><span><small>Jamaah</small><strong>{selectedBooking.pilgrims} orang</strong></span><span><small>Total harga pendaftaran</small><strong>{currency.format(selectedBooking.totalPrice)}</strong></span><span><small>Sudah dibuatkan invoice</small><strong>{currency.format(selectedBooking.alreadyInvoiced)}</strong></span><span><small>Sisa belum ditagihkan</small><strong>{currency.format(selectedBooking.remainingPrice)}</strong></span></div> : null}
         <div className="management-invoice-amount">
           <label><span>2. Tentukan nominal invoice *</span><input aria-label="Nominal invoice" inputMode="numeric" value={invoiceAmount} onChange={(event) => { setInvoiceAmount(event.target.value.replace(/\D/g, "")); setIssueError(""); }} /></label>
           <output>Invoice akan dibuat senilai <strong>{currency.format(numericInvoiceAmount || 0)}</strong></output>
-          <div><button type="button" className={numericInvoiceAmount === selectedBooking?.totalDp ? "active" : ""} onClick={() => setInvoiceAmount(String(selectedBooking?.totalDp ?? 0))}>Tagih DP {selectedBooking ? currency.format(selectedBooking.totalDp) : ""}</button><button type="button" className={numericInvoiceAmount === selectedBooking?.totalPrice ? "active" : ""} onClick={() => setInvoiceAmount(String(selectedBooking?.totalPrice ?? 0))}>Tagih pelunasan penuh</button></div>
+          <div><button type="button" className={numericInvoiceAmount === Math.min(selectedBooking?.totalDp ?? 0, selectedBooking?.remainingPrice ?? 0) ? "active" : ""} onClick={() => setInvoiceAmount(String(Math.min(selectedBooking?.totalDp ?? 0, selectedBooking?.remainingPrice ?? 0)))}>Tagih DP {selectedBooking ? currency.format(Math.min(selectedBooking.totalDp, selectedBooking.remainingPrice)) : ""}</button><button type="button" className={numericInvoiceAmount === selectedBooking?.remainingPrice ? "active" : ""} onClick={() => setInvoiceAmount(String(selectedBooking?.remainingPrice ?? 0))}>Tagih seluruh sisa</button></div>
           <small>Nominal ini hanya menentukan nilai tagihan invoice. Harga paket jamaah tetap tersimpan dan tidak berubah.</small>
         </div>
         <div className="management-document-number"><span>Nomor invoice yang akan dipakai</span><strong>{invoiceNumber}</strong><small>Nomor baru dipakai dan dinaikkan setelah invoice diterbitkan.</small></div>

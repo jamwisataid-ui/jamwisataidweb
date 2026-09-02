@@ -22,17 +22,13 @@ export async function POST(request: Request) {
     if (!sequence) throw new Error(`Format nomor ${kind === "invoice" ? "invoice" : "kwitansi"} belum diaktifkan.`);
     const booking = await db.query.bookings.findFirst({ where: eq(bookings.id, body.bookingId) });
     if (!booking) throw new Error("Booking tidak ditemukan.");
-    const linkedInvoice = kind === "receipt"
-      ? await db.query.issuedDocuments.findFirst({ where: and(eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.bookingId, booking.id), eq(issuedDocuments.status, "issued")) })
-      : undefined;
-    if (kind === "receipt" && !linkedInvoice) throw new Error("Kwitansi wajib terhubung ke invoice yang sudah diterbitkan.");
-
     const registrationRows = await db.select().from(registrations).where(eq(registrations.bookingId, booking.id));
     const settings = await db.query.managementSettings.findFirst({ where: eq(managementSettings.id, "default") });
     const accountRows = await db.select().from(financialAccounts).where(and(eq(financialAccounts.showOnInvoice, true), eq(financialAccounts.status, "active")));
     const issuedAt = new Date();
     const formatted = formatDocumentNumber(sequence, issuedAt);
     let payment: typeof payments.$inferSelect | undefined;
+    let linkedInvoice: typeof issuedDocuments.$inferSelect | undefined;
     let total: number;
     let items: TransactionPdfSnapshot["items"];
 
@@ -40,6 +36,10 @@ export async function POST(request: Request) {
       if (!body.paymentId) throw new Error("Pilih pembayaran yang akan dibuatkan kwitansi.");
       payment = await db.query.payments.findFirst({ where: and(eq(payments.id, body.paymentId), eq(payments.bookingId, booking.id)) });
       if (!payment || payment.status !== "confirmed") throw new Error("Pembayaran belum terkonfirmasi.");
+      linkedInvoice = payment.invoiceId
+        ? await db.query.issuedDocuments.findFirst({ where: and(eq(issuedDocuments.id, payment.invoiceId), eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.status, "issued")) })
+        : await db.query.issuedDocuments.findFirst({ where: and(eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.bookingId, booking.id), eq(issuedDocuments.status, "issued")) });
+      if (!linkedInvoice) throw new Error("Kwitansi wajib terhubung ke invoice yang sudah diterbitkan.");
       const allocations = await db.select().from(paymentAllocations).where(eq(paymentAllocations.paymentId, payment.id));
       const equalAllocations = allocations.length > 0 && allocations.every((allocation) => allocation.amount === allocations[0].amount);
       const qty = equalAllocations ? allocations.length : 1;
@@ -47,7 +47,11 @@ export async function POST(request: Request) {
       total = payment.amount;
     } else {
       const totals = invoiceTotals(registrationRows);
-      total = resolveInvoiceAmount(body.invoiceAmount, totals.totalPrice);
+      const existingInvoices = await db.select({ snapshot: issuedDocuments.snapshot }).from(issuedDocuments).where(and(eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.bookingId, booking.id), eq(issuedDocuments.status, "issued")));
+      const alreadyInvoiced = existingInvoices.reduce((sum, document) => sum + Number(document.snapshot.total ?? 0), 0);
+      const remaining = Math.max(0, totals.totalPrice - alreadyInvoiced);
+      if (remaining <= 0) throw new Error("Seluruh harga pendaftaran sudah ditagihkan.");
+      total = resolveInvoiceAmount(body.invoiceAmount, remaining);
       items = buildInvoiceItems({
         registrations: registrationRows,
         invoiceAmount: total,

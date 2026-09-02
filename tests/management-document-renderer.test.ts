@@ -37,4 +37,17 @@ describe("renderer template transaksi", () => {
     expect(pdf.getPageCount()).toBe(2);
     expect(pdf.getPages().map((page) => page.getSize())).toEqual([{ width: 1024, height: 1536 }, { width: 1024, height: 1536 }]);
   }, 15_000);
+
+  it("menghasilkan kwitansi dari template tetap untuk nominal besar", async () => {
+    const png = await renderer.renderTransactionPng({
+      ...base,
+      kind: "receipt",
+      number: "0066/jamw/300826",
+      invoiceNumber: "9933/jamw/300828",
+      method: "transfer",
+      items: [{ description: "Pembayaran cicilan paket umroh untuk keluarga dengan keterangan transaksi panjang", qty: 2, unitPrice: 123_456_789, total: 246_913_578 }],
+      total: 246_913_578,
+    });
+    await expect(sharp(png).metadata()).resolves.toMatchObject({ format: "png", width: 1536, height: 1024 });
+  });
 });

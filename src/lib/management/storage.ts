@@ -37,6 +37,21 @@ export function validatePrivateUpload(mimeType: string, sizeBytes: number) {
   }
 }
 
+export function validatePrivateFile(bytes: Uint8Array, mimeType: string, sizeBytes: number) {
+  validatePrivateUpload(mimeType, sizeBytes);
+  const startsWith = (...signature: number[]) => signature.every((byte, index) => bytes[index] === byte);
+  const isValid = mimeType === "image/jpeg"
+    ? startsWith(0xff, 0xd8, 0xff)
+    : mimeType === "image/png"
+      ? startsWith(0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a)
+      : mimeType === "image/webp"
+        ? startsWith(0x52, 0x49, 0x46, 0x46) && bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50
+        : mimeType === "application/pdf"
+          ? startsWith(0x25, 0x50, 0x44, 0x46, 0x2d)
+          : false;
+  if (!isValid) throw new Error("Isi file tidak sesuai dengan tipe JPG, PNG, WebP, atau PDF yang dipilih.");
+}
+
 export function privateObjectKey(scope: "pilgrims" | "payments" | "documents" | "settings", entityId: string, extension = "bin") {
   const safeExtension = extension.toLowerCase().replace(/[^a-z0-9]/g, "") || "bin";
   return `private/${scope}/${entityId}/${randomUUID()}.${safeExtension}`;

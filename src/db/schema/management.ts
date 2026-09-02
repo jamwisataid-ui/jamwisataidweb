@@ -1,5 +1,6 @@
 import {
   bigint,
+  type AnyPgColumn,
   boolean,
   date,
   index,
@@ -95,6 +96,7 @@ export const pilgrimDocuments = pgTable("pilgrim_documents", {
   objectKey: text("object_key").notNull().unique(),
   mimeType: text("mime_type").notNull(),
   sizeBytes: integer("size_bytes").notNull(),
+  checksum: text("checksum"),
   reviewStatus: documentReviewStatus("review_status").notNull().default("pending"),
   reviewNote: text("review_note"),
   uploadedBy: text("uploaded_by").references(() => users.id, { onDelete: "set null" }),
@@ -175,6 +177,7 @@ export const roomMates = pgTable("room_mates", {
 export const payments = pgTable("payments", {
   id: uuid("id").defaultRandom().primaryKey(),
   bookingId: uuid("booking_id").notNull().references(() => bookings.id, { onDelete: "restrict" }),
+  invoiceId: uuid("invoice_id").references((): AnyPgColumn => issuedDocuments.id, { onDelete: "restrict" }),
   accountId: uuid("account_id").notNull().references(() => financialAccounts.id, { onDelete: "restrict" }),
   paidAt: timestamp("paid_at", { withTimezone: true }).notNull(),
   amount: bigint("amount", { mode: "number" }).notNull(),
@@ -185,7 +188,10 @@ export const payments = pgTable("payments", {
   status: paymentRecordStatus("status").notNull().default("confirmed"),
   createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
   ...timestamps,
-}, (table) => [index("payments_booking_paid_idx").on(table.bookingId, table.paidAt)]);
+}, (table) => [
+  index("payments_booking_paid_idx").on(table.bookingId, table.paidAt),
+  index("payments_invoice_idx").on(table.invoiceId),
+]);
 
 export const paymentAllocations = pgTable("payment_allocations", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -302,6 +308,8 @@ export const issuedDocuments = pgTable("issued_documents", {
   sequenceId: uuid("sequence_id").notNull().references(() => documentSequences.id, { onDelete: "restrict" }),
   snapshot: jsonb("snapshot").$type<Record<string, unknown>>().notNull(),
   objectKey: text("object_key").notNull().unique(),
+  checksum: text("checksum"),
+  templateVersion: text("template_version").notNull().default("jamwisata-image-v1"),
   status: issuedDocumentStatus("status").notNull().default("issued"),
   issuedAt: timestamp("issued_at", { withTimezone: true }).notNull(),
   voidReason: text("void_reason"),

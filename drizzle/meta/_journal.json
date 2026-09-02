@@ -78,6 +78,13 @@
       "when": 1788066000000,
       "tag": "0010_add_marketing_attribution",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1788325200000,
+      "tag": "0011_finalize_management_transactions",
+      "breakpoints": true
     }
   ]
 }

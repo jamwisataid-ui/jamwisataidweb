@@ -3,7 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { unstable_rethrow } from "next/navigation";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 
 import {
   agents,
@@ -272,8 +272,17 @@ export async function recordPaymentAction(_state: ManagementActionState, formDat
       const booking = await tx.query.bookings.findFirst({ where: eq(bookings.id, parsed.data.bookingId) });
       if (!booking) throw new Error("Pendaftaran tidak ditemukan.");
       if (booking.status !== "active") throw new Error("Pembayaran tidak dapat dicatat karena pendaftaran sudah dibatalkan atau selesai.");
-      const invoice = await tx.query.issuedDocuments.findFirst({ where: and(eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.bookingId, parsed.data.bookingId), eq(issuedDocuments.status, "issued")) });
+      await tx.execute(sql`select id from issued_documents where id = ${parsed.data.invoiceId} for update`);
+      const invoice = await tx.query.issuedDocuments.findFirst({ where: and(eq(issuedDocuments.id, parsed.data.invoiceId), eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.bookingId, parsed.data.bookingId), eq(issuedDocuments.status, "issued")) });
       if (!invoice) throw new Error("Invoice belum diterbitkan. Buat invoice terlebih dahulu sebelum mencatat pembayaran.");
+      const invoicePayments = await tx.select({ id: payments.id, amount: payments.amount }).from(payments).where(and(eq(payments.invoiceId, invoice.id), eq(payments.status, "confirmed")));
+      const invoicePaymentIds = invoicePayments.map((item) => item.id);
+      const invoiceRefunds = invoicePaymentIds.length
+        ? await tx.select({ amount: refunds.amount }).from(refunds).where(and(inArray(refunds.paymentId, invoicePaymentIds), eq(refunds.status, "confirmed")))
+        : [];
+      const invoicePaid = invoicePayments.reduce((sum, item) => sum + item.amount, 0) - invoiceRefunds.reduce((sum, item) => sum + item.amount, 0);
+      const invoiceRemaining = Math.max(0, Number(invoice.snapshot.total ?? 0) - invoicePaid);
+      if (parsed.data.amount > invoiceRemaining) throw new Error(`Pembayaran melebihi sisa invoice (${invoiceRemaining.toLocaleString("id-ID")}).`);
       const registrationIds = parsed.data.allocations.map((item) => item.registrationId);
       const registrationRows = await tx.select().from(registrations).where(and(eq(registrations.bookingId, parsed.data.bookingId), inArray(registrations.id, registrationIds)));
       if (registrationRows.length !== registrationIds.length) throw new Error("Ada alokasi jamaah yang tidak sesuai dengan booking.");
@@ -290,7 +299,7 @@ export async function recordPaymentAction(_state: ManagementActionState, formDat
         if (allocation.amount > current.outstanding) throw new Error(`Alokasi melebihi sisa tagihan salah satu jamaah (${current.outstanding.toLocaleString("id-ID")}).`);
       }
       const paidAt = new Date(parsed.data.paidAt);
-      await tx.insert(payments).values({ id: paymentId, bookingId: parsed.data.bookingId, accountId: parsed.data.accountId, paidAt, amount: parsed.data.amount, method: parsed.data.method, reference: parsed.data.reference || null, note: parsed.data.note || null, createdBy: session.user.id });
+      await tx.insert(payments).values({ id: paymentId, bookingId: parsed.data.bookingId, invoiceId: invoice.id, accountId: parsed.data.accountId, paidAt, amount: parsed.data.amount, method: parsed.data.method, reference: parsed.data.reference || null, note: parsed.data.note || null, createdBy: session.user.id });
       await tx.insert(paymentAllocations).values(parsed.data.allocations.map((item) => ({ paymentId, ...item })));
       await tx.insert(cashTransactions).values({ accountId: parsed.data.accountId, paymentId, direction: "in", kind: "payment", amount: parsed.data.amount, transactionAt: paidAt, description: `Pembayaran booking ${parsed.data.bookingId}`, createdBy: session.user.id });
       for (const allocation of parsed.data.allocations) {
@@ -575,10 +584,12 @@ export async function deleteIssuedDocumentAction(formData: FormData): Promise<Ma
       const document = await tx.query.issuedDocuments.findFirst({ where: eq(issuedDocuments.id, id) });
       if (!document) throw new Error("Invoice atau kwitansi tidak ditemukan.");
       if (document.kind === "invoice") {
-        const linkedReceipt = await tx.query.issuedDocuments.findFirst({
-          where: and(eq(issuedDocuments.kind, "receipt"), eq(issuedDocuments.bookingId, document.bookingId), eq(issuedDocuments.status, "issued")),
-        });
+        const linkedPayments = await tx.select({ id: payments.id }).from(payments).where(eq(payments.invoiceId, document.id));
+        const linkedReceipt = linkedPayments.length ? await tx.query.issuedDocuments.findFirst({
+          where: and(eq(issuedDocuments.kind, "receipt"), inArray(issuedDocuments.paymentId, linkedPayments.map((payment) => payment.id)), eq(issuedDocuments.status, "issued")),
+        }) : undefined;
         if (linkedReceipt) throw new Error(`Hapus kwitansi ${linkedReceipt.number} terlebih dahulu sebelum menghapus invoice ini.`);
+        if (linkedPayments.length) throw new Error("Invoice sudah memiliki pembayaran dan tidak dapat dihapus agar histori keuangan tetap aman.");
       }
       objectKey = document.objectKey;
       label = document.kind === "invoice" ? "Invoice" : "Kwitansi";

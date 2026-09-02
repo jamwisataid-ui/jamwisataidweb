@@ -198,7 +198,7 @@ export function BookingForm({ pilgrims, departures, agents, defaultDpAmount }: B
   </form>;
 }
 
-type PaymentBooking = { id: string; bookingNumber: string; invoiceNumber: string; invoiceAmount: number; payerName: string; registrations: Array<{ id: string; agreedPrice: number; dpTarget: number; payment: { status: string; netPaid: number; outstanding: number }; pilgrim?: { fullName: string } }> };
+type PaymentBooking = { id: string; invoiceId: string; bookingNumber: string; invoiceNumber: string; invoiceAmount: number; invoiceRemaining: number; payerName: string; registrations: Array<{ id: string; agreedPrice: number; dpTarget: number; payment: { status: string; netPaid: number; outstanding: number }; pilgrim?: { fullName: string } }> };
 
 function allocatePayment(registrations: PaymentBooking["registrations"], amount: number) {
   let remaining = amount;
@@ -214,39 +214,41 @@ function allocatePayment(registrations: PaymentBooking["registrations"], amount:
 export function PaymentForm({ bookings, accounts, initialBookingId }: { bookings: PaymentBooking[]; accounts: Array<{ id: string; name: string }>; initialBookingId?: string }) {
   const [state, action, pending] = useActionState(recordPaymentAction, managementInitialState);
   const initialBooking = bookings.find((booking) => booking.id === initialBookingId) ?? bookings[0];
-  const [bookingId, setBookingId] = useState(initialBooking?.id ?? "");
-  const [amount, setAmount] = useState(() => initialBooking?.invoiceAmount ? String(initialBooking.invoiceAmount) : "");
-  const [allocations, setAllocations] = useState<Record<string, string>>(() => allocatePayment(initialBooking?.registrations ?? [], initialBooking?.invoiceAmount ?? 0));
+  const [invoiceId, setInvoiceId] = useState(initialBooking?.invoiceId ?? "");
+  const [amount, setAmount] = useState(() => initialBooking?.invoiceRemaining ? String(initialBooking.invoiceRemaining) : "");
+  const [allocations, setAllocations] = useState<Record<string, string>>(() => allocatePayment(initialBooking?.registrations ?? [], initialBooking?.invoiceRemaining ?? 0));
   const [localNow] = useState(() => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16));
-  const booking = bookings.find((item) => item.id === bookingId);
+  const booking = bookings.find((item) => item.invoiceId === invoiceId);
   const serialized = useMemo(() => JSON.stringify(Object.entries(allocations).filter(([, value]) => Number(value) > 0).map(([registrationId, value]) => ({ registrationId, amount: Number(value) }))), [allocations]);
   function autoAllocate() {
     setAllocations(allocatePayment(booking?.registrations ?? [], Number(amount) || 0));
   }
   function fillDp() {
+    let remainingInvoice = booking?.invoiceRemaining ?? 0;
     const next = Object.fromEntries((booking?.registrations ?? []).flatMap((registration) => {
-      const value = Math.min(Math.max(0, registration.dpTarget - registration.payment.netPaid), registration.payment.outstanding);
+      const value = Math.min(Math.max(0, registration.dpTarget - registration.payment.netPaid), registration.payment.outstanding, remainingInvoice);
+      remainingInvoice -= value;
       return value > 0 ? [[registration.id, String(value)]] : [];
     }));
     setAllocations(next);
     setAmount(String(Object.values(next).reduce((total, value) => total + Number(value), 0) || ""));
   }
   function fillSettlement() {
-    const next = Object.fromEntries((booking?.registrations ?? []).filter((registration) => registration.payment.outstanding > 0).map((registration) => [registration.id, String(registration.payment.outstanding)]));
+    const next = allocatePayment(booking?.registrations ?? [], booking?.invoiceRemaining ?? 0);
     setAllocations(next);
     setAmount(String(Object.values(next).reduce((total, value) => total + Number(value), 0) || ""));
   }
-  return <form action={action} className="management-form"><Feedback state={state} /><input type="hidden" name="allocations" value={serialized} />
+  return <form action={action} className="management-form"><Feedback state={state} /><input type="hidden" name="allocations" value={serialized} /><input type="hidden" name="bookingId" value={booking?.id ?? ""} />
     <div className="management-payment-flow-note"><FileText /><span><small>INVOICE YANG DIBAYAR</small><strong>{booking?.invoiceNumber ?? "Pilih invoice"} · {rupiah(booking?.invoiceAmount ?? 0)}</strong><p>Nominal otomatis mengikuti invoice. Jika uang yang diterima berbeda, nominal masih bisa diubah.</p></span></div>
     <div className="management-form-grid two">
-      <label><span>Invoice *</span><select name="bookingId" value={bookingId} onChange={(event) => { const next = bookings.find((item) => item.id === event.target.value); setBookingId(event.target.value); setAmount(next?.invoiceAmount ? String(next.invoiceAmount) : ""); setAllocations(allocatePayment(next?.registrations ?? [], next?.invoiceAmount ?? 0)); }} required>{bookings.map((item) => <option value={item.id} key={item.id}>{item.invoiceNumber} — {item.payerName} — {rupiah(item.invoiceAmount)}</option>)}</select></label>
+      <label><span>Invoice *</span><select name="invoiceId" value={invoiceId} onChange={(event) => { const next = bookings.find((item) => item.invoiceId === event.target.value); setInvoiceId(event.target.value); setAmount(next?.invoiceRemaining ? String(next.invoiceRemaining) : ""); setAllocations(allocatePayment(next?.registrations ?? [], next?.invoiceRemaining ?? 0)); }} required>{bookings.map((item) => <option value={item.invoiceId} key={item.invoiceId}>{item.invoiceNumber} — {item.payerName} — sisa {rupiah(item.invoiceRemaining)}</option>)}</select></label>
       <label><span>Masuk ke rekening/kas *</span><select name="accountId" required><option value="">Pilih rekening</option>{accounts.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
       <label><span>Tanggal pembayaran *</span><input name="paidAt" type="datetime-local" defaultValue={localNow} required /></label>
       <label><span>Metode</span><select name="method" defaultValue="transfer"><option value="transfer">Transfer</option><option value="cash">Tunai</option><option value="card">Kartu</option><option value="other">Lainnya</option></select></label>
       <label><span>Nominal pembayaran *</span><input name="amount" inputMode="numeric" value={amount} onChange={(event) => { const value = event.target.value.replace(/\D/g, ""); setAmount(value); setAllocations(allocatePayment(booking?.registrations ?? [], Number(value) || 0)); }} required /><small>Terisi dari nominal invoice dan tetap dapat disesuaikan.</small></label>
       <label><span>Referensi <i>opsional</i></span><input name="reference" placeholder="Nomor transfer" /></label>
     </div>
-    <div className="management-payment-presets"><span><strong>Isi nominal lebih cepat</strong><small>Pilihan ini hanya membantu mengisi. Nominal tetap bisa diubah manual.</small></span><div><button type="button" onClick={fillDp}>Sesuai target DP</button><button type="button" onClick={fillSettlement}>Pelunasan penuh</button></div></div>
+    <div className="management-payment-presets"><span><strong>Isi nominal lebih cepat</strong><small>Pembayaran maksimal mengikuti sisa invoice {rupiah(booking?.invoiceRemaining ?? 0)}.</small></span><div><button type="button" onClick={fillDp}>Sesuai target DP</button><button type="button" onClick={fillSettlement}>Bayar sisa invoice</button></div></div>
     <div className="management-allocation"><div><strong>Alokasi per jamaah</strong><button type="button" onClick={autoAllocate}>Alokasikan nominal custom</button></div>{booking?.registrations.map((registration) => <label key={registration.id}><span><strong>{registration.pilgrim?.fullName}</strong><small>{registration.payment.status} · target DP {rupiah(registration.dpTarget)} · sisa {rupiah(registration.payment.outstanding)}</small></span><input aria-label={`Alokasi ${registration.pilgrim?.fullName}`} inputMode="numeric" value={allocations[registration.id] ?? ""} onChange={(event) => setAllocations((current) => ({ ...current, [registration.id]: event.target.value.replace(/\D/g, "") }))} /></label>)}</div>
     <label><span>Catatan</span><textarea name="note" rows={2} /></label>
     <SubmitButton>{pending ? "Mencatat…" : "Simpan pembayaran & buat kwitansi"}</SubmitButton>

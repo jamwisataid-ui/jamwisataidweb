@@ -18,7 +18,7 @@ export function resolveInvoiceAmount(value: unknown, maximum: number) {
     throw new Error("Nominal invoice wajib diisi lebih dari Rp0.");
   }
   if (amount > maximum) {
-    throw new Error("Nominal invoice tidak boleh melebihi total harga pendaftaran.");
+    throw new Error("Nominal invoice tidak boleh melebihi sisa harga yang belum ditagihkan.");
   }
   return amount;
 }

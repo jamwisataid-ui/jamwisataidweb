@@ -32,6 +32,16 @@ describe("penomoran dokumen", () => {
     expect(formatDocumentNumber({ pattern: "{seq}{DD}{MM}{YY}", padding: 6, nextNumber: 99, reset: "monthly", currentPeriod: "2026-07" }, new Date("2026-08-29T10:00:00+07:00")).number).toBe("000001290826");
     expect(documentPeriod("yearly", new Date("2026-08-29"))).toBe("2026");
   });
+  it("menghasilkan 50 nomor unik berurutan", () => {
+    let nextNumber = 9933;
+    const numbers = Array.from({ length: 50 }, () => {
+      const result = formatDocumentNumber({ pattern: "{seq}/jamw/300828", padding: 4, nextNumber, reset: "never", currentPeriod: null }, new Date("2026-08-30T10:00:00+07:00"));
+      nextNumber = result.nextNumber;
+      return result.number;
+    });
+    expect(new Set(numbers).size).toBe(50);
+    expect(numbers.at(-1)).toBe("9982/jamw/300828");
+  });
 });
 
 describe("utilitas transaksi", () => {

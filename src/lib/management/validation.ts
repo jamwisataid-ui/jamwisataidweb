@@ -38,6 +38,7 @@ export const bookingSchema = z.object({
 
 export const paymentSchema = z.object({
   bookingId: z.string().uuid(),
+  invoiceId: z.string().uuid("Invoice wajib dipilih."),
   accountId: z.string().uuid(),
   paidAt: z.string().min(8),
   method: z.enum(["cash", "transfer", "card", "other"]),

@@ -284,7 +284,7 @@ function VideoCard({ video }: { video: TestimonialVideo }) {
         {isPlaying ? (
           <>
             <iframe
-              src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&playsinline=1&rel=0&enablejsapi=1`}
+              src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}?autoplay=1&playsinline=1&rel=0&enablejsapi=1`}
               title={video.title}
               onLoad={handleIframeLoaded}
               className="absolute inset-0 size-full border-0 z-10"
