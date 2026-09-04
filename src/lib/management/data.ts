@@ -60,7 +60,11 @@ export async function getManagementContext() {
   const agentsById = new Map(agentRows.map((item) => [item.id, item]));
   const bookingsById = new Map(bookingRows.map((item) => [item.id, item]));
   const registrationsById = new Map(registrationRows.map((item) => [item.id, item]));
-  const validPaymentIds = new Set(paymentRows.filter((item) => item.status === "confirmed").map((item) => item.id));
+  const validPaymentIds = new Set(
+    paymentRows
+      .filter((item) => item.status === "confirmed" && item.isIncludedInReports !== false)
+      .map((item) => item.id)
+  );
 
   const registrationSummaries = registrationRows.map((registration) => {
     const paid = allocationRows.filter((item) => item.registrationId === registration.id && validPaymentIds.has(item.paymentId)).reduce((sum, item) => sum + item.amount, 0);
@@ -89,6 +93,7 @@ export async function getManagementContext() {
   const accountBalances = accountRows.map((account) => {
     let balance = 0;
     for (const transaction of cashRows) {
+      if (transaction.isIncludedInReports === false) continue;
       if (transaction.accountId === account.id) balance += transaction.direction === "in" ? transaction.amount : -transaction.amount;
       if (transaction.direction === "transfer" && transaction.destinationAccountId === account.id) balance += transaction.amount;
     }
@@ -99,7 +104,7 @@ export async function getManagementContext() {
     const packageRegistrationIds = new Set(registrationSummaries.filter((item) => item.package?.id === pkg.id).map((item) => item.id));
     const income = allocationRows.filter((item) => packageRegistrationIds.has(item.registrationId) && validPaymentIds.has(item.paymentId)).reduce((sum, item) => sum + item.amount, 0);
     const refunded = refundRows.filter((item) => item.registrationId && packageRegistrationIds.has(item.registrationId) && item.status === "confirmed").reduce((sum, item) => sum + item.amount, 0);
-    const directExpenses = cashRows.filter((item) => item.packageId === pkg.id && item.direction === "out" && item.kind !== "refund" && item.kind !== "commission").reduce((sum, item) => sum + item.amount, 0);
+    const directExpenses = cashRows.filter((item) => item.isIncludedInReports !== false && item.packageId === pkg.id && item.direction === "out" && item.kind !== "refund" && item.kind !== "commission").reduce((sum, item) => sum + item.amount, 0);
     const paidCommissions = commissionRows.filter((item) => packageRegistrationIds.has(item.registrationId) && item.status === "paid").reduce((sum, item) => sum + item.amount, 0);
     const receivables = registrationSummaries.filter((item) => item.package?.id === pkg.id).reduce((sum, item) => sum + item.payment.outstanding, 0);
     return { packageId: pkg.id, packageName: pkg.name, income, refunded, expenses: directExpenses, commissions: paidCommissions, receivables, realizedProfit: income - refunded - directExpenses - paidCommissions };

@@ -188,6 +188,7 @@ export const payments = pgTable("payments", {
   proofObjectKey: text("proof_object_key"),
   note: text("note"),
   status: paymentRecordStatus("status").notNull().default("confirmed"),
+  isIncludedInReports: boolean("is_included_in_reports").notNull().default(true),
   createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
   ...timestamps,
 }, (table) => [
@@ -240,6 +241,7 @@ export const cashTransactions = pgTable("cash_transactions", {
   description: text("description").notNull(),
   isReversal: boolean("is_reversal").notNull().default(false),
   reversesTransactionId: uuid("reverses_transaction_id"),
+  isIncludedInReports: boolean("is_included_in_reports").notNull().default(true),
   createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
   ...timestamps,
 }, (table) => [

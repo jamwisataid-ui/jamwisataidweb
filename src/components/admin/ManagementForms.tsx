@@ -4,7 +4,7 @@ import { useActionState, useEffect, useMemo, useState } from "react";
 import type { ChangeEvent } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
-import { BookOpen, CheckCircle2, CircleAlert, FileText, LoaderCircle, Sparkles, UsersRound, WalletCards } from "lucide-react";
+import { BookOpen, CheckCircle2, CircleAlert, Eye, EyeOff, FileText, LoaderCircle, Sparkles, UsersRound, WalletCards } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -24,6 +24,7 @@ import {
   saveInventoryItemAction,
   seedManagementDefaultsAction,
   setManagementRecordStatusAction,
+  toggleReportInclusionAction,
   updateAccountAction,
   updateAgentAction,
   updatePilgrimAction,
@@ -344,6 +345,63 @@ export function RecordStatusForm({ entity, id, status }: { entity: "pilgrim" | "
   const next = status === "active" ? "archived" : "active";
   return <form action={action} className="management-status-form"><input type="hidden" name="entity" value={entity} /><input type="hidden" name="id" value={id} /><input type="hidden" name="status" value={next} /><Feedback state={state} /><button type="submit" disabled={pending}>{pending ? <LoaderCircle className="spin" /> : null}{pending ? "Memproses…" : status === "active" ? "Arsipkan data" : "Aktifkan kembali"}</button></form>;
 }
+
+export function ReportInclusionToggleForm({
+  entity,
+  id,
+  isIncluded,
+}: {
+  entity: "payment" | "cash_transaction";
+  id: string;
+  isIncluded: boolean;
+}) {
+  const [state, action, pending] = useActionState(toggleReportInclusionAction, managementInitialState);
+  const nextInclude = !isIncluded;
+
+  return (
+    <form action={action} className="management-status-form" style={{ marginTop: "8px" }}>
+      <input type="hidden" name="entity" value={entity} />
+      <input type="hidden" name="id" value={id} />
+      <input type="hidden" name="include" value={String(nextInclude)} />
+      <Feedback state={state} />
+      <button
+        type="submit"
+        disabled={pending}
+        className={`management-report-toggle-btn ${isIncluded ? "btn-exclude" : "btn-include"}`}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "8px",
+          padding: "8px 14px",
+          borderRadius: "6px",
+          fontSize: "13px",
+          fontWeight: 600,
+          cursor: "pointer",
+          border: isIncluded ? "1px solid #cbd5e1" : "1px solid #16a34a",
+          background: isIncluded ? "#f8fafc" : "#f0fdf4",
+          color: isIncluded ? "#475569" : "#15803d",
+          transition: "all 0.15s ease",
+        }}
+      >
+        {pending ? (
+          <LoaderCircle className="spin" aria-hidden />
+        ) : isIncluded ? (
+          <EyeOff size={15} aria-hidden />
+        ) : (
+          <Eye size={15} aria-hidden />
+        )}
+        <span>
+          {pending
+            ? "Memproses…"
+            : isIncluded
+            ? "Kecualikan dari Laporan (Data Testing)"
+            : "Masukkan Kembali ke Laporan"}
+        </span>
+      </button>
+    </form>
+  );
+}
+
 
 type SequenceValues = { pattern: string; nextNumber: number; padding: number; reset: "never" | "monthly" | "yearly"; currentPeriod: string | null };
 

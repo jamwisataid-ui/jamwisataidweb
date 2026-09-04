@@ -192,7 +192,7 @@ export function computeDepartureReports({
     );
     const regIds = new Set(depRegs.map((r) => r.id));
 
-    const validPayments = payments.filter((p) => p.status === "confirmed");
+    const validPayments = payments.filter((p) => p.status === "confirmed" && (p as any).isIncludedInReports !== false);
     let totalPaid = 0;
     validPayments.forEach((p) => {
       (p.allocations || []).forEach((alloc: any) => {
@@ -213,7 +213,8 @@ export function computeDepartureReports({
           c.direction === "out" &&
           c.kind !== "refund" &&
           c.kind !== "commission" &&
-          !c.isReversal
+          !c.isReversal &&
+          (c as any).isIncludedInReports !== false
       )
       .reduce((sum, c) => sum + c.amount, 0);
 

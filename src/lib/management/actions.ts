@@ -889,3 +889,72 @@ export async function deletePaymentAction(formData: FormData): Promise<Managemen
     return { ok: true, message: "Data pembayaran berhasil dihapus. Pemasukan kas dan piutang otomatis dikalkulasi ulang.", redirectTo: "/admin/manajemen/pembayaran" };
   } catch (error) { return failure(error); }
 }
+
+export async function toggleReportInclusionAction(
+  stateOrFormData: ManagementActionState | FormData,
+  maybeFormData?: FormData
+): Promise<ManagementActionState> {
+  const formData = maybeFormData instanceof FormData ? maybeFormData : (stateOrFormData as FormData);
+  const id = String(formData.get("id") ?? "").trim();
+  const entity = String(formData.get("entity") ?? "").trim(); // "payment" | "cash_transaction"
+  const include = formData.get("include") === "true";
+
+  if (!id || !["payment", "cash_transaction"].includes(entity)) {
+    return { ok: false, message: "Parameter status laporan tidak valid." };
+  }
+
+  try {
+    const session = await requireAdminSession();
+    await withManagementTransaction(async (tx) => {
+      if (entity === "payment") {
+        const payment = await tx.query.payments.findFirst({ where: eq(payments.id, id) });
+        if (!payment) throw new Error("Data pembayaran tidak ditemukan.");
+
+        await tx
+          .update(payments)
+          .set({ isIncludedInReports: include, updatedAt: new Date() })
+          .where(eq(payments.id, id));
+
+        // Also synchronize all linked cash transactions created by this payment
+        await tx
+          .update(cashTransactions)
+          .set({ isIncludedInReports: include, updatedAt: new Date() })
+          .where(eq(cashTransactions.paymentId, id));
+
+        await tx.insert(auditLogs).values({
+          actorId: session.user.id,
+          action: include ? "include_reports" : "exclude_reports",
+          entityType: "payment",
+          entityId: id,
+          summary: `Pembayaran ${rupiah(payment.amount)} ${include ? "dimasukkan kembali ke" : "dikecualikan dari"} laporan & perhitungan kas/piutang`,
+        });
+      } else if (entity === "cash_transaction") {
+        const transaction = await tx.query.cashTransactions.findFirst({ where: eq(cashTransactions.id, id) });
+        if (!transaction) throw new Error("Data transaksi kas tidak ditemukan.");
+
+        await tx
+          .update(cashTransactions)
+          .set({ isIncludedInReports: include, updatedAt: new Date() })
+          .where(eq(cashTransactions.id, id));
+
+        await tx.insert(auditLogs).values({
+          actorId: session.user.id,
+          action: include ? "include_reports" : "exclude_reports",
+          entityType: "cash_transaction",
+          entityId: id,
+          summary: `Transaksi kas "${transaction.description}" ${rupiah(transaction.amount)} ${include ? "dimasukkan kembali ke" : "dikecualikan dari"} laporan & perhitungan kas`,
+        });
+      }
+    });
+
+    refresh();
+    const actionLabel = include ? "berhasil dimasukkan kembali ke laporan" : "berhasil dikecualikan dari laporan keuangan & kas";
+    return {
+      ok: true,
+      message: `Data ${actionLabel}.`,
+    };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
