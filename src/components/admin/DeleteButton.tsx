@@ -140,7 +140,7 @@ export function DeleteButton({
             </p>
 
             <div className="admin-modal-warning-box">
-              <span>⚠️ Perhatian:</span> {type === "document" ? "Dokumen akan dihapus permanen. Booking, pembayaran, dan nomor urut tetap tersimpan." : type === "pilgrim" ? "Data pribadi dan seluruh file dokumen jamaah akan dihapus permanen. Jamaah yang sudah memiliki riwayat transaksi tidak dapat dihapus." : "Data yang telah dihapus bersifat permanen dan tidak dapat dipulihkan kembali dari sistem."}
+              <span>Perhatian:</span> {type === "document" ? "Dokumen akan dihapus permanen. Booking, pembayaran, dan nomor urut tetap tersimpan." : type === "pilgrim" ? "Data pribadi, file dokumen, kamar, dan pendaftaran terkait akan dihapus permanen dari sistem." : "Data yang telah dihapus bersifat permanen dan tidak dapat dipulihkan kembali dari sistem."}
             </div>
 
             <div className="admin-modal-actions">

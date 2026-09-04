@@ -24,8 +24,10 @@ import {
   payments,
   pilgrimDocuments,
   pilgrims,
+  referralLeads,
   refunds,
   registrations,
+  roomMates,
 } from "@/db/schema";
 import { withManagementTransaction } from "@/db/transaction";
 import { requireAdminSession } from "@/lib/admin-session";
@@ -125,16 +127,136 @@ export async function deletePilgrimAction(formData: FormData): Promise<Managemen
       const pilgrim = await tx.query.pilgrims.findFirst({ where: eq(pilgrims.id, id) });
       if (!pilgrim) throw new Error("Data jamaah tidak ditemukan atau sudah dihapus.");
 
-      const registration = await tx.query.registrations.findFirst({ where: eq(registrations.pilgrimId, id) });
-      if (registration) {
-        throw new Error("Jamaah sudah memiliki riwayat pendaftaran atau transaksi. Arsipkan data agar histori keuangan tetap aman.");
+      const pilgrimFiles: string[] = [];
+
+      // 1. Gather all pilgrim documents & object keys
+      const documents = await tx.query.pilgrimDocuments.findMany({ where: eq(pilgrimDocuments.pilgrimId, id) });
+      for (const doc of documents) {
+        if (doc.objectKey) pilgrimFiles.push(doc.objectKey);
+      }
+      await tx.delete(pilgrimDocuments).where(eq(pilgrimDocuments.pilgrimId, id));
+
+      // 2. Clear referral leads referencing this pilgrim
+      await tx.update(referralLeads).set({ convertedPilgrimId: null }).where(eq(referralLeads.convertedPilgrimId, id));
+
+      // 3. Find all registrations for this pilgrim
+      const pilgrimRegs = await tx.query.registrations.findMany({ where: eq(registrations.pilgrimId, id) });
+      const regIds = pilgrimRegs.map((r) => r.id);
+      const affectedBookingIds = Array.from(new Set(pilgrimRegs.map((r) => r.bookingId)));
+
+      if (regIds.length > 0) {
+        // Delete roommate pairs referencing these registrations
+        await tx.delete(roomMates).where(
+          sql`${roomMates.registrationId} IN ${regIds} OR ${roomMates.mateRegistrationId} IN ${regIds}`
+        );
+
+        // Delete commissions linked to these registrations
+        await tx.delete(commissions).where(inArray(commissions.registrationId, regIds));
+
+        // Delete or nullify inventory movements
+        await tx.delete(inventoryMovements).where(inArray(inventoryMovements.registrationId, regIds));
+
+        // Find payment allocations for these registrations
+        const allocations = await tx.query.paymentAllocations.findMany({
+          where: inArray(paymentAllocations.registrationId, regIds),
+        });
+        const paymentIdsFromAllocations = Array.from(new Set(allocations.map((a) => a.paymentId)));
+
+        // Delete refunds referencing these registrations
+        const regRefunds = await tx.query.refunds.findMany({
+          where: inArray(refunds.registrationId, regIds),
+        });
+        if (regRefunds.length > 0) {
+          const refundIds = regRefunds.map((r) => r.id);
+          await tx.delete(cashTransactions).where(inArray(cashTransactions.refundId, refundIds));
+          await tx.delete(refunds).where(inArray(refunds.id, refundIds));
+        }
+
+        // Delete allocations for these registrations
+        await tx.delete(paymentAllocations).where(inArray(paymentAllocations.registrationId, regIds));
+
+        // Check each payment: if it has no remaining allocations, clean it up
+        for (const paymentId of paymentIdsFromAllocations) {
+          const remainingAllocations = await tx.query.paymentAllocations.findMany({
+            where: eq(paymentAllocations.paymentId, paymentId),
+          });
+          if (remainingAllocations.length === 0) {
+            // Delete cash transactions for this payment
+            await tx.delete(cashTransactions).where(eq(cashTransactions.paymentId, paymentId));
+            // Check & clean up receipt document for this payment
+            const receipts = await tx.query.issuedDocuments.findMany({
+              where: eq(issuedDocuments.paymentId, paymentId),
+            });
+            for (const r of receipts) {
+              if (r.objectKey) pilgrimFiles.push(r.objectKey);
+            }
+            if (receipts.length > 0) {
+              await tx.delete(issuedDocuments).where(eq(issuedDocuments.paymentId, paymentId));
+            }
+            // Delete refunds on this payment if any
+            const paymentRefunds = await tx.query.refunds.findMany({
+              where: eq(refunds.paymentId, paymentId),
+            });
+            if (paymentRefunds.length > 0) {
+              const pRefundIds = paymentRefunds.map((r) => r.id);
+              await tx.delete(cashTransactions).where(inArray(cashTransactions.refundId, pRefundIds));
+              await tx.delete(refunds).where(eq(refunds.paymentId, paymentId));
+            }
+            await tx.delete(payments).where(eq(payments.id, paymentId));
+          }
+        }
+
+        // Delete registrations
+        await tx.delete(registrations).where(inArray(registrations.id, regIds));
+
+        // Check affected bookings: if booking has no other registrations left, delete it too
+        for (const bookingId of affectedBookingIds) {
+          const otherRegs = await tx.query.registrations.findMany({
+            where: eq(registrations.bookingId, bookingId),
+          });
+          if (otherRegs.length === 0) {
+            // Check any remaining payments on this booking
+            const bookingPayments = await tx.query.payments.findMany({
+              where: eq(payments.bookingId, bookingId),
+            });
+            for (const bp of bookingPayments) {
+              await tx.delete(cashTransactions).where(eq(cashTransactions.paymentId, bp.id));
+              await tx.delete(paymentAllocations).where(eq(paymentAllocations.paymentId, bp.id));
+              await tx.delete(refunds).where(eq(refunds.paymentId, bp.id));
+            }
+            if (bookingPayments.length > 0) {
+              await tx.delete(payments).where(eq(payments.bookingId, bookingId));
+            }
+
+            // Clean up issued documents (invoice/receipts) for this booking
+            const docs = await tx.query.issuedDocuments.findMany({
+              where: eq(issuedDocuments.bookingId, bookingId),
+            });
+            for (const doc of docs) {
+              if (doc.objectKey) pilgrimFiles.push(doc.objectKey);
+            }
+            if (docs.length > 0) {
+              await tx.delete(issuedDocuments).where(eq(issuedDocuments.bookingId, bookingId));
+            }
+
+            // Delete empty booking
+            await tx.delete(bookings).where(eq(bookings.id, bookingId));
+          }
+        }
       }
 
-      const documents = await tx.query.pilgrimDocuments.findMany({ where: eq(pilgrimDocuments.pilgrimId, id) });
-      await tx.delete(pilgrimDocuments).where(eq(pilgrimDocuments.pilgrimId, id));
+      // Finally delete the pilgrim record
       await tx.delete(pilgrims).where(eq(pilgrims.id, id));
-      await tx.insert(auditLogs).values({ actorId: session.user.id, action: "delete", entityType: "pilgrim", entityId: id, summary: `Data jamaah ${pilgrim.fullName} dihapus permanen` });
-      return documents.map((document) => document.objectKey);
+
+      await tx.insert(auditLogs).values({
+        actorId: session.user.id,
+        action: "delete",
+        entityType: "pilgrim",
+        entityId: id,
+        summary: `Data jamaah ${pilgrim.fullName} dan seluruh catatan terkait berhasil dihapus permanen`,
+      });
+
+      return pilgrimFiles;
     });
 
     const cleanup = await Promise.allSettled(objectKeys.map((objectKey) => deletePrivateObject(objectKey)));
@@ -142,7 +264,7 @@ export async function deletePilgrimAction(formData: FormData): Promise<Managemen
       console.warn("Sebagian file jamaah gagal dibersihkan dari penyimpanan private.");
     }
     refresh();
-    return { ok: true, message: "Data jamaah dan dokumennya berhasil dihapus.", redirectTo: "/admin/manajemen/jamaah" };
+    return { ok: true, message: "Data jamaah dan seluruh data terkait berhasil dihapus.", redirectTo: "/admin/manajemen/jamaah" };
   } catch (error) { return failure(error); }
 }
 
