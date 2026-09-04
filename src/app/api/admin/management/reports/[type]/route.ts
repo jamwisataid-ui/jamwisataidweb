@@ -15,51 +15,51 @@ function within(value: Date | string | null | undefined, filters: Filters) {
   return (!filters.from || date >= filters.from) && (!filters.to || date <= filters.to);
 }
 
-function createReport(type: string, data: Awaited<ReturnType<typeof getManagementContext>>, filters: Filters): Report | null {
+function createReport(
+  type: string,
+  data: Awaited<ReturnType<typeof getManagementContext>>,
+  filters: Filters,
+  excludeColumns: string[] = []
+): Report | null {
   const registrations = data.registrations.filter((item) => {
     if (filters.packageId && item.package?.id !== filters.packageId) return false;
     if (filters.departureId && item.departure?.id !== filters.departureId) return false;
     return true;
   });
 
-  if (type === "keberangkatan") {
+  if (type === "keberangkatan" || type === "rekap" || type === "semua" || type === "penjualan") {
     const selectedDeparture = filters.departureId ? data.departures.find((d) => d.id === filters.departureId) : null;
     const title = selectedDeparture
-      ? `Rekap Keberangkatan ${selectedDeparture.dateLabel} (${selectedDeparture.package?.name ?? "Umrah"})`
-      : "Laporan Rekap Seluruh Keberangkatan";
+      ? `Rekap Operasional & Penjualan ${selectedDeparture.dateLabel} (${selectedDeparture.package?.name ?? "Umrah"})`
+      : "Laporan Rekap Keseluruhan Penjualan & Operasional";
+
+    type MasterCol = { id: string; header: string; getValue: (r: (typeof registrations)[number]) => string | number };
+    const masterCols: MasterCol[] = [
+      { id: "jamaah", header: "Nama Jamaah", getValue: (r) => r.pilgrim?.fullName ?? "—" },
+      { id: "gender", header: "Gender", getValue: (r) => r.pilgrim?.gender ?? "—" },
+      { id: "kontak", header: "WhatsApp", getValue: (r) => r.pilgrim?.whatsapp ?? "—" },
+      { id: "paspor", header: "No. Paspor", getValue: (r) => r.pilgrim?.passportNumber ?? "—" },
+      { id: "paket", header: "Paket Umrah", getValue: (r) => r.package?.name ?? "—" },
+      { id: "keberangkatan", header: "Jadwal", getValue: (r) => r.departure?.dateLabel ?? "—" },
+      { id: "kamar", header: "Tipe Kamar", getValue: (r) => (r.roomType ? r.roomType.charAt(0).toUpperCase() + r.roomType.slice(1) : "Quad") },
+      { id: "kamar_mkh", header: "Kamar Makkah", getValue: (r) => r.makkahRoomNumber || r.roomNumber || "—" },
+      { id: "kamar_mdn", header: "Kamar Madinah", getValue: (r) => r.madinahRoomNumber || "—" },
+      { id: "agen", header: "Agen Referral", getValue: (r) => r.agent?.name ?? "Langsung (Tanpa Agen)" },
+      { id: "harga", header: "Biaya Paket", getValue: (r) => rupiah(r.agreedPrice) },
+      { id: "bayar", header: "Telah Dibayar", getValue: (r) => rupiah(r.payment?.netPaid ?? 0) },
+      { id: "piutang", header: "Sisa Piutang", getValue: (r) => rupiah(r.payment?.outstanding ?? 0) },
+      { id: "status_bayar", header: "Status Bayar", getValue: (r) => r.payment?.status ?? "Belum Bayar" },
+    ];
+
+    const activeCols = masterCols.filter((col) => !excludeColumns.includes(col.id));
+
+    const activeRegs = registrations.filter((r) => within(r.departure?.departureDate, filters));
+    const rows = activeRegs.map((r) => activeCols.map((col) => col.getValue(r)));
 
     return {
       title,
-      columns: [
-        "Nama Jamaah",
-        "Gender",
-        "WhatsApp",
-        "Paspor",
-        "Paket & Tanggal",
-        "Tipe Kamar",
-        "Kamar Makkah",
-        "Kamar Madinah",
-        "Harga Paket",
-        "Telah Dibayar",
-        "Sisa Piutang",
-        "Status Bayar",
-      ],
-      rows: registrations
-        .filter((r) => within(r.departure?.departureDate, filters))
-        .map((r) => [
-          r.pilgrim?.fullName ?? "—",
-          r.pilgrim?.gender ?? "—",
-          r.pilgrim?.whatsapp ?? "—",
-          r.pilgrim?.passportNumber ?? "—",
-          `${r.package?.name ?? "—"} (${r.departure?.dateLabel ?? "—"})`,
-          r.roomType ? r.roomType.charAt(0).toUpperCase() + r.roomType.slice(1) : "Quad",
-          r.makkahRoomNumber || r.roomNumber || "—",
-          r.madinahRoomNumber || "—",
-          rupiah(r.agreedPrice),
-          rupiah(r.payment?.netPaid ?? 0),
-          rupiah(r.payment?.outstanding ?? 0),
-          r.payment?.status ?? "Belum Bayar",
-        ]),
+      columns: activeCols.map((col) => col.header),
+      rows,
     };
   }
 
@@ -84,7 +84,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ type
   const from = fromValue && /^\d{4}-\d{2}-\d{2}$/.test(fromValue) ? new Date(`${fromValue}T00:00:00+07:00`) : undefined;
   const to = toValue && /^\d{4}-\d{2}-\d{2}$/.test(toValue) ? new Date(`${toValue}T23:59:59.999+07:00`) : undefined;
   if (from && to && from > to) return NextResponse.json({ error: "Tanggal awal tidak boleh melewati tanggal akhir." }, { status: 400 });
-  const report = createReport(type, await getManagementContext(), { from, to, packageId, departureId });
+  const excludeRaw = url.searchParams.get("exclude") || "";
+  const excludeColumns = excludeRaw ? excludeRaw.split(",").map((s) => s.trim()).filter(Boolean) : [];
+
+  const report = createReport(type, await getManagementContext(), { from, to, packageId, departureId }, excludeColumns);
 
   if (!report) return NextResponse.json({ error: "Jenis laporan tidak ditemukan." }, { status: 404 });
   // Generate professional export filename based on report title and date range
@@ -100,11 +103,44 @@ export async function GET(request: Request, { params }: { params: Promise<{ type
     const workbook = new ExcelJS.Workbook();
     workbook.creator = "Jam Wisata";
     const sheet = workbook.addWorksheet(report.title.slice(0, 31));
+
+    // Header Row
     sheet.addRow(report.columns);
-    report.rows.forEach((row) => sheet.addRow(row));
-    sheet.getRow(1).font = { bold: true, color: { argb: "FFFFFFFF" } };
-    sheet.getRow(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF0A2A4D" } };
-    sheet.columns.forEach((column) => { column.width = 22; });
+    const headerRow = sheet.getRow(1);
+    headerRow.height = 28;
+    headerRow.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 11 };
+    headerRow.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF0A2A4D" } };
+    headerRow.alignment = { vertical: "middle", horizontal: "center" };
+
+    // Data Rows
+    report.rows.forEach((row, rowIdx) => {
+      const addedRow = sheet.addRow(row);
+      addedRow.height = 22;
+      addedRow.alignment = { vertical: "middle" };
+      if (rowIdx % 2 === 1) {
+        addedRow.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF8FAFC" } };
+      }
+      // Add thin border to each cell
+      addedRow.eachCell((cell) => {
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFE2E8F0" } },
+          left: { style: "thin", color: { argb: "FFE2E8F0" } },
+          bottom: { style: "thin", color: { argb: "FFE2E8F0" } },
+          right: { style: "thin", color: { argb: "FFE2E8F0" } },
+        };
+      });
+    });
+
+    // Auto-fit Column Widths with minimum 16
+    sheet.columns.forEach((column, colIdx) => {
+      let maxLength = report.columns[colIdx]?.length ?? 12;
+      report.rows.forEach((row) => {
+        const valStr = String(row[colIdx] ?? "");
+        if (valStr.length > maxLength) maxLength = valStr.length;
+      });
+      column.width = Math.min(45, Math.max(16, maxLength + 3));
+    });
+
     sheet.views = [{ state: "frozen", ySplit: 1 }];
     sheet.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: report.columns.length } };
     const buffer = await workbook.xlsx.writeBuffer();

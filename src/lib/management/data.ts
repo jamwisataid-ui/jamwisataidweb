@@ -72,12 +72,14 @@ export async function getManagementContext() {
     const booking = bookingsById.get(registration.bookingId);
     const departure = booking ? departuresById.get(booking.departureId) : undefined;
     const pkg = departure ? packagesById.get(departure.packageId) : undefined;
+    const agent = booking?.agentId ? agentsById.get(booking.agentId) : undefined;
     return {
       ...registration,
       pilgrim: pilgrimsById.get(registration.pilgrimId),
       booking,
       departure,
       package: pkg,
+      agent,
       payment: paymentStatus({ agreedPrice: registration.agreedPrice, dpTarget: registration.dpTarget, paid, refunded }),
       dueAt: departure ? dueDate(departure.departureDate, settingsRows[0]?.paymentDueDays ?? 30) : null,
     };

@@ -153,6 +153,7 @@ export type DepartureReportItem = {
     gender: string;
     whatsapp: string;
     passportNumber: string;
+    agentName: string;
     roomType: string;
     makkahRoom: string;
     madinahRoom: string;
@@ -232,6 +233,7 @@ export function computeDepartureReports({
       gender: r.pilgrim?.gender || "—",
       whatsapp: r.pilgrim?.whatsapp || "—",
       passportNumber: r.pilgrim?.passportNumber || "—",
+      agentName: r.agent?.name || "Langsung",
       roomType: r.roomType ? r.roomType.charAt(0).toUpperCase() + r.roomType.slice(1) : "Quad",
       makkahRoom: r.makkahRoomNumber || r.roomNumber || "—",
       madinahRoom: r.madinahRoomNumber || "—",
