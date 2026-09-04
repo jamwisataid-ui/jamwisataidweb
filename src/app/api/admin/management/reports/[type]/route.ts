@@ -7,7 +7,7 @@ import { rupiah } from "@/lib/management/domain";
 import { renderReportPdf } from "@/lib/management/pdf";
 
 type Report = { title: string; columns: string[]; rows: Array<Array<string | number>> };
-type Filters = { from?: Date; to?: Date; packageId?: string };
+type Filters = { from?: Date; to?: Date; packageId?: string; departureId?: string };
 
 function within(value: Date | string | null | undefined, filters: Filters) {
   if (!value) return !filters.from && !filters.to;
@@ -16,7 +16,53 @@ function within(value: Date | string | null | undefined, filters: Filters) {
 }
 
 function createReport(type: string, data: Awaited<ReturnType<typeof getManagementContext>>, filters: Filters): Report | null {
-  const registrations = data.registrations.filter((item) => !filters.packageId || item.package?.id === filters.packageId);
+  const registrations = data.registrations.filter((item) => {
+    if (filters.packageId && item.package?.id !== filters.packageId) return false;
+    if (filters.departureId && item.departure?.id !== filters.departureId) return false;
+    return true;
+  });
+
+  if (type === "keberangkatan") {
+    const selectedDeparture = filters.departureId ? data.departures.find((d) => d.id === filters.departureId) : null;
+    const title = selectedDeparture
+      ? `Rekap Keberangkatan ${selectedDeparture.dateLabel} (${selectedDeparture.package?.name ?? "Umrah"})`
+      : "Laporan Rekap Seluruh Keberangkatan";
+
+    return {
+      title,
+      columns: [
+        "Nama Jamaah",
+        "Gender",
+        "WhatsApp",
+        "Paspor",
+        "Paket & Tanggal",
+        "Tipe Kamar",
+        "Kamar Makkah",
+        "Kamar Madinah",
+        "Harga Paket",
+        "Telah Dibayar",
+        "Sisa Piutang",
+        "Status Bayar",
+      ],
+      rows: registrations
+        .filter((r) => within(r.departure?.departureDate, filters))
+        .map((r) => [
+          r.pilgrim?.fullName ?? "—",
+          r.pilgrim?.gender ?? "—",
+          r.pilgrim?.whatsapp ?? "—",
+          r.pilgrim?.passportNumber ?? "—",
+          `${r.package?.name ?? "—"} (${r.departure?.dateLabel ?? "—"})`,
+          r.roomType ? r.roomType.charAt(0).toUpperCase() + r.roomType.slice(1) : "Quad",
+          r.makkahRoomNumber || r.roomNumber || "—",
+          r.madinahRoomNumber || "—",
+          rupiah(r.agreedPrice),
+          rupiah(r.payment?.netPaid ?? 0),
+          rupiah(r.payment?.outstanding ?? 0),
+          r.payment?.status ?? "Belum Bayar",
+        ]),
+    };
+  }
+
   if (type === "jamaah") return { title: "Laporan Data Jamaah", columns: ["Nama", "WhatsApp", "Email", "Paspor", "Status"], rows: data.pilgrims.filter((item) => within(item.createdAt, filters)).map((item) => [item.fullName, item.whatsapp, item.email ?? "", item.passportNumber ?? "", item.status]) };
   if (type === "manifest") return { title: "Manifest & Room List", columns: ["Jamaah", "Gender", "Paket", "Keberangkatan", "Paspor", "Tipe", "Kamar Makkah", "Kamar Madinah"], rows: registrations.filter((item) => within(item.departure?.departureDate, filters)).toSorted((a, b) => String(a.pilgrim?.gender).localeCompare(String(b.pilgrim?.gender))).map((item) => [item.pilgrim?.fullName ?? "", item.pilgrim?.gender ?? "", item.package?.name ?? "", item.departure?.departureDate ?? "", item.pilgrim?.passportNumber ?? "", item.roomType ? item.roomType.charAt(0).toUpperCase() + item.roomType.slice(1) : "", item.makkahRoomNumber || item.roomNumber || "", item.madinahRoomNumber || ""]) };
   if (type === "pembayaran") return { title: "Laporan Pembayaran & Piutang", columns: ["Tanggal", "Invoice", "Booking", "Pembayar", "Nominal", "Metode", "Status"], rows: data.payments.filter((payment) => within(payment.paidAt, filters)).filter((payment) => !filters.packageId || registrations.some((registration) => registration.bookingId === payment.bookingId)).map((payment) => [payment.paidAt.toISOString(), data.documents.find((document) => document.id === payment.invoiceId)?.number ?? "", payment.booking?.bookingNumber ?? "", payment.booking?.payerName ?? "", rupiah(payment.amount), payment.method, payment.status]) };
@@ -34,10 +80,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ type
   const fromValue = url.searchParams.get("from");
   const toValue = url.searchParams.get("to");
   const packageId = url.searchParams.get("packageId") || undefined;
+  const departureId = url.searchParams.get("departureId") || undefined;
   const from = fromValue && /^\d{4}-\d{2}-\d{2}$/.test(fromValue) ? new Date(`${fromValue}T00:00:00+07:00`) : undefined;
   const to = toValue && /^\d{4}-\d{2}-\d{2}$/.test(toValue) ? new Date(`${toValue}T23:59:59.999+07:00`) : undefined;
   if (from && to && from > to) return NextResponse.json({ error: "Tanggal awal tidak boleh melewati tanggal akhir." }, { status: 400 });
-  const report = createReport(type, await getManagementContext(), { from, to, packageId });
+  const report = createReport(type, await getManagementContext(), { from, to, packageId, departureId });
+
   if (!report) return NextResponse.json({ error: "Jenis laporan tidak ditemukan." }, { status: 404 });
   const format = url.searchParams.get("format") === "xlsx" ? "xlsx" : "pdf";
   if (format === "xlsx") {

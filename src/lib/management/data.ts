@@ -26,7 +26,7 @@ import {
   refunds,
   registrations,
 } from "@/db/schema";
-import { dueDate, paymentStatus, upcomingBirthday } from "./domain";
+import { computeDepartureReports, dueDate, paymentStatus, upcomingBirthday } from "./domain";
 
 export async function getManagementContext() {
   const db = requireDatabase();
@@ -111,10 +111,22 @@ export async function getManagementContext() {
     return birthday && birthday.daysUntil <= 14 ? [{ id: pilgrim.id, fullName: pilgrim.fullName, whatsapp: pilgrim.whatsapp, birthDate: pilgrim.birthDate, ...birthday }] : [];
   }).sort((a, b) => a.daysUntil - b.daysUntil || a.fullName.localeCompare(b.fullName));
 
+  const departuresWithPackage = departureRows.map((departure) => ({ ...departure, package: packagesById.get(departure.packageId) }));
+  const departureReports = computeDepartureReports({
+    departures: departuresWithPackage,
+    registrations: registrationSummaries,
+    payments: paymentRows.map((payment) => ({ ...payment, booking: bookingsById.get(payment.bookingId), allocations: allocationRows.filter((item) => item.paymentId === payment.id) })),
+    cashTransactions: cashRows,
+    commissions: commissionRows,
+    refunds: refundRows,
+  });
+
   return {
     pilgrims: pilgrimRows,
     packages: packageRows,
-    departures: departureRows.map((departure) => ({ ...departure, package: packagesById.get(departure.packageId) })),
+    departures: departuresWithPackage,
+    departureReports,
+
     agents: agentRows,
     accounts: accountBalances,
     categories: categoryRows,

@@ -29,12 +29,19 @@ type RegistrationItem = Context["registrations"][number];
 export function RoomListWorkspace({ data }: { data: Context }) {
   const [activeGender, setActiveGender] = useState<"Laki-laki" | "Perempuan">("Laki-laki");
   const [activeCity, setActiveCity] = useState<RoomCity>("makkah");
+  const [selectedDepartureId, setSelectedDepartureId] = useState<string>("");
   const [expandedRooms, setExpandedRooms] = useState<Record<string, boolean>>({});
 
-  // Filter registrations with valid genders
+  // Filter registrations with valid genders & optional departure filter
   const genderRegistrations = useMemo(() => {
-    return data.registrations.filter((item) => item.pilgrim?.gender === activeGender && item.status === "active");
-  }, [data.registrations, activeGender]);
+    return data.registrations.filter((item) => {
+      if (item.pilgrim?.gender !== activeGender) return false;
+      if (item.status !== "active") return false;
+      if (selectedDepartureId && item.departure?.id !== selectedDepartureId) return false;
+      return true;
+    });
+  }, [data.registrations, activeGender, selectedDepartureId]);
+
 
   // Find accommodation hotel name for departure if available
   const hotelsByDepartureAndCity = useMemo(() => {
@@ -161,30 +168,48 @@ export function RoomListWorkspace({ data }: { data: Context }) {
         </button>
       </section>
 
-      {/* 2. TINGKAT KEDUA: PILIH KOTA / HOTEL MAKKAH VS MADINAH */}
+      {/* 2. TINGKAT KEDUA: PILIH JADWAL KEBERANGKATAN & LOKASI HOTEL */}
       <section className="roomlist-city-selector">
-        <div className="roomlist-city-label">
-          <span>Pilih Lokasi Hotel:</span>
-        </div>
-        <div className="roomlist-city-pills">
-          <button
-            type="button"
-            onClick={() => setActiveCity("makkah")}
-            className={`roomlist-city-pill ${activeCity === "makkah" ? "active" : ""}`}
-          >
-            <Hotel className="size-5" />
-            <span>🕋 Hotel Makkah</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveCity("madinah")}
-            className={`roomlist-city-pill ${activeCity === "madinah" ? "active" : ""}`}
-          >
-            <Building2 className="size-5" />
-            <span>🕌 Hotel Madinah</span>
-          </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap", width: "100%", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <label style={{ fontSize: "14px", fontWeight: "700", color: "#173251", display: "flex", alignItems: "center", gap: "6px" }}>
+              <span>Jadwal:</span>
+              <select
+                value={selectedDepartureId}
+                onChange={(e) => setSelectedDepartureId(e.target.value)}
+                style={{ minHeight: "40px", padding: "6px 12px", borderRadius: "8px", border: "1px solid #c8d3e0", background: "#fff", color: "#102a4c", fontWeight: "600", fontSize: "13px" }}
+              >
+                <option value="">Semua Keberangkatan</option>
+                {data.departures.map((dep) => (
+                  <option key={dep.id} value={dep.id}>
+                    {dep.dateLabel} ({dep.package?.name ?? "Umrah"})
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="roomlist-city-pills">
+            <button
+              type="button"
+              onClick={() => setActiveCity("makkah")}
+              className={`roomlist-city-pill ${activeCity === "makkah" ? "active" : ""}`}
+            >
+              <Hotel className="size-5" />
+              <span>🕋 Hotel Makkah</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveCity("madinah")}
+              className={`roomlist-city-pill ${activeCity === "madinah" ? "active" : ""}`}
+            >
+              <Building2 className="size-5" />
+              <span>🕌 Hotel Madinah</span>
+            </button>
+          </div>
         </div>
       </section>
+
 
       {/* 3. SECTION UNASSIGNED / BELUM DAPAT KAMAR */}
       {unassigned.length > 0 && (

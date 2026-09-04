@@ -84,7 +84,165 @@ function Manifest({ data }: { data: Context }) { const genders = ["Laki-laki", "
 
 function Invoices({ data }: { data: Context }) { const invoices = data.documents.filter((item) => item.kind === "invoice").length; const receipts = data.documents.filter((item) => item.kind === "receipt").length; return <><AdminPageHeader eyebrow="DOKUMEN TRANSAKSI" title="Invoice & kwitansi" description="Invoice untuk menagih pembayaran. Kwitansi dibuat otomatis setelah pembayaran diterima." action={{ href: "/admin/manajemen/invoice-kwitansi/baru", label: "Buat invoice" }} /><section className="management-document-history"><header><div><small>HISTORI DOKUMEN</small><h2>Dokumen yang sudah diterbitkan</h2><p>Klik satu dokumen untuk melihat preview, download, atau mencetak ulang.</p></div><dl><div><dt>Invoice</dt><dd>{invoices}</dd></div><div><dt>Kwitansi</dt><dd>{receipts}</dd></div></dl></header>{data.documents.length ? <div className="management-table-wrap"><table className="management-table management-document-table"><thead><tr><th>Dokumen</th><th>Customer / transaksi</th><th>Tanggal terbit</th><th>Status</th><th>Aksi</th></tr></thead><tbody>{data.documents.map((item) => { const booking = data.bookings.find((row) => row.id === item.bookingId); const Icon = item.kind === "invoice" ? FileText : ReceiptText; return <tr key={item.id}><td><Link className="management-document-identity" href={`/admin/manajemen/invoice-kwitansi/${item.id}`}><span><Icon /></span><span><strong>{item.number}</strong><small>{item.kind === "invoice" ? "Invoice" : "Kwitansi"}</small></span></Link></td><td data-label="Customer"><span><strong>{booking?.payerName ?? "Pembayar tidak ditemukan"}</strong><small>{booking?.bookingNumber ?? "Transaksi lama"}</small></span></td><td data-label="Tanggal terbit"><DateText value={item.issuedAt} /></td><td data-label="Status"><Status tone={item.status === "issued" ? "good" : "bad"}>{item.status === "issued" ? "Terbit" : "Dibatalkan"}</Status></td><td data-label="Tindakan"><div className="admin-table-actions"><Link className="management-row-link" href={`/admin/manajemen/invoice-kwitansi/${item.id}`}>Buka dokumen</Link><DeleteButton id={item.id} name={item.number} type="document" documentKind={item.kind} /></div></td></tr>; })}</tbody></table></div> : <Empty>Belum ada dokumen. Buat invoice pertama untuk memulai.</Empty>}</section></>; }
 
-function Reports({ data }: { data: Context }) { const realizedIncome = data.cashTransactions.filter((item) => item.direction === "in" && !item.isReversal).reduce((sum, item) => sum + item.amount, 0); const realizedExpense = data.cashTransactions.filter((item) => item.direction === "out" && !item.isReversal).reduce((sum, item) => sum + item.amount, 0); return <><AdminPageHeader eyebrow="REKAP BISNIS" title="Pusat laporan" description="Kas aktual, piutang, dan proyeksi ditampilkan terpisah agar mudah dipahami." /><section className="management-kpis reports"><article><small>Pemasukan aktual</small><strong>{rupiah(realizedIncome)}</strong></article><article><small>Pengeluaran aktual</small><strong>{rupiah(realizedExpense)}</strong></article><article><small>Selisih kas</small><strong>{rupiah(realizedIncome - realizedExpense)}</strong></article><article><small>Piutang</small><strong>{rupiah(data.dashboard.receivables)}</strong></article></section><section className="management-panel"><header><div><small>LABA REALISASI</small><h2>Laba per paket</h2></div></header><div className="management-table-wrap"><table className="management-table"><thead><tr><th>Paket</th><th>Pemasukan</th><th>Refund</th><th>Biaya</th><th>Komisi dibayar</th><th>Laba</th><th>Piutang</th></tr></thead><tbody>{data.packageFinancials.map((item) => <tr key={item.packageId}><td><strong>{item.packageName}</strong></td><td>{rupiah(item.income)}</td><td>{rupiah(item.refunded)}</td><td>{rupiah(item.expenses)}</td><td>{rupiah(item.commissions)}</td><td><strong>{rupiah(item.realizedProfit)}</strong></td><td>{rupiah(item.receivables)}</td></tr>)}</tbody></table></div></section><section className="management-panel"><header><div><small>DOWNLOAD</small><h2>Laporan berdasarkan periode</h2><p>Pilih periode dan paket, lalu unduh laporan yang dibutuhkan.</p></div></header><ReportDownloadFilters packages={data.packages.map(({ id, name }) => ({ id, name }))} /></section></>; }
+function Reports({ data }: { data: Context }) {
+  const realizedIncome = data.cashTransactions.filter((item) => item.direction === "in" && !item.isReversal).reduce((sum, item) => sum + item.amount, 0);
+  const realizedExpense = data.cashTransactions.filter((item) => item.direction === "out" && !item.isReversal).reduce((sum, item) => sum + item.amount, 0);
+
+  return (
+    <>
+      <AdminPageHeader
+        eyebrow="REKAP BISNIS & OPERASIONAL"
+        title="Pusat Laporan & Rekap"
+        description="Pantau rekap data per jadwal keberangkatan, kas masuk/keluar aktual, piutang jamaah, dan laba paket."
+      />
+      <section className="management-kpis reports">
+        <article>
+          <small>Pemasukan aktual</small>
+          <strong>{rupiah(realizedIncome)}</strong>
+        </article>
+        <article>
+          <small>Pengeluaran aktual</small>
+          <strong>{rupiah(realizedExpense)}</strong>
+        </article>
+        <article>
+          <small>Selisih kas</small>
+          <strong>{rupiah(realizedIncome - realizedExpense)}</strong>
+        </article>
+        <article>
+          <small>Total Piutang Jamaah</small>
+          <strong>{rupiah(data.dashboard.receivables)}</strong>
+        </article>
+      </section>
+
+      {/* REKAP PER JADWAL KEBERANGKATAN */}
+      <section className="management-panel">
+        <header>
+          <div>
+            <small>OPERASIONAL KEBERANGKATAN</small>
+            <h2>Rekap Data per Jadwal Keberangkatan</h2>
+            <p>Rincian jamaah, penerimaan biaya, sisa piutang, dan estimasi laba per jadwal keberangkatan.</p>
+          </div>
+        </header>
+        <div className="management-table-wrap">
+          <table className="management-table">
+            <thead>
+              <tr>
+                <th>Jadwal & Paket</th>
+                <th>Maskapai</th>
+                <th>Jamaah</th>
+                <th>Total Biaya Paket</th>
+                <th>Sudah Dibayar</th>
+                <th>Sisa Piutang</th>
+                <th>Laba Realisasi</th>
+                <th>Unduh Rekap</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.departureReports.map((item) => (
+                <tr key={item.departureId}>
+                  <td>
+                    <strong>{item.dateLabel}</strong>
+                    <small style={{ display: "block", color: "#65758a" }}>{item.packageName}</small>
+                  </td>
+                  <td>{item.airline}</td>
+                  <td>
+                    <Status tone={item.totalPilgrims > 0 ? "good" : "neutral"}>
+                      {item.totalPilgrims} Jamaah
+                    </Status>
+                  </td>
+                  <td>{rupiah(item.totalAgreedPrice)}</td>
+                  <td style={{ color: "#166534", fontWeight: "700" }}>{rupiah(item.totalPaid)}</td>
+                  <td style={{ color: item.totalReceivables > 0 ? "#991b1b" : "#6b7280", fontWeight: "700" }}>
+                    {rupiah(item.totalReceivables)}
+                  </td>
+                  <td>
+                    <strong>{rupiah(item.realizedProfit)}</strong>
+                  </td>
+                  <td>
+                    <div style={{ display: "flex", gap: "6px" }}>
+                      <a
+                        href={`/api/admin/management/reports/keberangkatan?format=xlsx&departureId=${item.departureId}`}
+                        style={{ padding: "4px 8px", fontSize: "11px", fontWeight: "700", border: "1px solid #c8b482", borderRadius: "6px", color: "#8b660c", textDecoration: "none" }}
+                      >
+                        Excel
+                      </a>
+                      <a
+                        href={`/api/admin/management/reports/keberangkatan?format=pdf&departureId=${item.departureId}`}
+                        style={{ padding: "4px 8px", fontSize: "11px", fontWeight: "700", border: "1px solid #c8b482", borderRadius: "6px", color: "#8b660c", textDecoration: "none" }}
+                      >
+                        PDF
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* LABA PER PAKET */}
+      <section className="management-panel">
+        <header>
+          <div>
+            <small>LABA REALISASI</small>
+            <h2>Laba per paket</h2>
+          </div>
+        </header>
+        <div className="management-table-wrap">
+          <table className="management-table">
+            <thead>
+              <tr>
+                <th>Paket</th>
+                <th>Pemasukan</th>
+                <th>Refund</th>
+                <th>Biaya</th>
+                <th>Komisi dibayar</th>
+                <th>Laba</th>
+                <th>Piutang</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.packageFinancials.map((item) => (
+                <tr key={item.packageId}>
+                  <td><strong>{item.packageName}</strong></td>
+                  <td>{rupiah(item.income)}</td>
+                  <td>{rupiah(item.refunded)}</td>
+                  <td>{rupiah(item.expenses)}</td>
+                  <td>{rupiah(item.commissions)}</td>
+                  <td><strong>{rupiah(item.realizedProfit)}</strong></td>
+                  <td>{rupiah(item.receivables)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* UNDUH LAPORAN */}
+      <section className="management-panel">
+        <header>
+          <div>
+            <small>DOWNLOAD & EKSPOR</small>
+            <h2>Laporan berdasarkan periode & filter</h2>
+            <p>Pilih periode tanggal, paket, atau jadwal keberangkatan, lalu unduh dokumen Excel atau PDF.</p>
+          </div>
+        </header>
+        <ReportDownloadFilters
+          packages={data.packages.map(({ id, name }) => ({ id, name }))}
+          departures={data.departures.map((d) => ({
+            id: d.id,
+            departureDate: d.departureDate,
+            dateLabel: d.dateLabel,
+            packageId: d.packageId,
+            packageName: d.package?.name,
+          }))}
+        />
+      </section>
+    </>
+  );
+}
+
 
 function Settings({ data }: { data: Context }) { return <><AdminPageHeader eyebrow="PENGATURAN" title="Pengaturan internal" description="Atur nilai default, identitas, dan template pesan yang dipakai sistem." /><section className="management-panel"><header><div><small>IDENTITAS & TRANSAKSI</small><h2>Pengaturan utama</h2></div></header><ManagementSettingsForm values={data.settings ? { companyName: data.settings.companyName, companyAddress: data.settings.companyAddress, companyPhone: data.settings.companyPhone, companyEmail: data.settings.companyEmail, defaultDpAmount: data.settings.defaultDpAmount, paymentDueDays: data.settings.paymentDueDays, financeSignerName: data.settings.financeSignerName, financeSignerTitle: data.settings.financeSignerTitle, birthdayMessageTemplate: data.settings.birthdayMessageTemplate } : null} /></section><section className="management-panel"><header><div><small>IMPORT DATA LAMA</small><h2>Import CSV tervalidasi</h2></div></header><CsvImportForm /></section><section className="management-panel"><header><div><small>REKENING</small><h2>Rekening & kas aktif</h2></div></header><div className="management-mini-list">{data.accounts.map((account) => <div key={account.id}><span><strong>{account.name}</strong><small>{account.bankName || "Kas tunai"} · {account.accountNumber || "Tanpa nomor"}</small></span><Status tone={account.showOnInvoice ? "good" : "neutral"}>{account.showOnInvoice ? "Tampil di invoice" : "Internal"}</Status></div>)}</div></section></>; }
 

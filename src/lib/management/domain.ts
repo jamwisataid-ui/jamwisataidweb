@@ -130,3 +130,134 @@ export function generateDefaultRoomNumber({
   const numStr = String(roomIndex).padStart(2, "0");
   return `${cityCode}-${hotel}-${typeLabel}-${numStr}`;
 }
+
+export type DepartureReportItem = {
+  departureId: string;
+  departureDate: string;
+  dateLabel: string;
+  packageId: string;
+  packageName: string;
+  airline: string;
+  totalPilgrims: number;
+  totalReceivables: number;
+  totalAgreedPrice: number;
+  totalPaid: number;
+  totalRefunded: number;
+  directExpenses: number;
+  paidCommissions: number;
+  realizedProfit: number;
+  status: string;
+  pilgrims: Array<{
+    registrationId: string;
+    fullName: string;
+    gender: string;
+    whatsapp: string;
+    passportNumber: string;
+    roomType: string;
+    makkahRoom: string;
+    madinahRoom: string;
+    agreedPrice: number;
+    paid: number;
+    outstanding: number;
+    paymentStatus: string;
+  }>;
+};
+
+export function computeDepartureReports({
+  departures,
+  registrations,
+  payments,
+  cashTransactions,
+  commissions,
+  refunds,
+}: {
+  departures: Array<{
+    id: string;
+    departureDate: string;
+    dateLabel: string;
+    packageId: string;
+    package?: { id: string; name: string };
+    airline?: string;
+    status?: string;
+  }>;
+  registrations: Array<any>;
+  payments: Array<any>;
+  cashTransactions: Array<any>;
+  commissions: Array<any>;
+  refunds: Array<any>;
+}): DepartureReportItem[] {
+  return departures.map((dep) => {
+    const depRegs = registrations.filter(
+      (r) => r.departure?.id === dep.id && r.status === "active"
+    );
+    const regIds = new Set(depRegs.map((r) => r.id));
+
+    const validPayments = payments.filter((p) => p.status === "confirmed");
+    let totalPaid = 0;
+    validPayments.forEach((p) => {
+      (p.allocations || []).forEach((alloc: any) => {
+        if (regIds.has(alloc.registrationId)) {
+          totalPaid += alloc.amount;
+        }
+      });
+    });
+
+    const totalRefunded = refunds
+      .filter((rf) => rf.registrationId && regIds.has(rf.registrationId) && rf.status === "confirmed")
+      .reduce((sum, rf) => sum + rf.amount, 0);
+
+    const directExpenses = cashTransactions
+      .filter(
+        (c) =>
+          c.packageId === dep.packageId &&
+          c.direction === "out" &&
+          c.kind !== "refund" &&
+          c.kind !== "commission" &&
+          !c.isReversal
+      )
+      .reduce((sum, c) => sum + c.amount, 0);
+
+    const paidCommissions = commissions
+      .filter((cm) => regIds.has(cm.registrationId) && cm.status === "paid")
+      .reduce((sum, cm) => sum + cm.amount, 0);
+
+    const totalAgreedPrice = depRegs.reduce((sum, r) => sum + (r.agreedPrice || 0), 0);
+    const totalReceivables = depRegs.reduce((sum, r) => sum + (r.payment?.outstanding || 0), 0);
+    const realizedProfit = totalPaid - totalRefunded - directExpenses - paidCommissions;
+
+    const pilgrimList = depRegs.map((r) => ({
+      registrationId: r.id,
+      fullName: r.pilgrim?.fullName || "—",
+      gender: r.pilgrim?.gender || "—",
+      whatsapp: r.pilgrim?.whatsapp || "—",
+      passportNumber: r.pilgrim?.passportNumber || "—",
+      roomType: r.roomType ? r.roomType.charAt(0).toUpperCase() + r.roomType.slice(1) : "Quad",
+      makkahRoom: r.makkahRoomNumber || r.roomNumber || "—",
+      madinahRoom: r.madinahRoomNumber || "—",
+      agreedPrice: r.agreedPrice,
+      paid: r.payment?.netPaid || 0,
+      outstanding: r.payment?.outstanding || 0,
+      paymentStatus: r.payment?.status || "Belum Bayar",
+    }));
+
+    return {
+      departureId: dep.id,
+      departureDate: dep.departureDate,
+      dateLabel: dep.dateLabel,
+      packageId: dep.packageId,
+      packageName: dep.package?.name || "Paket Umrah",
+      airline: dep.airline || "—",
+      totalPilgrims: depRegs.length,
+      totalAgreedPrice,
+      totalReceivables,
+      totalPaid,
+      totalRefunded,
+      directExpenses,
+      paidCommissions,
+      realizedProfit,
+      status: dep.status || "open",
+      pilgrims: pilgrimList,
+    };
+  });
+}
+
