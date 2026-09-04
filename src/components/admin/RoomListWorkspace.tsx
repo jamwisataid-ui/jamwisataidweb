@@ -24,10 +24,11 @@ import { toast } from "sonner";
 
 import {
   ROOM_CAPACITIES,
+  generateDefaultRoomNumber,
   type RoomCity,
   type RoomType,
 } from "@/lib/management/domain";
-import { assignRoomAction, renameRoomAction } from "@/lib/management/actions";
+import { assignRoomAction, batchAssignRoomAction, renameRoomAction } from "@/lib/management/actions";
 import { AdminPageHeader } from "./AdminUi";
 import type { getManagementContext } from "@/lib/management/data";
 
@@ -61,6 +62,13 @@ export function RoomListWorkspace({ data }: { data: Context }) {
     currentRoomNumber: string;
   } | null>(null);
 
+  // Batch room creation modal state
+  const [batchModalOpen, setBatchModalOpen] = useState(false);
+  const [batchRoomType, setBatchRoomType] = useState<RoomType>("quad");
+  const [batchRoomNumber, setBatchRoomNumber] = useState("");
+  const [batchSelectedRegIds, setBatchSelectedRegIds] = useState<string[]>([]);
+  const [batchSelectedPackageId, setBatchSelectedPackageId] = useState<string>("");
+
   // Filter registrations with valid genders & optional departure filter
   const genderRegistrations = useMemo(() => {
     return data.registrations.filter((item) => {
@@ -84,7 +92,7 @@ export function RoomListWorkspace({ data }: { data: Context }) {
   }, [data.accommodations]);
 
   // Build room grouping for the current gender and city
-  const { rooms, unassigned } = useMemo(() => {
+  const { rooms, unassigned, roomsByPackage } = useMemo(() => {
     const roomMap = new Map<
       string,
       {
@@ -92,6 +100,8 @@ export function RoomListWorkspace({ data }: { data: Context }) {
         roomType: RoomType;
         departureId?: string;
         departureName: string;
+        packageId?: string;
+        packageName: string;
         hotelName: string;
         occupants: RegistrationItem[];
       }
@@ -116,7 +126,9 @@ export function RoomListWorkspace({ data }: { data: Context }) {
             roomNumber: roomNum,
             roomType: chosenRoomType,
             departureId: item.booking?.departureId,
-            departureName: item.package?.name ?? "Paket Umroh",
+            departureName: item.departure?.dateLabel ? `${item.departure.dateLabel} (${item.package?.name ?? "Umroh"})` : (item.package?.name ?? "Paket Umroh"),
+            packageId: item.package?.id,
+            packageName: item.package?.name ?? "Paket Umroh",
             hotelName: depHotel,
             occupants: [],
           });
@@ -127,9 +139,22 @@ export function RoomListWorkspace({ data }: { data: Context }) {
       }
     }
 
+    const sortedRooms = Array.from(roomMap.values()).sort((a, b) => a.roomNumber.localeCompare(b.roomNumber));
+
+    // Group rooms by Package
+    const packageGroupMap = new Map<string, { packageName: string; rooms: typeof sortedRooms }>();
+    for (const r of sortedRooms) {
+      const pKey = r.packageName;
+      if (!packageGroupMap.has(pKey)) {
+        packageGroupMap.set(pKey, { packageName: pKey, rooms: [] });
+      }
+      packageGroupMap.get(pKey)!.rooms.push(r);
+    }
+
     return {
-      rooms: Array.from(roomMap.values()).sort((a, b) => a.roomNumber.localeCompare(b.roomNumber)),
+      rooms: sortedRooms,
       unassigned: unassignedList,
+      roomsByPackage: Array.from(packageGroupMap.values()),
     };
   }, [genderRegistrations, activeCity, hotelsByDepartureAndCity]);
 
@@ -145,6 +170,96 @@ export function RoomListWorkspace({ data }: { data: Context }) {
   const totalMen = useMemo(() => data.registrations.filter((r) => r.pilgrim?.gender === "Laki-laki" && r.status === "active").length, [data.registrations]);
   const totalWomen = useMemo(() => data.registrations.filter((r) => r.pilgrim?.gender === "Perempuan" && r.status === "active").length, [data.registrations]);
   const ungendered = useMemo(() => data.registrations.filter((r) => !r.pilgrim?.gender && r.status === "active"), [data.registrations]);
+
+  function openBatchModal() {
+    // Generate suggested room name based on existing rooms count
+    const existingRoomsInCity = rooms.length;
+    const hotel = activeCity === "makkah" ? "Pullman" : "Arkan";
+    const suggested = generateDefaultRoomNumber({
+      city: activeCity,
+      hotelName: hotel,
+      roomType: "quad",
+      roomIndex: existingRoomsInCity + 1,
+    });
+    setBatchRoomNumber(suggested);
+    setBatchRoomType("quad");
+    setBatchSelectedRegIds([]);
+    setBatchSelectedPackageId("");
+    setBatchModalOpen(true);
+  }
+
+  function handleBatchTypeChange(type: RoomType) {
+    setBatchRoomType(type);
+    const hotel = activeCity === "makkah" ? "Pullman" : "Arkan";
+    const suggested = generateDefaultRoomNumber({
+      city: activeCity,
+      hotelName: hotel,
+      roomType: type,
+      roomIndex: rooms.length + 1,
+    });
+    setBatchRoomNumber(suggested);
+    // Trim selected if exceeds capacity
+    const cap = ROOM_CAPACITIES[type] || 4;
+    if (batchSelectedRegIds.length > cap) {
+      setBatchSelectedRegIds((prev) => prev.slice(0, cap));
+    }
+  }
+
+  function toggleBatchPilgrim(reg: RegistrationItem) {
+    const isSelected = batchSelectedRegIds.includes(reg.id);
+    const cap = ROOM_CAPACITIES[batchRoomType] || 4;
+
+    if (isSelected) {
+      const next = batchSelectedRegIds.filter((id) => id !== reg.id);
+      setBatchSelectedRegIds(next);
+      if (next.length === 0) {
+        setBatchSelectedPackageId("");
+      }
+    } else {
+      if (batchSelectedRegIds.length >= cap) {
+        toast.error(`Kamar tipe ${batchRoomType.toUpperCase()} maksimal ${cap} orang.`);
+        return;
+      }
+      const pkgId = reg.package?.id ?? "";
+      if (batchSelectedPackageId && pkgId && pkgId !== batchSelectedPackageId) {
+        toast.error("Tidak bisa memilih jamaah dari paket berbeda dalam satu kamar.");
+        return;
+      }
+      if (pkgId) setBatchSelectedPackageId(pkgId);
+      setBatchSelectedRegIds([...batchSelectedRegIds, reg.id]);
+    }
+  }
+
+  async function handleBatchSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!batchRoomNumber.trim()) {
+      toast.error("Nomor / nama kamar wajib diisi.");
+      return;
+    }
+    if (batchSelectedRegIds.length === 0) {
+      toast.error("Pilih minimal 1 jamaah untuk dimasukkan ke kamar.");
+      return;
+    }
+
+    const fd = new FormData();
+    fd.set("city", activeCity);
+    fd.set("roomType", batchRoomType);
+    fd.set("roomNumber", batchRoomNumber.trim());
+    for (const id of batchSelectedRegIds) {
+      fd.append("registrationIds", id);
+    }
+
+    startTransition(async () => {
+      const res = await batchAssignRoomAction({ ok: false, message: "" }, fd);
+      if (res.ok) {
+        toast.success(res.message);
+        setBatchModalOpen(false);
+        router.refresh();
+      } else {
+        toast.error(res.message);
+      }
+    });
+  }
 
   function toggleRoom(roomNumber: string) {
     setExpandedRooms((prev) => ({
@@ -216,12 +331,7 @@ export function RoomListWorkspace({ data }: { data: Context }) {
       <AdminPageHeader
         eyebrow="OPERASIONAL KAMAR & MANIFEST"
         title="Manifest & Room List"
-        description="Susun kamar Quad (4 orang), Triple (3 orang), atau Double (2 orang). Tampilan besar, rapi, dan terpisah per Hotel Makkah & Madinah."
-        action={
-          data.registrations.length
-            ? { href: "/admin/manajemen/manifest-room-list/baru", label: "+ Atur Kamar Jamaah" }
-            : undefined
-        }
+        description="Susun kamar Quad (4 orang), Triple (3 orang), atau Double (2 orang). Tampilan terstruktur rapi per paket & terpisah per Hotel Makkah & Madinah."
       />
 
       {ungendered.length > 0 && (
@@ -313,8 +423,17 @@ export function RoomListWorkspace({ data }: { data: Context }) {
             <div>
               <span className="roomlist-tag-warn">BELUM MASUK KAMAR</span>
               <h3>Ada {unassigned.length} Jamaah {activeGender} belum dapat kamar di {activeCity === "makkah" ? "Makkah" : "Madinah"}</h3>
-              <p>Pilih kamar yang sudah ada langsung di kartu kamar di bawah, atau klik tombol &ldquo;Atur Kamar&rdquo;.</p>
+              <p>Pilih kamar yang sudah ada langsung di kartu kamar di bawah, atau buat kamar baru dengan mencentang jamaah.</p>
             </div>
+            <button
+              type="button"
+              onClick={openBatchModal}
+              className="roomlist-new-room-btn"
+              style={{ background: "#bd8d1b", color: "#fff" }}
+            >
+              <Plus className="size-4" />
+              <span>+ Buat Kamar Baru (Pilih Jamaah)</span>
+            </button>
           </header>
 
           <div className="roomlist-unassigned-grid">
@@ -356,13 +475,16 @@ export function RoomListWorkspace({ data }: { data: Context }) {
               {rooms.length} Kamar Jamaah {activeGender} ({activeCity === "makkah" ? "Hotel Makkah" : "Hotel Madinah"})
             </h2>
           </div>
-          <Link
-            href="/admin/manajemen/manifest-room-list/baru"
-            className="roomlist-new-room-btn"
-          >
-            <Plus className="size-4" />
-            <span>+ Atur Kamar Baru</span>
-          </Link>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <button
+              type="button"
+              onClick={openBatchModal}
+              className="roomlist-new-room-btn"
+            >
+              <Plus className="size-4" />
+              <span>+ Buat Kamar Baru (Pilih Jamaah)</span>
+            </button>
+          </div>
         </header>
 
         {rooms.length === 0 ? (
@@ -370,125 +492,138 @@ export function RoomListWorkspace({ data }: { data: Context }) {
             <BedSingle className="size-10 text-stone-400" />
             <h3>Belum ada pembagian kamar di {activeCity === "makkah" ? "Makkah" : "Madinah"}</h3>
             <p>
-              Seluruh jamaah {activeGender.toLowerCase()} belum ditempatkan ke nomor kamar. Klik tombol &ldquo;Atur Kamar Baru&rdquo; di atas untuk mulai menyusun kamar.
+              Seluruh jamaah {activeGender.toLowerCase()} belum ditempatkan ke nomor kamar. Klik tombol &ldquo;+ Buat Kamar Baru&rdquo; di atas untuk mulai menyusun kamar secara berkelompok.
             </p>
           </div>
         ) : (
-          <div className="roomlist-cards-grid">
-            {rooms.map((room) => {
-              const capacity = ROOM_CAPACITIES[room.roomType] || 4;
-              const filledCount = room.occupants.length;
-              const isFull = filledCount >= capacity;
-              const remaining = Math.max(0, capacity - filledCount);
-              const open = isExpanded(room.roomNumber);
-
-              return (
-                <article
-                  key={room.roomNumber}
-                  className={`roomlist-card ${isFull ? "room-full" : "room-available"}`}
-                >
-                  {/* CARD HEADER (CLICKABLE ACCORDION) */}
-                  <div
-                    className="roomlist-card-header"
-                    onClick={() => toggleRoom(room.roomNumber)}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <div className="roomlist-card-title-group">
-                      <span className="roomlist-accordion-arrow">
-                        {open ? <ChevronDown className="size-5" /> : <ChevronRight className="size-5" />}
-                      </span>
-                      <div>
-                        <div className="roomlist-title-row">
-                          <h3 className="roomlist-room-title">{room.roomNumber}</h3>
-                          <span className={`roomlist-status-pill ${isFull ? "pill-full" : "pill-open"}`}>
-                            {isFull ? `Penuh (${filledCount}/${capacity})` : `Tersedia ${remaining} Slot (${filledCount}/${capacity})`}
-                          </span>
-                        </div>
-                        <p className="roomlist-meta-sub">
-                          Tipe: <strong>{room.roomType.toUpperCase()} ({capacity} Orang)</strong> · {room.hotelName} · {room.departureName}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="roomlist-header-action" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        type="button"
-                        onClick={() => setRenameModal({
-                          currentRoomNumber: room.roomNumber,
-                          city: activeCity,
-                          departureId: room.departureId,
-                        })}
-                        className="roomlist-edit-room-link roomlist-action-inline-btn"
-                        title="Ubah nama nomor kamar ini langsung untuk semua jamaah di dalamnya"
-                      >
-                        <Edit3 className="size-3.5" />
-                        <span>Edit Nama Kamar</span>
-                      </button>
-                    </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+            {roomsByPackage.map((pkgGroup) => (
+              <div key={pkgGroup.packageName} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                {roomsByPackage.length > 1 && (
+                  <div style={{ padding: "8px 14px", background: "#f1f5f9", borderRadius: "8px", borderLeft: "4px solid #bd8d1b", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <strong style={{ color: "#0f172a", fontSize: "15px" }}>{pkgGroup.packageName}</strong>
+                    <span style={{ fontSize: "12px", color: "#64748b", fontWeight: 600 }}>{pkgGroup.rooms.length} Kamar</span>
                   </div>
+                )}
+                <div className="roomlist-cards-grid">
+                  {pkgGroup.rooms.map((room) => {
+                    const capacity = ROOM_CAPACITIES[room.roomType] || 4;
+                    const filledCount = room.occupants.length;
+                    const isFull = filledCount >= capacity;
+                    const remaining = Math.max(0, capacity - filledCount);
+                    const open = isExpanded(room.roomNumber);
 
-                  {/* CARD BODY: COLLAPSIBLE LIST OF OCCUPANTS */}
-                  {open && (
-                    <div className="roomlist-card-body">
-                      <ul className="roomlist-occupants-list">
-                        {room.occupants.map((occupant, idx) => (
-                          <li key={occupant.id} className="roomlist-occupant-row">
-                            <div className="occupant-left">
-                              <span className="occupant-slot-num">{idx + 1}</span>
-                              <div className="occupant-details">
-                                <strong className="occupant-name">{occupant.pilgrim?.fullName}</strong>
-                                <small className="occupant-sub">
-                                  Paspor: {occupant.pilgrim?.passportNumber || "Belum ada"} · WhatsApp: {occupant.pilgrim?.whatsapp || "—"}
-                                </small>
-                              </div>
-                            </div>
-                            <div className="occupant-right">
-                              <button
-                                type="button"
-                                onClick={() => setMoveModal({
-                                  registration: occupant,
-                                  currentRoomNumber: room.roomNumber,
-                                })}
-                                className="occupant-move-btn roomlist-action-inline-btn"
-                              >
-                                <ArrowRightLeft className="size-3 mr-1" />
-                                <span>Pindah Kamar</span>
-                              </button>
-                            </div>
-                          </li>
-                        ))}
-
-                        {/* EMPTY SLOTS INDICATOR */}
-                        {Array.from({ length: remaining }).map((_, slotIdx) => (
-                          <li key={`empty-${slotIdx}`} className="roomlist-empty-slot">
-                            <span className="occupant-slot-num empty">{filledCount + slotIdx + 1}</span>
-                            <span className="empty-slot-text">
-                              Slot Kosong ({room.roomType.toUpperCase()}) — Masih muat 1 jamaah lagi
+                    return (
+                      <article
+                        key={room.roomNumber}
+                        className={`roomlist-card ${isFull ? "room-full" : "room-available"}`}
+                      >
+                        {/* CARD HEADER (CLICKABLE ACCORDION) */}
+                        <div
+                          className="roomlist-card-header"
+                          onClick={() => toggleRoom(room.roomNumber)}
+                          role="button"
+                          tabIndex={0}
+                        >
+                          <div className="roomlist-card-title-group">
+                            <span className="roomlist-accordion-arrow">
+                              {open ? <ChevronDown className="size-5" /> : <ChevronRight className="size-5" />}
                             </span>
+                            <div>
+                              <div className="roomlist-title-row">
+                                <h3 className="roomlist-room-title">{room.roomNumber}</h3>
+                                <span className={`roomlist-status-pill ${isFull ? "pill-full" : "pill-open"}`}>
+                                  {isFull ? `Penuh (${filledCount}/${capacity})` : `Tersedia ${remaining} Slot (${filledCount}/${capacity})`}
+                                </span>
+                              </div>
+                              <p className="roomlist-meta-sub">
+                                Tipe: <strong>{room.roomType.toUpperCase()} ({capacity} Orang)</strong> · {room.hotelName} · {room.departureName}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="roomlist-header-action" onClick={(e) => e.stopPropagation()}>
                             <button
                               type="button"
-                              onClick={() => setAssignModal({
-                                targetRoomNumber: room.roomNumber,
-                                targetRoomType: room.roomType,
+                              onClick={() => setRenameModal({
+                                currentRoomNumber: room.roomNumber,
+                                city: activeCity,
                                 departureId: room.departureId,
                               })}
-                              className="occupant-add-btn roomlist-action-inline-btn"
+                              className="roomlist-edit-room-link roomlist-action-inline-btn"
+                              title="Ubah nama nomor kamar ini langsung untuk semua jamaah di dalamnya"
                             >
-                              <UserPlus className="size-3.5" />
-                              <span>Isi Slot</span>
+                              <Edit3 className="size-3.5" />
+                              <span>Edit Nama Kamar</span>
                             </button>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </article>
-              );
-            })}
+                          </div>
+                        </div>
+
+                        {/* CARD BODY: COLLAPSIBLE LIST OF OCCUPANTS */}
+                        {open && (
+                          <div className="roomlist-card-body">
+                            <ul className="roomlist-occupants-list">
+                              {room.occupants.map((occupant, idx) => (
+                                <li key={occupant.id} className="roomlist-occupant-row">
+                                  <div className="occupant-left">
+                                    <span className="occupant-slot-num">{idx + 1}</span>
+                                    <div className="occupant-details">
+                                      <strong className="occupant-name">{occupant.pilgrim?.fullName}</strong>
+                                      <small className="occupant-sub">
+                                        Paspor: {occupant.pilgrim?.passportNumber || "Belum ada"} · WhatsApp: {occupant.pilgrim?.whatsapp || "—"}
+                                      </small>
+                                    </div>
+                                  </div>
+                                  <div className="occupant-right">
+                                    <button
+                                      type="button"
+                                      onClick={() => setMoveModal({
+                                        registration: occupant,
+                                        currentRoomNumber: room.roomNumber,
+                                      })}
+                                      className="occupant-move-btn roomlist-action-inline-btn"
+                                    >
+                                      <ArrowRightLeft className="size-3 mr-1" />
+                                      <span>Pindah Kamar</span>
+                                    </button>
+                                  </div>
+                                </li>
+                              ))}
+
+                              {/* EMPTY SLOTS INDICATOR */}
+                              {Array.from({ length: remaining }).map((_, slotIdx) => (
+                                <li key={`empty-${slotIdx}`} className="roomlist-empty-slot">
+                                  <span className="occupant-slot-num empty">{filledCount + slotIdx + 1}</span>
+                                  <span className="empty-slot-text">
+                                    Slot Kosong ({room.roomType.toUpperCase()}) — Masih muat 1 jamaah lagi
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setAssignModal({
+                                      targetRoomNumber: room.roomNumber,
+                                      targetRoomType: room.roomType,
+                                      departureId: room.departureId,
+                                    })}
+                                    className="occupant-add-btn roomlist-action-inline-btn"
+                                  >
+                                    <UserPlus className="size-3.5" />
+                                    <span>Isi Slot</span>
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </section>
+
 
       {/* DIALOG 1: EDIT / GANTI NAMA KAMAR */}
       {renameModal && (
@@ -761,6 +896,147 @@ export function RoomListWorkspace({ data }: { data: Context }) {
                   disabled={isPending}
                 >
                   {isPending ? "Menyimpan..." : "Simpan Kamar"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* DIALOG 4: BUAT KAMAR BARU SECARA BATCH (PILIH JAMAAH DENGAN CHECKBOX) */}
+      {batchModalOpen && (
+        <div className="roomlist-modal-backdrop" onClick={() => !isPending && setBatchModalOpen(false)}>
+          <div className="roomlist-modal-box" style={{ maxWidth: "560px" }} onClick={(e) => e.stopPropagation()}>
+            <div className="roomlist-modal-header">
+              <div>
+                <h3 style={{ margin: 0 }}>Buat Kamar Baru ({activeCity === "makkah" ? "Makkah" : "Madinah"})</h3>
+                <small style={{ color: "#64748b" }}>
+                  Khusus jamaah <strong>{activeGender}</strong> · Pilih beberapa jamaah sekaligus dengan centang.
+                </small>
+              </div>
+              <button
+                type="button"
+                className="roomlist-modal-close-btn"
+                onClick={() => setBatchModalOpen(false)}
+                disabled={isPending}
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleBatchSubmit}>
+              <div className="roomlist-modal-body" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <div className="roomlist-modal-field">
+                    <label htmlFor="batchRoomType">Tipe Kamar *</label>
+                    <select
+                      id="batchRoomType"
+                      value={batchRoomType}
+                      onChange={(e) => handleBatchTypeChange(e.target.value as RoomType)}
+                    >
+                      <option value="quad">Quad (Maks 4 Orang)</option>
+                      <option value="triple">Triple (Maks 3 Orang)</option>
+                      <option value="double">Double (Maks 2 Orang)</option>
+                    </select>
+                  </div>
+
+                  <div className="roomlist-modal-field">
+                    <label htmlFor="batchRoomNumber">Nomor / Nama Kamar *</label>
+                    <input
+                      id="batchRoomNumber"
+                      value={batchRoomNumber}
+                      onChange={(e) => setBatchRoomNumber(e.target.value)}
+                      placeholder="Contoh: MKH-Pullman-Quad-01"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #e2e8f0", paddingBottom: "8px" }}>
+                  <span style={{ fontSize: "13px", fontWeight: 700, color: "#1e293b" }}>
+                    Pilih Jamaah Belum Dapat Kamar:
+                  </span>
+                  <span style={{ fontSize: "12px", fontWeight: 600, color: batchSelectedRegIds.length === (ROOM_CAPACITIES[batchRoomType] || 4) ? "#16a34a" : "#b45309" }}>
+                    {batchSelectedRegIds.length} / {ROOM_CAPACITIES[batchRoomType] || 4} orang dipilih
+                  </span>
+                </div>
+
+                {unassigned.length === 0 ? (
+                  <div style={{ padding: "20px", textAlign: "center", background: "#f8fafc", borderRadius: "8px" }}>
+                    <p style={{ margin: 0, color: "#64748b", fontSize: "13px" }}>
+                      Tidak ada jamaah {activeGender.toLowerCase()} yang belum mendapat kamar di {activeCity === "makkah" ? "Makkah" : "Madinah"}.
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxHeight: "280px", overflowY: "auto", paddingRight: "4px" }}>
+                    {unassigned.map((reg) => {
+                      const isChecked = batchSelectedRegIds.includes(reg.id);
+                      const regPkgId = reg.package?.id ?? "";
+                      const isLockedOut = batchSelectedPackageId !== "" && regPkgId !== "" && regPkgId !== batchSelectedPackageId;
+                      const capReached = !isChecked && batchSelectedRegIds.length >= (ROOM_CAPACITIES[batchRoomType] || 4);
+                      const disabled = isLockedOut || capReached;
+
+                      return (
+                        <label
+                          key={reg.id}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            padding: "8px 12px",
+                            borderRadius: "8px",
+                            border: isChecked ? "1.5px solid #bd8d1b" : "1px solid #e2e8f0",
+                            background: isChecked ? "#fffdf5" : disabled ? "#f8fafc" : "#fff",
+                            opacity: disabled ? 0.5 : 1,
+                            cursor: disabled ? "not-allowed" : "pointer",
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            disabled={disabled}
+                            onChange={() => toggleBatchPilgrim(reg)}
+                            style={{ width: "16px", height: "16px", accentColor: "#bd8d1b" }}
+                          />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                              <strong style={{ fontSize: "14px", color: "#1e293b" }}>{reg.pilgrim?.fullName}</strong>
+                              <span style={{ fontSize: "11px", fontWeight: 700, color: "#bd8d1b" }}>
+                                {(reg.roomType || "quad").toUpperCase()}
+                              </span>
+                            </div>
+                            <small style={{ color: "#64748b", fontSize: "11px", display: "block" }}>
+                              {reg.package?.name ?? "Paket Umroh"} · Paspor: {reg.pilgrim?.passportNumber || "—"}
+                            </small>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {batchSelectedPackageId && (
+                  <small style={{ fontSize: "11px", color: "#0284c7" }}>
+                    ℹ️ Mengunci pilihan pada jamaah dari paket yang sama untuk menjaga keseragaman rombongan.
+                  </small>
+                )}
+              </div>
+
+              <div className="roomlist-modal-actions">
+                <button
+                  type="button"
+                  className="roomlist-btn-secondary"
+                  onClick={() => setBatchModalOpen(false)}
+                  disabled={isPending}
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="roomlist-btn-primary"
+                  disabled={isPending || batchSelectedRegIds.length === 0}
+                >
+                  {isPending ? "Menyimpan Kamar..." : `Buat Kamar (${batchSelectedRegIds.length} Jamaah)`}
                 </button>
               </div>
             </form>

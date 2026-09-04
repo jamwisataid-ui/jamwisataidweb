@@ -3,7 +3,7 @@ import { AlertTriangle, ArrowRight, Banknote, Boxes, CakeSlice, CheckCircle2, Cl
 
 import type { getManagementContext } from "@/lib/management/data";
 import { DEFAULT_BIRTHDAY_MESSAGE, rupiah } from "@/lib/management/domain";
-import { InitializeManagementButton, ManagementSettingsForm } from "./ManagementForms";
+import { InitializeManagementButton, ManagementSettingsForm, ReportInclusionToggleForm } from "./ManagementForms";
 import { AdminPageHeader } from "./AdminUi";
 import { CsvImportForm } from "./CsvImportForm";
 import { DeleteButton } from "./DeleteButton";
@@ -216,6 +216,117 @@ function Reports({ data }: { data: Context }) {
               ))}
             </tbody>
           </table>
+        </div>
+      </section>
+
+      {/* KELOLA PENGECUALIAN DATA LAPORAN (DATA TESTING) */}
+      <section className="management-panel">
+        <header>
+          <div>
+            <small>DATA TESTING & FILTER LAPORAN</small>
+            <h2>Kelola Transaksi Laporan (Kecualikan Data Testing)</h2>
+            <p>
+              Kecualikan transaksi percobaan/testing langsung dari Pusat Laporan tanpa perlu menghapus riwayatnya. Data yang dikecualikan tidak akan mempengaruhi saldo kas, penerimaan, dan piutang.
+            </p>
+          </div>
+        </header>
+
+        <div style={{ display: "grid", gap: "20px" }}>
+          <div>
+            <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#1e293b", marginBottom: "8px" }}>
+              Transaksi Pembayaran Jamaah ({data.payments.length})
+            </h3>
+            {data.payments.length ? (
+              <div className="management-table-wrap">
+                <table className="management-table">
+                  <thead>
+                    <tr>
+                      <th>Tanggal</th>
+                      <th>Booking & Pembayar</th>
+                      <th>Nominal</th>
+                      <th>Status Laporan</th>
+                      <th>Aksi Cepat</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.payments.slice(0, 50).map((item) => {
+                      const isIncluded = item.isIncludedInReports !== false;
+                      return (
+                        <tr key={item.id}>
+                          <td><DateText value={item.paidAt} /></td>
+                          <td>
+                            <strong>{item.booking?.bookingNumber ?? "—"}</strong>
+                            <small>{item.booking?.payerName} · {item.method}</small>
+                          </td>
+                          <td><strong>{rupiah(item.amount)}</strong></td>
+                          <td>
+                            <Status tone={isIncluded ? "good" : "neutral"}>
+                              {isIncluded ? "Masuk Laporan" : "Dikecualikan (Testing)"}
+                            </Status>
+                          </td>
+                          <td>
+                            <ReportInclusionToggleForm entity="payment" id={item.id} isIncluded={isIncluded} />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <Empty>Belum ada data pembayaran.</Empty>
+            )}
+          </div>
+
+          <div>
+            <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#1e293b", marginBottom: "8px" }}>
+              Transaksi Kas Masuk / Keluar Mandiri ({data.cashTransactions.filter((c) => !c.paymentId).length})
+            </h3>
+            {data.cashTransactions.filter((c) => !c.paymentId).length ? (
+              <div className="management-table-wrap">
+                <table className="management-table">
+                  <thead>
+                    <tr>
+                      <th>Tanggal</th>
+                      <th>Keterangan</th>
+                      <th>Jenis & Nominal</th>
+                      <th>Status Laporan</th>
+                      <th>Aksi Cepat</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.cashTransactions
+                      .filter((c) => !c.paymentId)
+                      .slice(0, 50)
+                      .map((item) => {
+                        const isIncluded = (item as any).isIncludedInReports !== false;
+                        return (
+                          <tr key={item.id}>
+                            <td><DateText value={item.transactionAt} /></td>
+                            <td><strong>{item.description}</strong></td>
+                            <td>
+                              <span style={{ fontWeight: 600, color: item.direction === "in" ? "#166534" : "#991b1b" }}>
+                                {item.direction === "in" ? "+ " : "- "}{rupiah(item.amount)}
+                              </span>
+                            </td>
+                            <td>
+                              <Status tone={isIncluded ? "good" : "neutral"}>
+                                {isIncluded ? "Masuk Laporan" : "Dikecualikan (Testing)"}
+                              </Status>
+                            </td>
+                            <td>
+                              <ReportInclusionToggleForm entity="cash_transaction" id={item.id} isIncluded={isIncluded} />
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <Empty>Belum ada data transaksi kas non-pembayaran.</Empty>
+            )}
+          </div>
         </div>
       </section>
 

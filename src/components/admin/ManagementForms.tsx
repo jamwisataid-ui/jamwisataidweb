@@ -29,7 +29,7 @@ import {
   updateAgentAction,
   updatePilgrimAction,
 } from "@/lib/management/actions";
-import { formatDocumentNumber, rupiah } from "@/lib/management/domain";
+import { formatDocumentNumber, generateDefaultRoomNumber, rupiah } from "@/lib/management/domain";
 import type { ManagementActionState } from "@/lib/management/validation";
 
 const managementInitialState: ManagementActionState = { ok: false, message: "" };
@@ -495,6 +495,18 @@ export function RoomListForm({
     });
   }, [registrations, city, selectedRegId, selectedReg?.gender]);
 
+  function suggestRoomNumber() {
+    const hotel = city === "makkah" ? "Pullman" : "Arkan";
+    const nextIdx = existingRoomsInCity.length + 1;
+    const suggested = generateDefaultRoomNumber({
+      city,
+      hotelName: hotel,
+      roomType: (roomType as "quad" | "triple" | "double") || "quad",
+      roomIndex: nextIdx,
+    });
+    setRoomNumber(suggested);
+  }
+
   return (
     <form action={action} className="management-form">
       <Feedback state={state} />
@@ -502,12 +514,17 @@ export function RoomListForm({
         <label>
           <span>Pilih Jamaah *</span>
           <select name="registrationId" value={selectedRegId} onChange={(e) => onSelectRegistration(e.target.value)} required>
-            {registrations.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.pilgrimName} · {item.gender || "jenis kelamin belum diisi"} · {item.packageName}
-              </option>
-            ))}
+            {registrations.map((item) => {
+              const assignedRoom = city === "madinah" ? item.madinahRoomNumber : (item.makkahRoomNumber || item.roomNumber);
+              const statusTag = assignedRoom ? `[Kamar: ${assignedRoom}]` : `[BELUM ADA KAMAR]`;
+              return (
+                <option key={item.id} value={item.id}>
+                  {statusTag} {item.pilgrimName} ({item.gender || "Jenis Kelamin ?"}) · {item.packageName}
+                </option>
+              );
+            })}
           </select>
+          <small>Menampilkan status penempatan jamaah di {city === "makkah" ? "Hotel Makkah" : "Hotel Madinah"}.</small>
         </label>
         <label>
           <span>Lokasi Hotel / Kota *</span>
@@ -525,12 +542,30 @@ export function RoomListForm({
           </select>
         </label>
         <label>
-          <span>Nomor / Nama Kamar * (Wajib Diisi)</span>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span>Nomor / Nama Kamar * (Wajib Diisi)</span>
+            <button
+              type="button"
+              onClick={suggestRoomNumber}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#b45309",
+                fontSize: "12px",
+                fontWeight: 600,
+                textDecoration: "underline",
+                cursor: "pointer",
+                padding: 0,
+              }}
+            >
+              + Buat Format Otomatis
+            </button>
+          </div>
           <input
             name="roomNumber"
             value={roomNumber}
             onChange={(e) => setRoomNumber(e.target.value)}
-            placeholder="Ketik baru atau pilih kamar yang sudah ada..."
+            placeholder="Contoh: MKH-Pullman-Quad-01 atau Kamar 401..."
             list="existing-rooms-list"
             required
           />
@@ -568,7 +603,7 @@ export function RoomListForm({
               ))}
             </div>
           )}
-          <small>Nama kamar fisik hotel. Bisa pilih dari kamar yang sudah ada di atas atau ketik nama baru.</small>
+          <small>Nama kamar fisik hotel. Bisa pilih dari kamar yang sudah ada di atas atau klik &ldquo;Buat Format Otomatis&rdquo;.</small>
         </label>
       </div>
       <p className="management-form-note">

@@ -689,6 +689,28 @@ export async function assignRoomAction(_state: ManagementActionState, formData: 
         const occupantBooking = await tx.query.bookings.findFirst({ where: eq(bookings.id, occupant.bookingId) });
         if (occupantBooking?.departureId === booking.departureId) relevantRoom.push(occupant);
       }
+      const regPackageMap = new Map<string, string>();
+      async function getRegPackageId(reg: { id: string; bookingId: string } | null | undefined) {
+        if (!reg) return "";
+        if (regPackageMap.has(reg.id)) return regPackageMap.get(reg.id)!;
+        const b = await tx.query.bookings.findFirst({ where: eq(bookings.id, reg.bookingId) });
+        if (!b) return "";
+        const dep = await tx.query.departures.findFirst({ where: eq(departures.id, b.departureId) });
+        const pkgId = dep?.packageId ?? "";
+        regPackageMap.set(reg.id, pkgId);
+        return pkgId;
+      }
+
+      const currentPkgId = await getRegPackageId(registration);
+
+      // Enforce: beda paket jangan sampai bisa 1 kamar
+      for (const occupant of relevantRoom) {
+        const occPkgId = await getRegPackageId(occupant);
+        if (occPkgId && currentPkgId && occPkgId !== currentPkgId) {
+          throw new Error(`Kamar ${roomNumber} sudah ditempati jamaah dari paket berbeda. Jamaah beda paket tidak boleh disatukan dalam 1 kamar.`);
+        }
+      }
+
       const conflictingType = relevantRoom.find((occupant) => occupant.roomType && occupant.roomType !== roomType);
       if (conflictingType) throw new Error(`Kamar ${roomNumber} sudah terdaftar sebagai tipe ${conflictingType.roomType}.`);
       if (relevantRoom.length >= capacities[roomType]) {
@@ -715,16 +737,150 @@ export async function assignRoomAction(_state: ManagementActionState, formData: 
       await tx.update(registrations).set(updateData).where(eq(registrations.id, registration.id));
       await tx.insert(auditLogs).values({
         actorId: session.user.id,
-        action: "assign-room",
+        action: "assign_room",
         entityType: "registration",
         entityId: registration.id,
-        summary: `${pilgrim.fullName} ditempatkan di kamar ${city === "makkah" ? "Makkah" : "Madinah"} ${roomNumber} (${roomType})`,
+        summary: `Menempatkan ${pilgrim.fullName} ke kamar ${roomNumber} (${roomType.toUpperCase()}) di ${city === "makkah" ? "Hotel Makkah" : "Hotel Madinah"}`,
       });
     });
     refresh();
     return { ok: true, message: "Room List berhasil diperbarui.", redirectTo: `/admin/manajemen/manifest-room-list?tab=${city}` };
   } catch (error) { return failure(error); }
 }
+
+export async function batchAssignRoomAction(
+  _state: ManagementActionState,
+  formData: FormData
+): Promise<ManagementActionState> {
+  const city = String(formData.get("city") ?? "makkah").toLowerCase() as "makkah" | "madinah";
+  const roomType = String(formData.get("roomType") ?? "quad").toLowerCase() as "quad" | "triple" | "double";
+  const roomNumber = String(formData.get("roomNumber") ?? "").trim();
+  const registrationIds = formData.getAll("registrationIds").map(String).filter(Boolean);
+
+  const capacities: Record<string, number> = { double: 2, triple: 3, quad: 4 };
+  const capacity = capacities[roomType] || 4;
+
+  if (!roomNumber) {
+    return { ok: false, message: "Nomor / nama kamar wajib diisi." };
+  }
+  if (registrationIds.length === 0) {
+    return { ok: false, message: "Pilih minimal satu jamaah untuk dimasukkan ke kamar." };
+  }
+  if (registrationIds.length > capacity) {
+    return {
+      ok: false,
+      message: `Jumlah jamaah yang dipilih (${registrationIds.length}) melebihi kapasitas kamar tipe ${roomType.toUpperCase()} (maksimal ${capacity} orang).`,
+    };
+  }
+
+  try {
+    const session = await requireAdminSession();
+    await withManagementTransaction(async (tx) => {
+      // Fetch registrations
+      const regRows = await tx.select().from(registrations).where(inArray(registrations.id, registrationIds));
+      if (regRows.length !== registrationIds.length) {
+        throw new Error("Sebagian data pendaftaran jamaah tidak ditemukan.");
+      }
+
+      async function getRegPackageId(bId: string) {
+        const b = await tx.query.bookings.findFirst({ where: eq(bookings.id, bId) });
+        if (!b) return "";
+        const dep = await tx.query.departures.findFirst({ where: eq(departures.id, b.departureId) });
+        return dep?.packageId ?? "";
+      }
+
+      // Check all pilgrims gender and package
+      let expectedGender: string | null = null;
+      let expectedPackageId: string | null = null;
+      const pilgrimNames: string[] = [];
+
+      for (const reg of regRows) {
+        const p = await tx.query.pilgrims.findFirst({ where: eq(pilgrims.id, reg.pilgrimId) });
+        if (!p?.gender) {
+          throw new Error(`Jenis kelamin jamaah ${p?.fullName ?? "jamaah"} belum diisi di profil.`);
+        }
+        if (!expectedGender) {
+          expectedGender = p.gender;
+        } else if (expectedGender !== p.gender) {
+          throw new Error("Jamaah laki-laki dan perempuan tidak boleh disatukan dalam satu kamar.");
+        }
+
+        const pkgId = await getRegPackageId(reg.bookingId);
+        if (!expectedPackageId) {
+          expectedPackageId = pkgId;
+        } else if (pkgId && expectedPackageId !== pkgId) {
+          throw new Error("Jamaah dari paket berbeda tidak boleh disatukan dalam satu kamar.");
+        }
+        pilgrimNames.push(p.fullName);
+      }
+
+      // Check existing occupants of target room
+      const cityColumn = city === "madinah" ? registrations.madinahRoomNumber : registrations.makkahRoomNumber;
+      const sameRoomCity = await tx.select().from(registrations).where(and(eq(cityColumn, roomNumber), eq(registrations.status, "active")));
+      const sameRoomLegacy = await tx.select().from(registrations).where(and(eq(registrations.roomNumber, roomNumber), eq(registrations.status, "active")));
+      const allExisting = Array.from(new Map([...sameRoomCity, ...sameRoomLegacy].map((row) => [row.id, row])).values());
+
+      // Filter out any of the newly selected registrations in case of reassignment
+      const externalExisting = allExisting.filter((occ) => !registrationIds.includes(occ.id));
+
+      // Validate capacity with existing occupants
+      if (externalExisting.length + registrationIds.length > capacity) {
+        throw new Error(
+          `Kamar ${roomNumber} sudah berisi ${externalExisting.length} orang. Tidak muat untuk menambah ${registrationIds.length} orang lagi (kapasitas tipe ${roomType.toUpperCase()} maksimal ${capacity} orang).`
+        );
+      }
+
+      // Check conflicting room type or gender with existing occupants
+      for (const occ of externalExisting) {
+        if (occ.roomType && occ.roomType !== roomType) {
+          throw new Error(`Kamar ${roomNumber} sudah terdaftar dengan tipe ${occ.roomType.toUpperCase()}.`);
+        }
+        const occPkgId = await getRegPackageId(occ.bookingId);
+        if (occPkgId && expectedPackageId && occPkgId !== expectedPackageId) {
+          throw new Error(`Kamar ${roomNumber} sudah ditempati jamaah dari paket berbeda.`);
+        }
+        const occP = await tx.query.pilgrims.findFirst({ where: eq(pilgrims.id, occ.pilgrimId) });
+        if (occP?.gender && occP.gender !== expectedGender) {
+          throw new Error(`Kamar ${roomNumber} sudah ditempati jamaah ${occP.gender.toLowerCase()}.`);
+        }
+      }
+
+      // Perform update for all selected registrations
+      const updateData: Partial<typeof registrations.$inferInsert> = {
+        roomType,
+        roomNumber,
+        updatedAt: new Date(),
+      };
+      if (city === "madinah") {
+        updateData.madinahRoomNumber = roomNumber;
+      } else {
+        updateData.makkahRoomNumber = roomNumber;
+      }
+
+      for (const reg of regRows) {
+        await tx.update(registrations).set(updateData).where(eq(registrations.id, reg.id));
+      }
+
+      await tx.insert(auditLogs).values({
+        actorId: session.user.id,
+        action: "batch-assign-room",
+        entityType: "registration",
+        entityId: regRows[0].id,
+        summary: `${registrationIds.length} jamaah (${pilgrimNames.join(", ")}) dimasukkan ke kamar ${city === "makkah" ? "Makkah" : "Madinah"} ${roomNumber} (${roomType})`,
+      });
+    });
+
+    refresh();
+    return {
+      ok: true,
+      message: `Kamar ${roomNumber} berhasil disimpan untuk ${registrationIds.length} jamaah.`,
+      redirectTo: `/admin/manajemen/manifest-room-list?tab=${city}`,
+    };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
 
 export async function renameRoomAction(stateOrFormData: ManagementActionState | FormData, maybeFormData?: FormData): Promise<ManagementActionState> {
   const formData = maybeFormData instanceof FormData ? maybeFormData : (stateOrFormData as FormData);
