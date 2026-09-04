@@ -3048,3 +3048,167 @@
   }
 }
 
+/* Modal Dialog Styles for Room List Actions */
+.roomlist-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 42, 76, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+  animation: roomlistFadeIn 0.15s ease-out;
+}
+
+@keyframes roomlistFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.roomlist-modal-box {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ebe6dc;
+  display: flex;
+  flex-direction: column;
+}
+
+.roomlist-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f0eae1;
+  background: #fbf9f5;
+  border-radius: 16px 16px 0 0;
+}
+
+.roomlist-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #173251;
+  font-weight: 800;
+}
+
+.roomlist-modal-close-btn {
+  background: transparent;
+  border: none;
+  color: #8c7853;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.roomlist-modal-close-btn:hover {
+  background: #f0eae1;
+  color: #173251;
+}
+
+.roomlist-modal-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.roomlist-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.roomlist-modal-field label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1b385a;
+}
+
+.roomlist-modal-field input,
+.roomlist-modal-field select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #dcd3c3;
+  font-size: 14px;
+  color: #142a45;
+  background: #ffffff;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.roomlist-modal-field input:focus,
+.roomlist-modal-field select:focus {
+  border-color: #bd8d1b;
+  box-shadow: 0 0 0 3px rgba(189, 141, 27, 0.15);
+}
+
+.roomlist-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  background: #fcfbf9;
+  border-top: 1px solid #f0eae1;
+  border-radius: 0 0 16px 16px;
+}
+
+.roomlist-btn-secondary {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid #d4cbba;
+  background: #ffffff;
+  color: #4b5869;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.roomlist-btn-secondary:hover {
+  background: #f5f0e6;
+  color: #173251;
+}
+
+.roomlist-btn-primary {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background: #bd8d1b;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.roomlist-btn-primary:hover:not(:disabled) {
+  background: #a67914;
+}
+
+.roomlist-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.roomlist-action-inline-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+

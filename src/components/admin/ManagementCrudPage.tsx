@@ -163,7 +163,7 @@ export function ManagementDetailPage({ module, id, data }: { module: string; id:
   }
   if (module === "manifest-room-list") {
     const item = data.registrations.find((row) => row.id === id); if (!item) return null;
-    return <><AdminPageHeader eyebrow="ATUR ROOM LIST" title={item.pilgrim?.fullName ?? "Jamaah"} description={`${item.package?.name ?? "Paket"} · ${item.pilgrim?.gender ?? "Jenis kelamin belum diisi"}`} backHref={backHref} /><Panel title="Penempatan kamar"><RoomListForm defaultRegistrationId={item.id} defaultRoomType={item.roomType ?? "quad"} registrations={[{ id: item.id, pilgrimName: item.pilgrim?.fullName ?? "Jamaah", gender: item.pilgrim?.gender ?? null, packageName: item.package?.name ?? "Paket", roomType: item.roomType, makkahRoomNumber: item.makkahRoomNumber, madinahRoomNumber: item.madinahRoomNumber, roomNumber: item.roomNumber }]} /></Panel></>;
+    return <><AdminPageHeader eyebrow="ATUR ROOM LIST" title={item.pilgrim?.fullName ?? "Jamaah"} description={`${item.package?.name ?? "Paket"} · ${item.pilgrim?.gender ?? "Jenis kelamin belum diisi"}`} backHref={backHref} /><Panel title="Penempatan kamar"><RoomListForm defaultRegistrationId={item.id} defaultRoomType={item.roomType ?? "quad"} registrations={data.registrations.map((r) => ({ id: r.id, pilgrimName: r.pilgrim?.fullName ?? "Jamaah", gender: r.pilgrim?.gender ?? null, packageName: r.package?.name ?? "Paket", roomType: r.roomType, makkahRoomNumber: r.makkahRoomNumber, madinahRoomNumber: r.madinahRoomNumber, roomNumber: r.roomNumber }))} /></Panel></>;
   }
   if (module === "invoice-kwitansi") {
     const item = data.documents.find((row) => row.id === id); if (!item) return null;

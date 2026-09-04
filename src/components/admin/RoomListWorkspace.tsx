@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   BedSingle,
   Building2,
@@ -13,13 +14,20 @@ import {
   Plus,
   UserPlus,
   AlertCircle,
+  X,
+  ArrowRightLeft,
+  Check,
+  User,
+  Users,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import {
   ROOM_CAPACITIES,
   type RoomCity,
   type RoomType,
 } from "@/lib/management/domain";
+import { assignRoomAction, renameRoomAction } from "@/lib/management/actions";
 import { AdminPageHeader } from "./AdminUi";
 import type { getManagementContext } from "@/lib/management/data";
 
@@ -27,10 +35,31 @@ type Context = Awaited<ReturnType<typeof getManagementContext>>;
 type RegistrationItem = Context["registrations"][number];
 
 export function RoomListWorkspace({ data }: { data: Context }) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
   const [activeGender, setActiveGender] = useState<"Laki-laki" | "Perempuan">("Laki-laki");
   const [activeCity, setActiveCity] = useState<RoomCity>("makkah");
   const [selectedDepartureId, setSelectedDepartureId] = useState<string>("");
   const [expandedRooms, setExpandedRooms] = useState<Record<string, boolean>>({});
+
+  // Modals state
+  const [renameModal, setRenameModal] = useState<{
+    currentRoomNumber: string;
+    city: RoomCity;
+    departureId?: string;
+  } | null>(null);
+
+  const [assignModal, setAssignModal] = useState<{
+    targetRoomNumber: string;
+    targetRoomType: RoomType;
+    departureId?: string;
+  } | null>(null);
+
+  const [moveModal, setMoveModal] = useState<{
+    registration: RegistrationItem;
+    currentRoomNumber: string;
+  } | null>(null);
 
   // Filter registrations with valid genders & optional departure filter
   const genderRegistrations = useMemo(() => {
@@ -41,7 +70,6 @@ export function RoomListWorkspace({ data }: { data: Context }) {
       return true;
     });
   }, [data.registrations, activeGender, selectedDepartureId]);
-
 
   // Find accommodation hotel name for departure if available
   const hotelsByDepartureAndCity = useMemo(() => {
@@ -62,6 +90,7 @@ export function RoomListWorkspace({ data }: { data: Context }) {
       {
         roomNumber: string;
         roomType: RoomType;
+        departureId?: string;
         departureName: string;
         hotelName: string;
         occupants: RegistrationItem[];
@@ -86,6 +115,7 @@ export function RoomListWorkspace({ data }: { data: Context }) {
           roomMap.set(roomNum, {
             roomNumber: roomNum,
             roomType: chosenRoomType,
+            departureId: item.booking?.departureId,
             departureName: item.package?.name ?? "Paket Umroh",
             hotelName: depHotel,
             occupants: [],
@@ -103,6 +133,14 @@ export function RoomListWorkspace({ data }: { data: Context }) {
     };
   }, [genderRegistrations, activeCity, hotelsByDepartureAndCity]);
 
+  // Rooms that have available slots in current city and gender
+  const availableRoomsWithSlots = useMemo(() => {
+    return rooms.filter((r) => {
+      const cap = ROOM_CAPACITIES[r.roomType] || 4;
+      return r.occupants.length < cap;
+    });
+  }, [rooms]);
+
   // Count totals for badges
   const totalMen = useMemo(() => data.registrations.filter((r) => r.pilgrim?.gender === "Laki-laki" && r.status === "active").length, [data.registrations]);
   const totalWomen = useMemo(() => data.registrations.filter((r) => r.pilgrim?.gender === "Perempuan" && r.status === "active").length, [data.registrations]);
@@ -117,6 +155,60 @@ export function RoomListWorkspace({ data }: { data: Context }) {
 
   function isExpanded(roomNumber: string) {
     return expandedRooms[roomNumber] ?? true; // Default open for easy visibility
+  }
+
+  // Handle direct rename room
+  async function handleRenameSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    startTransition(async () => {
+      const res = await renameRoomAction(fd);
+      if (res.ok) {
+        toast.success(res.message);
+        setRenameModal(null);
+        router.refresh();
+      } else {
+        toast.error(res.message);
+      }
+    });
+  }
+
+  // Handle quick slot assignment (unassigned pilgrim -> room)
+  async function handleAssignSlot(registrationId: string) {
+    if (!assignModal) return;
+    const fd = new FormData();
+    fd.set("registrationId", registrationId);
+    fd.set("city", activeCity);
+    fd.set("roomType", assignModal.targetRoomType);
+    fd.set("roomNumber", assignModal.targetRoomNumber);
+
+    startTransition(async () => {
+      const res = await assignRoomAction({ ok: false, message: "" }, fd);
+      if (res.ok) {
+        toast.success(res.message);
+        setAssignModal(null);
+        router.refresh();
+      } else {
+        toast.error(res.message);
+      }
+    });
+  }
+
+  // Handle move pilgrim to existing or new room
+  async function handleMoveSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!moveModal) return;
+    const fd = new FormData(e.currentTarget);
+    startTransition(async () => {
+      const res = await assignRoomAction({ ok: false, message: "" }, fd);
+      if (res.ok) {
+        toast.success(res.message);
+        setMoveModal(null);
+        router.refresh();
+      } else {
+        toast.error(res.message);
+      }
+    });
   }
 
   return (
@@ -148,7 +240,9 @@ export function RoomListWorkspace({ data }: { data: Context }) {
           onClick={() => setActiveGender("Laki-laki")}
           className={`roomlist-gender-btn ${activeGender === "Laki-laki" ? "active" : ""}`}
         >
-          <div className="gender-btn-icon">👨</div>
+          <div className="gender-btn-icon">
+            <User className="size-6 text-sky-800" />
+          </div>
           <div className="gender-btn-text">
             <strong>Jamaah Laki-laki</strong>
             <small>{totalMen} orang terdaftar</small>
@@ -160,7 +254,9 @@ export function RoomListWorkspace({ data }: { data: Context }) {
           onClick={() => setActiveGender("Perempuan")}
           className={`roomlist-gender-btn ${activeGender === "Perempuan" ? "active" : ""}`}
         >
-          <div className="gender-btn-icon">🧕</div>
+          <div className="gender-btn-icon">
+            <Users className="size-6 text-emerald-800" />
+          </div>
           <div className="gender-btn-text">
             <strong>Jamaah Perempuan</strong>
             <small>{totalWomen} orang terdaftar</small>
@@ -196,7 +292,7 @@ export function RoomListWorkspace({ data }: { data: Context }) {
               className={`roomlist-city-pill ${activeCity === "makkah" ? "active" : ""}`}
             >
               <Hotel className="size-5" />
-              <span>🕋 Hotel Makkah</span>
+              <span>Hotel Makkah</span>
             </button>
             <button
               type="button"
@@ -204,12 +300,11 @@ export function RoomListWorkspace({ data }: { data: Context }) {
               className={`roomlist-city-pill ${activeCity === "madinah" ? "active" : ""}`}
             >
               <Building2 className="size-5" />
-              <span>🕌 Hotel Madinah</span>
+              <span>Hotel Madinah</span>
             </button>
           </div>
         </div>
       </section>
-
 
       {/* 3. SECTION UNASSIGNED / BELUM DAPAT KAMAR */}
       {unassigned.length > 0 && (
@@ -218,26 +313,34 @@ export function RoomListWorkspace({ data }: { data: Context }) {
             <div>
               <span className="roomlist-tag-warn">BELUM MASUK KAMAR</span>
               <h3>Ada {unassigned.length} Jamaah {activeGender} belum dapat kamar di {activeCity === "makkah" ? "Makkah" : "Madinah"}</h3>
-              <p>Klik tombol &ldquo;Atur Kamar&rdquo; di bawah untuk langsung menempatkan ke nomor kamar.</p>
+              <p>Pilih kamar yang sudah ada langsung di kartu kamar di bawah, atau klik tombol &ldquo;Atur Kamar&rdquo;.</p>
             </div>
           </header>
 
           <div className="roomlist-unassigned-grid">
             {unassigned.map((item) => (
               <div key={item.id} className="roomlist-unassigned-card">
-                <div className="unassigned-avatar">👤</div>
+                <div className="unassigned-avatar">
+                  <User className="size-5 text-stone-600" />
+                </div>
                 <div className="unassigned-info">
                   <strong>{item.pilgrim?.fullName}</strong>
                   <small>{item.package?.name ?? "Paket Umroh"} · {item.pilgrim?.passportNumber ? `Paspor: ${item.pilgrim.passportNumber}` : "Paspor belum diisi"}</small>
                   <span className="roomlist-type-badge">{item.roomType ? item.roomType.toUpperCase() : "QUAD"}</span>
                 </div>
-                <Link
-                  href={`/admin/manajemen/manifest-room-list/${item.id}`}
-                  className="roomlist-assign-btn"
-                >
-                  <DoorOpen className="size-4" />
-                  <span>Atur Kamar</span>
-                </Link>
+                <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                  <button
+                    type="button"
+                    onClick={() => setMoveModal({
+                      registration: item,
+                      currentRoomNumber: "",
+                    })}
+                    className="roomlist-assign-btn roomlist-action-inline-btn"
+                  >
+                    <DoorOpen className="size-4" />
+                    <span>Masuk Kamar</span>
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -309,14 +412,19 @@ export function RoomListWorkspace({ data }: { data: Context }) {
                     </div>
 
                     <div className="roomlist-header-action" onClick={(e) => e.stopPropagation()}>
-                      <Link
-                        href={`/admin/manajemen/manifest-room-list/${room.occupants[0]?.id}`}
-                        className="roomlist-edit-room-link"
-                        title="Edit atau ganti nomor kamar"
+                      <button
+                        type="button"
+                        onClick={() => setRenameModal({
+                          currentRoomNumber: room.roomNumber,
+                          city: activeCity,
+                          departureId: room.departureId,
+                        })}
+                        className="roomlist-edit-room-link roomlist-action-inline-btn"
+                        title="Ubah nama nomor kamar ini langsung untuk semua jamaah di dalamnya"
                       >
                         <Edit3 className="size-3.5" />
-                        <span>Edit Kamar</span>
-                      </Link>
+                        <span>Edit Nama Kamar</span>
+                      </button>
                     </div>
                   </div>
 
@@ -336,12 +444,17 @@ export function RoomListWorkspace({ data }: { data: Context }) {
                               </div>
                             </div>
                             <div className="occupant-right">
-                              <Link
-                                href={`/admin/manajemen/manifest-room-list/${occupant.id}`}
-                                className="occupant-move-btn"
+                              <button
+                                type="button"
+                                onClick={() => setMoveModal({
+                                  registration: occupant,
+                                  currentRoomNumber: room.roomNumber,
+                                })}
+                                className="occupant-move-btn roomlist-action-inline-btn"
                               >
-                                Pindah Kamar
-                              </Link>
+                                <ArrowRightLeft className="size-3 mr-1" />
+                                <span>Pindah Kamar</span>
+                              </button>
                             </div>
                           </li>
                         ))}
@@ -353,13 +466,18 @@ export function RoomListWorkspace({ data }: { data: Context }) {
                             <span className="empty-slot-text">
                               Slot Kosong ({room.roomType.toUpperCase()}) — Masih muat 1 jamaah lagi
                             </span>
-                            <Link
-                              href="/admin/manajemen/manifest-room-list/baru"
-                              className="occupant-add-btn"
+                            <button
+                              type="button"
+                              onClick={() => setAssignModal({
+                                targetRoomNumber: room.roomNumber,
+                                targetRoomType: room.roomType,
+                                departureId: room.departureId,
+                              })}
+                              className="occupant-add-btn roomlist-action-inline-btn"
                             >
                               <UserPlus className="size-3.5" />
                               <span>Isi Slot</span>
-                            </Link>
+                            </button>
                           </li>
                         ))}
                       </ul>
@@ -371,6 +489,284 @@ export function RoomListWorkspace({ data }: { data: Context }) {
           </div>
         )}
       </section>
+
+      {/* DIALOG 1: EDIT / GANTI NAMA KAMAR */}
+      {renameModal && (
+        <div className="roomlist-modal-backdrop" onClick={() => !isPending && setRenameModal(null)}>
+          <div className="roomlist-modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="roomlist-modal-header">
+              <h3>Edit Nama / Nomor Kamar</h3>
+              <button
+                type="button"
+                className="roomlist-modal-close-btn"
+                onClick={() => setRenameModal(null)}
+                disabled={isPending}
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+            <form onSubmit={handleRenameSubmit}>
+              <div className="roomlist-modal-body">
+                <p style={{ fontSize: "14px", color: "#475569", margin: 0 }}>
+                  Mengubah nama kamar <strong>{renameModal.currentRoomNumber}</strong> di <strong>{renameModal.city === "makkah" ? "Makkah" : "Madinah"}</strong> akan langsung memperbarui seluruh jamaah di kamar ini sekaligus tanpa harus memindahkan satu per satu.
+                </p>
+                <input type="hidden" name="currentRoomNumber" value={renameModal.currentRoomNumber} />
+                <input type="hidden" name="city" value={renameModal.city} />
+                {renameModal.departureId && (
+                  <input type="hidden" name="departureId" value={renameModal.departureId} />
+                )}
+
+                <div className="roomlist-modal-field">
+                  <label htmlFor="newRoomNumber">Nama / Nomor Kamar Baru *</label>
+                  <input
+                    id="newRoomNumber"
+                    name="newRoomNumber"
+                    defaultValue={renameModal.currentRoomNumber}
+                    placeholder="Contoh: MKH-Pullman-Quad-01 atau Kamar 402"
+                    autoFocus
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="roomlist-modal-actions">
+                <button
+                  type="button"
+                  className="roomlist-btn-secondary"
+                  onClick={() => setRenameModal(null)}
+                  disabled={isPending}
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="roomlist-btn-primary"
+                  disabled={isPending}
+                >
+                  {isPending ? "Menyimpan..." : "Simpan Nama Kamar"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* DIALOG 2: ISI SLOT KOSONG (PILIH DARI JAMAAH BELUM DAPAT KAMAR) */}
+      {assignModal && (
+        <div className="roomlist-modal-backdrop" onClick={() => !isPending && setAssignModal(null)}>
+          <div className="roomlist-modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="roomlist-modal-header">
+              <h3>Isi Slot Kamar: {assignModal.targetRoomNumber}</h3>
+              <button
+                type="button"
+                className="roomlist-modal-close-btn"
+                onClick={() => setAssignModal(null)}
+                disabled={isPending}
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+            <div className="roomlist-modal-body">
+              <p style={{ fontSize: "14px", color: "#475569", margin: 0 }}>
+                Pilih jamaah <strong>{activeGender}</strong> yang belum masuk kamar di {activeCity === "makkah" ? "Makkah" : "Madinah"} untuk dimasukkan ke kamar <strong>{assignModal.targetRoomNumber}</strong>:
+              </p>
+
+              {unassigned.length === 0 ? (
+                <div style={{ padding: "24px", textAlign: "center", background: "#f8fafc", borderRadius: "10px" }}>
+                  <p style={{ margin: 0, color: "#64748b", fontSize: "14px" }}>
+                    Semua jamaah {activeGender.toLowerCase()} sudah mendapatkan kamar di {activeCity === "makkah" ? "Makkah" : "Madinah"}.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", maxHeight: "300px", overflowY: "auto" }}>
+                  {unassigned.map((p) => (
+                    <div
+                      key={p.id}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "10px 14px",
+                        borderRadius: "8px",
+                        border: "1px solid #e2e8f0",
+                        background: "#fff",
+                      }}
+                    >
+                      <div>
+                        <strong style={{ display: "block", fontSize: "14px", color: "#1e293b" }}>{p.pilgrim?.fullName}</strong>
+                        <small style={{ color: "#64748b", fontSize: "12px" }}>
+                          {p.package?.name ?? "Paket Umroh"} · Tipe req: {(p.roomType || "quad").toUpperCase()}
+                        </small>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleAssignSlot(p.id)}
+                        disabled={isPending}
+                        style={{
+                          padding: "6px 12px",
+                          borderRadius: "6px",
+                          background: "#bd8d1b",
+                          color: "#fff",
+                          border: "none",
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                        }}
+                      >
+                        <Check className="size-3.5" />
+                        <span>Pilih</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="roomlist-modal-actions">
+              <button
+                type="button"
+                className="roomlist-btn-secondary"
+                onClick={() => setAssignModal(null)}
+                disabled={isPending}
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DIALOG 3: PINDAH / MASUK KAMAR JAMAAH */}
+      {moveModal && (
+        <div className="roomlist-modal-backdrop" onClick={() => !isPending && setMoveModal(null)}>
+          <div className="roomlist-modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="roomlist-modal-header">
+              <h3>{moveModal.currentRoomNumber ? "Pindah Kamar Jamaah" : "Tempatkan ke Kamar"}</h3>
+              <button
+                type="button"
+                className="roomlist-modal-close-btn"
+                onClick={() => setMoveModal(null)}
+                disabled={isPending}
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+            <form onSubmit={handleMoveSubmit}>
+              <div className="roomlist-modal-body">
+                <input type="hidden" name="registrationId" value={moveModal.registration.id} />
+                <input type="hidden" name="city" value={activeCity} />
+
+                <div style={{ background: "#f8fafc", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                  <strong style={{ display: "block", fontSize: "15px", color: "#1e293b" }}>{moveModal.registration.pilgrim?.fullName}</strong>
+                  <small style={{ color: "#64748b", fontSize: "12px" }}>
+                    Paket: {moveModal.registration.package?.name ?? "Umroh"} · Gender: {moveModal.registration.pilgrim?.gender}
+                  </small>
+                  {moveModal.currentRoomNumber && (
+                    <div style={{ marginTop: "4px", fontSize: "12px", color: "#b45309", fontWeight: 600 }}>
+                      Kamar Saat Ini: {moveModal.currentRoomNumber}
+                    </div>
+                  )}
+                </div>
+
+                <div className="roomlist-modal-field">
+                  <label htmlFor="modalRoomType">Tipe Kamar *</label>
+                  <select
+                    id="modalRoomType"
+                    name="roomType"
+                    defaultValue={moveModal.registration.roomType?.toLowerCase() || "quad"}
+                    required
+                  >
+                    <option value="quad">Quad (4 Orang)</option>
+                    <option value="triple">Triple (3 Orang)</option>
+                    <option value="double">Double (2 Orang)</option>
+                  </select>
+                </div>
+
+                <div className="roomlist-modal-field">
+                  <label htmlFor="modalRoomNumber">Pilih Kamar yang Ada atau Ketik Baru *</label>
+                  <input
+                    id="modalRoomNumber"
+                    name="roomNumber"
+                    defaultValue={moveModal.currentRoomNumber}
+                    list="move-modal-room-suggestions"
+                    placeholder="Pilih atau ketik nomor kamar..."
+                    required
+                  />
+                  <datalist id="move-modal-room-suggestions">
+                    {availableRoomsWithSlots.map((r) => {
+                      const cap = ROOM_CAPACITIES[r.roomType] || 4;
+                      const sisa = cap - r.occupants.length;
+                      return (
+                        <option key={r.roomNumber} value={r.roomNumber}>
+                          {r.roomNumber} (Tersedia {sisa} slot)
+                        </option>
+                      );
+                    })}
+                  </datalist>
+                </div>
+
+                {availableRoomsWithSlots.length > 0 && (
+                  <div>
+                    <span style={{ fontSize: "12px", fontWeight: 600, color: "#64748b", display: "block", marginBottom: "6px" }}>
+                      Kamar yang masih ada slot kosong di {activeCity === "makkah" ? "Makkah" : "Madinah"}:
+                    </span>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                      {availableRoomsWithSlots.map((r) => {
+                        const cap = ROOM_CAPACITIES[r.roomType] || 4;
+                        const sisa = cap - r.occupants.length;
+                        return (
+                          <button
+                            key={r.roomNumber}
+                            type="button"
+                            onClick={(e) => {
+                              const input = e.currentTarget.closest("form")?.elements.namedItem("roomNumber") as HTMLInputElement | null;
+                              if (input) input.value = r.roomNumber;
+                              const select = e.currentTarget.closest("form")?.elements.namedItem("roomType") as HTMLSelectElement | null;
+                              if (select) select.value = r.roomType.toLowerCase();
+                            }}
+                            style={{
+                              fontSize: "12px",
+                              padding: "4px 8px",
+                              borderRadius: "6px",
+                              border: "1px solid #bd8d1b",
+                              background: "#fff9ec",
+                              color: "#946a0c",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                            }}
+                          >
+                            {r.roomNumber} (Sisa {sisa})
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="roomlist-modal-actions">
+                <button
+                  type="button"
+                  className="roomlist-btn-secondary"
+                  onClick={() => setMoveModal(null)}
+                  disabled={isPending}
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="roomlist-btn-primary"
+                  disabled={isPending}
+                >
+                  {isPending ? "Menyimpan..." : "Simpan Kamar"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

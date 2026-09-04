@@ -410,6 +410,33 @@ export function RoomListForm({
     }
   }
 
+  // Extract existing rooms in the current city matching the pilgrim's gender
+  const existingRoomsInCity = useMemo(() => {
+    const map = new Map<string, { roomNumber: string; roomType: string; count: number }>();
+    const pilgrimGender = selectedReg?.gender;
+    for (const r of registrations) {
+      if (r.id === selectedRegId) continue;
+      // If gender known, match gender
+      if (pilgrimGender && r.gender && r.gender !== pilgrimGender) continue;
+      const rNum = (city === "madinah" ? r.madinahRoomNumber : (r.makkahRoomNumber || r.roomNumber))?.trim();
+      if (!rNum) continue;
+      const rType = r.roomType || "quad";
+      const cur = map.get(rNum) || { roomNumber: rNum, roomType: rType, count: 0 };
+      cur.count += 1;
+      map.set(rNum, cur);
+    }
+    const caps: Record<string, number> = { double: 2, triple: 3, quad: 4 };
+    return Array.from(map.values()).map((item) => {
+      const cap = caps[item.roomType.toLowerCase()] || 4;
+      const remaining = Math.max(0, cap - item.count);
+      return {
+        ...item,
+        capacity: cap,
+        remaining,
+      };
+    });
+  }, [registrations, city, selectedRegId, selectedReg?.gender]);
+
   return (
     <form action={action} className="management-form">
       <Feedback state={state} />
@@ -427,8 +454,8 @@ export function RoomListForm({
         <label>
           <span>Lokasi Hotel / Kota *</span>
           <select name="city" value={city} onChange={(e) => onCityChange(e.target.value as "makkah" | "madinah")} required>
-            <option value="makkah">🕋 Hotel Makkah</option>
-            <option value="madinah">🕌 Hotel Madinah</option>
+            <option value="makkah">Hotel Makkah</option>
+            <option value="madinah">Hotel Madinah</option>
           </select>
         </label>
         <label>
@@ -445,10 +472,45 @@ export function RoomListForm({
             name="roomNumber"
             value={roomNumber}
             onChange={(e) => setRoomNumber(e.target.value)}
-            placeholder="Contoh: MKH-Pullman-Quad-01 atau Kamar 301"
+            placeholder="Ketik baru atau pilih kamar yang sudah ada..."
+            list="existing-rooms-list"
             required
           />
-          <small>Nama atau nomor kamar fisik di hotel. Wajib diisi sebelum disimpan.</small>
+          <datalist id="existing-rooms-list">
+            {existingRoomsInCity.map((er) => (
+              <option key={er.roomNumber} value={er.roomNumber}>
+                {er.roomNumber} (Tipe {er.roomType.toUpperCase()} - sisa {er.remaining} slot)
+              </option>
+            ))}
+          </datalist>
+          {existingRoomsInCity.length > 0 && (
+            <div style={{ marginTop: "6px", display: "flex", flexWrap: "wrap", gap: "6px", alignItems: "center" }}>
+              <span style={{ fontSize: "11px", color: "#64748b" }}>Pilih kamar yang tersedia:</span>
+              {existingRoomsInCity.filter((er) => er.remaining > 0).map((er) => (
+                <button
+                  key={er.roomNumber}
+                  type="button"
+                  onClick={() => {
+                    setRoomNumber(er.roomNumber);
+                    setRoomType(er.roomType.toLowerCase());
+                  }}
+                  style={{
+                    fontSize: "11px",
+                    fontWeight: 600,
+                    padding: "3px 8px",
+                    borderRadius: "4px",
+                    border: "1px solid #bd8d1b",
+                    background: roomNumber === er.roomNumber ? "#bd8d1b" : "#fff9ec",
+                    color: roomNumber === er.roomNumber ? "#fff" : "#946a0c",
+                    cursor: "pointer",
+                  }}
+                >
+                  {er.roomNumber} ({er.remaining} slot)
+                </button>
+              ))}
+            </div>
+          )}
+          <small>Nama kamar fisik hotel. Bisa pilih dari kamar yang sudah ada di atas atau ketik nama baru.</small>
         </label>
       </div>
       <p className="management-form-note">

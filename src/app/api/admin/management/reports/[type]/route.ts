@@ -87,6 +87,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ type
   const report = createReport(type, await getManagementContext(), { from, to, packageId, departureId });
 
   if (!report) return NextResponse.json({ error: "Jenis laporan tidak ditemukan." }, { status: 404 });
+  // Generate professional export filename based on report title and date range
+  const safeTitle = report.title
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "_");
+  const dateSuffix = fromValue && toValue ? `_${fromValue}_sd_${toValue}` : fromValue ? `_sejak_${fromValue}` : "";
+  const exportFilename = `${safeTitle}${dateSuffix}`;
+
   const format = url.searchParams.get("format") === "xlsx" ? "xlsx" : "pdf";
   if (format === "xlsx") {
     const workbook = new ExcelJS.Workbook();
@@ -100,8 +108,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ type
     sheet.views = [{ state: "frozen", ySplit: 1 }];
     sheet.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: report.columns.length } };
     const buffer = await workbook.xlsx.writeBuffer();
-    return new NextResponse(new Uint8Array(buffer), { headers: { "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "content-disposition": `attachment; filename="laporan-${type}.xlsx"` } });
+    return new NextResponse(new Uint8Array(buffer), { headers: { "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "content-disposition": `attachment; filename="${exportFilename}.xlsx"` } });
   }
   const pdf = await renderReportPdf(report.title, report.columns, report.rows);
-  return new NextResponse(new Uint8Array(pdf), { headers: { "content-type": "application/pdf", "content-disposition": `attachment; filename="laporan-${type}.pdf"` } });
+  return new NextResponse(new Uint8Array(pdf), { headers: { "content-type": "application/pdf", "content-disposition": `attachment; filename="${exportFilename}.pdf"` } });
 }

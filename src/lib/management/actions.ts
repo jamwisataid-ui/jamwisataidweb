@@ -604,6 +604,87 @@ export async function assignRoomAction(_state: ManagementActionState, formData: 
   } catch (error) { return failure(error); }
 }
 
+export async function renameRoomAction(stateOrFormData: ManagementActionState | FormData, maybeFormData?: FormData): Promise<ManagementActionState> {
+  const formData = maybeFormData instanceof FormData ? maybeFormData : (stateOrFormData as FormData);
+  const currentRoomNumber = String(formData.get("currentRoomNumber") ?? "").trim();
+  const newRoomNumber = String(formData.get("newRoomNumber") ?? "").trim();
+  const city = String(formData.get("city") ?? "makkah").toLowerCase() as "makkah" | "madinah";
+  const departureId = String(formData.get("departureId") ?? "").trim();
+
+  if (!currentRoomNumber || !newRoomNumber) {
+    return { ok: false, message: "Nama kamar lama dan nama kamar baru wajib diisi." };
+  }
+  if (currentRoomNumber === newRoomNumber) {
+    return { ok: true, message: "Nama kamar tidak berubah." };
+  }
+
+  try {
+    const session = await requireAdminSession();
+    await withManagementTransaction(async (tx) => {
+      const cityColumn = city === "madinah" ? registrations.madinahRoomNumber : registrations.makkahRoomNumber;
+
+      // Find all registrations currently in currentRoomNumber (including legacy fallback if makkah)
+      const primaryRegs = await tx.select().from(registrations).where(
+        and(eq(cityColumn, currentRoomNumber), eq(registrations.status, "active"))
+      );
+      const legacyRegs = city === "makkah"
+        ? await tx.select().from(registrations).where(
+            and(eq(registrations.roomNumber, currentRoomNumber), eq(registrations.status, "active"))
+          )
+        : [];
+      const combinedActiveRegs = Array.from(new Map([...primaryRegs, ...legacyRegs].map((r) => [r.id, r])).values());
+
+      // Filter by departure if departureId provided
+      const targetRegs: typeof combinedActiveRegs = [];
+      for (const reg of combinedActiveRegs) {
+        if (departureId) {
+          const b = await tx.query.bookings.findFirst({ where: eq(bookings.id, reg.bookingId) });
+          if (b?.departureId === departureId) targetRegs.push(reg);
+        } else {
+          targetRegs.push(reg);
+        }
+      }
+
+      if (targetRegs.length === 0) {
+        throw new Error(`Kamar "${currentRoomNumber}" tidak memiliki jamaah aktif.`);
+      }
+
+      // Check if newRoomNumber is already used by other pilgrims of different departure or conflicting gender
+      const conflictRegs = await tx.select().from(registrations).where(
+        and(eq(cityColumn, newRoomNumber), eq(registrations.status, "active"))
+      );
+      if (conflictRegs.length > 0) {
+        throw new Error(`Kamar "${newRoomNumber}" sudah digunakan oleh jamaah lain. Gunakan nama kamar yang berbeda.`);
+      }
+
+      const updateData: Partial<typeof registrations.$inferInsert> = {
+        updatedAt: new Date(),
+      };
+      if (city === "madinah") {
+        updateData.madinahRoomNumber = newRoomNumber;
+      } else {
+        updateData.makkahRoomNumber = newRoomNumber;
+        updateData.roomNumber = newRoomNumber;
+      }
+
+      for (const reg of targetRegs) {
+        await tx.update(registrations).set(updateData).where(eq(registrations.id, reg.id));
+      }
+
+      await tx.insert(auditLogs).values({
+        actorId: session.user.id,
+        action: "rename-room",
+        entityType: "registration",
+        entityId: targetRegs[0].id,
+        summary: `Kamar ${city === "makkah" ? "Makkah" : "Madinah"} diubah dari "${currentRoomNumber}" menjadi "${newRoomNumber}" (${targetRegs.length} jamaah)`,
+      });
+    });
+    refresh();
+    return { ok: true, message: `Nama kamar berhasil diubah menjadi "${newRoomNumber}".` };
+  } catch (error) { return failure(error); }
+}
+
+
 export async function deleteIssuedDocumentAction(formData: FormData): Promise<ManagementActionState> {
   const id = String(formData.get("id") ?? "").trim();
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
