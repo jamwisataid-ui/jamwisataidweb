@@ -91,3 +91,42 @@ export function upcomingBirthday(birthDate: string, now = new Date()) {
   }
   return { daysUntil: Math.round((nextBirthday - today) / 86400000), age: birthdayYear - birthYear, date: new Date(nextBirthday).toISOString().slice(0, 10) };
 }
+
+export type RoomCity = "makkah" | "madinah";
+export type RoomType = "quad" | "triple" | "double";
+
+export const ROOM_CAPACITIES: Record<RoomType, number> = {
+  quad: 4,
+  triple: 3,
+  double: 2,
+};
+
+export const ROOM_TYPE_LABELS: Record<RoomType, string> = {
+  quad: "Quad · 4 orang",
+  triple: "Triple · 3 orang",
+  double: "Double · 2 orang",
+};
+
+export function cleanHotelSlug(hotelName?: string | null): string {
+  if (!hotelName) return "Hotel";
+  const cleaned = hotelName.replace(/^(hotel|akomodasi)\s+/i, "").trim().split(/\s+/)[0];
+  return cleaned ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1) : "Hotel";
+}
+
+export function generateDefaultRoomNumber({
+  city,
+  hotelName,
+  roomType,
+  roomIndex,
+}: {
+  city: RoomCity;
+  hotelName?: string | null;
+  roomType: RoomType;
+  roomIndex: number;
+}): string {
+  const cityCode = city === "makkah" ? "MKH" : "MDN";
+  const hotel = cleanHotelSlug(hotelName);
+  const typeLabel = roomType.charAt(0).toUpperCase() + roomType.slice(1);
+  const numStr = String(roomIndex).padStart(2, "0");
+  return `${cityCode}-${hotel}-${typeLabel}-${numStr}`;
+}

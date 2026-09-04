@@ -163,8 +163,40 @@ export function BookingForm({ pilgrims, departures, agents, defaultDpAmount }: B
       <div className="management-form-grid two">
         <label><span>Paket keberangkatan *</span><select name="departureId" value={departureId} onChange={(event) => selectDeparture(event.target.value)} required><option value="">Pilih paket keberangkatan</option>{departures.map((item) => <option key={item.id} value={item.id}>{item.package?.name} — {item.departureDate}</option>)}</select><small>Pilih jadwal yang akan diikuti oleh seluruh jamaah dalam pendaftaran ini.</small><ErrorText state={state} name="departureId" /></label>
         <label><span>Harga per jamaah *</span><input name="agreedPrice" inputMode="numeric" value={agreedPrice} onChange={(event) => setAgreedPrice(event.target.value.replace(/\D/g, ""))} placeholder="Pilih paket terlebih dahulu" required /><output className="management-money-readable">Terbaca: <strong>{rupiah(Number(agreedPrice || 0))}</strong></output><small>{selectedDeparture ? `Harga awal paket ${rupiah(Number(selectedDeparture.price))}. Ubah hanya jika ada harga khusus.` : "Harga otomatis terisi setelah paket dipilih."}</small><ErrorText state={state} name="agreedPrice" /></label>
-        <label><span>Target DP per jamaah *</span><input name="dpTarget" inputMode="numeric" value={dpTarget} onChange={(event) => setDpTarget(event.target.value.replace(/\D/g, ""))} required /><output className="management-money-readable">Terbaca: <strong>{rupiah(Number(dpTarget || 0))}</strong></output><small>DP adalah uang muka yang perlu dibayar lebih dulu. Default sistem {rupiah(defaultDpAmount)}.</small><ErrorText state={state} name="dpTarget" /></label>
-        <label><span>Diskon per jamaah</span><input name="discountAmount" inputMode="numeric" value={discountAmount} onChange={(event) => setDiscountAmount(event.target.value.replace(/\D/g, ""))} /><output className="management-money-readable">Terbaca: <strong>{rupiah(Number(discountAmount || 0))}</strong></output><small>Isi angka 0 jika tidak ada diskon. Diskon dipotong dari harga setiap jamaah.</small><ErrorText state={state} name="discountAmount" />{Number(discountAmount) >= Number(agreedPrice) && Number(discountAmount) > 0 ? <small className="management-field-error">Diskon harus lebih kecil daripada harga jamaah.</small> : null}</label>
+        <label>
+          <span>Target DP per jamaah *</span>
+          <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+            <button
+              type="button"
+              onClick={() => setDpTarget(String(defaultDpAmount || 5000000))}
+              className="management-row-link"
+              style={{ padding: "4px 10px", borderRadius: "6px", cursor: "pointer", background: dpTarget === String(defaultDpAmount || 5000000) ? "#142a45" : "#f1ede4", color: dpTarget === String(defaultDpAmount || 5000000) ? "#fff" : "#3b4758", border: "1px solid #dcd5c7" }}
+            >
+              Default Rp5 Juta
+            </button>
+            <button
+              type="button"
+              onClick={() => setDpTarget("")}
+              className="management-row-link"
+              style={{ padding: "4px 10px", borderRadius: "6px", cursor: "pointer", background: dpTarget !== String(defaultDpAmount || 5000000) ? "#142a45" : "#f1ede4", color: dpTarget !== String(defaultDpAmount || 5000000) ? "#fff" : "#3b4758", border: "1px solid #dcd5c7" }}
+            >
+              Ketik Bebas / Manual
+            </button>
+          </div>
+          <input
+            name="dpTarget"
+            inputMode="numeric"
+            value={dpTarget}
+            onChange={(event) => setDpTarget(event.target.value.replace(/\D/g, ""))}
+            placeholder="Ketik nominal DP manual..."
+            required
+          />
+          <output className="management-money-readable">Terbaca: <strong>{rupiah(Number(dpTarget || 0))}</strong></output>
+          <small>Bisa pakai default Rp5jt atau langsung ketik angka bebas sesuai kesepakatan.</small>
+          <ErrorText state={state} name="dpTarget" />
+        </label>
+        <label><span>Tipe kamar *</span><select name="roomType" defaultValue="quad"><option value="quad">Quad · 4 orang (Standar Paket)</option><option value="triple">Triple · 3 orang</option><option value="double">Double · 2 orang</option></select><small>Tipe kamar default yang akan otomatis diterapkan pada Room List.</small></label>
+        <label className="span-two"><span>Diskon per jamaah</span><input name="discountAmount" inputMode="numeric" value={discountAmount} onChange={(event) => setDiscountAmount(event.target.value.replace(/\D/g, ""))} /><output className="management-money-readable">Terbaca: <strong>{rupiah(Number(discountAmount || 0))}</strong></output><small>Isi angka 0 jika tidak ada diskon. Diskon dipotong dari harga setiap jamaah.</small><ErrorText state={state} name="discountAmount" />{Number(discountAmount) >= Number(agreedPrice) && Number(discountAmount) > 0 ? <small className="management-field-error">Diskon harus lebih kecil daripada harga jamaah.</small> : null}</label>
       </div>
     </section>
 
@@ -340,7 +372,90 @@ export function ManagementSettingsForm({ values }: { values: { companyName: stri
   return <form action={action} className="management-form"><Feedback state={state} /><div className="management-form-grid two"><label><span>Nama perusahaan *</span><input name="companyName" defaultValue={values?.companyName ?? "Jam Wisata"} required /></label><label><span>Nomor WhatsApp/telepon</span><input name="companyPhone" defaultValue={values?.companyPhone ?? ""} /></label><label><span>Email perusahaan</span><input name="companyEmail" type="email" defaultValue={values?.companyEmail ?? ""} /></label><label><span>Default DP per jamaah *</span><input name="defaultDpAmount" inputMode="numeric" defaultValue={values?.defaultDpAmount ?? 5000000} required /></label><label><span>Pelunasan maksimal H-</span><input name="paymentDueDays" type="number" min="1" max="180" defaultValue={values?.paymentDueDays ?? 30} required /></label><label><span>Nama penandatangan</span><input name="financeSignerName" defaultValue={values?.financeSignerName ?? ""} /></label><label><span>Jabatan penandatangan</span><input name="financeSignerTitle" defaultValue={values?.financeSignerTitle ?? "Keuangan"} /></label><label className="span-two"><span>Alamat perusahaan</span><textarea name="companyAddress" defaultValue={values?.companyAddress ?? ""} rows={3} /></label><label className="span-two"><span>Template ucapan ulang tahun *</span><textarea name="birthdayMessageTemplate" defaultValue={values?.birthdayMessageTemplate ?? "Assalamu'alaikum Kak [NAMA], selamat ulang tahun yang ke-[UMUR]. Semoga Allah senantiasa memberikan kesehatan, keberkahan usia, dan kemudahan dalam setiap ibadah. Salam hangat dari Jam Wisata."} rows={5} maxLength={1000} required /><small>Gunakan [NAMA] untuk nama jamaah dan [UMUR] untuk umur yang diisi otomatis.</small></label></div><SubmitButton>{pending ? "Menyimpan…" : "Simpan pengaturan"}</SubmitButton></form>;
 }
 
-export function RoomListForm({ registrations }: { registrations: Array<{ id: string; pilgrimName: string; gender: string | null; packageName: string }> }) {
+export function RoomListForm({
+  registrations,
+  defaultRegistrationId,
+  defaultCity = "makkah",
+  defaultRoomType = "quad",
+  defaultRoomNumber = "",
+}: {
+  registrations: Array<{ id: string; pilgrimName: string; gender: string | null; packageName: string; roomType?: string | null; makkahRoomNumber?: string | null; madinahRoomNumber?: string | null; roomNumber?: string | null }>;
+  defaultRegistrationId?: string;
+  defaultCity?: "makkah" | "madinah";
+  defaultRoomType?: string;
+  defaultRoomNumber?: string;
+}) {
   const [state, action, pending] = useActionState(assignRoomAction, managementInitialState);
-  return <form action={action} className="management-form"><Feedback state={state} /><div className="management-form-grid two"><label><span>Jamaah *</span><select name="registrationId">{registrations.map((item) => <option key={item.id} value={item.id}>{item.pilgrimName} · {item.gender || "jenis kelamin belum diisi"} · {item.packageName}</option>)}</select></label><label><span>Tipe kamar *</span><select name="roomType"><option value="quad">Quad · 4 orang</option><option value="triple">Triple · 3 orang</option><option value="double">Double · 2 orang</option></select></label><label><span>Nomor/nama kamar *</span><input name="roomNumber" placeholder="Contoh: 301 atau Q-01" required /></label></div><p className="management-form-note">Sistem akan menolak kamar yang penuh atau mencampur jamaah laki-laki dan perempuan.</p><SubmitButton>{pending ? "Menyimpan…" : "Masukkan ke Room List"}</SubmitButton></form>;
+  const [selectedRegId, setSelectedRegId] = useState(defaultRegistrationId ?? registrations[0]?.id ?? "");
+  const [city, setCity] = useState<"makkah" | "madinah">(defaultCity);
+  const selectedReg = registrations.find((item) => item.id === selectedRegId);
+  const [roomType, setRoomType] = useState(selectedReg?.roomType ?? defaultRoomType ?? "quad");
+  const [roomNumber, setRoomNumber] = useState(defaultRoomNumber || (city === "madinah" ? (selectedReg?.madinahRoomNumber ?? "") : (selectedReg?.makkahRoomNumber ?? selectedReg?.roomNumber ?? "")));
+
+  function onSelectRegistration(id: string) {
+    setSelectedRegId(id);
+    const reg = registrations.find((item) => item.id === id);
+    if (reg) {
+      if (reg.roomType) setRoomType(reg.roomType);
+      const curRoom = city === "madinah" ? (reg.madinahRoomNumber ?? "") : (reg.makkahRoomNumber ?? reg.roomNumber ?? "");
+      if (curRoom) setRoomNumber(curRoom);
+    }
+  }
+
+  function onCityChange(newCity: "makkah" | "madinah") {
+    setCity(newCity);
+    if (selectedReg) {
+      const curRoom = newCity === "madinah" ? (selectedReg.madinahRoomNumber ?? "") : (selectedReg.makkahRoomNumber ?? selectedReg.roomNumber ?? "");
+      setRoomNumber(curRoom);
+    }
+  }
+
+  return (
+    <form action={action} className="management-form">
+      <Feedback state={state} />
+      <div className="management-form-grid two">
+        <label>
+          <span>Pilih Jamaah *</span>
+          <select name="registrationId" value={selectedRegId} onChange={(e) => onSelectRegistration(e.target.value)} required>
+            {registrations.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.pilgrimName} · {item.gender || "jenis kelamin belum diisi"} · {item.packageName}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Lokasi Hotel / Kota *</span>
+          <select name="city" value={city} onChange={(e) => onCityChange(e.target.value as "makkah" | "madinah")} required>
+            <option value="makkah">🕋 Hotel Makkah</option>
+            <option value="madinah">🕌 Hotel Madinah</option>
+          </select>
+        </label>
+        <label>
+          <span>Tipe kamar *</span>
+          <select name="roomType" value={roomType} onChange={(e) => setRoomType(e.target.value)} required>
+            <option value="quad">Quad · 4 orang</option>
+            <option value="triple">Triple · 3 orang</option>
+            <option value="double">Double · 2 orang</option>
+          </select>
+        </label>
+        <label>
+          <span>Nomor / Nama Kamar * (Wajib Diisi)</span>
+          <input
+            name="roomNumber"
+            value={roomNumber}
+            onChange={(e) => setRoomNumber(e.target.value)}
+            placeholder="Contoh: MKH-Pullman-Quad-01 atau Kamar 301"
+            required
+          />
+          <small>Nama atau nomor kamar fisik di hotel. Wajib diisi sebelum disimpan.</small>
+        </label>
+      </div>
+      <p className="management-form-note">
+        Sistem otomatis memisahkan kamar laki-laki & perempuan serta menjaga batas kapasitas (Quad 4 orang, Triple 3 orang, Double 2 orang).
+      </p>
+      <SubmitButton>{pending ? "Menyimpan…" : "Simpan Room List"}</SubmitButton>
+    </form>
+  );
 }
+

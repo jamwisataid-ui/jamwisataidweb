@@ -85,6 +85,13 @@
       "when": 1788325200000,
       "tag": "0011_finalize_management_transactions",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1788482353072,
+      "tag": "0012_massive_pride",
+      "breakpoints": true
     }
   ]
 }

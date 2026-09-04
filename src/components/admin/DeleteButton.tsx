@@ -6,12 +6,12 @@ import { AlertTriangle, Loader2, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { deleteArticleAction, deleteEntryAction, deletePackageAction } from "@/lib/cms/actions";
-import { deleteIssuedDocumentAction, deletePilgrimAction } from "@/lib/management/actions";
+import { deleteIssuedDocumentAction, deletePaymentAction, deletePilgrimAction } from "@/lib/management/actions";
 
 interface DeleteButtonProps {
   id: string;
   name: string;
-  type: "package" | "article" | "entry" | "document" | "pilgrim";
+  type: "package" | "article" | "entry" | "document" | "pilgrim" | "payment";
   documentKind?: "invoice" | "receipt";
   entryType?: string;
   variant?: "table" | "form";
@@ -44,7 +44,7 @@ export function DeleteButton({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, isPending]);
 
-  const itemLabel = type === "package" ? "paket" : type === "article" ? "artikel" : type === "pilgrim" ? "jamaah" : type === "document" ? (documentKind === "receipt" ? "kwitansi" : "invoice") : "konten";
+  const itemLabel = type === "package" ? "paket" : type === "article" ? "artikel" : type === "pilgrim" ? "jamaah" : type === "payment" ? "pembayaran" : type === "document" ? (documentKind === "receipt" ? "kwitansi" : "invoice") : "konten";
 
   const confirmDelete = () => {
     startTransition(async () => {
@@ -61,6 +61,8 @@ export function DeleteButton({
         result = await deleteEntryAction(formData);
       } else if (type === "document") {
         result = await deleteIssuedDocumentAction(formData);
+      } else if (type === "payment") {
+        result = await deletePaymentAction(formData);
       } else {
         result = await deletePilgrimAction(formData);
       }

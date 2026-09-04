@@ -34,6 +34,7 @@ export const bookingSchema = z.object({
   dpTarget: money.positive("Target DP wajib lebih dari nol."),
   discountAmount: money.default(0),
   commissionAmount: money.refine((value) => value === 0 || value === 500_000 || value === 1_000_000, "Komisi tidak valid."),
+  roomType: z.enum(["quad", "triple", "double"]).default("quad"),
 });
 
 export const paymentSchema = z.object({

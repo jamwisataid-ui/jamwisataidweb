@@ -160,6 +160,8 @@ export const registrations = pgTable("registrations", {
   discountAmount: bigint("discount_amount", { mode: "number" }).notNull().default(0),
   roomType: text("room_type"),
   roomNumber: text("room_number"),
+  makkahRoomNumber: text("makkah_room_number"),
+  madinahRoomNumber: text("madinah_room_number"),
   commissionAmount: bigint("commission_amount", { mode: "number" }).notNull().default(0),
   status: bookingStatus("status").notNull().default("active"),
   ...timestamps,

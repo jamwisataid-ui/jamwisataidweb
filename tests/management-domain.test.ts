@@ -58,3 +58,18 @@ describe("pengingat ulang tahun", () => {
     expect(upcomingBirthday("1990-08-29", new Date("2026-08-30T05:00:00Z"))).toMatchObject({ daysUntil: 364, age: 37, date: "2027-08-29" });
   });
 });
+
+describe("room list & assignment domain", () => {
+  it("membersihkan nama hotel untuk kode kamar", async () => {
+    const { cleanHotelSlug } = await import("../src/lib/management/domain");
+    expect(cleanHotelSlug("Hotel Pullman Zamzam")).toBe("Pullman");
+    expect(cleanHotelSlug("Akomodasi Arkan Almanar")).toBe("Arkan");
+    expect(cleanHotelSlug(null)).toBe("Hotel");
+  });
+
+  it("menghasilkan nomor kamar default terstruktur per kota dan nomor urut", async () => {
+    const { generateDefaultRoomNumber } = await import("../src/lib/management/domain");
+    expect(generateDefaultRoomNumber({ city: "makkah", hotelName: "Pullman Zamzam", roomType: "quad", roomIndex: 1 })).toBe("MKH-Pullman-Quad-01");
+    expect(generateDefaultRoomNumber({ city: "madinah", hotelName: "Arkan Almanar", roomType: "triple", roomIndex: 3 })).toBe("MDN-Arkan-Triple-03");
+  });
+});

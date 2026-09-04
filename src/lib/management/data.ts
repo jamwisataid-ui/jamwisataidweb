@@ -4,6 +4,7 @@ import { asc, desc, eq } from "drizzle-orm";
 
 import { requireDatabase } from "@/db";
 import {
+  accommodations,
   agents,
   bookings,
   cashTransactions,
@@ -29,7 +30,7 @@ import { dueDate, paymentStatus, upcomingBirthday } from "./domain";
 
 export async function getManagementContext() {
   const db = requireDatabase();
-  const [pilgrimRows, packageRows, departureRows, agentRows, accountRows, categoryRows, settingsRows, bookingRows, registrationRows, paymentRows, allocationRows, refundRows, inventoryRows, movementRows, commissionRows, documentRows, sequenceRows, leadRows, pilgrimDocumentRows, cashRows] = await Promise.all([
+  const [pilgrimRows, packageRows, departureRows, agentRows, accountRows, categoryRows, settingsRows, bookingRows, registrationRows, paymentRows, allocationRows, refundRows, inventoryRows, movementRows, commissionRows, documentRows, sequenceRows, leadRows, pilgrimDocumentRows, cashRows, accommodationRows] = await Promise.all([
     db.select().from(pilgrims).orderBy(desc(pilgrims.createdAt)),
     db.select().from(packages).orderBy(desc(packages.createdAt)),
     db.select().from(departures).orderBy(asc(departures.departureDate)),
@@ -50,6 +51,7 @@ export async function getManagementContext() {
     db.select().from(referralLeads).orderBy(desc(referralLeads.createdAt)),
     db.select().from(pilgrimDocuments).orderBy(desc(pilgrimDocuments.createdAt)),
     db.select().from(cashTransactions).orderBy(desc(cashTransactions.transactionAt)).limit(500),
+    db.select().from(accommodations).orderBy(asc(accommodations.sortOrder)),
   ]);
 
   const pilgrimsById = new Map(pilgrimRows.map((item) => [item.id, item]));
@@ -128,6 +130,7 @@ export async function getManagementContext() {
     sequences: sequenceRows,
     leads: leadRows.map((lead) => ({ ...lead, agent: agentsById.get(lead.agentId), package: lead.packageId ? packagesById.get(lead.packageId) : undefined })),
     pilgrimDocuments: pilgrimDocumentRows,
+    accommodations: accommodationRows,
     cashTransactions: cashRows,
     packageFinancials,
     upcomingBirthdays,

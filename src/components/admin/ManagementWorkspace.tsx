@@ -8,6 +8,7 @@ import { AdminPageHeader } from "./AdminUi";
 import { CsvImportForm } from "./CsvImportForm";
 import { DeleteButton } from "./DeleteButton";
 import { ReportDownloadFilters } from "./ReportDownloadFilters";
+import { RoomListWorkspace } from "./RoomListWorkspace";
 
 type Context = Awaited<ReturnType<typeof getManagementContext>>;
 
@@ -95,7 +96,7 @@ export function ManagementWorkspace({ module, data }: { module?: string; data: C
   if (module === "keuangan") return <Finance data={data} />;
   if (module === "agen-referral") return <Agents data={data} />;
   if (module === "stok") return <Stock data={data} />;
-  if (module === "manifest-room-list") return <Manifest data={data} />;
+  if (module === "manifest-room-list") return <RoomListWorkspace data={data} />;
   if (module === "invoice-kwitansi") return <Invoices data={data} />;
   if (module === "laporan") return <Reports data={data} />;
   if (module === "pengaturan") return <Settings data={data} />;

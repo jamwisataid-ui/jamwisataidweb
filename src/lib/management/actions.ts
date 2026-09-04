@@ -30,7 +30,7 @@ import {
 import { withManagementTransaction } from "@/db/transaction";
 import { requireAdminSession } from "@/lib/admin-session";
 import { issueTransactionDocument } from "./issue-document";
-import { paymentStatus } from "./domain";
+import { paymentStatus, rupiah } from "./domain";
 import { deletePrivateObject } from "./storage";
 import { agentSchema, bookingSchema, cashSchema, fields, type ManagementActionState, paymentSchema, pilgrimSchema, stockMovementSchema } from "./validation";
 
@@ -225,6 +225,7 @@ export async function createBookingAction(_state: ManagementActionState, formDat
       const registrationRows = parsed.data.pilgrimIds.map((pilgrimId) => ({
         id: randomUUID(), bookingId, pilgrimId, agreedPrice: finalPrice,
         discountAmount: parsed.data.discountAmount,
+        roomType: parsed.data.roomType,
         dpTarget: parsed.data.dpTarget || settings?.defaultDpAmount || 5_000_000,
         commissionAmount: parsed.data.agentId ? parsed.data.commissionAmount : 0,
       }));
@@ -537,9 +538,12 @@ export async function saveManagementSettingsAction(_state: ManagementActionState
 export async function assignRoomAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
   const registrationId = String(formData.get("registrationId") ?? "");
   const roomType = String(formData.get("roomType") ?? "").toLowerCase();
+  const city = String(formData.get("city") ?? "makkah").toLowerCase() as "makkah" | "madinah";
   const roomNumber = String(formData.get("roomNumber") ?? "").trim();
   const capacities: Record<string, number> = { double: 2, triple: 3, quad: 4 };
-  if (!registrationId || !capacities[roomType] || !roomNumber) return { ok: false, message: "Jamaah, tipe kamar, dan nomor kamar wajib diisi." };
+  if (!registrationId || !capacities[roomType] || !roomNumber) {
+    return { ok: false, message: "Jamaah, tipe kamar, dan nomor kamar wajib diisi." };
+  }
   try {
     const session = await requireAdminSession();
     await withManagementTransaction(async (tx) => {
@@ -549,25 +553,54 @@ export async function assignRoomAction(_state: ManagementActionState, formData: 
       if (!pilgrim?.gender) throw new Error("Jenis kelamin jamaah wajib diisi sebelum mengatur kamar.");
       const booking = await tx.query.bookings.findFirst({ where: eq(bookings.id, registration.bookingId) });
       if (!booking) throw new Error("Booking tidak ditemukan.");
-      const sameRoom = await tx.select().from(registrations).where(eq(registrations.roomNumber, roomNumber));
-      const relevantRoom = [] as typeof sameRoom;
-      for (const occupant of sameRoom) {
+
+      // Check existing occupants for the same room in this city and departure
+      const cityColumn = city === "madinah" ? registrations.madinahRoomNumber : registrations.makkahRoomNumber;
+      const sameRoomCity = await tx.select().from(registrations).where(and(eq(cityColumn, roomNumber), eq(registrations.status, "active")));
+      // Also fallback to legacy roomNumber if neither city column is populated
+      const sameRoomLegacy = await tx.select().from(registrations).where(and(eq(registrations.roomNumber, roomNumber), eq(registrations.status, "active")));
+      const allCandidates = Array.from(new Map([...sameRoomCity, ...sameRoomLegacy].map((row) => [row.id, row])).values());
+
+      const relevantRoom = [] as typeof allCandidates;
+      for (const occupant of allCandidates) {
         if (occupant.id === registration.id) continue;
         const occupantBooking = await tx.query.bookings.findFirst({ where: eq(bookings.id, occupant.bookingId) });
         if (occupantBooking?.departureId === booking.departureId) relevantRoom.push(occupant);
       }
-      const conflictingType = relevantRoom.find((occupant) => occupant.roomType !== roomType);
+      const conflictingType = relevantRoom.find((occupant) => occupant.roomType && occupant.roomType !== roomType);
       if (conflictingType) throw new Error(`Kamar ${roomNumber} sudah terdaftar sebagai tipe ${conflictingType.roomType}.`);
-      if (relevantRoom.length >= capacities[roomType]) throw new Error(`Kamar ${roomNumber} sudah penuh untuk tipe ${roomType}.`);
+      if (relevantRoom.length >= capacities[roomType]) {
+        throw new Error(`Kamar ${roomNumber} di ${city === "makkah" ? "Makkah" : "Madinah"} sudah penuh untuk tipe ${roomType} (maksimal ${capacities[roomType]} orang).`);
+      }
       for (const occupant of relevantRoom) {
         const occupantPilgrim = await tx.query.pilgrims.findFirst({ where: eq(pilgrims.id, occupant.pilgrimId) });
-        if (occupantPilgrim?.gender && occupantPilgrim.gender !== pilgrim.gender) throw new Error(`Kamar ${roomNumber} sudah dipakai jamaah ${occupantPilgrim.gender.toLowerCase()}.`);
+        if (occupantPilgrim?.gender && occupantPilgrim.gender !== pilgrim.gender) {
+          throw new Error(`Kamar ${roomNumber} sudah dipakai oleh jamaah ${occupantPilgrim.gender.toLowerCase()}.`);
+        }
       }
-      await tx.update(registrations).set({ roomType, roomNumber, updatedAt: new Date() }).where(eq(registrations.id, registration.id));
-      await tx.insert(auditLogs).values({ actorId: session.user.id, action: "assign-room", entityType: "registration", entityId: registration.id, summary: `${pilgrim.fullName} ditempatkan di kamar ${roomNumber} (${roomType})` });
+
+      const updateData: Partial<typeof registrations.$inferInsert> = {
+        roomType,
+        roomNumber, // keep updated for legacy compatibility
+        updatedAt: new Date(),
+      };
+      if (city === "madinah") {
+        updateData.madinahRoomNumber = roomNumber;
+      } else {
+        updateData.makkahRoomNumber = roomNumber;
+      }
+
+      await tx.update(registrations).set(updateData).where(eq(registrations.id, registration.id));
+      await tx.insert(auditLogs).values({
+        actorId: session.user.id,
+        action: "assign-room",
+        entityType: "registration",
+        entityId: registration.id,
+        summary: `${pilgrim.fullName} ditempatkan di kamar ${city === "makkah" ? "Makkah" : "Madinah"} ${roomNumber} (${roomType})`,
+      });
     });
     refresh();
-    return { ok: true, message: "Room List berhasil diperbarui.", redirectTo: `/admin/manajemen/manifest-room-list/${registrationId}` };
+    return { ok: true, message: "Room List berhasil diperbarui.", redirectTo: `/admin/manajemen/manifest-room-list?tab=${city}` };
   } catch (error) { return failure(error); }
 }
 
@@ -608,5 +641,48 @@ export async function deleteIssuedDocumentAction(formData: FormData): Promise<Ma
     }
     refresh();
     return { ok: true, message: `${label} berhasil dihapus.`, redirectTo: "/admin/manajemen/invoice-kwitansi" };
+  } catch (error) { return failure(error); }
+}
+
+export async function deletePaymentAction(formData: FormData): Promise<ManagementActionState> {
+  const id = String(formData.get("id") ?? "").trim();
+  if (!id) return { ok: false, message: "ID pembayaran tidak valid." };
+  try {
+    const session = await requireAdminSession();
+    await withManagementTransaction(async (tx) => {
+      const payment = await tx.query.payments.findFirst({ where: eq(payments.id, id) });
+      if (!payment) throw new Error("Data pembayaran tidak ditemukan.");
+
+      // Check linked receipt
+      const receipt = await tx.query.issuedDocuments.findFirst({
+        where: and(eq(issuedDocuments.paymentId, id), eq(issuedDocuments.status, "issued")),
+      });
+      if (receipt) {
+        throw new Error(`Hapus kwitansi ${receipt.number} terlebih dahulu di menu Invoice & Kwitansi sebelum menghapus data pembayaran ini.`);
+      }
+
+      // Check linked refunds
+      const linkedRefunds = await tx.select().from(refunds).where(eq(refunds.paymentId, id));
+      if (linkedRefunds.length) {
+        throw new Error("Pembayaran memiliki catatan refund dan tidak dapat dihapus langsung.");
+      }
+
+      // Delete cash transactions created by this payment
+      await tx.delete(cashTransactions).where(eq(cashTransactions.paymentId, id));
+      // Delete payment allocations
+      await tx.delete(paymentAllocations).where(eq(paymentAllocations.paymentId, id));
+      // Delete payment record
+      await tx.delete(payments).where(eq(payments.id, id));
+
+      await tx.insert(auditLogs).values({
+        actorId: session.user.id,
+        action: "delete",
+        entityType: "payment",
+        entityId: id,
+        summary: `Pembayaran ${rupiah(payment.amount)} dihapus manual oleh admin`,
+      });
+    });
+    refresh();
+    return { ok: true, message: "Data pembayaran berhasil dihapus. Pemasukan kas dan piutang otomatis dikalkulasi ulang.", redirectTo: "/admin/manajemen/pembayaran" };
   } catch (error) { return failure(error); }
 }
