@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
 import { ManagementDetailPage } from "@/components/admin/ManagementCrudPage";
+import { HppDetailPage } from "@/components/admin/HppPages";
 import { getManagementContext } from "@/lib/management/data";
+import { getHppCosting } from "@/lib/management/hpp-data";
 import { getManagementModule } from "@/lib/management/modules";
 
 export const metadata: Metadata = { title: "Detail Data Manajemen" };
@@ -11,6 +13,11 @@ export default async function ManagementDetailRoute({ params }: { params: Promis
   const { module, id } = await params;
   if (module === "dokumen") redirect(`/admin/manajemen/jamaah/${id}`);
   if (!getManagementModule(module) || ["laporan", "pengaturan"].includes(module)) notFound();
+  if (module === "hpp-umroh") {
+    const hpp = await getHppCosting(id);
+    if (!hpp.costing) notFound();
+    return <HppDetailPage data={hpp} costing={hpp.costing} />;
+  }
   const data = await getManagementContext();
   const page = <ManagementDetailPage module={module} id={id} data={data} />;
   const exists = module === "jamaah" ? data.pilgrims.some((row) => row.id === id)

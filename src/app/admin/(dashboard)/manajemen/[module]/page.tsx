@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { ManagementWorkspace } from "@/components/admin/ManagementWorkspace";
+import { HppListPage } from "@/components/admin/HppPages";
 import { getManagementContext } from "@/lib/management/data";
+import { getHppContext } from "@/lib/management/hpp-data";
 import { getManagementModule, managementModules } from "@/lib/management/modules";
 
 export function generateStaticParams() {
@@ -20,6 +22,7 @@ export default async function ManagementModulePage({ params }: { params: Promise
   if (slug === "dokumen") redirect("/admin/manajemen/jamaah");
   const selectedModule = getManagementModule(slug);
   if (!selectedModule) notFound();
+  if (slug === "hpp-umroh") return <HppListPage data={await getHppContext()} />;
 
   return <ManagementWorkspace module={slug} data={await getManagementContext()} />;
 }

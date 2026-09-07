@@ -9,6 +9,7 @@ import {
   BookOpenText,
   Boxes,
   Building2,
+  Calculator,
   ChartNoAxesCombined,
   ClipboardCheck,
   ContactRound,
@@ -39,7 +40,7 @@ const cmsNav = [
 const managementNav = [
   { label: "Ringkasan", items: [["/admin/manajemen", "Ringkasan", LayoutDashboard]] },
   { label: "Operasional", items: [["/admin/manajemen/jamaah", "Data Jamaah", UsersRound], ["/admin/manajemen/keberangkatan", "Keberangkatan", PlaneTakeoff], ["/admin/manajemen/manifest-room-list", "Manifest & Room List", ClipboardCheck]] },
-  { label: "Keuangan", items: [["/admin/manajemen/pembayaran", "Pembayaran", WalletCards], ["/admin/manajemen/invoice-kwitansi", "Invoice & Kwitansi", ReceiptText], ["/admin/manajemen/keuangan", "Kas & Keuangan", BadgeDollarSign], ["/admin/manajemen/laporan", "Pusat Laporan", ChartNoAxesCombined]] },
+  { label: "Keuangan", items: [["/admin/manajemen/pembayaran", "Pembayaran", WalletCards], ["/admin/manajemen/invoice-kwitansi", "Invoice & Kwitansi", ReceiptText], ["/admin/manajemen/keuangan", "Kas & Keuangan", BadgeDollarSign], ["/admin/manajemen/hpp-umroh", "HPP Paket Umrah", Calculator], ["/admin/manajemen/laporan", "Pusat Laporan", ChartNoAxesCombined]] },
   { label: "Pemasaran & logistik", items: [["/admin/manajemen/agen-referral", "Agen & Referral", ContactRound], ["/admin/manajemen/stok", "Stok Perlengkapan", Boxes]] },
   { label: "Sistem", items: [["/admin/manajemen/pengaturan", "Pengaturan", Settings2]] },
 ] as const;

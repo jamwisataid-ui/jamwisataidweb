@@ -36,6 +36,12 @@ export const managementModules = [
     description: "Kelola kas masuk, kas keluar, piutang, biaya, dan estimasi laba setiap paket.",
   },
   {
+    slug: "hpp-umroh",
+    title: "HPP & Simulasi Paket",
+    eyebrow: "KALKULATOR PAKET UMRAH",
+    description: "Hitung biaya paket, FOC, margin, dan harga jual sebelum diterapkan ke website.",
+  },
+  {
     slug: "agen-referral",
     title: "Agen & Referral",
     eyebrow: "PEMASARAN AGEN",

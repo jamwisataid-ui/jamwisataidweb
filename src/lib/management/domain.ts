@@ -181,11 +181,11 @@ export function computeDepartureReports({
     airline?: string;
     status?: string;
   }>;
-  registrations: Array<any>;
-  payments: Array<any>;
-  cashTransactions: Array<any>;
-  commissions: Array<any>;
-  refunds: Array<any>;
+  registrations: Array<{ id: string; status: string; agreedPrice: number; departure?: { id: string }; payment?: { outstanding: number; netPaid: number; status: string }; agent?: { name: string }; pilgrim?: { fullName: string; whatsapp: string; gender: string | null; passportNumber: string | null }; roomType?: string | null; roomNumber?: string | null; makkahRoomNumber?: string | null; madinahRoomNumber?: string | null }>;
+  payments: Array<{ status: string; isIncludedInReports?: boolean; allocations?: Array<{ registrationId: string; amount: number }> }>;
+  cashTransactions: Array<{ packageId: string | null; direction: string; kind: string; isReversal: boolean; isIncludedInReports?: boolean; amount: number }>;
+  commissions: Array<{ registrationId: string; status: string; amount: number }>;
+  refunds: Array<{ registrationId: string | null; status: string; amount: number }>;
 }): DepartureReportItem[] {
   return departures.map((dep) => {
     const depRegs = registrations.filter(
@@ -193,10 +193,10 @@ export function computeDepartureReports({
     );
     const regIds = new Set(depRegs.map((r) => r.id));
 
-    const validPayments = payments.filter((p) => p.status === "confirmed" && (p as any).isIncludedInReports !== false);
+    const validPayments = payments.filter((p) => p.status === "confirmed" && p.isIncludedInReports !== false);
     let totalPaid = 0;
     validPayments.forEach((p) => {
-      (p.allocations || []).forEach((alloc: any) => {
+      (p.allocations || []).forEach((alloc) => {
         if (regIds.has(alloc.registrationId)) {
           totalPaid += alloc.amount;
         }
@@ -215,7 +215,7 @@ export function computeDepartureReports({
           c.kind !== "refund" &&
           c.kind !== "commission" &&
           !c.isReversal &&
-          (c as any).isIncludedInReports !== false
+          c.isIncludedInReports !== false
       )
       .reduce((sum, c) => sum + c.amount, 0);
 
@@ -263,4 +263,3 @@ export function computeDepartureReports({
     };
   });
 }
-

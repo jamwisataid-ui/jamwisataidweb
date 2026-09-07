@@ -6,6 +6,7 @@ import {
   index,
   integer,
   jsonb,
+  numeric,
   pgEnum,
   pgTable,
   text,
@@ -38,6 +39,10 @@ export const issuedDocumentKind = pgEnum("issued_document_kind", ["invoice", "re
 export const issuedDocumentStatus = pgEnum("issued_document_status", ["issued", "void"]);
 export const numberingReset = pgEnum("numbering_reset", ["never", "monthly", "yearly"]);
 export const leadStatus = pgEnum("referral_lead_status", ["new", "contacted", "converted", "closed"]);
+export const hppStatus = pgEnum("hpp_status", ["draft", "final", "applied", "archived"]);
+export const hppCurrency = pgEnum("hpp_currency", ["IDR", "USD", "SAR"]);
+export const hppCostBasis = pgEnum("hpp_cost_basis", ["per_pax", "group", "room_per_night"]);
+export const hppLaMode = pgEnum("hpp_la_mode", ["package", "hotel_detail"]);
 
 export const managementSettings = pgTable("management_settings", {
   id: text("id").primaryKey().default("default"),
@@ -323,4 +328,73 @@ export const issuedDocuments = pgTable("issued_documents", {
 }, (table) => [
   uniqueIndex("issued_documents_kind_number_idx").on(table.kind, table.number),
   index("issued_documents_booking_idx").on(table.bookingId, table.issuedAt),
+]);
+
+export const hppPriceMaster = pgTable("hpp_price_master", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  code: text("code").notNull(),
+  category: text("category").notNull(),
+  name: text("name").notNull(),
+  currency: hppCurrency("currency").notNull().default("IDR"),
+  costBasis: hppCostBasis("cost_basis").notNull().default("per_pax"),
+  amount: numeric("amount", { precision: 18, scale: 2 }).notNull().default("0"),
+  metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
+  sortOrder: integer("sort_order").notNull().default(0),
+  status: recordStatus("status").notNull().default("active"),
+  updatedBy: text("updated_by").references(() => users.id, { onDelete: "set null" }),
+  ...timestamps,
+}, (table) => [
+  uniqueIndex("hpp_price_master_code_idx").on(table.code),
+  index("hpp_price_master_category_idx").on(table.category, table.sortOrder),
+]);
+
+export const hppCostings = pgTable("hpp_costings", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  title: text("title").notNull(),
+  packageId: text("package_id").references(() => packages.id, { onDelete: "set null" }),
+  departureId: uuid("departure_id").references(() => departures.id, { onDelete: "set null" }),
+  departureDate: date("departure_date", { mode: "string" }),
+  season: text("season").notNull().default("high"),
+  laMode: hppLaMode("la_mode").notNull().default("package"),
+  durationDays: integer("duration_days").notNull(),
+  paxCount: integer("pax_count").notNull(),
+  usdRate: numeric("usd_rate", { precision: 18, scale: 2 }).notNull(),
+  sarRate: numeric("sar_rate", { precision: 18, scale: 2 }).notNull(),
+  profitMargin: numeric("profit_margin", { precision: 18, scale: 2 }).notNull().default("0"),
+  marketingFee: numeric("marketing_fee", { precision: 18, scale: 2 }).notNull().default("0"),
+  subtotalBase: numeric("subtotal_base", { precision: 18, scale: 2 }).notNull().default("0"),
+  focTourLeader: numeric("foc_tour_leader", { precision: 18, scale: 2 }).notNull().default("0"),
+  hppPerPax: numeric("hpp_per_pax", { precision: 18, scale: 2 }).notNull().default("0"),
+  sellingPrice: numeric("selling_price", { precision: 18, scale: 2 }).notNull().default("0"),
+  appliedPrice: bigint("applied_price", { mode: "number" }),
+  formulaVersion: text("formula_version").notNull().default("muhasib-v1"),
+  status: hppStatus("status").notNull().default("draft"),
+  notes: text("notes"),
+  snapshot: jsonb("snapshot").$type<Record<string, unknown>>().notNull().default({}),
+  createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
+  updatedBy: text("updated_by").references(() => users.id, { onDelete: "set null" }),
+  appliedAt: timestamp("applied_at", { withTimezone: true }),
+  ...timestamps,
+}, (table) => [
+  index("hpp_costings_status_updated_idx").on(table.status, table.updatedAt),
+  index("hpp_costings_package_idx").on(table.packageId),
+]);
+
+export const hppCostingItems = pgTable("hpp_costing_items", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  costingId: uuid("costing_id").notNull().references(() => hppCostings.id, { onDelete: "cascade" }),
+  code: text("code").notNull(),
+  category: text("category").notNull(),
+  name: text("name").notNull(),
+  currency: hppCurrency("currency").notNull().default("IDR"),
+  costBasis: hppCostBasis("cost_basis").notNull().default("per_pax"),
+  unitAmount: numeric("unit_amount", { precision: 18, scale: 2 }).notNull().default("0"),
+  quantity: numeric("quantity", { precision: 10, scale: 2 }).notNull().default("1"),
+  computedPerPax: numeric("computed_per_pax", { precision: 18, scale: 2 }).notNull().default("0"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
+  ...timestamps,
+}, (table) => [
+  uniqueIndex("hpp_costing_items_costing_code_idx").on(table.costingId, table.code),
+  index("hpp_costing_items_costing_sort_idx").on(table.costingId, table.sortOrder),
 ]);
