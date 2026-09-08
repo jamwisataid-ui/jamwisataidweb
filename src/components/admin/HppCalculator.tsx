@@ -210,5 +210,38 @@ export function HppCalculator({ initial, masters, departures }: { initial?: HppF
 }
 
 function HotelSelector({ label, value, masters, onChange, item, onItemChange }: { label: string; value: string; masters: Master[]; onChange: (id: string) => void; item?: HppItemInput; onItemChange: (patch: Partial<HppItemInput>) => void }) {
-  return <fieldset className="hpp-hotel-field"><legend>{label}</legend><label><span>Pilih hotel Quad</span><select value={value} onChange={(e) => onChange(e.target.value)}><option value="">Pilih hotel</option>{masters.map((master) => <option value={master.id} key={master.id}>{master.name}</option>)}</select></label><div><label><span>Tarif SAR/kamar/malam</span><input inputMode="numeric" value={item?.unitAmount ?? 0} onChange={(e) => onItemChange({ unitAmount: cleanNumber(e.target.value) })} /></label><label><span>Jumlah malam</span><input type="number" min="0" value={item?.quantity ?? 0} onChange={(e) => onItemChange({ quantity: cleanNumber(e.target.value) })} /></label></div><small>Harga dibagi otomatis untuk 4 jamaah. Triple/Double dapat ditambahkan lewat Master Harga.</small></fieldset>;
+  return (
+    <fieldset className="hpp-hotel-field">
+      <legend>{label}</legend>
+      <label>
+        <span>Pilih nama hotel (Sekamar Berempat / Quad)</span>
+        <select value={value} onChange={(e) => onChange(e.target.value)}>
+          <option value="">-- Pilih dari daftar {masters.length} hotel master --</option>
+          {masters.map((master) => {
+            const low = master.metadata?.low ? `Low ${master.metadata.low}` : "";
+            const high = master.metadata?.high ? `High ${master.metadata.high} SAR` : "";
+            const rateDesc = [low, high].filter(Boolean).join(" / ");
+            return (
+              <option value={master.id} key={master.id}>
+                {master.name} {rateDesc ? `(${rateDesc})` : `(${master.amount} SAR)`}
+              </option>
+            );
+          })}
+        </select>
+      </label>
+      <div>
+        <label>
+          <span>Tarif SAR / kamar / malam</span>
+          <input inputMode="numeric" value={item?.unitAmount ?? 0} onChange={(e) => onItemChange({ unitAmount: cleanNumber(e.target.value) })} />
+          <small>{item?.unitAmount ? `${item.unitAmount} Riyal / malam` : "Pilih hotel atau ketik manual"}</small>
+        </label>
+        <label>
+          <span>Jumlah malam menginap</span>
+          <input type="number" min="0" max="30" value={item?.quantity ?? 0} onChange={(e) => onItemChange({ quantity: cleanNumber(e.target.value) })} />
+          <small>{item?.quantity ? `${item.quantity} malam` : "Contoh: 4 malam"}</small>
+        </label>
+      </div>
+      <small>Kamar Quad (sekamar berempat): Biaya otomatis dibagi rata 4 orang jamaah.</small>
+    </fieldset>
+  );
 }
