@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateHpp, DEFAULT_HPP_ITEMS, hppMasterCode, itemCostPerPax, roundSellingPrice } from "../src/lib/management/hpp";
+import { applyHppMasterPrices, calculateHpp, DEFAULT_HPP_ITEMS, hppMasterCode, itemCostPerPax, roundSellingPrice } from "../src/lib/management/hpp";
 
 describe("HPP Umrah", () => {
   it("mereproduksi golden case MUHASIB 35 pax", () => {
@@ -24,5 +24,23 @@ describe("HPP Umrah", () => {
 
   it("membuat kode master yang aman dan konsisten", () => {
     expect(hppMasterCode("hotel_makkah", "Mövenpick Hotel *****", "A1B2-C3D4-E5F6")).toBe("hotel_makkah-movenpick-hotel-a1b2c3d4");
+  });
+
+  it("menghubungkan harga, jumlah, mata uang, dan cara hitung dari master", () => {
+    const items = applyHppMasterPrices(DEFAULT_HPP_ITEMS, [{ code: "main_ticket", name: "Tiket utama", currency: "IDR", costBasis: "per_pax", amount: 16_000_000, metadata: { defaultQuantity: 2 } }]);
+    const ticket = items.find((item) => item.code === "main_ticket");
+    expect(ticket).toMatchObject({ unitAmount: 16_000_000, quantity: 2, costBasis: "per_pax" });
+    expect(itemCostPerPax(ticket!, { paxCount: 35, usdRate: 17_000, sarRate: 4_500 })).toBe(32_000_000);
+  });
+
+  it("menghitung bus berangkat dan datang per jamaah", () => {
+    const buses = DEFAULT_HPP_ITEMS.filter((item) => item.code === "departure_bus" || item.code === "arrival_bus");
+    expect(buses.every((item) => item.costBasis === "per_pax")).toBe(true);
+    expect(itemCostPerPax({ ...buses[0], unitAmount: 250_000, quantity: 2 }, { paxCount: 40, usdRate: 1, sarRate: 1 })).toBe(500_000);
+  });
+
+  it("harga jual final selalu sama dengan HPP ditambah keuntungan dan fee", () => {
+    const result = calculateHpp({ paxCount: 35, usdRate: 17_649, sarRate: 4_817, profitMargin: 2_500_000, marketingFee: 500_000, items: DEFAULT_HPP_ITEMS });
+    expect(result.sellingPrice).toBeCloseTo(result.hppPerPax + 3_000_000, 5);
   });
 });

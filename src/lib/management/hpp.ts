@@ -40,6 +40,32 @@ export type HppInput = {
   items: HppItemInput[];
 };
 
+export type HppMasterValue = {
+  code: string;
+  name: string;
+  currency: HppCurrency;
+  costBasis: HppCostBasis;
+  amount: string | number;
+  metadata?: Record<string, unknown>;
+};
+
+export function applyHppMasterPrices(items: HppItemInput[], masters: HppMasterValue[]) {
+  const byCode = new Map(masters.map((master) => [master.code, master]));
+  return items.map((item) => {
+    const master = byCode.get(item.code);
+    if (!master) return { ...item };
+    const defaultQuantity = Number(master.metadata?.defaultQuantity);
+    return {
+      ...item,
+      name: master.name,
+      currency: master.currency,
+      costBasis: master.costBasis,
+      unitAmount: Number(master.amount) || 0,
+      quantity: Number.isFinite(defaultQuantity) && defaultQuantity >= 0 ? defaultQuantity : item.quantity,
+    };
+  });
+}
+
 export function currencyRate(currency: HppCurrency, input: Pick<HppInput, "usdRate" | "sarRate">) {
   if (currency === "USD") return input.usdRate;
   if (currency === "SAR") return input.sarRate;
@@ -97,9 +123,9 @@ export const DEFAULT_HPP_ITEMS: HppItemInput[] = [
   { code: "handling_domestic", category: "handling", name: "Handling domestik", currency: "IDR", costBasis: "per_pax", unitAmount: 25_000, quantity: 1 },
   { code: "domestic_meal", category: "handling", name: "Konsumsi transit domestik", currency: "IDR", costBasis: "per_pax", unitAmount: 35_000, quantity: 2 },
   { code: "lounge", category: "handling", name: "Lounge", currency: "IDR", costBasis: "per_pax", unitAmount: 0, quantity: 1 },
-  { code: "departure_bus", category: "departure_bus", name: "Sewa bus keberangkatan", currency: "IDR", costBasis: "group", unitAmount: 0, quantity: 1 },
+  { code: "departure_bus", category: "departure_bus", name: "Sewa bus keberangkatan", currency: "IDR", costBasis: "per_pax", unitAmount: 0, quantity: 1 },
   { code: "departure_snack", category: "departure_bus", name: "Snack bus keberangkatan", currency: "IDR", costBasis: "per_pax", unitAmount: 15_000, quantity: 1 },
-  { code: "arrival_bus", category: "arrival_bus", name: "Sewa bus kedatangan", currency: "IDR", costBasis: "group", unitAmount: 13_000_000, quantity: 1 },
+  { code: "arrival_bus", category: "arrival_bus", name: "Sewa bus kedatangan", currency: "IDR", costBasis: "per_pax", unitAmount: 371_428.5714, quantity: 1 },
   { code: "arrival_snack", category: "arrival_bus", name: "Snack bus kedatangan", currency: "IDR", costBasis: "per_pax", unitAmount: 15_000, quantity: 1 },
   { code: "mandatory_equipment", category: "equipment", name: "Perlengkapan wajib", currency: "IDR", costBasis: "per_pax", unitAmount: 250_000, quantity: 1 },
   { code: "optional_equipment", category: "equipment", name: "Perlengkapan opsional", currency: "IDR", costBasis: "per_pax", unitAmount: 675_000, quantity: 1 },

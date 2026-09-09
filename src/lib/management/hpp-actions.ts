@@ -9,7 +9,7 @@ import { z } from "zod";
 import { auditLogs, departures, hppCostingItems, hppCostings, hppPriceMaster } from "@/db/schema";
 import { withManagementTransaction } from "@/db/transaction";
 import { requireAdminSession } from "@/lib/admin-session";
-import { calculateHpp, HPP_FORMULA_VERSION, HPP_MASTER_CATEGORIES, hppMasterCode, roundSellingPrice } from "./hpp";
+import { calculateHpp, HPP_FORMULA_VERSION, HPP_MASTER_CATEGORIES, hppMasterCode } from "./hpp";
 import type { ManagementActionState } from "./validation";
 
 const money = z.coerce.number().finite().min(0).max(Number.MAX_SAFE_INTEGER);
@@ -20,7 +20,25 @@ const masterSchema = z.object({
   currency: z.enum(["IDR", "USD", "SAR"]),
   costBasis: z.enum(["per_pax", "group", "room_per_night"]),
   amount: money,
+  defaultQuantity: money.default(1),
 });
+
+function localizedNumber(value: FormDataEntryValue | null, fallback = 0) {
+  if (typeof value !== "string") return fallback;
+  const raw = value.trim().replace(/\s/g, "").replace(/[^\d,.-]/g, "");
+  if (!raw) return fallback;
+  const lastComma = raw.lastIndexOf(",");
+  const lastDot = raw.lastIndexOf(".");
+  let normalized = raw;
+  if (lastComma >= 0 && lastDot >= 0) {
+    const decimal = lastComma > lastDot ? "," : ".";
+    normalized = raw.replace(decimal === "," ? /\./g : /,/g, "").replace(decimal, ".");
+  } else if ((raw.match(/\./g) ?? []).length > 1 || (/\.\d{3}$/.test(raw) && !/\.\d{1,2}$/.test(raw))) normalized = raw.replace(/\./g, "");
+  else if ((raw.match(/,/g) ?? []).length > 1 || (/,\d{3}$/.test(raw) && !/,\d{1,2}$/.test(raw))) normalized = raw.replace(/,/g, "");
+  else normalized = raw.replace(",", ".");
+  const result = Number(normalized);
+  return Number.isFinite(result) ? result : fallback;
+}
 const itemSchema = z.object({
   code: z.string().min(1), category: z.string().min(1), name: z.string().min(2),
   currency: z.enum(["IDR", "USD", "SAR"]), costBasis: z.enum(["per_pax", "group", "room_per_night"]),
@@ -70,7 +88,7 @@ export async function saveHppCostingAction(_state: ManagementActionState, formDa
         durationDays: input.durationDays, paxCount: input.paxCount, usdRate: String(input.usdRate), sarRate: String(input.sarRate),
         profitMargin: String(input.profitMargin), marketingFee: String(input.marketingFee), subtotalBase: result.subtotalBase.toFixed(2),
         focTourLeader: result.focTourLeader.toFixed(2), hppPerPax: result.hppPerPax.toFixed(2), sellingPrice: result.sellingPrice.toFixed(2),
-        appliedPrice: Math.round(input.appliedPrice || roundSellingPrice(result.sellingPrice)), formulaVersion: HPP_FORMULA_VERSION,
+        appliedPrice: Math.round(input.appliedPrice || result.sellingPrice), formulaVersion: HPP_FORMULA_VERSION,
         status: input.status, notes: input.notes || null, snapshot: { input, result, savedAt: new Date().toISOString() },
         updatedBy: session.user.id, updatedAt: new Date(),
       } as const;
@@ -171,22 +189,29 @@ export async function saveHppMasterAction(_state: ManagementActionState, formDat
   try {
     const session = await requireAdminSession();
     const id = String(formData.get("id") ?? "");
-    const amount = Number(formData.get("amount") ?? 0);
+    const amount = localizedNumber(formData.get("amount"));
     const currency = String(formData.get("currency") ?? "IDR") as "IDR" | "USD" | "SAR";
-    if (!id || !Number.isFinite(amount) || amount < 0 || !["IDR", "USD", "SAR"].includes(currency)) throw new Error("Harga master tidak valid.");
+    const costBasis = String(formData.get("costBasis") ?? "per_pax") as "per_pax" | "group" | "room_per_night";
+    const defaultQuantity = localizedNumber(formData.get("defaultQuantity"), 1);
+    if (!id || !Number.isFinite(amount) || amount < 0 || !["IDR", "USD", "SAR"].includes(currency) || !["per_pax", "group", "room_per_night"].includes(costBasis) || defaultQuantity < 0) throw new Error("Harga, jumlah, atau cara hitung master tidak valid.");
     await withManagementTransaction(async (tx) => {
       const item = await tx.query.hppPriceMaster.findFirst({ where: eq(hppPriceMaster.id, id) });
       if (!item) throw new Error("Item master tidak ditemukan.");
-      await tx.update(hppPriceMaster).set({ amount: String(amount), currency, updatedBy: session.user.id, updatedAt: new Date() }).where(eq(hppPriceMaster.id, id));
+      const seasonal = item.category === "hotel_makkah" || item.category === "hotel_madinah" ? {
+        low: localizedNumber(formData.get("low"), Number(item.metadata.low ?? amount)),
+        medium: localizedNumber(formData.get("medium"), Number(item.metadata.medium ?? amount)),
+        high: localizedNumber(formData.get("high"), Number(item.metadata.high ?? amount)),
+      } : {};
+      await tx.update(hppPriceMaster).set({ amount: String(amount), currency, costBasis, metadata: { ...item.metadata, ...seasonal, defaultQuantity }, updatedBy: session.user.id, updatedAt: new Date() }).where(eq(hppPriceMaster.id, id));
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "update", entityType: "hpp_price_master", entityId: id, summary: `Harga default ${item.name} diperbarui` });
     });
     revalidatePath("/admin/manajemen/hpp-umroh", "layout");
-    return { ok: true, message: "Harga default berhasil diperbarui." };
+    return { ok: true, message: "Harga dan jumlah default berhasil diperbarui.", redirectTo: "/admin/manajemen/hpp-umroh/master-harga" };
   } catch (error) { return fail(error); }
 }
 
 export async function createHppMasterAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
-  const parsed = masterSchema.safeParse(Object.fromEntries(formData.entries()));
+  const parsed = masterSchema.safeParse({ ...Object.fromEntries(formData.entries()), amount: localizedNumber(formData.get("amount")), defaultQuantity: localizedNumber(formData.get("defaultQuantity"), 1) });
   if (!parsed.success) return { ok: false, message: "Periksa data master yang ditandai.", errors: parsed.error.flatten().fieldErrors as Record<string, string[]> };
   try {
     const session = await requireAdminSession();
@@ -204,6 +229,7 @@ export async function createHppMasterAction(_state: ManagementActionState, formD
         currency: input.currency,
         costBasis: input.costBasis,
         amount: String(input.amount),
+        metadata: { defaultQuantity: input.defaultQuantity },
         sortOrder: (last?.sortOrder ?? 0) + 10,
         updatedBy: session.user.id,
       });

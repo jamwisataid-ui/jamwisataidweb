@@ -1,20 +1,19 @@
 "use client";
 
 import { useActionState, useEffect, useMemo, useState } from "react";
-import { Calculator, CheckCircle2, ChevronDown, CircleAlert, HelpCircle, Hotel, Info, Save, Sparkles } from "lucide-react";
+import { Calculator, CheckCircle2, ChevronDown, CircleAlert, Hotel, RefreshCw, Save, Sparkles } from "lucide-react";
 import { FormFeedback } from "./FormFeedback";
 import { saveHppCostingAction } from "@/lib/management/hpp-actions";
-import { calculateHpp, DEFAULT_HPP_ITEMS, HPP_CATEGORIES, roundSellingPrice, type HppCostBasis, type HppCurrency, type HppItemInput, type HppLaMode } from "@/lib/management/hpp";
+import { applyHppMasterPrices, calculateHpp, DEFAULT_HPP_ITEMS, HPP_CATEGORIES, roundSellingPrice, type HppCostBasis, type HppCurrency, type HppItemInput, type HppLaMode } from "@/lib/management/hpp";
 import type { ManagementActionState } from "@/lib/management/validation";
 
 const initialState: ManagementActionState = { ok: false, message: "" };
 const currency = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 });
-const number = new Intl.NumberFormat("id-ID", { maximumFractionDigits: 2 });
 
 export type HppFormInitial = {
   id?: string; title?: string; packageId?: string | null; departureId?: string | null; departureDate?: string | null;
   season?: string; laMode?: HppLaMode; durationDays?: number; paxCount?: number; usdRate?: string | number; sarRate?: string | number;
-  profitMargin?: string | number; marketingFee?: string | number; appliedPrice?: number | null; notes?: string | null;
+  profitMargin?: string | number; marketingFee?: string | number; sellingPrice?: string | number; appliedPrice?: number | null; notes?: string | null;
   items?: Array<{ code: string; category: string; name: string; currency: HppCurrency; costBasis: HppCostBasis; unitAmount: string | number; quantity: string | number; metadata?: Record<string, unknown> }>;
 };
 
@@ -22,17 +21,19 @@ type Master = { id: string; code: string; category: string; name: string; curren
 type Departure = { id: string; departureDate: string; price: string; packageId: string; package?: { name: string } };
 
 function numeric(value: unknown) { return Number(typeof value === "string" || typeof value === "number" ? value : 0) || 0; }
-function cleanNumber(value: string) { return Number(value.replace(/[^\d.]/g, "")) || 0; }
+function cleanMoney(value: string) { return Number(value.replace(/[^\d]/g, "")) || 0; }
+function cleanQuantity(value: string) {
+  const normalized = value.trim().replace(/,/g, ".").replace(/[^\d.]/g, "");
+  const [whole = "0", ...decimals] = normalized.split(".");
+  return Number(decimals.length ? `${whole}.${decimals.join("")}` : whole) || 0;
+}
 
 export function HppCalculator({ initial, masters, departures }: { initial?: HppFormInitial; masters: Master[]; departures: Departure[] }) {
-  const masterMap = useMemo(() => new Map(masters.map((item) => [item.code, item])), [masters]);
   const startingItems = useMemo<HppItemInput[]>(() => {
     if (initial?.items?.length) return initial.items.map((item) => ({ ...item, unitAmount: numeric(item.unitAmount), quantity: numeric(item.quantity), occupancy: numeric(item.metadata?.occupancy) || undefined }));
-    return DEFAULT_HPP_ITEMS.map((item) => {
-      const master = masterMap.get(item.code);
-      return master ? { ...item, name: master.name, currency: master.currency, costBasis: master.costBasis, unitAmount: numeric(master.amount), quantity: numeric(master.metadata?.defaultQuantity) || item.quantity } : { ...item };
-    });
-  }, [initial, masterMap]);
+    return applyHppMasterPrices(DEFAULT_HPP_ITEMS, masters);
+  }, [initial, masters]);
+  const masterFingerprint = useMemo(() => masters.map((item) => `${item.code}:${item.amount}:${item.currency}:${item.costBasis}:${item.metadata?.defaultQuantity ?? 1}:${item.metadata?.low ?? ""}:${item.metadata?.medium ?? ""}:${item.metadata?.high ?? ""}`).join("|"), [masters]);
   const [state, action, pending] = useActionState(saveHppCostingAction, initialState);
   const [title, setTitle] = useState(initial?.title ?? "");
   const [departureId, setDepartureId] = useState(initial?.departureId ?? "");
@@ -46,6 +47,8 @@ export function HppCalculator({ initial, masters, departures }: { initial?: HppF
   const [profitMargin, setProfitMargin] = useState(numeric(initial?.profitMargin) || 1_000_000);
   const [marketingFee, setMarketingFee] = useState(numeric(initial?.marketingFee) || 1_000_000);
   const [appliedPrice, setAppliedPrice] = useState(numeric(initial?.appliedPrice));
+  const initialSellingPrice = numeric(initial?.sellingPrice);
+  const [manualPrice, setManualPrice] = useState(Boolean(initial?.appliedPrice && initialSellingPrice && ![Math.round(initialSellingPrice), roundSellingPrice(initialSellingPrice)].includes(numeric(initial.appliedPrice))));
   const [notes, setNotes] = useState(initial?.notes ?? "");
   const [items, setItems] = useState(startingItems);
   const [saveLabel, setSaveLabel] = useState("Belum ada perubahan");
@@ -58,6 +61,8 @@ export function HppCalculator({ initial, masters, departures }: { initial?: HppF
     try { return calculateHpp({ paxCount, usdRate, sarRate, profitMargin, marketingFee, items }); }
     catch { return { items: [], subtotalBase: 0, focTourLeader: 0, hppPerPax: 0, sellingPrice: 0 }; }
   }, [items, marketingFee, paxCount, profitMargin, sarRate, usdRate]);
+  const calculatedFinalPrice = Math.round(result.sellingPrice);
+  const effectiveFinalPrice = manualPrice ? appliedPrice : calculatedFinalPrice;
 
   useEffect(() => {
     if (initial?.id) return;
@@ -66,6 +71,11 @@ export function HppCalculator({ initial, masters, departures }: { initial?: HppF
     const timer = window.setTimeout(() => {
       try {
         const draft = JSON.parse(saved);
+        if (draft.masterFingerprint !== masterFingerprint) {
+          localStorage.removeItem(storageKey);
+          setSaveLabel("Master harga terbaru sudah dimuat");
+          return;
+        }
         if (draft.title) setTitle(draft.title);
         if (Array.isArray(draft.items)) setItems(draft.items);
         setDepartureId(draft.departureId ?? ""); setDepartureDate(draft.departureDate ?? "");
@@ -73,19 +83,19 @@ export function HppCalculator({ initial, masters, departures }: { initial?: HppF
         setDurationDays(numeric(draft.durationDays) || 9); setPaxCount(numeric(draft.paxCount) || 35);
         setUsdRate(numeric(draft.usdRate) || 17649); setSarRate(numeric(draft.sarRate) || 4817);
         setProfitMargin(numeric(draft.profitMargin)); setMarketingFee(numeric(draft.marketingFee));
-        setAppliedPrice(numeric(draft.appliedPrice)); setNotes(draft.notes ?? ""); setSaveLabel("Draft dipulihkan dari perangkat");
+        setAppliedPrice(numeric(draft.appliedPrice)); setManualPrice(Boolean(draft.manualPrice)); setNotes(draft.notes ?? ""); setSaveLabel("Draft dipulihkan dari perangkat");
       } catch { localStorage.removeItem(storageKey); }
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [initial?.id, storageKey]);
+  }, [initial?.id, masterFingerprint, storageKey]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      localStorage.setItem(storageKey, JSON.stringify({ title, departureId, departureDate, season, laMode, durationDays, paxCount, usdRate, sarRate, profitMargin, marketingFee, appliedPrice, notes, items }));
+      localStorage.setItem(storageKey, JSON.stringify({ masterFingerprint, title, departureId, departureDate, season, laMode, durationDays, paxCount, usdRate, sarRate, profitMargin, marketingFee, appliedPrice: effectiveFinalPrice, manualPrice, notes, items }));
       setSaveLabel("Draft aman di perangkat");
     }, 650);
     return () => window.clearTimeout(timer);
-  }, [appliedPrice, departureDate, departureId, durationDays, items, laMode, marketingFee, notes, paxCount, profitMargin, sarRate, season, storageKey, title, usdRate]);
+  }, [appliedPrice, departureDate, departureId, durationDays, effectiveFinalPrice, items, laMode, manualPrice, marketingFee, masterFingerprint, notes, paxCount, profitMargin, sarRate, season, storageKey, title, usdRate]);
 
   function updateItem(code: string, patch: Partial<HppItemInput>) { setItems((current) => current.map((item) => item.code === code ? { ...item, ...patch } : item)); }
   function chooseDeparture(id: string) {
@@ -108,7 +118,7 @@ export function HppCalculator({ initial, masters, departures }: { initial?: HppF
     const code = `hotel_${city}`;
     setItems((current) => {
       const withoutLa = current.filter((item) => item.code !== "land_arrangement" && item.code !== code);
-      return [...withoutLa, { code, category: "la", name: selected.name, currency: "SAR", costBasis: "room_per_night", unitAmount: rate, quantity: 4, occupancy: 4 }];
+      return [...withoutLa, { code, category: "la", name: selected.name, currency: selected.currency, costBasis: "room_per_night", unitAmount: rate, quantity: numeric(selected.metadata.defaultQuantity) || 4, occupancy: 4 }];
     });
   }
   function changeSeason(value: string) {
@@ -123,8 +133,23 @@ export function HppCalculator({ initial, masters, departures }: { initial?: HppF
   function switchLaMode(mode: HppLaMode) {
     setLaMode(mode);
     if (mode === "package") {
-      setItems((current) => [...current.filter((item) => !item.code.startsWith("hotel_")), DEFAULT_HPP_ITEMS.find((item) => item.code === "land_arrangement")!]);
+      const landArrangement = applyHppMasterPrices([DEFAULT_HPP_ITEMS.find((item) => item.code === "land_arrangement")!], masters)[0];
+      setItems((current) => [...current.filter((item) => !item.code.startsWith("hotel_") && item.code !== "land_arrangement"), landArrangement]);
     } else setItems((current) => current.filter((item) => item.code !== "land_arrangement"));
+  }
+
+  function syncLatestMaster() {
+    setItems((current) => {
+      let next = applyHppMasterPrices(current, masters);
+      const selectedLa = masters.find((item) => item.code === laPreset);
+      if (selectedLa) next = next.map((item) => item.code === "land_arrangement" ? { ...item, name: selectedLa.name, currency: selectedLa.currency, costBasis: "per_pax", unitAmount: numeric(selectedLa.amount) } : item);
+      const selectedMakkah = masters.find((item) => item.id === makkahHotel);
+      const selectedMadinah = masters.find((item) => item.id === madinahHotel);
+      if (selectedMakkah) next = next.map((item) => item.code === "hotel_makkah" ? { ...item, unitAmount: numeric(selectedMakkah.metadata[season] ?? selectedMakkah.amount) } : item);
+      if (selectedMadinah) next = next.map((item) => item.code === "hotel_madinah" ? { ...item, unitAmount: numeric(selectedMadinah.metadata[season] ?? selectedMadinah.amount) } : item);
+      return next;
+    });
+    setSaveLabel("Semua komponen memakai Master Harga terbaru");
   }
 
   const fieldLabels = { title: "Nama simulasi", durationDays: "Durasi", paxCount: "Jumlah jamaah", usdRate: "Kurs USD", sarRate: "Kurs SAR", items: "Komponen biaya" };
@@ -133,6 +158,7 @@ export function HppCalculator({ initial, masters, departures }: { initial?: HppF
     {initial?.id ? <input type="hidden" name="id" value={initial.id} /> : null}
     <input type="hidden" name="packageId" value={departures.find((item) => item.id === departureId)?.packageId ?? initial?.packageId ?? ""} />
     <input type="hidden" name="items" value={JSON.stringify(items)} />
+    <input type="hidden" name="appliedPrice" value={effectiveFinalPrice} />
     <div className="hpp-builder-main">
       <section className="management-panel hpp-intro-panel">
         <header><div><small>LANGKAH 1 DARI 4</small><h2>Informasi paket & rombongan</h2><p>Isi data dasarnya dulu. Semua hasil di sebelah kanan akan dihitung otomatis.</p></div><span className="hpp-save-state"><Save />{pending ? "Menyimpan ke server…" : saveLabel}</span></header>
@@ -140,10 +166,10 @@ export function HppCalculator({ initial, masters, departures }: { initial?: HppF
           <label className="span-two"><span>Nama paket / simulasi *</span><input name="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Contoh: Umrah Akhir Tahun 9 Hari" required /><small>Tulis nama paket untuk memudahkan pencarian di arsip kantor.</small></label>
           <label><span>Paket di website <i>(opsional)</i></span><select name="departureId" value={departureId} onChange={(e) => chooseDeparture(e.target.value)}><option value="">Belum dihubungkan ke paket mana pun</option>{departures.map((item) => <option value={item.id} key={item.id}>{item.package?.name ?? "Paket"} — {item.departureDate}</option>)}</select><small>Pilih jika harga ini ingin langsung dihubungkan ke paket yang sudah ada.</small></label>
           <label><span>Tanggal keberangkatan</span><input name="departureDate" type="date" value={departureDate} onChange={(e) => setDepartureDate(e.target.value)} /><small>Perkiraan tanggal rombongan berangkat.</small></label>
-          <label><span>Durasi perjalanan *</span><div className="hpp-input-suffix"><input name="durationDays" type="number" min="1" max="60" value={durationDays} onChange={(e) => setDurationDays(cleanNumber(e.target.value))} required /><b>hari</b></div><small>Lama perjalanan (contoh: 9, 12, atau 16 hari).</small></label>
-          <label><span>Jumlah jamaah (Pax) *</span><div className="hpp-input-suffix"><input name="paxCount" type="number" min="1" max="500" value={paxCount} onChange={(e) => setPaxCount(cleanNumber(e.target.value))} required /><b>orang</b></div><small>Biaya sewa bus dan gratis Tour Leader otomatis dibagi ke jumlah ini.</small></label>
-          <label><span>Kurs USD ke Rupiah *</span><input name="usdRate" inputMode="numeric" value={usdRate} onChange={(e) => setUsdRate(cleanNumber(e.target.value))} /><small>1 Dolar AS = {currency.format(usdRate)} (contoh: Visa Saudi)</small></label>
-          <label><span>Kurs SAR (Riyal) ke Rupiah *</span><input name="sarRate" inputMode="numeric" value={sarRate} onChange={(e) => setSarRate(cleanNumber(e.target.value))} /><small>1 Riyal Saudi = {currency.format(sarRate)} (contoh: Raudhah & Hotel)</small></label>
+          <label><span>Durasi perjalanan *</span><div className="hpp-input-suffix"><input name="durationDays" type="number" min="1" max="60" value={durationDays} onChange={(e) => setDurationDays(cleanQuantity(e.target.value))} required /><b>hari</b></div><small>Lama perjalanan (contoh: 9, 12, atau 16 hari).</small></label>
+          <label><span>Jumlah jamaah (Pax) *</span><div className="hpp-input-suffix"><input name="paxCount" type="number" min="1" max="500" value={paxCount} onChange={(e) => setPaxCount(cleanQuantity(e.target.value))} required /><b>orang</b></div><small>Dipakai untuk FOC Tour Leader. Sewa bus sudah dihitung per jamaah, bukan dibagi rombongan.</small></label>
+          <label><span>Kurs USD ke Rupiah *</span><input name="usdRate" inputMode="numeric" value={usdRate} onChange={(e) => setUsdRate(cleanMoney(e.target.value))} /><small>1 Dolar AS = {currency.format(usdRate)} (contoh: Visa Saudi)</small></label>
+          <label><span>Kurs SAR (Riyal) ke Rupiah *</span><input name="sarRate" inputMode="numeric" value={sarRate} onChange={(e) => setSarRate(cleanMoney(e.target.value))} /><small>1 Riyal Saudi = {currency.format(sarRate)} (contoh: Raudhah & Hotel)</small></label>
         </div>
       </section>
 
@@ -156,7 +182,7 @@ export function HppCalculator({ initial, masters, departures }: { initial?: HppF
         <input type="hidden" name="laMode" value={laMode} />
         {laMode === "package" ? <div className="management-form management-form-grid two">
           <label><span>Pilih contoh paket LA atau ketik manual</span><select value={laPreset} onChange={(e) => chooseLaPreset(e.target.value)}><option value="">Ketik harga sendiri di bawah</option>{masters.filter((item) => item.category === "la_package").map((item) => <option value={item.code} key={item.id}>{item.name} — {currency.format(numeric(item.amount))}</option>)}</select><small>Bisa klik contoh di atas, atau langsung isi kolom harga di sebelah kanan.</small></label>
-          <label><span>Harga LA per jamaah (Rupiah) *</span><input inputMode="numeric" value={items.find((item) => item.code === "land_arrangement")?.unitAmount ?? 0} onChange={(e) => updateItem("land_arrangement", { unitAmount: cleanNumber(e.target.value) })} /><small>{currency.format(numeric(items.find((item) => item.code === "land_arrangement")?.unitAmount))} per orang</small></label>
+          <label><span>Harga LA per jamaah (Rupiah) *</span><input inputMode="numeric" value={items.find((item) => item.code === "land_arrangement")?.unitAmount ?? 0} onChange={(e) => updateItem("land_arrangement", { unitAmount: cleanMoney(e.target.value) })} /><small>{currency.format(numeric(items.find((item) => item.code === "land_arrangement")?.unitAmount))} per orang</small></label>
         </div> : <div className="management-form management-form-grid two">
           <label><span>Musim keberangkatan</span><select name="season" value={season} onChange={(e) => changeSeason(e.target.value)}><option value="low">Low Season (Biasa)</option><option value="medium">Medium Season (Sedang)</option><option value="high">High Season (Ramai / Liburan)</option></select><small>Tarif hotel otomatis menyesuaikan musim yang dipilih.</small></label>
           <div />
@@ -167,20 +193,20 @@ export function HppCalculator({ initial, masters, departures }: { initial?: HppF
       </section>
 
       <section className="management-panel">
-        <header><div><small>LANGKAH 3 DARI 4</small><h2>Rincian komponen biaya lainnya</h2><p>Semua biaya standar sudah terisi otomatis. Anda cukup membuka kelompok yang ingin diperiksa atau disesuaikan nominalnya.</p></div></header>
+        <header><div><small>LANGKAH 3 DARI 4</small><h2>Rincian komponen biaya lainnya</h2><p>Harga dan jumlah dapat diubah. Hasil per jamaah selalu dihitung dari Harga Satuan × Jumlah.</p></div><button type="button" className="hpp-sync-master" onClick={syncLatestMaster}><RefreshCw />Pakai Master Harga terbaru</button></header>
         <div className="hpp-cost-groups">{HPP_CATEGORIES.filter(([key]) => key !== "la").map(([key, label], index) => {
           const categoryItems = result.items.filter((item) => item.category === key);
           const total = categoryItems.reduce((sum, item) => sum + item.computedPerPax, 0);
-          return <details key={key} open={index < 2}><summary><span><b>{index + 1}</b><strong>{label}</strong></span><span>{currency.format(total)}<ChevronDown /></span></summary><div>{items.filter((item) => item.category === key).map((item) => <div className="hpp-cost-row" key={item.code}><label><span>{item.name}</span><small>{item.costBasis === "group" ? "Biaya rombongan (dibagi rata ke seluruh jamaah)" : item.currency === "IDR" ? "Biaya per orang" : `Biaya ${item.currency} per orang`}</small></label><select aria-label={`Mata uang ${item.name}`} value={item.currency} onChange={(e) => updateItem(item.code, { currency: e.target.value as HppCurrency })}><option>IDR</option><option>USD</option><option>SAR</option></select><input aria-label={`Harga ${item.name}`} inputMode="decimal" value={item.unitAmount} onChange={(e) => updateItem(item.code, { unitAmount: cleanNumber(e.target.value) })} /><input aria-label={`Jumlah ${item.name}`} type="number" min="0" step="0.01" value={item.quantity} onChange={(e) => updateItem(item.code, { quantity: cleanNumber(e.target.value) })} /><strong>{currency.format(result.items.find((row) => row.code === item.code)?.computedPerPax ?? 0)}</strong></div>)}</div></details>;
+          return <details key={key} open={index < 2}><summary><span><b>{index + 1}</b><strong>{label}</strong></span><span>{currency.format(total)}<ChevronDown /></span></summary><div>{items.filter((item) => item.category === key).map((item) => <div className="hpp-cost-row" key={item.code}><label><span>{item.name}</span><small>{item.costBasis === "group" ? "Total rombongan ÷ jumlah jamaah" : item.costBasis === "room_per_night" ? "Harga kamar × malam ÷ isi kamar" : "Harga satuan × jumlah per jamaah"}</small></label><select aria-label={`Mata uang ${item.name}`} value={item.currency} onChange={(e) => updateItem(item.code, { currency: e.target.value as HppCurrency })}><option>IDR</option><option>USD</option><option>SAR</option></select><input aria-label={`Harga satuan ${item.name}`} inputMode="numeric" value={item.unitAmount} onChange={(e) => updateItem(item.code, { unitAmount: cleanMoney(e.target.value) })} /><input aria-label={`Jumlah ${item.name}`} inputMode="decimal" value={item.quantity} onChange={(e) => updateItem(item.code, { quantity: cleanQuantity(e.target.value) })} /><strong>{currency.format(result.items.find((row) => row.code === item.code)?.computedPerPax ?? 0)}</strong></div>)}</div></details>;
         })}</div>
       </section>
 
       <section className="management-panel">
         <header><div><small>LANGKAH 4 DARI 4</small><h2>Target keuntungan & harga jual</h2><p>Tentukan margin keuntungan kantor dan fee agen, lalu simpan hasil perhitungan.</p></div></header>
         <div className="management-form management-form-grid two">
-          <label><span>Target keuntungan kantor (per jamaah)</span><input name="profitMargin" inputMode="numeric" value={profitMargin} onChange={(e) => setProfitMargin(cleanNumber(e.target.value))} /><small>Laba bersih kantor: {currency.format(profitMargin)} / orang</small></label>
-          <label><span>Alokasi komisi / fee agen (per jamaah)</span><input name="marketingFee" inputMode="numeric" value={marketingFee} onChange={(e) => setMarketingFee(cleanNumber(e.target.value))} /><small>Komisi marketing: {currency.format(marketingFee)} / orang</small></label>
-          <label className="span-two"><span>Harga jual final untuk jamaah</span><input name="appliedPrice" inputMode="numeric" value={appliedPrice || roundSellingPrice(result.sellingPrice)} onChange={(e) => setAppliedPrice(cleanNumber(e.target.value))} /><small>Saran pembulatan: <strong>{currency.format(roundSellingPrice(result.sellingPrice))}</strong> (Boleh Anda ubah atau bulatkan sesuai brosur promosi).</small></label>
+          <label><span>Target keuntungan kantor (per jamaah)</span><input name="profitMargin" inputMode="numeric" value={profitMargin} onChange={(e) => setProfitMargin(cleanMoney(e.target.value))} /><small>Ditambahkan utuh ke HPP: {currency.format(profitMargin)} / orang.</small></label>
+          <label><span>Alokasi komisi / fee agen (per jamaah)</span><input name="marketingFee" inputMode="numeric" value={marketingFee} onChange={(e) => setMarketingFee(cleanMoney(e.target.value))} /><small>Ditambahkan utuh ke harga jual: {currency.format(marketingFee)} / orang.</small></label>
+          <label className="span-two"><span>Harga jual final untuk jamaah</span><div className="hpp-final-price-control"><input inputMode="numeric" value={effectiveFinalPrice} onChange={(e) => { setManualPrice(true); setAppliedPrice(cleanMoney(e.target.value)); }} /><button type="button" className={!manualPrice ? "active" : ""} onClick={() => setManualPrice(false)}>Ikuti hitungan otomatis</button><button type="button" onClick={() => { setManualPrice(true); setAppliedPrice(roundSellingPrice(result.sellingPrice)); }}>Bulatkan Rp100 ribu</button></div><small>{manualPrice ? `Harga diatur manual. Hasil rumus murni: ${currency.format(calculatedFinalPrice)}.` : `Otomatis: HPP ${currency.format(result.hppPerPax)} + keuntungan ${currency.format(profitMargin)} + fee ${currency.format(marketingFee)}.`}</small></label>
           <label className="span-two"><span>Catatan tambahan <i>(opsional)</i></span><textarea name="notes" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Contoh: Termasuk ziarah Thaif, hotel bintang 5 depan pelataran, dll." /></label>
         </div>
       </section>
@@ -196,9 +222,9 @@ export function HppCalculator({ initial, masters, departures }: { initial?: HppF
         <div><dt>+ Alokasi fee agen</dt><dd>{currency.format(marketingFee)}</dd></div>
       </dl>
       <div className="hpp-selling">
-        <span>Harga jual hasil hitungan</span>
-        <strong>{currency.format(result.sellingPrice)}</strong>
-        <small>Modal HPP + Keuntungan + Fee Agen</small>
+        <span>Harga jual final yang dipakai</span>
+        <strong>{currency.format(effectiveFinalPrice)}</strong>
+        <small>{manualPrice ? `Diatur manual · hasil rumus ${currency.format(calculatedFinalPrice)}` : "HPP + Keuntungan + Fee Agen"}</small>
       </div>
       <div className="hpp-ready">{title.trim().length >= 3 && paxCount > 0 ? <CheckCircle2 /> : <CircleAlert />}<span><strong>{title.trim().length >= 3 && paxCount > 0 ? "Formulir siap disimpan" : "Mohon lengkapi nama & jumlah jamaah"}</strong><small>Data otomatis aman tersimpan di komputer Anda.</small></span></div>
       <div className="hpp-submit-actions">
@@ -232,12 +258,12 @@ function HotelSelector({ label, value, masters, onChange, item, onItemChange }: 
       <div>
         <label>
           <span>Tarif SAR / kamar / malam</span>
-          <input inputMode="numeric" value={item?.unitAmount ?? 0} onChange={(e) => onItemChange({ unitAmount: cleanNumber(e.target.value) })} />
+          <input inputMode="numeric" value={item?.unitAmount ?? 0} onChange={(e) => onItemChange({ unitAmount: cleanMoney(e.target.value) })} />
           <small>{item?.unitAmount ? `${item.unitAmount} Riyal / malam` : "Pilih hotel atau ketik manual"}</small>
         </label>
         <label>
           <span>Jumlah malam menginap</span>
-          <input type="number" min="0" max="30" value={item?.quantity ?? 0} onChange={(e) => onItemChange({ quantity: cleanNumber(e.target.value) })} />
+          <input inputMode="decimal" value={item?.quantity ?? 0} onChange={(e) => onItemChange({ quantity: cleanQuantity(e.target.value) })} />
           <small>{item?.quantity ? `${item.quantity} malam` : "Contoh: 4 malam"}</small>
         </label>
       </div>
