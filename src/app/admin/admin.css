@@ -762,20 +762,34 @@
 .hpp-record-actions button { width:100%;border-color:#d4dbe3;background:#fff;color:#173252; }
 .hpp-record-actions button.danger { border-color:#e6c7c7;color:#a43636; }
 .hpp-master-panel>div { display:grid; }
+.hpp-master-add { margin-bottom:22px; }
+.hpp-master-add>div { padding:0 20px 20px; }
+.hpp-master-create { padding-top:4px; }
+.hpp-master-create>.admin-primary-button { width:max-content; }
+.hpp-master-row-wrap { display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;border-bottom:1px solid #e7eaee; }
+.hpp-master-row-wrap>.admin-form-error { grid-column:1/-1;margin:10px 0 0; }
+.hpp-master-row-wrap:last-child { border-bottom:0; }
 .hpp-master-row { display:grid;grid-template-columns:minmax(220px,1fr) 90px 160px 90px;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #e7eaee; }
-.hpp-master-row:last-child { border-bottom:0; }
+.hpp-master-row-wrap .hpp-master-row { border-bottom:0; }
 .hpp-master-row>span { display:grid;gap:3px; }
 .hpp-master-row strong { color:#243c5b;font-size:14px; }
 .hpp-master-row small { color:#7a8797;font-size:11px; }
 .hpp-master-row input,.hpp-master-row select { min-height:44px;padding:9px;border:1px solid #d2d9e1;border-radius:8px;background:#fff;color:#173252;font:inherit; }
 .hpp-master-row>small { grid-column:2/-1; }
 .hpp-master-row>small.success { color:#187647; }.hpp-master-row>small.error { color:#ae3434; }
+.hpp-master-delete { display:grid;gap:4px; }
+.hpp-master-delete button { display:flex;min-height:44px;align-items:center;justify-content:center;gap:6px;border:1px solid #e6c7c7;border-radius:8px;background:#fff;color:#a43636;font:inherit;font-size:12px;font-weight:800;cursor:pointer; }
+.hpp-master-delete button:hover { background:#fff5f5; }
+.hpp-master-delete button:disabled { cursor:wait;opacity:.62; }
+.hpp-master-delete svg { width:15px; }
+.hpp-master-delete small { max-width:150px;color:#187647;font-size:10px; }
+.hpp-master-delete small.error { color:#ae3434; }
 .hpp-apply-form { padding-top:0; }
 .hpp-apply-confirm { display:flex!important;grid-template-columns:20px 1fr!important;align-items:flex-start!important;gap:9px!important;padding:11px;border-radius:8px;background:#fbf7ec;color:#5f4a19!important;font-size:12px!important; }
 .hpp-apply-confirm input { width:18px!important;min-height:18px!important;margin-top:1px; }
 
 @media(max-width:1180px){.hpp-builder{grid-template-columns:1fr}.hpp-summary{position:static}.hpp-detail-columns{grid-template-columns:1fr}.hpp-cost-row{grid-template-columns:minmax(170px,1fr) 72px 110px 65px 135px}}
-@media(max-width:720px){.hpp-mode-picker,.hpp-detail-hero{grid-template-columns:1fr}.hpp-detail-hero>.management-status{justify-self:start}.hpp-intro-panel>header{display:grid!important;gap:12px}.hpp-save-state{justify-self:start;margin:0;white-space:normal}.hpp-cost-row{grid-template-columns:72px minmax(0,1fr) 64px;padding:13px}.hpp-cost-row label{grid-column:1/-1}.hpp-cost-row>strong{grid-column:1/-1;text-align:left;color:#8b6508;font-size:15px}.hpp-hotel-field>div,.hpp-downloads,.hpp-record-actions{grid-template-columns:1fr}.hpp-master-row{grid-template-columns:82px minmax(0,1fr) 84px}.hpp-master-row>span{grid-column:1/-1}.hpp-master-row>small{grid-column:1/-1}.hpp-detail-hero strong{font-size:23px}}
+@media(max-width:720px){.hpp-mode-picker,.hpp-detail-hero{grid-template-columns:1fr}.hpp-detail-hero>.management-status{justify-self:start}.hpp-intro-panel>header{display:grid!important;gap:12px}.hpp-save-state{justify-self:start;margin:0;white-space:normal}.hpp-cost-row{grid-template-columns:72px minmax(0,1fr) 64px;padding:13px}.hpp-cost-row label{grid-column:1/-1}.hpp-cost-row>strong{grid-column:1/-1;text-align:left;color:#8b6508;font-size:15px}.hpp-hotel-field>div,.hpp-downloads,.hpp-record-actions{grid-template-columns:1fr}.hpp-master-row-wrap{grid-template-columns:1fr;padding:11px 0}.hpp-master-row{grid-template-columns:82px minmax(0,1fr) 84px;padding:0}.hpp-master-row>span{grid-column:1/-1}.hpp-master-row>small{grid-column:1/-1}.hpp-master-delete button{width:100%}.hpp-master-create>.admin-primary-button{width:100%}.hpp-detail-hero strong{font-size:23px}}
 
 /* Accessibility & Readability Helpers for Easy Admin Experience */
 .admin-price-badge {

@@ -3,16 +3,24 @@
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { unstable_rethrow } from "next/navigation";
-import { eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { auditLogs, departures, hppCostingItems, hppCostings, hppPriceMaster } from "@/db/schema";
 import { withManagementTransaction } from "@/db/transaction";
 import { requireAdminSession } from "@/lib/admin-session";
-import { calculateHpp, HPP_FORMULA_VERSION, roundSellingPrice } from "./hpp";
+import { calculateHpp, HPP_FORMULA_VERSION, HPP_MASTER_CATEGORIES, hppMasterCode, roundSellingPrice } from "./hpp";
 import type { ManagementActionState } from "./validation";
 
 const money = z.coerce.number().finite().min(0).max(Number.MAX_SAFE_INTEGER);
+const masterCategories = HPP_MASTER_CATEGORIES.map(([value]) => value) as [string, ...string[]];
+const masterSchema = z.object({
+  name: z.string().trim().min(2, "Nama biaya minimal 2 karakter.").max(120),
+  category: z.enum(masterCategories),
+  currency: z.enum(["IDR", "USD", "SAR"]),
+  costBasis: z.enum(["per_pax", "group", "room_per_night"]),
+  amount: money,
+});
 const itemSchema = z.object({
   code: z.string().min(1), category: z.string().min(1), name: z.string().min(2),
   currency: z.enum(["IDR", "USD", "SAR"]), costBasis: z.enum(["per_pax", "group", "room_per_night"]),
@@ -174,5 +182,50 @@ export async function saveHppMasterAction(_state: ManagementActionState, formDat
     });
     revalidatePath("/admin/manajemen/hpp-umroh", "layout");
     return { ok: true, message: "Harga default berhasil diperbarui." };
+  } catch (error) { return fail(error); }
+}
+
+export async function createHppMasterAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
+  const parsed = masterSchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) return { ok: false, message: "Periksa data master yang ditandai.", errors: parsed.error.flatten().fieldErrors as Record<string, string[]> };
+  try {
+    const session = await requireAdminSession();
+    const id = randomUUID();
+    const input = parsed.data;
+    await withManagementTransaction(async (tx) => {
+      const duplicate = await tx.query.hppPriceMaster.findFirst({ where: and(eq(hppPriceMaster.category, input.category), eq(hppPriceMaster.name, input.name)) });
+      if (duplicate?.status === "active") throw new Error("Nama master tersebut sudah ada pada kategori yang sama.");
+      const [last] = await tx.select({ sortOrder: hppPriceMaster.sortOrder }).from(hppPriceMaster).where(eq(hppPriceMaster.category, input.category)).orderBy(desc(hppPriceMaster.sortOrder)).limit(1);
+      await tx.insert(hppPriceMaster).values({
+        id,
+        code: hppMasterCode(input.category, input.name, id),
+        category: input.category,
+        name: input.name,
+        currency: input.currency,
+        costBasis: input.costBasis,
+        amount: String(input.amount),
+        sortOrder: (last?.sortOrder ?? 0) + 10,
+        updatedBy: session.user.id,
+      });
+      await tx.insert(auditLogs).values({ actorId: session.user.id, action: "create", entityType: "hpp_price_master", entityId: id, summary: `Master HPP ${input.name} ditambahkan` });
+    });
+    revalidatePath("/admin/manajemen/hpp-umroh", "layout");
+    return { ok: true, message: "Master harga baru berhasil ditambahkan.", redirectTo: "/admin/manajemen/hpp-umroh/master-harga" };
+  } catch (error) { return fail(error); }
+}
+
+export async function deleteHppMasterAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
+  try {
+    const session = await requireAdminSession();
+    const id = String(formData.get("id") ?? "");
+    if (!id) throw new Error("Master harga tidak ditemukan.");
+    await withManagementTransaction(async (tx) => {
+      const item = await tx.query.hppPriceMaster.findFirst({ where: eq(hppPriceMaster.id, id) });
+      if (!item) throw new Error("Master harga tidak ditemukan.");
+      await tx.update(hppPriceMaster).set({ status: "archived", updatedBy: session.user.id, updatedAt: new Date() }).where(eq(hppPriceMaster.id, id));
+      await tx.insert(auditLogs).values({ actorId: session.user.id, action: "archive", entityType: "hpp_price_master", entityId: id, summary: `Master HPP ${item.name} dihapus dari pilihan` });
+    });
+    revalidatePath("/admin/manajemen/hpp-umroh", "layout");
+    return { ok: true, message: "Master harga dihapus dari pilihan perhitungan.", redirectTo: "/admin/manajemen/hpp-umroh/master-harga" };
   } catch (error) { return fail(error); }
 }

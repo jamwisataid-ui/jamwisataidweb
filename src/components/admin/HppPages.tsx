@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { ArrowRight, Calculator, Download, FileSpreadsheet, Pencil } from "lucide-react";
 import { AdminPageHeader } from "./AdminUi";
-import { ApplyHppPriceForm, HppMasterPriceForm, HppRecordActions } from "./HppActionForms";
+import { ApplyHppPriceForm, HppMasterCreateForm, HppMasterPriceForm, HppRecordActions } from "./HppActionForms";
 import { HppCalculator, type HppFormInitial } from "./HppCalculator";
-import { HPP_CATEGORIES } from "@/lib/management/hpp";
+import { HPP_CATEGORIES, HPP_MASTER_CATEGORIES } from "@/lib/management/hpp";
 import type { getHppContext } from "@/lib/management/hpp-data";
 
 type Context = Awaited<ReturnType<typeof getHppContext>>;
@@ -42,9 +42,10 @@ export function HppDetailPage({ data, costing }: { data: Context; costing: Conte
 
 export function HppMasterPage({ data }: { data: Context }) {
   const groups = Array.from(new Set(data.masterPrices.map((item) => item.category)));
-  const labels: Record<string, string> = { ticket: "Tiket Pesawat", visa: "Visa & Asuransi", la: "Land Arrangement Default", la_package: "Paket LA Siap Pakai", handling: "Handling & Konsumsi", departure_bus: "Bus Keberangkatan", arrival_bus: "Bus Kedatangan", equipment: "Perlengkapan Umrah", manasik: "Bimbingan Manasik", program: "Program Tambahan", social: "Sedekah & Sosial", other: "Biaya Lain & Operasional", hotel_makkah: "Hotel Makkah", hotel_madinah: "Hotel Madinah" };
+  const labels: Record<string, string> = Object.fromEntries(HPP_MASTER_CATEGORIES);
   return <><AdminPageHeader eyebrow="PENGATURAN HPP" title="Master Harga HPP" description="Harga ini menjadi nilai awal perhitungan baru. Simulasi lama tidak ikut berubah." backHref="/admin/manajemen/hpp-umroh" />
     <div className="management-warning"><Pencil /><span><strong>Aman untuk diperbarui.</strong> Perubahan master hanya dipakai pada simulasi yang dibuat setelahnya.</span></div>
+    <details className="management-disclosure hpp-master-add"><summary><span><strong>Tambah biaya atau hotel baru</strong><small>Buka bagian ini jika item yang dibutuhkan belum tersedia.</small></span><i>+</i></summary><div><HppMasterCreateForm /></div></details>
     {groups.map((group) => <section className="management-panel hpp-master-panel" key={group}><header><div><small>KATEGORI</small><h2>{labels[group] ?? group.replaceAll("_", " ")}</h2></div></header><div>{data.masterPrices.filter((item) => item.category === group).map((item) => <HppMasterPriceForm item={item} key={item.id} />)}</div></section>)}
   </>;
 }

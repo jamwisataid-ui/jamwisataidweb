@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateHpp, DEFAULT_HPP_ITEMS, itemCostPerPax, roundSellingPrice } from "../src/lib/management/hpp";
+import { calculateHpp, DEFAULT_HPP_ITEMS, hppMasterCode, itemCostPerPax, roundSellingPrice } from "../src/lib/management/hpp";
 
 describe("HPP Umrah", () => {
   it("mereproduksi golden case MUHASIB 35 pax", () => {
@@ -20,5 +20,9 @@ describe("HPP Umrah", () => {
   it("menolak pax nol dan membulatkan harga jual ke atas", () => {
     expect(() => calculateHpp({ paxCount: 0, usdRate: 1, sarRate: 1, profitMargin: 0, marketingFee: 0, items: DEFAULT_HPP_ITEMS })).toThrow("Jumlah jamaah");
     expect(roundSellingPrice(29_889_167.67)).toBe(29_900_000);
+  });
+
+  it("membuat kode master yang aman dan konsisten", () => {
+    expect(hppMasterCode("hotel_makkah", "Mövenpick Hotel *****", "A1B2-C3D4-E5F6")).toBe("hotel_makkah-movenpick-hotel-a1b2c3d4");
   });
 });

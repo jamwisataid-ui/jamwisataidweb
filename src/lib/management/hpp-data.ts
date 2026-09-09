@@ -9,7 +9,7 @@ export async function getHppContext() {
   const [costings, items, masterPrices, packageRows, departureRows] = await Promise.all([
     database.select().from(hppCostings).orderBy(desc(hppCostings.updatedAt)),
     database.select().from(hppCostingItems).orderBy(asc(hppCostingItems.sortOrder)),
-    database.select().from(hppPriceMaster).orderBy(asc(hppPriceMaster.category), asc(hppPriceMaster.sortOrder)),
+    database.select().from(hppPriceMaster).where(eq(hppPriceMaster.status, "active")).orderBy(asc(hppPriceMaster.category), asc(hppPriceMaster.sortOrder)),
     database.select({ id: packages.id, name: packages.name, status: packages.status }).from(packages).orderBy(asc(packages.name)),
     database.select().from(departures).orderBy(asc(departures.departureDate)),
   ]);

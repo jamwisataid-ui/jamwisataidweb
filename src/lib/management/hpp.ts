@@ -1,5 +1,21 @@
 export const HPP_FORMULA_VERSION = "muhasib-v1";
 
+export const HPP_MASTER_CATEGORIES = [
+  ["ticket", "Tiket Pesawat"], ["visa", "Visa & Asuransi"], ["la", "Land Arrangement Default"],
+  ["la_package", "Paket LA Siap Pakai"], ["handling", "Handling & Konsumsi"],
+  ["departure_bus", "Bus Keberangkatan"], ["arrival_bus", "Bus Kedatangan"],
+  ["equipment", "Perlengkapan Umrah"], ["manasik", "Bimbingan Manasik"],
+  ["program", "Program Tambahan"], ["social", "Sedekah & Sosial"],
+  ["other", "Biaya Lain & Operasional"], ["hotel_makkah", "Hotel Makkah"],
+  ["hotel_madinah", "Hotel Madinah"],
+] as const;
+
+export function hppMasterCode(category: string, name: string, suffix: string) {
+  const slug = name.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 42) || "item";
+  return `${category}-${slug}-${suffix.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 8)}`;
+}
+
 export type HppCurrency = "IDR" | "USD" | "SAR";
 export type HppCostBasis = "per_pax" | "group" | "room_per_night";
 export type HppLaMode = "package" | "hotel_detail";
