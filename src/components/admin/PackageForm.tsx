@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Loader2, UploadCloud } from "lucide-react";
+import { Loader2, Plus, Trash2, UploadCloud } from "lucide-react";
 
 import { savePackageAction } from "@/lib/cms/actions";
 import { cleanRupiahInput, formatRupiahInput, terbilangRupiah } from "@/lib/cms/utils";
@@ -11,6 +11,7 @@ import { DeleteButton } from "./DeleteButton";
 import { FormFeedback } from "./FormFeedback";
 
 type Values = Record<string, unknown>;
+type ItineraryDay = { day: number; title: string; description: string };
 const initialState: ActionState = { ok: false, message: "" };
 const field = (values: Values, key: string, fallback = "") => String(values[key] ?? fallback);
 
@@ -23,7 +24,7 @@ const preservedFields = [
   ["makkahDistance", ""], ["madinahDistance", ""],
   ["facilities", ""], ["highlights", ""],
   ["includes", ""], ["excludes", ""], ["terms", ""],
-  ["destinations", ""], ["itinerary", "[]"],
+  ["destinations", ""],
 ] as const;
 
 export function PackageForm({ values = {} }: { values?: Values }) {
@@ -33,6 +34,14 @@ export function PackageForm({ values = {} }: { values?: Values }) {
   const [durationDays, setDurationDays] = useState(() => field(values, "durationDays", "9"));
   const [category, setCategory] = useState(() => field(values, "category", "umrah"));
   const [packageType, setPackageType] = useState(() => field(values, "packageType", "reguler"));
+  const [itinerary, setItinerary] = useState<ItineraryDay[]>(() => {
+    try {
+      const parsed = JSON.parse(field(values, "itinerary", "[]"));
+      return Array.isArray(parsed) ? parsed.map((item, index) => ({ day: Number(item.day) || index + 1, title: String(item.title ?? ""), description: String(item.description ?? "") })) : [];
+    } catch {
+      return [];
+    }
+  });
   const isPublished = field(values, "status") === "published";
   const hasDraftChanges = values.hasDraftChanges === true;
 
@@ -51,6 +60,7 @@ export function PackageForm({ values = {} }: { values?: Values }) {
       {preservedFields.map(([name, fallback]) => (
         <input key={name} type="hidden" name={name} value={field(values, name, fallback)} />
       ))}
+      <input type="hidden" name="itinerary" value={JSON.stringify(itinerary)} />
 
       <section className="admin-form-section">
         <div><p>Informasi paket</p><span>Nama, jenis, dan gambar yang terlihat pada kartu homepage.</span></div>
@@ -220,6 +230,30 @@ export function PackageForm({ values = {} }: { values?: Values }) {
             </div>
             {error("price") ? <small className="admin-upload-error">{error("price")}</small> : null}
           </label>
+        </div>
+      </section>
+
+      <section className="admin-form-section">
+        <div><p>Detail &amp; itinerary</p><span>Di bagian ini admin bisa mengubah urutan perjalanan harian yang tampil di halaman detail paket.</span></div>
+        <div className="admin-itinerary-editor">
+          {itinerary.length ? itinerary.map((item, index) => (
+            <div className="admin-itinerary-row" key={`${index}-${item.day}`}>
+              <label>
+                <span>Hari</span>
+                <input type="number" min="1" value={item.day} onChange={(event) => setItinerary((current) => current.map((day, row) => row === index ? { ...day, day: Number(event.target.value) || 1 } : day))} />
+              </label>
+              <label>
+                <span>Judul kegiatan</span>
+                <input value={item.title} placeholder="Contoh: Jakarta – Madinah" onChange={(event) => setItinerary((current) => current.map((day, row) => row === index ? { ...day, title: event.target.value } : day))} />
+              </label>
+              <label className="admin-itinerary-description">
+                <span>Keterangan</span>
+                <textarea value={item.description} placeholder="Tulis kegiatan hari ini" onChange={(event) => setItinerary((current) => current.map((day, row) => row === index ? { ...day, description: event.target.value } : day))} />
+              </label>
+              <button type="button" className="admin-icon-button admin-itinerary-remove" aria-label={`Hapus hari ${item.day}`} onClick={() => setItinerary((current) => current.filter((_, row) => row !== index))}><Trash2 size={16} /></button>
+            </div>
+          )) : <p className="admin-itinerary-empty">Belum ada itinerary. Klik tombol di bawah untuk menambahkan hari perjalanan.</p>}
+          <button type="button" className="admin-secondary-button admin-itinerary-add" onClick={() => setItinerary((current) => [...current, { day: current.length + 1, title: "", description: "" }])}><Plus size={16} /> Tambah hari perjalanan</button>
         </div>
       </section>
 

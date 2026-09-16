@@ -1454,6 +1454,27 @@
 .admin-input-prefix > span,
 .admin-input-suffix > span { font-size: 18px; }
 
+/* Keep the currency prefix in its own visual lane at every form scale. */
+.admin-form-grid .admin-input-prefix input { padding-left: 68px !important; }
+.admin-form-grid .admin-input-prefix > span { left: 18px; }
+
+.admin-itinerary-editor { display: grid; gap: 14px; }
+.admin-icon-button { display: inline-grid; place-items: center; width: 42px; height: 42px; border: 1px solid currentColor; border-radius: 9px; background: #fff; cursor: pointer; }
+.admin-itinerary-row { display: grid; grid-template-columns: 88px minmax(180px, .8fr) minmax(240px, 1.4fr) 42px; gap: 12px; align-items: end; padding: 16px; border: 1px solid rgba(6,26,47,.12); border-radius: 12px; background: #fffdf8; }
+.admin-itinerary-row label { display: grid; gap: 7px; }
+.admin-itinerary-row label > span { font-size: 12px; font-weight: 700; color: #59616d; }
+.admin-itinerary-row textarea { min-height: 64px; resize: vertical; }
+.admin-itinerary-remove { color: #a53d35; }
+.admin-itinerary-empty { margin: 0; color: #7d8592; font-size: 14px; line-height: 1.6; }
+.admin-itinerary-add { justify-self: start; }
+
+@media (max-width: 620px) {
+  .admin-form-grid .admin-input-prefix input { padding-left: 58px !important; }
+  .admin-form-grid .admin-input-prefix > span { left: 16px; }
+  .admin-itinerary-row { grid-template-columns: 1fr 1fr 42px; }
+  .admin-itinerary-description { grid-column: 1 / -1; }
+}
+
 .admin-checkbox { min-height: 58px; font-size: 18px; }
 .admin-checkbox input { width: 20px !important; min-height: 20px !important; }
 
