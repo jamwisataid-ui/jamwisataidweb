@@ -14,6 +14,7 @@ import {
   Play,
   RotateCcw,
   Search,
+  TrainFront,
   X,
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
@@ -121,6 +122,16 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
                 <span className="font-semibold text-white">{travelPackage.airline ?? "Garuda Indonesia / Saudia"}</span>
               </div>
             </div>
+
+            {travelPackage.highSpeedTrain ? (
+              <div className="flex items-start gap-2.5 text-xs text-slate-200">
+                <TrainFront className="size-4 shrink-0 text-[#E8C967] mt-0.5" />
+                <div className="leading-tight">
+                  <span className="block text-[10px] uppercase font-bold tracking-wider text-[#D5A12B]">Kereta Cepat</span>
+                  <span className="font-semibold text-white">{travelPackage.highSpeedTrain}</span>
+                </div>
+              </div>
+            ) : null}
           </div>
 
           {/* 4. Jadwal Keberangkatan */}

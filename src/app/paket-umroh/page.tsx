@@ -9,6 +9,7 @@ import {
   MessageCircle,
   Plane,
   Sparkles,
+  TrainFront,
 } from "lucide-react";
 
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -208,6 +209,12 @@ export default async function PaketUmrohHubPage() {
                         <Plane className="size-4 text-[#D5A12B] shrink-0" />
                         <span>Maskapai: <strong>{pkg.airline}</strong></span>
                       </div>
+                      {pkg.highSpeedTrain ? (
+                        <div className="flex items-center gap-2">
+                          <TrainFront className="size-4 text-[#D5A12B] shrink-0" />
+                          <span>Kereta Cepat: <strong>{pkg.highSpeedTrain}</strong></span>
+                        </div>
+                      ) : null}
                       <div className="flex items-center gap-2">
                         <Hotel className="size-4 text-[#D5A12B] shrink-0" />
                         <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
