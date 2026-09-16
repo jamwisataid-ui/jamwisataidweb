@@ -6,7 +6,7 @@ import { unstable_rethrow } from "next/navigation";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { auditLogs, departures, hppCostingItems, hppCostings, hppPriceMaster } from "@/db/schema";
+import { auditLogs, departures, hppCostingItems, hppCostings, hppPriceMaster, packages } from "@/db/schema";
 import { withManagementTransaction } from "@/db/transaction";
 import { requireAdminSession } from "@/lib/admin-session";
 import { calculateHpp, HPP_FORMULA_VERSION, HPP_MASTER_CATEGORIES, hppMasterCode } from "./hpp";
@@ -82,6 +82,12 @@ export async function saveHppCostingAction(_state: ManagementActionState, formDa
     const result = calculateHpp(input);
     const existingId = String(formData.get("id") ?? "");
     await withManagementTransaction(async (tx) => {
+      if (input.departureId) {
+        const linkedDeparture = await tx.query.departures.findFirst({ where: eq(departures.id, input.departureId) });
+        if (!linkedDeparture) throw new Error("Paket keberangkatan HPP tidak ditemukan.");
+        const linkedPackage = await tx.query.packages.findFirst({ where: eq(packages.id, linkedDeparture.packageId) });
+        if (!linkedPackage || linkedPackage.category !== "umrah") throw new Error("Simulasi HPP hanya dapat dihubungkan ke Paket Umroh.");
+      }
       const values = {
         title: input.title, packageId: input.packageId || null, departureId: input.departureId || null,
         departureDate: input.departureDate || null, season: input.season, laMode: input.laMode,
@@ -159,6 +165,8 @@ export async function applyHppPriceAction(_state: ManagementActionState, formDat
         tx.query.departures.findFirst({ where: eq(departures.id, departureId) }),
       ]);
       if (!costing || !departure) throw new Error("Simulasi atau keberangkatan tidak ditemukan.");
+      const targetPackage = await tx.query.packages.findFirst({ where: eq(packages.id, departure.packageId) });
+      if (!targetPackage || targetPackage.category !== "umrah") throw new Error("Harga HPP hanya dapat diterapkan ke Paket Umroh.");
       await tx.update(departures).set({ price: String(price), updatedAt: new Date() }).where(eq(departures.id, departureId));
       await tx.update(hppCostings).set({ departureId, packageId: departure.packageId, appliedPrice: price, status: "applied", appliedAt: new Date(), updatedBy: session.user.id, updatedAt: new Date() }).where(eq(hppCostings.id, id));
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "apply_price", entityType: "hpp_costing", entityId: id, summary: `Harga keberangkatan diubah dari Rp${Number(departure.price).toLocaleString("id-ID")} menjadi Rp${price.toLocaleString("id-ID")}` });

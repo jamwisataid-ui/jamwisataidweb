@@ -38,6 +38,7 @@ function invalidate(type: "packages" | "entries" | "articles", path?: string) {
   if (path) revalidatePath(path);
   if (type === "packages") {
     revalidatePath("/paket-umroh");
+    revalidatePath("/paket-wisata");
     revalidatePath("/jadwal-umroh");
     revalidatePath("/harga-umroh");
   }
@@ -235,6 +236,7 @@ export async function savePackageAction(_state: ActionState, formData: FormData)
       manasikDate: data.manasikDate || null,
       dateLabel: data.departureLabel,
       airline: data.airline,
+      highSpeedTrain: data.highSpeedTrain || null,
       departureAirport: data.departureAirport,
       arrivalAirport: data.arrivalAirport || null,
       price: String(data.price),
@@ -276,7 +278,7 @@ export async function savePackageAction(_state: ActionState, formData: FormData)
 
     await database.delete(contentDrafts).where(and(eq(contentDrafts.entityType, "package"), eq(contentDrafts.entityId, data.id)));
     await writeAudit(session.user.id, "publish", "package", data.id, `${data.name} diterbitkan`);
-    invalidate("packages", `/paket-umroh/${data.slug}`);
+    invalidate("packages", `/${data.category === "halal-tour" ? "paket-wisata" : "paket-umroh"}/${data.slug}`);
     return { ok: true, message: "Paket berhasil diterbitkan ke website.", redirectTo: `/admin/paket/${data.id}` };
   } catch (error) {
     console.error("Gagal menyimpan paket:", error);
@@ -456,7 +458,7 @@ export async function deletePackageAction(formData: FormData): Promise<ActionSta
     if (referenced.length) {
       await database.update(packages).set({ status: "archived", updatedBy: session.user.id, updatedAt: new Date() }).where(eq(packages.id, id));
       await writeAudit(session.user.id, "archive", "package", id, `Mengarsipkan paket yang sudah memiliki pendaftaran: ${pkg.name}`);
-      invalidate("packages", `/paket-umroh/${pkg.slug}`);
+      invalidate("packages", `/${pkg.category === "halal-tour" ? "paket-wisata" : "paket-umroh"}/${pkg.slug}`);
       return { ok: true, message: `Paket "${pkg.name}" sudah memiliki jamaah, jadi diarsipkan tanpa menghapus riwayat.`, redirectTo: "/admin/paket" };
     }
 
@@ -469,7 +471,7 @@ export async function deletePackageAction(formData: FormData): Promise<ActionSta
     await database.delete(packages).where(eq(packages.id, id));
 
     await writeAudit(session.user.id, "delete", "package", id, `Menghapus paket: ${pkg.name}`);
-    invalidate("packages", `/paket/${pkg.slug}`);
+    invalidate("packages", `/${pkg.category === "halal-tour" ? "paket-wisata" : "paket-umroh"}/${pkg.slug}`);
 
     return { ok: true, message: `Paket "${pkg.name}" berhasil dihapus.`, redirectTo: "/admin/paket" };
   } catch (error) {

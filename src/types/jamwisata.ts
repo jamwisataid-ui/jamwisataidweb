@@ -10,6 +10,7 @@ export type TravelPackage = {
   departureDate?: string;
   departureMonth?: string;
   airline?: string;
+  highSpeedTrain?: string;
   departureAirport?: string;
   arrivalAirport?: string;
   makkahHotel?: {

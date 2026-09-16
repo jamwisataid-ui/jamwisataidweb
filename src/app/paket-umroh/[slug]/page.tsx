@@ -11,6 +11,7 @@ import {
   MessageCircle,
   ShieldCheck,
   Sparkles,
+  TrainFront,
   X,
 } from "lucide-react";
 
@@ -20,23 +21,36 @@ import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/roo
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
 import { formatIDR, whatsappHref } from "@/data/jamwisata";
-import { getPublishedPackages } from "@/lib/cms/public";
+import { getPublishedPackagesByCategory, type PublicPackageCategory } from "@/lib/cms/public";
 import { resolveAbsoluteImageUrl, SITE_URL } from "@/lib/seo";
 
-interface Props {
+export interface PackageDetailProps {
   params: Promise<{ slug: string }>;
 }
 
+const detailConfig = (category: PublicPackageCategory) => category === "halal-tour" ? {
+  label: "Paket Wisata",
+  basePath: "/paket-wisata",
+  tripDescription: "Paket perjalanan wisata",
+  touristType: ["Wisatawan", "Keluarga Muslim"],
+} : {
+  label: "Paket Umroh",
+  basePath: "/paket-umroh",
+  tripDescription: "Paket perjalanan ibadah umroh",
+  touristType: ["Muslim", "Jamaah Umroh"],
+};
+
 export async function generateStaticParams() {
-  const umrahPackages = await getPublishedPackages();
+  const umrahPackages = await getPublishedPackagesByCategory("umrah");
   return umrahPackages.map((pkg) => ({
     slug: pkg.slug,
   }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generatePackageMetadata({ params }: PackageDetailProps, category: PublicPackageCategory): Promise<Metadata> {
   const { slug } = await params;
-  const umrahPackages = await getPublishedPackages();
+  const config = detailConfig(category);
+  const umrahPackages = await getPublishedPackagesByCategory(category);
   const pkg = umrahPackages.find((p) => p.slug === slug);
 
   if (!pkg) {
@@ -53,7 +67,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     alternates: {
-      canonical: `/paket-umroh/${pkg.slug}`,
+      canonical: `${config.basePath}/${pkg.slug}`,
     },
     robots: {
       index: true,
@@ -67,7 +81,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      url: `${SITE_URL}/paket-umroh/${pkg.slug}`,
+      url: `${SITE_URL}${config.basePath}/${pkg.slug}`,
       siteName: "Jam Wisata",
       locale: "id_ID",
       type: "website",
@@ -89,9 +103,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function PackageDetailPage({ params }: Props) {
+export async function generateMetadata(props: PackageDetailProps): Promise<Metadata> {
+  return generatePackageMetadata(props, "umrah");
+}
+
+export async function renderPackageDetail({ params }: PackageDetailProps, category: PublicPackageCategory) {
   const { slug } = await params;
-  const umrahPackages = await getPublishedPackages();
+  const config = detailConfig(category);
+  const umrahPackages = await getPublishedPackagesByCategory(category);
   const pkg = umrahPackages.find((p) => p.slug === slug);
 
   if (!pkg) {
@@ -102,8 +121,8 @@ export default async function PackageDetailPage({ params }: Props) {
     "@context": "https://schema.org",
     "@type": "TouristTrip",
     name: `Paket ${pkg.name} — Jam Wisata`,
-    description: `Paket perjalanan ibadah umroh ${pkg.name} bersama Jam Wisata keberangkatan ${pkg.departureDate}. Maskapai: ${pkg.airline}, Hotel Makkah: ${pkg.makkahHotel?.name}, Hotel Madinah: ${pkg.madinahHotel?.name}.`,
-    touristType: ["Muslim", "Jamaah Umroh"],
+    description: `${config.tripDescription} ${pkg.name} bersama Jam Wisata keberangkatan ${pkg.departureDate}. Maskapai: ${pkg.airline}, Hotel Makkah: ${pkg.makkahHotel?.name}, Hotel Madinah: ${pkg.madinahHotel?.name}.`,
+    touristType: config.touristType,
     provider: {
       "@type": "TravelAgency",
       name: "Jam Wisata",
@@ -123,7 +142,7 @@ export default async function PackageDetailPage({ params }: Props) {
       price: pkg.priceFrom,
       priceCurrency: "IDR",
       availability: "https://schema.org/InStock",
-      url: `https://jamwisata.id/paket-umroh/${pkg.slug}`,
+      url: `${SITE_URL}${config.basePath}/${pkg.slug}`,
       validFrom: "2026-01-01",
     },
     itinerary: pkg.itinerary?.map((item) => ({
@@ -146,14 +165,14 @@ export default async function PackageDetailPage({ params }: Props) {
       {
         "@type": "ListItem",
         position: 2,
-        name: "Paket Umroh",
-        item: "https://jamwisata.id/paket-umroh",
+        name: config.label,
+        item: `${SITE_URL}${config.basePath}`,
       },
       {
         "@type": "ListItem",
         position: 3,
         name: pkg.name,
-        item: `https://jamwisata.id/paket-umroh/${pkg.slug}`,
+        item: `${SITE_URL}${config.basePath}/${pkg.slug}`,
       },
     ],
   };
@@ -181,8 +200,8 @@ export default async function PackageDetailPage({ params }: Props) {
               <ArrowLeft className="size-3.5" /> Beranda
             </Link>
             <span className="text-[#D5A12B]">/</span>
-            <Link href="/paket-umroh" className="hover:text-[#E8C967] transition">
-              Paket Umroh
+            <Link href={config.basePath} className="hover:text-[#E8C967] transition">
+              {config.label}
             </Link>
             <span className="text-[#D5A12B]">/</span>
             <span className="text-white font-bold">{pkg.name}</span>
@@ -345,6 +364,12 @@ export default async function PackageDetailPage({ params }: Props) {
                     <span className="text-slate-400">Maskapai</span>
                     <span className="font-semibold text-white">{pkg.airline}</span>
                   </div>
+                  {pkg.highSpeedTrain ? (
+                    <div className="flex justify-between gap-4 py-1 border-b border-white/5">
+                      <span className="flex items-center gap-1.5 text-slate-400"><TrainFront className="size-3.5 text-[#D5A12B]" />Kereta Cepat</span>
+                      <span className="text-right font-semibold text-white">{pkg.highSpeedTrain}</span>
+                    </div>
+                  ) : null}
                   <div className="flex justify-between py-1 border-b border-white/5">
                     <span className="text-slate-400">Hotel Makkah</span>
                     <span className="ml-4 flex min-w-0 items-center justify-end gap-3 text-right font-semibold text-white"><span>{pkg.makkahHotel?.name}</span><HotelStarRating rating={pkg.makkahHotel?.star} variant="dark" /></span>
@@ -407,4 +432,8 @@ export default async function PackageDetailPage({ params }: Props) {
       <WhatsAppConcierge />
     </main>
   );
+}
+
+export default async function PackageDetailPage(props: PackageDetailProps) {
+  return renderPackageDetail(props, "umrah");
 }

@@ -10,7 +10,7 @@ export async function getHppContext() {
     database.select().from(hppCostings).orderBy(desc(hppCostings.updatedAt)),
     database.select().from(hppCostingItems).orderBy(asc(hppCostingItems.sortOrder)),
     database.select().from(hppPriceMaster).where(eq(hppPriceMaster.status, "active")).orderBy(asc(hppPriceMaster.category), asc(hppPriceMaster.sortOrder)),
-    database.select({ id: packages.id, name: packages.name, status: packages.status }).from(packages).orderBy(asc(packages.name)),
+    database.select({ id: packages.id, name: packages.name, status: packages.status, category: packages.category }).from(packages).where(eq(packages.category, "umrah")).orderBy(asc(packages.name)),
     database.select().from(departures).orderBy(asc(departures.departureDate)),
   ]);
   const packagesById = new Map(packageRows.map((item) => [item.id, item]));
@@ -23,7 +23,7 @@ export async function getHppContext() {
     })),
     masterPrices,
     packages: packageRows,
-    departures: departureRows.map((departure) => ({ ...departure, package: packagesById.get(departure.packageId) })),
+    departures: departureRows.filter((departure) => packagesById.has(departure.packageId)).map((departure) => ({ ...departure, package: packagesById.get(departure.packageId) })),
   };
 }
 

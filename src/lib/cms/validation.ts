@@ -28,6 +28,7 @@ export const packageFormSchema = z.object({
   returnDate: z.string().trim().optional(),
   manasikDate: z.string().trim().optional(),
   airline: z.string().trim().min(2, "Maskapai wajib diisi."),
+  highSpeedTrain: z.string().trim().max(120, "Kereta Cepat maksimal 120 karakter.").optional(),
   departureAirport: z.string().trim().min(2, "Bandara keberangkatan wajib diisi."),
   arrivalAirport: z.string().trim().optional(),
   price: z.preprocess(

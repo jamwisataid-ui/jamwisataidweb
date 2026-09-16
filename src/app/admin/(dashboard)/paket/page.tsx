@@ -1,20 +1,27 @@
 import Link from "next/link";
 import { AdminEmptyState, AdminPageHeader, AdminStatus } from "@/components/admin/AdminUi";
 import { DeleteButton } from "@/components/admin/DeleteButton";
-import { listPackagesAdmin } from "@/lib/cms/admin";
+import { listPackagesAdmin, type CmsPackageCategory } from "@/lib/cms/admin";
 import { formatRupiahInput } from "@/lib/cms/utils";
 
-export default async function PackagesAdminPage() {
-  const items = await listPackagesAdmin();
+export default async function PackagesAdminPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
+  const query = await searchParams;
+  const category: CmsPackageCategory = query.category === "halal-tour" ? "halal-tour" : "umrah";
+  const isTour = category === "halal-tour";
+  const items = await listPackagesAdmin(category);
   return (
     <>
       <AdminPageHeader
-        eyebrow="PAKET UMRAH"
-        title="Daftar paket"
+        eyebrow={isTour ? "PAKET WISATA" : "PAKET UMRAH"}
+        title={`Daftar paket ${isTour ? "Wisata" : "Umroh"}`}
         description="Tambah paket baru atau ubah informasi harga, hotel, dan jadwal paket yang sudah ada."
-        action={{ href: "/admin/paket/baru", label: "Tambah paket baru" }}
+        action={{ href: `/admin/paket/baru?category=${category}`, label: `Tambah paket ${isTour ? "Wisata" : "Umroh"}` }}
       />
       <section className="admin-panel admin-list-panel">
+        <div className="admin-package-tabs" aria-label="Filter kategori paket">
+          <Link href="/admin/paket?category=umrah" className={category === "umrah" ? "is-active" : ""}>Paket Umroh</Link>
+          <Link href="/admin/paket?category=halal-tour" className={category === "halal-tour" ? "is-active" : ""}>Paket Wisata</Link>
+        </div>
         {items.length ? (
           <div className="admin-table-wrap">
             <table className="admin-table">
@@ -71,10 +78,10 @@ export default async function PackagesAdminPage() {
           </div>
         ) : (
           <AdminEmptyState
-            title="Belum ada paket"
-            description="Tekan tombol di bawah untuk menambahkan paket pertama."
-            href="/admin/paket/baru"
-            action="Tambah paket baru"
+            title={`Belum ada paket ${isTour ? "Wisata" : "Umroh"}`}
+            description="Tekan tombol di bawah untuk menambahkan paket pertama pada kategori ini."
+            href={`/admin/paket/baru?category=${category}`}
+            action={`Tambah paket ${isTour ? "Wisata" : "Umroh"}`}
           />
         )}
       </section>

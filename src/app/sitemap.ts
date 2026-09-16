@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
-import { getPublishedArticles, getPublishedPackages } from "@/lib/cms/public";
+import { getPublishedArticles, getPublishedPackagesByCategory } from "@/lib/cms/public";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [umrahPackages, articles] = await Promise.all([getPublishedPackages(), getPublishedArticles()]);
+  const [umrahPackages, tourPackages, articles] = await Promise.all([getPublishedPackagesByCategory("umrah"), getPublishedPackagesByCategory("halal-tour"), getPublishedArticles()]);
   const baseUrl = "https://jamwisata.id";
   const currentDate = new Date().toISOString();
 
@@ -25,6 +25,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: currentDate,
       changeFrequency: "weekly",
       priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/paket-wisata`,
+      lastModified: currentDate,
+      changeFrequency: "weekly",
+      priority: 0.85,
     },
     {
       url: `${baseUrl}/jadwal-umroh`,
@@ -65,7 +71,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "weekly",
     priority: 0.9,
   }));
+  const tourRoutes: MetadataRoute.Sitemap = tourPackages.map((pkg) => ({
+    url: `${baseUrl}/paket-wisata/${pkg.slug}`,
+    lastModified: currentDate,
+    changeFrequency: "weekly",
+    priority: 0.85,
+  }));
 
   const articleRoutes: MetadataRoute.Sitemap = articles.map((article) => ({ url: `${baseUrl}/artikel/${article.slug}`, lastModified: article.updatedAt, changeFrequency: "monthly", priority: 0.7 }));
-  return [...staticRoutes, ...packageRoutes, ...articleRoutes];
+  return [...staticRoutes, ...packageRoutes, ...tourRoutes, ...articleRoutes];
 }

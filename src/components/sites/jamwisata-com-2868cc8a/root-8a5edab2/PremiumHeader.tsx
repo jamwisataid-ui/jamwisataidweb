@@ -23,6 +23,7 @@ const whatsapp = whatsappHref("Assalamu’alaikum, saya ingin berkonsultasi meng
 const links = [
   ["beranda", "Beranda"],
   ["paket-umrah", "Paket Umrah"],
+  ["paket-wisata", "Paket Wisata"],
   ["tentang-kami", "Mengapa Kami"],
   ["testimoni", "Testimoni"],
   ["galeri", "Galeri"],
@@ -37,6 +38,8 @@ export function PremiumHeader() {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   const articlesActive = pathname?.startsWith("/artikel");
+  const packageHref = (id: string) => id === "paket-umrah" ? "/paket-umroh" : id === "paket-wisata" ? "/paket-wisata" : id === "beranda" ? "/" : `/#${id}`;
+  const packageActive = (id: string) => id === "paket-umrah" ? pathname?.startsWith("/paket-umroh") : id === "paket-wisata" ? pathname?.startsWith("/paket-wisata") : active === id;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -150,10 +153,10 @@ export function PremiumHeader() {
             {links.map(([id, label]) => (
               <a
                 key={id}
-                href={id === "beranda" ? "/" : `/#${id}`}
-                aria-current={active === id ? "location" : undefined}
+                href={packageHref(id)}
+                aria-current={packageActive(id) ? "location" : undefined}
                 className={`relative px-3 py-1.5 text-[13px] font-semibold tracking-wide transition-colors after:absolute after:inset-x-3 after:bottom-0 after:h-[2px] after:origin-left after:rounded-full after:bg-gradient-gold-rich after:transition-transform ${
-                  active === id
+                  packageActive(id)
                     ? "text-[#E8C967] font-bold after:scale-x-100"
                     : "text-white/85 after:scale-x-0 hover:text-white hover:after:scale-x-100"
                 }`}
@@ -232,10 +235,10 @@ export function PremiumHeader() {
               {links.map(([id, label]) => (
                 <a
                   key={id}
-                  href={id === "beranda" ? "/" : `/#${id}`}
+                  href={packageHref(id)}
                   onClick={closeMenu}
                   className={`flex items-center justify-between rounded-xl px-3 py-3 text-sm font-semibold transition ${
-                    active === id
+                    packageActive(id)
                       ? "bg-[#D5A12B]/20 text-[#E8C967] font-bold"
                       : "text-white/80 hover:bg-white/5 hover:text-white"
                   }`}

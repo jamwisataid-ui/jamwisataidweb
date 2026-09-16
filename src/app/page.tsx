@@ -4,8 +4,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { HeroPackages } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/HeroPackages";
 import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/ModernProofFooter";
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
+import { TourPackagesSection } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/TourPackagesSection";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
-import { getPublishedArticles, getPublishedEntries, getPublishedPackages } from "@/lib/cms/public";
+import { getPublishedArticles, getPublishedEntries, getPublishedPackagesByCategory } from "@/lib/cms/public";
 import { SITE_URL } from "@/lib/seo";
 
 const homepageSchema = {
@@ -82,8 +83,9 @@ const homepageSchema = {
 };
 
 export default async function Home() {
-  const [packages, testimonialsData, galleryData, faqData, articlesData] = await Promise.all([
-    getPublishedPackages(),
+  const [packages, tourPackages, testimonialsData, galleryData, faqData, articlesData] = await Promise.all([
+    getPublishedPackagesByCategory("umrah"),
+    getPublishedPackagesByCategory("halal-tour"),
     getPublishedEntries("testimonial"),
     getPublishedEntries("gallery"),
     getPublishedEntries("faq"),
@@ -115,6 +117,7 @@ export default async function Home() {
       <JsonLd schema={homepageSchema} />
       <PremiumHeader />
       <HeroPackages packages={displayedPackages} />
+      <TourPackagesSection packages={tourPackages.slice(0, 6)} />
       {articles.length ? (
         <section id="artikel" className="home-articles-section">
           <div className="jam-container">

@@ -14,6 +14,9 @@ import {
 } from "@/db/schema";
 import { umrahPackages } from "@/data/jamwisata";
 import type { TravelPackage } from "@/types/jamwisata";
+import { filterPackagesByCategory, type ManagedPackageCategory } from "./package-category";
+
+export { packagePublicPath } from "./package-category";
 
 export type PublicContentType =
   | "testimonial"
@@ -88,6 +91,7 @@ const queryPackages = unstable_cache(
         departureDate: departure?.dateLabel,
         departureMonth: departure?.departureDate.slice(0, 7),
         airline: departure?.airline,
+        highSpeedTrain: departure?.highSpeedTrain ?? undefined,
         departureAirport: departure?.departureAirport,
         arrivalAirport: departure?.arrivalAirport ?? undefined,
         makkahHotel: makkah ? { name: makkah.hotelName, star: makkah.star ?? undefined, distance: makkah.distance ?? undefined } : undefined,
@@ -112,6 +116,13 @@ const queryPackages = unstable_cache(
 );
 
 export const getPublishedPackages = cache(queryPackages);
+
+export type PublicPackageCategory = ManagedPackageCategory;
+
+export const getPublishedPackagesByCategory = cache(async (category: PublicPackageCategory) => {
+  const published = await getPublishedPackages();
+  return filterPackagesByCategory(published, category);
+});
 
 const queryEntries = unstable_cache(
   async (type: PublicContentType): Promise<PublicContentEntry[]> => {

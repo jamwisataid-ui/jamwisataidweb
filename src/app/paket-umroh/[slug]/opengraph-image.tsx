@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getPublishedPackages } from "@/lib/cms/public";
+import { getPublishedPackagesByCategory } from "@/lib/cms/public";
 import { formatIDR } from "@/data/jamwisata";
 
 export const runtime = "nodejs";
@@ -16,7 +16,7 @@ export default async function PackageOpenGraphImage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const packages = await getPublishedPackages();
+  const packages = await getPublishedPackagesByCategory("umrah");
   const pkg = packages.find((p) => p.slug === slug);
 
   const title = pkg?.name || "Paket Umroh Jam Wisata";

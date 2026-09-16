@@ -32,9 +32,13 @@ export async function getDashboardData() {
     recent,
   };
 }
-export async function listPackagesAdmin() {
+export type CmsPackageCategory = "umrah" | "halal-tour";
+
+export async function listPackagesAdmin(category?: CmsPackageCategory) {
   const database = requireDatabase();
-  const packageList = await database.select().from(packages).orderBy(desc(packages.createdAt));
+  const packageList = category
+    ? await database.select().from(packages).where(eq(packages.category, category)).orderBy(desc(packages.createdAt))
+    : await database.select().from(packages).orderBy(desc(packages.createdAt));
   if (!packageList.length) return [];
   const allDepartures = await database.select().from(departures).orderBy(asc(departures.departureDate));
 
@@ -94,6 +98,7 @@ export async function getPackageAdmin(id: string) {
     returnDate: departure?.returnDate ?? "",
     manasikDate: departure?.manasikDate ?? "",
     airline: departure?.airline ?? "",
+    highSpeedTrain: departure?.highSpeedTrain ?? "",
     departureAirport: departure?.departureAirport ?? "",
     arrivalAirport: departure?.arrivalAirport ?? "",
     price: departure ? Number(departure.price) : 0,

@@ -15,7 +15,7 @@ const initialState: ActionState = { ok: false, message: "" };
 const field = (values: Values, key: string, fallback = "") => String(values[key] ?? fallback);
 
 const preservedFields = [
-  ["id", ""], ["departureId", ""], ["slug", ""], ["category", "umrah"], ["summary", ""],
+  ["id", ""], ["departureId", ""], ["slug", ""], ["summary", ""],
   ["featured", "false"], ["sortOrder", "0"], ["detailUrl", ""],
   ["seoTitle", ""], ["seoDescription", ""], ["returnDate", ""],
   ["manasikDate", ""], ["departureAirport", "Jakarta"], ["arrivalAirport", ""],
@@ -31,6 +31,8 @@ export function PackageForm({ values = {} }: { values?: Values }) {
   const [imageUrl, setImageUrl] = useState(field(values, "imageUrl"));
   const [displayPrice, setDisplayPrice] = useState(() => formatRupiahInput(field(values, "price")));
   const [durationDays, setDurationDays] = useState(() => field(values, "durationDays", "9"));
+  const [category, setCategory] = useState(() => field(values, "category", "umrah"));
+  const [packageType, setPackageType] = useState(() => field(values, "packageType", "reguler"));
   const isPublished = field(values, "status") === "published";
   const hasDraftChanges = values.hasDraftChanges === true;
 
@@ -59,12 +61,29 @@ export function PackageForm({ values = {} }: { values?: Values }) {
             {error("name") ? <small className="admin-upload-error">{error("name")}</small> : null}
           </label>
           <label>
-            <span>Jenis paket</span>
-            <select name="packageType" defaultValue={field(values, "packageType", "reguler")}>
-              <option value="reguler">Umroh Reguler</option>
-              <option value="bintang-5">Umroh Bintang 5</option>
-              <option value="plus">Umroh Plus</option>
-              <option value="tour">Wisata Halal</option>
+            <span>Kategori paket</span>
+            <select name="category" value={category} onChange={(event) => {
+              const next = event.target.value;
+              setCategory(next);
+              setPackageType(next === "halal-tour" ? "tour" : packageType === "tour" ? "reguler" : packageType);
+            }}>
+              <option value="umrah">Umroh</option>
+              <option value="halal-tour">Wisata</option>
+            </select>
+            <small>Menentukan daftar dan halaman publik tempat paket ditampilkan.</small>
+          </label>
+          <label>
+            <span>Jenis program</span>
+            <select name="packageType" value={packageType} onChange={(event) => setPackageType(event.target.value)}>
+              {category === "halal-tour" ? (
+                <option value="tour">Wisata</option>
+              ) : (
+                <>
+                  <option value="reguler">Umroh Reguler</option>
+                  <option value="bintang-5">Umroh Bintang 5</option>
+                  <option value="plus">Umroh Plus</option>
+                </>
+              )}
             </select>
           </label>
           <label>
@@ -124,6 +143,12 @@ export function PackageForm({ values = {} }: { values?: Values }) {
             <span>Maskapai</span>
             <input name="airline" defaultValue={field(values, "airline")} placeholder="Contoh: Qatar Airways" required />
             {error("airline") ? <small className="admin-upload-error">{error("airline")}</small> : null}
+          </label>
+          <label className="admin-train-field">
+            <span>Kereta Cepat <em>opsional</em></span>
+            <input name="highSpeedTrain" defaultValue={field(values, "highSpeedTrain")} placeholder="Contoh: Haramain High Speed Railway" />
+            <small>Jika tidak digunakan, biarkan kosong dan informasi ini tidak akan tampil di website.</small>
+            {error("highSpeedTrain") ? <small className="admin-upload-error">{error("highSpeedTrain")}</small> : null}
           </label>
           <label>
             <span>Hotel Makkah</span>

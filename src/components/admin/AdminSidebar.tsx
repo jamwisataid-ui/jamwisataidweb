@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import {
   BadgeDollarSign,
@@ -33,7 +33,7 @@ import {
 } from "lucide-react";
 
 const cmsNav = [
-  { label: "Menu utama", items: [["/admin", "Beranda", House], ["/admin/paket", "Paket Umrah", PackageOpen], ["/admin/artikel", "Artikel", BookOpenText]] },
+  { label: "Menu utama", items: [["/admin", "Beranda", House], ["/admin/paket?category=umrah", "Paket Umrah", PackageOpen], ["/admin/paket?category=halal-tour", "Paket Wisata", PackageOpen], ["/admin/artikel", "Artikel", BookOpenText]] },
   { label: "Konten homepage", items: [["/admin/konten/gallery", "Galeri foto", GalleryHorizontal], ["/admin/konten/testimonial", "Video jamaah", MessageSquareQuote], ["/admin/konten/faq", "Tanya jawab", FileQuestion]] },
 ] as const;
 
@@ -47,6 +47,7 @@ const managementNav = [
 
 export function AdminSidebar({ name, email }: { name: string; email: string }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const managementMode = pathname.startsWith("/admin/manajemen");
@@ -81,7 +82,11 @@ export function AdminSidebar({ name, email }: { name: string; email: string }) {
       </section>
       <nav aria-label={managementMode ? "Navigasi manajemen internal" : "Navigasi CMS"} className="admin-nav">
         {nav.map((group) => <section key={group.label}><p>{group.label}</p>{group.items.map(([href, label, Icon]) => {
-          const active = href === dashboardHref ? pathname === href : pathname.startsWith(href);
+          const [hrefPath, hrefQuery] = href.split("?");
+          const expectedCategory = hrefQuery ? new URLSearchParams(hrefQuery).get("category") : null;
+          const active = expectedCategory
+            ? pathname === hrefPath && (searchParams.get("category") ?? "umrah") === expectedCategory
+            : href === dashboardHref ? pathname === href : pathname.startsWith(hrefPath);
           return <Link onClick={() => setOpen(false)} key={href} href={href} className={active ? "active" : ""}><Icon aria-hidden /><span>{label}</span>{active ? <i /> : null}</Link>;
         })}</section>)}
       </nav>

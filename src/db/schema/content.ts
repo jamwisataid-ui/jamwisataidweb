@@ -87,6 +87,7 @@ export const departures = pgTable(
     manasikDate: date("manasik_date", { mode: "string" }),
     dateLabel: text("date_label").notNull(),
     airline: text("airline").notNull(),
+    highSpeedTrain: text("high_speed_train"),
     departureAirport: text("departure_airport").notNull(),
     arrivalAirport: text("arrival_airport"),
     price: numeric("price", { precision: 14, scale: 0 }).notNull(),

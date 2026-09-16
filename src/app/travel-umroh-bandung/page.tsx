@@ -24,7 +24,7 @@ import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/roo
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
 import { formatIDR, whatsappHref } from "@/data/jamwisata";
-import { getPublishedPackages } from "@/lib/cms/public";
+import { getPublishedPackagesByCategory } from "@/lib/cms/public";
 import { defaultOpenGraphImages, defaultTwitterImages, SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -150,7 +150,7 @@ const bandungFaqs = [
 ];
 
 export default async function TravelUmrohBandungPage() {
-  const umrahPackages = await getPublishedPackages();
+  const umrahPackages = await getPublishedPackagesByCategory("umrah");
   const displayedPackages = umrahPackages.slice(0, 10);
   return (
     <main className="jam-page min-h-screen bg-white text-[#333333]">
