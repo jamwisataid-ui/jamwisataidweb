@@ -84,14 +84,21 @@ export function AdminSidebar({ name, email }: { name: string; email: string }) {
         {nav.map((group) => <section key={group.label}><p>{group.label}</p>{group.items.map(([href, label, Icon]) => {
           const [hrefPath, hrefQuery] = href.split("?");
           const expectedCategory = hrefQuery ? new URLSearchParams(hrefQuery).get("category") : null;
-          const active = expectedCategory
-            ? pathname === hrefPath && (searchParams.get("category") ?? "umrah") === expectedCategory
-            : href === dashboardHref ? pathname === href : pathname.startsWith(hrefPath);
+          let active = false;
+          if (expectedCategory) {
+            const isPaket = pathname.startsWith("/admin/paket");
+            const currentCat = searchParams.get("category") === "halal-tour" ? "halal-tour" : "umrah";
+            active = isPaket && currentCat === expectedCategory;
+          } else if (href === dashboardHref) {
+            active = pathname === href;
+          } else {
+            active = pathname.startsWith(hrefPath);
+          }
           return <Link onClick={() => setOpen(false)} key={href} href={href} className={active ? "active" : ""}><Icon aria-hidden /><span>{label}</span>{active ? <i /> : null}</Link>;
         })}</section>)}
       </nav>
       <div className="admin-sidebar-utility">
-        <Link className="admin-account-link" onClick={() => setOpen(false)} href="/admin/ganti-password"><KeyRound aria-hidden /><span>Ganti kata sandi</span></Link>
+        <Link className={`admin-account-link ${pathname === "/admin/ganti-password" ? "active" : ""}`} onClick={() => setOpen(false)} href="/admin/ganti-password"><KeyRound aria-hidden /><span>Ganti kata sandi</span>{pathname === "/admin/ganti-password" ? <i /> : null}</Link>
         <a className="admin-view-site" href="/" target="_blank" rel="noreferrer"><SquareArrowOutUpRight aria-hidden /><span>Buka website</span></a>
       </div>
       <div className="admin-profile">

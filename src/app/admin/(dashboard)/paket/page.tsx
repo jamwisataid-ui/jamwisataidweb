@@ -65,9 +65,21 @@ export default async function PackagesAdminPage({ searchParams }: { searchParams
                     </td>
                     <td data-label="Aksi">
                       <div className="admin-table-actions">
-                        <Link href={`/admin/paket/${item.id}`} className="admin-text-button">
+                        <Link href={`/admin/paket/${item.id}?category=${category}`} className="admin-text-button" title="Edit seluruh data dan detail paket ini">
                           Ubah
                         </Link>
+                        {item.slug && item.status === "published" ? (
+                          <a
+                            href={category === "halal-tour" ? `/paket-wisata/${item.slug}` : `/paket-umroh/${item.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="admin-text-button"
+                            style={{ color: "#0284c7", fontWeight: "600" }}
+                            title="Buka halaman detail publik paket ini di tab baru"
+                          >
+                            Lihat Web ↗
+                          </a>
+                        ) : null}
                         <DeleteButton id={item.id} name={item.name} type="package" />
                       </div>
                     </td>

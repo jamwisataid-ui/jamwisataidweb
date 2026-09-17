@@ -37,9 +37,27 @@ export function PremiumHeader() {
   const pathname = usePathname();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
-  const articlesActive = pathname?.startsWith("/artikel");
-  const packageHref = (id: string) => id === "paket-umrah" ? "/paket-umroh" : id === "paket-wisata" ? "/paket-wisata" : id === "beranda" ? "/" : `/#${id}`;
-  const packageActive = (id: string) => id === "paket-umrah" ? pathname?.startsWith("/paket-umroh") : id === "paket-wisata" ? pathname?.startsWith("/paket-wisata") : active === id;
+
+  const isHomepage = pathname === "/";
+  const articlesActive = Boolean(pathname?.startsWith("/artikel"));
+
+  const packageHref = (id: string) => {
+    if (id === "paket-umrah") return "/paket-umroh";
+    if (id === "paket-wisata") return "/paket-wisata";
+    if (id === "beranda") return "/";
+    return isHomepage ? `#${id}` : `/#${id}`;
+  };
+
+  const packageActive = (id: string) => {
+    if (isHomepage) {
+      if (articlesActive) return false;
+      return active === id;
+    }
+    if (id === "paket-umrah") return Boolean(pathname?.startsWith("/paket-umroh"));
+    if (id === "paket-wisata") return Boolean(pathname?.startsWith("/paket-wisata"));
+    if (id === "tentang-kami") return Boolean(pathname?.startsWith("/tentang-kami"));
+    return false;
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -49,6 +67,7 @@ export function PremiumHeader() {
   }, []);
 
   useEffect(() => {
+    if (!isHomepage) return;
     const sections = links
       .map(([id]) => document.getElementById(id))
       .filter(Boolean) as HTMLElement[];
@@ -63,7 +82,7 @@ export function PremiumHeader() {
     );
     sections.forEach((section) => observer.observe(section));
     return () => observer.disconnect();
-  }, []);
+  }, [isHomepage]);
 
   useEffect(() => {
     if (!menuOpen) return;

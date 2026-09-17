@@ -20,6 +20,7 @@ import { HotelStarRating } from "@/components/HotelStarRating";
 import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/ModernProofFooter";
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
+import { AdminDetailFloatingBar } from "@/components/admin/AdminDetailFloatingBar";
 import { formatIDR, whatsappHref } from "@/data/jamwisata";
 import { getPublishedPackagesByCategory, type PublicPackageCategory } from "@/lib/cms/public";
 import { resolveAbsoluteImageUrl, SITE_URL } from "@/lib/seo";
@@ -319,7 +320,7 @@ export async function renderPackageDetail({ params }: PackageDetailProps, catego
               </div>
 
               {/* Terms & Conditions */}
-              {pkg.terms && (
+              {pkg.terms && pkg.terms.length > 0 && (
                 <div className="rounded-2xl border border-[#061A2F]/10 bg-white p-6 shadow-xs">
                   <h3 className="font-[family-name:var(--font-cinzel)] text-base font-bold text-[#061A2F] flex items-center gap-2">
                     <FileText className="size-4 text-[#D5A12B]" />
@@ -430,6 +431,7 @@ export async function renderPackageDetail({ params }: PackageDetailProps, catego
 
       <ModernProofFooter />
       <WhatsAppConcierge />
+      <AdminDetailFloatingBar packageId={pkg.id} category={category} />
     </main>
   );
 }
