@@ -38,6 +38,7 @@ export async function POST(request: Request) {
     await db.insert(auditLogs).values({ actorId: session.user.id, action: "upload", entityType: "pilgrim_document", entityId: document.id, summary: `${kind} ${pilgrim.fullName} diunggah` });
     return NextResponse.json({ ok: true, documentId: document.id });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Upload gagal." }, { status: 500 });
+    console.error("Pilgrim document upload failed:", error);
+    return NextResponse.json({ error: "Dokumen gagal diunggah. Silakan coba lagi." }, { status: 500 });
   }
 }

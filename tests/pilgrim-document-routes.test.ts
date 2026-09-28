@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   createPrivateDownloadUrl: vi.fn(),
   deletePrivateObject: vi.fn(),
+  insertError: null as Error | null,
   inserted: [] as Array<Record<string, unknown>>,
   pilgrimDocument: null as Record<string, unknown> | null,
   putPrivateObject: vi.fn(),
@@ -43,7 +44,11 @@ vi.mock("@/db", () => ({
       values: vi.fn((values: Record<string, unknown>) => {
         mocks.inserted.push(values);
         if (values.entityType === "pilgrim_document") return Promise.resolve();
-        return { returning: vi.fn().mockResolvedValue([{ id: `document-${mocks.inserted.length}`, ...values }]) };
+        return {
+          returning: vi.fn(() => mocks.insertError
+            ? Promise.reject(mocks.insertError)
+            : Promise.resolve([{ id: `document-${mocks.inserted.length}`, ...values }])),
+        };
       }),
     })),
   }),
@@ -64,6 +69,8 @@ describe("pilgrim Buku Vaksin routes", () => {
   beforeEach(() => {
     mocks.createPrivateDownloadUrl.mockReset();
     mocks.deletePrivateObject.mockReset();
+    mocks.deletePrivateObject.mockResolvedValue(undefined);
+    mocks.insertError = null;
     mocks.inserted.length = 0;
     mocks.pilgrimDocument = null;
     mocks.putPrivateObject.mockReset();
@@ -111,5 +118,21 @@ describe("pilgrim Buku Vaksin routes", () => {
 
     expect(response.status).toBe(307);
     expect(mocks.createPrivateDownloadUrl).toHaveBeenCalledWith("private/key.pdf", "buku-vaksin.pdf");
+  });
+
+  it("keeps database details out of upload error responses", async () => {
+    const technicalError = new Error('invalid input value for enum pilgrim_document_kind: "buku_vaksin"');
+    mocks.insertError = technicalError;
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    const response = await POST(vaccineBookUpload("buku-vaksin.pdf"));
+    const payload = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(payload).toEqual({ error: "Dokumen gagal diunggah. Silakan coba lagi." });
+    expect(JSON.stringify(payload)).not.toContain("pilgrim_document_kind");
+    expect(mocks.deletePrivateObject).toHaveBeenCalledWith("private/pilgrims/pilgrim-1/vaccine.pdf");
+    expect(consoleError).toHaveBeenCalledWith("Pilgrim document upload failed:", technicalError);
+    consoleError.mockRestore();
   });
 });
