@@ -5,6 +5,8 @@ import { AlertCircle, CheckCircle2, FileCheck2, FileUp, LoaderCircle, Save } fro
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import { isPilgrimDocumentKind } from "@/lib/management/pilgrim-documents";
+
 const DRAFT_KEY = "jamwisata:management-document-upload-draft";
 
 type UploadProgress = "idle" | "uploading" | "saving" | "done" | "error";
@@ -36,8 +38,6 @@ function fileSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-const documentKinds = new Set(["ktp", "kk", "akta_lahir", "buku_nikah", "ijazah", "paspor", "other"]);
-
 export function PilgrimDocumentUpload({ pilgrims, initialKind }: { pilgrims: Array<{ id: string; fullName: string }>; initialKind?: string }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -45,7 +45,7 @@ export function PilgrimDocumentUpload({ pilgrims, initialKind }: { pilgrims: Arr
   const [uploadProgress, setUploadProgress] = useState(0);
   const [message, setMessage] = useState("");
   const [pilgrimId, setPilgrimId] = useState(pilgrims[0]?.id ?? "");
-  const selectedInitialKind = initialKind && documentKinds.has(initialKind) ? initialKind : "ktp";
+  const selectedInitialKind = initialKind && isPilgrimDocumentKind(initialKind) ? initialKind : "ktp";
   const [kind, setKind] = useState(selectedInitialKind);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [restoredFileName, setRestoredFileName] = useState("");
@@ -64,7 +64,7 @@ export function PilgrimDocumentUpload({ pilgrims, initialKind }: { pilgrims: Arr
     const restoreDraft = window.setTimeout(() => {
       if (draft) {
         if (draft.pilgrimId && pilgrims.some((item) => item.id === draft.pilgrimId)) setPilgrimId(draft.pilgrimId);
-        if (!initialKind && draft.kind && documentKinds.has(draft.kind)) setKind(draft.kind);
+        if (!initialKind && draft.kind && isPilgrimDocumentKind(draft.kind)) setKind(draft.kind);
         if (draft.fileName) setRestoredFileName(draft.fileName);
         if (draft.updatedAt) setDraftSavedAt(new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" }).format(new Date(draft.updatedAt)));
       }
@@ -125,7 +125,7 @@ export function PilgrimDocumentUpload({ pilgrims, initialKind }: { pilgrims: Arr
   return <form onSubmit={submit} className="management-form management-document-upload">
     <div className="management-form-grid two">
       <label><span>Jamaah *</span><select name="pilgrimId" value={pilgrimId} onChange={(event) => { setPilgrimId(event.target.value); setDraftSavedAt(""); setDraftDirty(true); }} required disabled={busy}>{pilgrims.map((item) => <option key={item.id} value={item.id}>{item.fullName}</option>)}</select></label>
-      <label><span>Jenis dokumen *</span><select name="kind" value={kind} onChange={(event) => { setKind(event.target.value); setDraftSavedAt(""); setDraftDirty(true); }} disabled={busy}><option value="ktp">KTP</option><option value="kk">Kartu Keluarga</option><option value="akta_lahir">Akta Lahir</option><option value="buku_nikah">Buku Nikah</option><option value="ijazah">Ijazah</option><option value="paspor">Paspor</option><option value="other">Dokumen lain</option></select></label>
+      <label><span>Jenis dokumen *</span><select name="kind" value={kind} onChange={(event) => { const nextKind = event.target.value; if (isPilgrimDocumentKind(nextKind)) setKind(nextKind); setDraftSavedAt(""); setDraftDirty(true); }} disabled={busy}><option value="ktp">KTP</option><option value="kk">Kartu Keluarga</option><option value="akta_lahir">Akta Lahir</option><option value="buku_nikah">Buku Nikah</option><option value="ijazah">Ijazah</option><option value="paspor">Paspor</option><option value="buku_vaksin">Buku Vaksin</option><option value="other">Dokumen lain</option></select></label>
     </div>
     <label className={`management-upload-picker ${fileName ? "has-file" : ""}`}>
       <span className="management-upload-icon">{fileName ? <FileCheck2 /> : <FileUp />}</span>

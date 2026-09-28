@@ -3,6 +3,7 @@ import { AlertTriangle, CheckCircle2, CircleAlert, Download, FileText, Upload } 
 
 import type { getManagementContext } from "@/lib/management/data";
 import { formatDocumentNumber, rupiah } from "@/lib/management/domain";
+import { hasMinimumRequiredPilgrimDocuments, PILGRIM_DOCUMENT_REQUIREMENTS } from "@/lib/management/pilgrim-documents";
 import { AdminPageHeader } from "./AdminUi";
 import { TransactionDocumentBuilder } from "./TransactionDocumentBuilder";
 import { EnsureReceiptButton } from "./EnsureReceiptButton";
@@ -59,22 +60,14 @@ function PilgrimValue({ children }: { children: React.ReactNode }) {
 }
 
 function PilgrimDocumentChecklist({ pilgrimId, documents }: { pilgrimId: string; documents: Context["pilgrimDocuments"] }) {
-  const requirements = [
-    ["ktp", "KTP", "Wajib"],
-    ["kk", "Kartu Keluarga", "Wajib"],
-    ["akta_lahir", "Akta Lahir", "Minimal salah satu dokumen pendukung"],
-    ["buku_nikah", "Buku Nikah", "Minimal salah satu dokumen pendukung"],
-    ["ijazah", "Ijazah", "Minimal salah satu dokumen pendukung"],
-    ["paspor", "Paspor", "Lengkapi saat sudah tersedia"],
-  ] as const;
   const supportingComplete = documents.some((document) => ["akta_lahir", "buku_nikah", "ijazah"].includes(document.kind));
   const additional = documents.filter((document) => document.kind === "other");
   return <div className="management-document-checklist">
     <div className={`management-document-group-status ${supportingComplete ? "complete" : "missing"}`}>{supportingComplete ? <CheckCircle2 /> : <CircleAlert />}<span><strong>Dokumen pendukung</strong><small>{supportingComplete ? "Syarat minimal Akta Lahir, Buku Nikah, atau Ijazah sudah terpenuhi." : "Belum ada. Upload minimal salah satu: Akta Lahir, Buku Nikah, atau Ijazah."}</small></span></div>
-    {requirements.map(([kind, label, note]) => {
+    {PILGRIM_DOCUMENT_REQUIREMENTS.map(({ kind, label, note }) => {
       const matches = documents.filter((document) => document.kind === kind);
       const document = matches[0];
-      return <div className={`management-document-check ${document ? "complete" : "missing"}`} key={kind}><span className="management-document-check-icon">{document ? <CheckCircle2 /> : <CircleAlert />}</span><span><strong>{label}</strong><small>{document ? `${document.originalName}${matches.length > 1 ? ` · ${matches.length} file` : ""}` : note}</small></span>{document ? <div className="management-document-check-actions"><PrivateDocumentPreview id={document.id} name={document.originalName} mimeType={document.mimeType} /><a href={`/api/admin/management/documents/${document.id}`}><Download /> Download</a><Link className="management-document-add-action" href={`/admin/manajemen/jamaah/${pilgrimId}/dokumen/baru?jenis=${kind}`}><Upload /> Tambah</Link></div> : <Link className="management-document-missing-action" href={`/admin/manajemen/jamaah/${pilgrimId}/dokumen/baru?jenis=${kind}`}><Upload /> Unggah {label}</Link>}</div>;
+      return <div className={`management-document-check ${document ? "complete" : "missing"}`} key={kind}><span className="management-document-check-icon">{document ? <CheckCircle2 /> : <CircleAlert />}</span><span><strong>{label}</strong><small>{document ? `${document.originalName}${matches.length > 1 ? ` · ${matches.length} file` : ""}` : note}</small></span>{document ? <div className="management-document-check-actions"><PrivateDocumentPreview id={document.id} name={document.originalName} mimeType={document.mimeType} /><a href={`/api/admin/management/documents/${document.id}`}><Download /> Download</a><Link className="management-document-add-action" href={`/admin/manajemen/jamaah/${pilgrimId}/dokumen/baru?jenis=${kind}`}><Upload /> Tambah / Ganti</Link></div> : <Link className="management-document-missing-action" href={`/admin/manajemen/jamaah/${pilgrimId}/dokumen/baru?jenis=${kind}`}><Upload /> Unggah {label}</Link>}</div>;
     })}
     {additional.map((document) => <div className="management-document-check complete" key={document.id}><span className="management-document-check-icon"><CheckCircle2 /></span><span><strong>Dokumen tambahan</strong><small>{document.originalName}</small></span><div className="management-document-check-actions"><PrivateDocumentPreview id={document.id} name={document.originalName} mimeType={document.mimeType} /><a href={`/api/admin/management/documents/${document.id}`}><Download /> Download</a></div></div>)}
   </div>;
@@ -130,7 +123,7 @@ export function ManagementDetailPage({ module, id, data }: { module: string; id:
     const docs = data.pilgrimDocuments.filter((row) => row.pilgrimId === id && row.reviewStatus !== "rejected");
     const history = data.registrations.filter((row) => row.pilgrimId === id);
     const kinds = new Set(docs.map((doc) => doc.kind));
-    const documentsComplete = kinds.has("ktp") && kinds.has("kk") && (kinds.has("akta_lahir") || kinds.has("buku_nikah") || kinds.has("ijazah"));
+    const documentsComplete = hasMinimumRequiredPilgrimDocuments(kinds);
     const missingFields = [item.email, item.gender, item.birthDate, item.passportNumber, item.passportExpiry].filter((value) => !value).length;
     return <><AdminPageHeader eyebrow="DETAIL JAMAAH" title={item.fullName} description="Data pribadi, dokumen, paket, dan pembayaran jamaah tersimpan dalam satu halaman." backHref={backHref} actions={[{ href: `/admin/manajemen/jamaah/${item.id}/edit`, label: "Edit data", secondary: true, icon: "edit" }, { href: `/admin/manajemen/jamaah/${item.id}/dokumen/baru`, label: "Upload dokumen", icon: "upload" }]} /><Panel title="Data pribadi" description={missingFields ? `${missingFields} data masih belum diisi dan perlu dilengkapi.` : "Semua data utama jamaah sudah diisi."}><DetailGrid rows={[["Nama lengkap", <PilgrimValue key="name">{item.fullName}</PilgrimValue>], ["WhatsApp", <PilgrimValue key="whatsapp">{item.whatsapp}</PilgrimValue>], ["Email", <PilgrimValue key="email">{item.email}</PilgrimValue>], ["Jenis kelamin", <PilgrimValue key="gender">{item.gender}</PilgrimValue>], ["Tanggal lahir", item.birthDate ? <DateText key="birth" value={item.birthDate} /> : <PilgrimValue key="birth-missing">{null}</PilgrimValue>], ["Kewarganegaraan", <PilgrimValue key="nationality">{item.nationality}</PilgrimValue>], ["Nomor paspor", <PilgrimValue key="passport-number">{item.passportNumber}</PilgrimValue>], ["Masa berlaku paspor", item.passportExpiry ? <DateText key="passport" value={item.passportExpiry} /> : <PilgrimValue key="passport-missing">{null}</PilgrimValue>], ["Status data", item.status === "active" ? "Aktif" : "Diarsipkan"], ["Catatan", <PilgrimValue key="notes">{item.notes}</PilgrimValue>]]} /></Panel><Panel title={`Kelengkapan dokumen (${docs.length} file)`} description={documentsComplete ? "KTP, KK, dan dokumen pendukung minimal sudah lengkap." : "Dokumen kosong dapat langsung diunggah melalui tombol pada setiap baris."}><PilgrimDocumentChecklist pilgrimId={item.id} documents={docs} /></Panel><Panel title={`Riwayat paket & pembayaran (${history.length})`}>{history.length ? <div className="management-mini-list">{history.map((row) => <Link key={row.id} href={`/admin/manajemen/keberangkatan/${row.bookingId}`}><span><strong>{row.package?.name}</strong><small>{row.booking?.bookingNumber} · {row.payment.status} · terbayar {rupiah(row.payment.netPaid)}</small></span><strong>Sisa {rupiah(row.payment.outstanding)}</strong></Link>)}</div> : <p className="management-form-note">Jamaah ini belum terdaftar pada paket keberangkatan.</p>}</Panel><section className="management-danger-zone"><span><strong>Hapus data jamaah</strong><small>{history.length ? "Menghapus jamaah ini akan membersihkan pendaftaran, kamar, dan dokumen terkait secara permanen." : "Hanya gunakan jika data salah atau duplikat. Seluruh dokumen jamaah ikut dihapus permanen."}</small></span><DeleteButton id={item.id} name={item.fullName} type="pilgrim" variant="form" /></section></>;
   }

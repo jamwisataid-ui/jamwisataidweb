@@ -25,7 +25,7 @@ const timestamps = {
 };
 
 export const recordStatus = pgEnum("management_record_status", ["active", "archived"]);
-export const documentKind = pgEnum("pilgrim_document_kind", ["ktp", "kk", "akta_lahir", "buku_nikah", "ijazah", "paspor", "other"]);
+export const documentKind = pgEnum("pilgrim_document_kind", ["ktp", "kk", "akta_lahir", "buku_nikah", "ijazah", "paspor", "buku_vaksin", "other"]);
 export const documentReviewStatus = pgEnum("document_review_status", ["pending", "verified", "rejected"]);
 export const bookingStatus = pgEnum("booking_status", ["active", "cancelled", "completed"]);
 export const paymentMethod = pgEnum("payment_method", ["cash", "transfer", "card", "other"]);

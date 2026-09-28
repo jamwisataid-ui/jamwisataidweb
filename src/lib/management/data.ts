@@ -27,6 +27,7 @@ import {
   registrations,
 } from "@/db/schema";
 import { computeDepartureReports, dueDate, paymentStatus, upcomingBirthday } from "./domain";
+import { hasMinimumRequiredPilgrimDocuments } from "./pilgrim-documents";
 
 export async function getManagementContext() {
   const db = requireDatabase();
@@ -162,7 +163,7 @@ export async function getManagementContext() {
       dueSoon: registrationSummaries.filter((item) => item.payment.status !== "Lunas" && item.dueAt && item.dueAt <= new Date(Date.now() + 14 * 86400000)).length,
       incompleteDocuments: pilgrimRows.filter((pilgrim) => {
         const kinds = new Set(pilgrimDocumentRows.filter((doc) => doc.pilgrimId === pilgrim.id && doc.reviewStatus !== "rejected").map((doc) => doc.kind));
-        return !kinds.has("ktp") || !kinds.has("kk") || !(kinds.has("akta_lahir") || kinds.has("buku_nikah") || kinds.has("ijazah"));
+        return !hasMinimumRequiredPilgrimDocuments(kinds);
       }).length,
       lowStock: inventoryRows.filter((item) => item.currentStock <= item.minimumStock).length,
       earnedCommission: commissionRows.filter((item) => item.status === "earned").reduce((sum, item) => sum + item.amount, 0),

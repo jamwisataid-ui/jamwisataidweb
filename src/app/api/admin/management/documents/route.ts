@@ -5,9 +5,8 @@ import { createHash } from "node:crypto";
 import { requireDatabase } from "@/db";
 import { auditLogs, pilgrimDocuments, pilgrims } from "@/db/schema";
 import { requireAdminSession } from "@/lib/admin-session";
+import { isPilgrimDocumentKind } from "@/lib/management/pilgrim-documents";
 import { deletePrivateObject, privateObjectKey, putPrivateObject, validatePrivateFile } from "@/lib/management/storage";
-
-const kinds = new Set(["ktp", "kk", "akta_lahir", "buku_nikah", "ijazah", "paspor", "other"]);
 
 export async function POST(request: Request) {
   try {
@@ -17,7 +16,7 @@ export async function POST(request: Request) {
     const pilgrimId = String(formData.get("pilgrimId") ?? "");
     const kind = String(formData.get("kind") ?? "");
     const file = formData.get("file");
-    if (!pilgrimId || !kinds.has(kind)) return NextResponse.json({ error: "Data jamaah atau jenis dokumen tidak valid." }, { status: 400 });
+    if (!pilgrimId || !isPilgrimDocumentKind(kind)) return NextResponse.json({ error: "Data jamaah atau jenis dokumen tidak valid." }, { status: 400 });
     if (!(file instanceof File) || !file.size) return NextResponse.json({ error: "Pilih file yang ingin diunggah." }, { status: 400 });
 
     const db = requireDatabase();
@@ -31,7 +30,7 @@ export async function POST(request: Request) {
     await putPrivateObject(objectKey, bytes, file.type);
     let document: typeof pilgrimDocuments.$inferSelect;
     try {
-      [document] = await db.insert(pilgrimDocuments).values({ pilgrimId: pilgrim.id, kind: kind as typeof pilgrimDocuments.$inferInsert.kind, originalName: file.name, objectKey, mimeType: file.type, sizeBytes: file.size, checksum: createHash("sha256").update(bytes).digest("hex"), uploadedBy: session.user.id }).returning();
+      [document] = await db.insert(pilgrimDocuments).values({ pilgrimId: pilgrim.id, kind, originalName: file.name, objectKey, mimeType: file.type, sizeBytes: file.size, checksum: createHash("sha256").update(bytes).digest("hex"), uploadedBy: session.user.id }).returning();
     } catch (error) {
       await deletePrivateObject(objectKey).catch(() => undefined);
       throw error;
