@@ -96,7 +96,13 @@ function Reports({ data }: { data: Context }) {
         description="Pantau laba/rugi berbasis kas dan rekap penjualan, jamaah, kamar, agen, serta pembayaran dalam satu halaman."
       />
       <ProfitLossReport data={data} />
-      <UnifiedReportWorkspace data={data} />
+      <details className="management-report-disclosure">
+        <summary>
+          <span><small>LAPORAN OPERASIONAL</small><strong>Penjualan, Jamaah & Keuangan</strong></span>
+          <span aria-hidden="true" />
+        </summary>
+        <div><UnifiedReportWorkspace data={data} /></div>
+      </details>
     </>
   );
 }

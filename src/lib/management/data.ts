@@ -145,6 +145,9 @@ export async function getManagementContext() {
     const paymentDeparture = paymentBooking ? departuresById.get(paymentBooking.departureId) : undefined;
     const refund = transaction.refundId ? refundsById.get(transaction.refundId) : undefined;
     const commission = commissionByTransactionId.get(transaction.id);
+    const reportDescription = transaction.kind === "payment" && paymentBooking
+      ? `Pembayaran ${paymentBooking.bookingNumber} · ${paymentBooking.payerName}`
+      : transaction.description;
     const linkedPackage = transaction.packageId
       ? packagesById.get(transaction.packageId)
       : paymentDeparture
@@ -156,6 +159,7 @@ export async function getManagementContext() {
             : undefined;
     return {
       ...transaction,
+      description: reportDescription,
       resolvedPackageId: linkedPackage?.id ?? null,
       packageName: linkedPackage?.name ?? null,
       categoryName: transaction.categoryId ? categoriesById.get(transaction.categoryId)?.name ?? null : null,

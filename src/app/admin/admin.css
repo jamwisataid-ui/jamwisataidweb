@@ -2297,7 +2297,54 @@
 .management-report-filters label > span { margin-bottom: 6px; color: #53667e; font-size: 11px; font-weight: 750; }
 .management-report-filters input,.management-report-filters select { width: 100%; min-height: 44px; padding: 8px 10px; border: 1px solid #bdc9d6; border-radius: 8px; background: #fff; color: #173251; font: inherit; }
 .management-profit-loss-filters { grid-template-columns: repeat(3,minmax(180px,1fr)); align-items: end; margin-bottom: 18px; }
-.management-profit-loss-kpis { grid-template-columns: repeat(5,minmax(0,1fr)); }
+.management-profit-loss-panel { margin: 0 0 18px; overflow: hidden; }
+.management-profit-loss-header { align-items: flex-start !important; }
+.management-profit-loss-header p { max-width: 720px; margin: 5px 0 0; color: #68778a; font-size: 13px; line-height: 1.55; }
+.management-profit-loss-actions { display: flex; flex: 0 0 auto; gap: 8px; }
+.management-profit-loss-actions .management-create-link { min-width: 92px; }
+.management-profit-loss-error { grid-column: 1/-1; color: #a52e27; font-size: 12px; font-weight: 750; }
+.management-profit-loss-summary { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; margin-bottom: 16px; }
+.management-profit-loss-summary > article { min-width: 0; padding: 16px; border: 1px solid #e5e0d6; border-radius: 11px; background: #fff; }
+.management-profit-loss-summary > article:first-child { grid-column: 1/-1; display: flex; min-height: 92px; align-items: center; justify-content: space-between; gap: 20px; border: 0; background: #0b284b; color: #fff; }
+.management-profit-loss-summary small,.management-profit-loss-summary strong { display: block; }
+.management-profit-loss-summary small { color: #6d7a8b; font-size: 11px; font-weight: 750; }
+.management-profit-loss-summary strong { margin-top: 8px; color: #173252; font-family: var(--font-cinzel),Georgia,serif; font-size: clamp(17px,1.55vw,24px); font-variant-numeric: tabular-nums; line-height: 1.15; white-space: nowrap; }
+.management-profit-loss-summary > article:first-child small { color: #e8cc84; font-size: 10px; letter-spacing: .12em; }
+.management-profit-loss-summary > article:first-child strong { margin-top: 4px; color: #fff; font-size: 17px; }
+.management-profit-loss-summary > article:first-child b { max-width: 65%; color: #fff; font-family: var(--font-cinzel),Georgia,serif; font-size: clamp(25px,3vw,38px); font-variant-numeric: tabular-nums; line-height: 1.1; overflow-wrap: anywhere; text-align: right; }
+.management-profit-loss-summary > article:first-child.is-profit b,.management-profit-loss-summary .positive { color: #237844; }
+.management-profit-loss-summary > article:first-child.is-loss b,.management-profit-loss-summary .negative { color: #a9342e; }
+.management-profit-loss-summary > article:first-child.is-profit b { color: #8fe0ad; }
+.management-profit-loss-summary > article:first-child.is-loss b { color: #ffaaa4; }
+.management-profit-loss-details { overflow: hidden; border: 1px solid #e3ded3; border-radius: 11px; background: #fff; }
+.management-profit-loss-details > summary { display: flex; min-height: 66px; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 16px; color: #173252; cursor: pointer; list-style: none; }
+.management-profit-loss-details > summary::-webkit-details-marker { display: none; }
+.management-profit-loss-details > summary span,.management-profit-loss-details > summary strong,.management-profit-loss-details > summary small { display: block; }
+.management-profit-loss-details > summary strong { font-size: 14px; }
+.management-profit-loss-details > summary small { margin-top: 4px; color: #778496; font-size: 11px; }
+.management-profit-loss-details > summary svg { width: 18px; transition: transform .18s ease; }
+.management-profit-loss-details[open] > summary { border-bottom: 1px solid #e8e3da; background: #faf8f3; }
+.management-profit-loss-details[open] > summary svg { transform: rotate(180deg); }
+.management-profit-loss-table { min-width: 850px; table-layout: fixed; }
+.management-profit-loss-table th:nth-child(1) { width: 105px; }
+.management-profit-loss-table th:nth-child(2) { width: 28%; }
+.management-profit-loss-table th:nth-child(3) { width: 145px; }
+.management-profit-loss-table th:nth-child(4) { width: 130px; }
+.management-profit-loss-table th:nth-child(5),.management-profit-loss-table th:nth-child(6) { width: 145px; text-align: right; }
+.management-profit-loss-table td { overflow-wrap: anywhere; }
+.management-profit-loss-table td:nth-child(1),.management-profit-loss-table td:nth-child(5),.management-profit-loss-table td:nth-child(6) { white-space: nowrap; }
+.management-profit-loss-table td:nth-child(5),.management-profit-loss-table td:nth-child(6) { font-weight: 750; text-align: right; }
+.management-report-disclosure { overflow: hidden; border: 1px solid #ded8cc; border-radius: 16px; background: #fff; box-shadow: 0 10px 30px rgba(7,26,53,.045); }
+.management-report-disclosure > summary { display: flex; min-height: 88px; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 24px; color: #173252; cursor: pointer; list-style: none; }
+.management-report-disclosure > summary::-webkit-details-marker { display: none; }
+.management-report-disclosure > summary span:first-child,.management-report-disclosure > summary small,.management-report-disclosure > summary strong { display: block; }
+.management-report-disclosure > summary small { margin-bottom: 5px; color: #9a6e09; font-size: 10px; font-weight: 800; letter-spacing: .12em; }
+.management-report-disclosure > summary strong { font-family: var(--font-cinzel),Georgia,serif; font-size: 20px; }
+.management-report-disclosure > summary > span:last-child { flex: 0 0 auto; padding: 9px 13px; border-radius: 8px; background: #eef2f6; color: #173252; font-size: 0; font-weight: 750; }
+.management-report-disclosure > summary > span:last-child::before { content: "Buka laporan"; font-size: 12px; }
+.management-report-disclosure[open] > summary { border-bottom: 1px solid #e5e0d7; }
+.management-report-disclosure[open] > summary > span:last-child::before { content: "Tutup laporan"; }
+.management-report-disclosure > div { display: grid; gap: 16px; padding: 18px; }
 .management-create-link[aria-disabled="true"] { pointer-events: none; opacity: .5; }
 .management-report-presets { display: flex; grid-column: 1/-1; gap: 8px; }
 .management-report-presets button { min-height: 38px; padding: 7px 13px; border: 1px solid #173d68; border-radius: 8px; background: #fff; color: #173d68; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
@@ -2537,7 +2584,6 @@
 
 @media (max-width: 1180px) {
   .management-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .management-profit-loss-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .management-dashboard-columns { grid-template-columns: 1fr; }
   .management-birthday-list { grid-template-columns: 1fr; }
   .management-account-grid,.management-inventory-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
@@ -2547,7 +2593,21 @@
 }
 @media (max-width: 720px) {
   .management-kpis,.management-form-grid.two,.management-settings-grid,.management-account-grid,.management-inventory-grid { grid-template-columns: 1fr; }
-  .management-profit-loss-kpis { grid-template-columns: 1fr; }
+  .management-profit-loss-header { align-items: stretch !important; flex-direction: column; }
+  .management-profit-loss-actions,.management-profit-loss-actions .management-create-link { width: 100%; }
+  .management-profit-loss-summary { grid-template-columns: 1fr 1fr; }
+  .management-profit-loss-summary > article:first-child { align-items: flex-start; flex-direction: column; grid-column: 1/-1; gap: 10px; }
+  .management-profit-loss-summary > article:first-child b { max-width: 100%; text-align: left; }
+  .management-profit-loss-summary > article { padding: 14px; }
+  .management-profit-loss-summary strong { font-size: 17px; white-space: normal; }
+  .management-profit-loss-table { min-width: 0; table-layout: auto; }
+  .management-profit-loss-table td:first-child { display: flex; text-align: right; }
+  .management-profit-loss-table td::before { flex: 0 0 92px; color: #748296; content: attr(data-label); font-size: 10px; font-weight: 800; letter-spacing: .05em; text-align: left; text-transform: uppercase; }
+  .management-profit-loss-table td:nth-child(1),.management-profit-loss-table td:nth-child(5),.management-profit-loss-table td:nth-child(6) { white-space: normal; }
+  .management-report-disclosure > summary { min-height: 78px; align-items: flex-start; padding: 16px; }
+  .management-report-disclosure > summary strong { font-size: 16px; }
+  .management-report-disclosure > summary > span:last-child { padding: 7px 9px; font-size: 10px; }
+  .management-report-disclosure > div { padding: 12px; }
   .management-kpis > a,.management-kpis > article { min-height: 125px; }
   .management-panel { padding: 18px 14px; }
   .management-accounts-panel > header { align-items: stretch; flex-direction: column; }
