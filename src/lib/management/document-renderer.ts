@@ -18,6 +18,13 @@ export type TransactionPdfSnapshot = {
   method?: string;
   reference?: string | null;
   invoiceNumber?: string;
+  program?: {
+    packageName?: string | null;
+    departure?: string | null;
+    makkahHotel?: string | null;
+    madinahHotel?: string | null;
+    airline?: string | null;
+  };
   accounts: Array<{ bankName?: string | null; accountNumber?: string | null; accountHolder?: string | null }>;
   company: { name: string; address: string; phone: string; email: string; signerName: string; signerTitle: string };
 };
@@ -45,6 +52,7 @@ export type FittedTextLayout = {
   lineWidths: number[];
   totalHeight: number;
   truncated: boolean;
+  horizontallyScaled?: boolean;
 };
 
 type LineMeasureCache = Map<string, { width: number; height: number }>;
@@ -155,6 +163,17 @@ export async function fitTextToBox(value: string, field: TemplateFieldConfig): P
   const fontSize = minimum;
   const lineHeight = resolvedLineHeight(field, fontSize);
   const allLines = await wrapAtSize(clean, field, fontSize, cache);
+  if (field.scaleToFit && maxLines === 1) {
+    return {
+      fontSize,
+      lineHeight,
+      lines: [clean],
+      lineWidths: [field.width],
+      totalHeight: lineHeight,
+      truncated: false,
+      horizontallyScaled: true,
+    };
+  }
   const allowedLines = Math.max(1, Math.min(maxLines, Math.floor(field.height / lineHeight)));
   const lines = allLines.slice(0, allowedLines);
   const truncated = allLines.length > allowedLines;
@@ -180,7 +199,12 @@ async function fieldOverlay(value: string, config: TemplateFieldConfig, yOverrid
   const composites: OverlayOptions[] = [];
   for (let index = 0; index < layout.lines.length; index++) {
     if (!layout.lines[index]) continue;
-    const rendered = await renderLine(layout.lines[index], field, layout.fontSize);
+    let rendered = await renderLine(layout.lines[index], field, layout.fontSize);
+    if (layout.horizontallyScaled && rendered.width > field.width) {
+      const input = await sharp(rendered.input).resize({ width: Math.round(field.width), fit: "fill" }).png().toBuffer();
+      const metadata = await sharp(input).metadata();
+      rendered = { input, width: metadata.width ?? Math.round(field.width), height: metadata.height ?? rendered.height };
+    }
     const lineX = field.textAlign === "right"
       ? field.width - rendered.width
       : field.textAlign === "center"
@@ -202,37 +226,37 @@ async function pageFields(data: TransactionPdfSnapshot, pageItems: TransactionPd
   const fields = template.fields;
   const output: Array<Promise<OverlayOptions>> = [
     fieldOverlay(data.customer.name, fields.customerName),
-    fieldOverlay(dateLabel(data.issuedAt), fields.date),
+    fieldOverlay(data.kind === "receipt" ? `Bandung, ${dateLabel(data.issuedAt)}` : dateLabel(data.issuedAt), fields.date),
     fieldOverlay(data.number, fields.documentNumber),
   ];
   if (data.kind === "invoice") {
+    output.push(fieldOverlay(data.program?.packageName ?? "-", fields.packageName));
+    output.push(fieldOverlay(data.program?.departure ?? "-", fields.departure));
+    output.push(fieldOverlay(data.program?.makkahHotel ?? "-", fields.makkahHotel));
+    output.push(fieldOverlay(data.program?.madinahHotel ?? "-", fields.madinahHotel));
+    output.push(fieldOverlay(data.program?.airline ?? "-", fields.airline));
     pageItems.forEach((item, index) => {
       const rowY = template.rows[index];
-      const descriptionField = pageItems.length === 1 ? { ...fields.description, height: 112, maxLines: 3, verticalAlign: "top" as const } : fields.description;
-      output.push(fieldOverlay(item.description, descriptionField, rowY));
-      output.push(fieldOverlay(String(item.qty), fields.qty, rowY + 13));
-      output.push(fieldOverlay(templateCurrency(item.unitPrice), fields.price, rowY + 13));
-      output.push(fieldOverlay(templateCurrency(item.total), fields.itemTotal, rowY + 13));
-    });
-    if (showGrandTotal) output.push(fieldOverlay(templateCurrency(data.total), fields.grandTotal));
-    else output.push(fieldOverlay("Lanjut halaman berikutnya", fields.continuation));
-    data.accounts.slice(0, 3).forEach((account, index) => output.push(fieldOverlay(account.accountNumber ?? "-", fields[`account${index + 1}`])));
-  } else {
-    output.push(fieldOverlay(paymentMethod(data.method), fields.paymentMethod));
-    pageItems.forEach((item, index) => {
-      const rowY = template.rows[index];
-      const descriptionField = pageItems.length === 1 ? { ...fields.description, height: 120, maxLines: 3, verticalAlign: "top" as const } : { ...fields.description, height: 38, maxLines: 1, fontSize: 18, minFontSize: 14 };
+      const descriptionField = fields.description;
       output.push(fieldOverlay(String(index + 1), fields.rowNumber, rowY));
       output.push(fieldOverlay(item.description, descriptionField, rowY));
-      output.push(fieldOverlay(String(item.qty), fields.qty, rowY));
-      output.push(fieldOverlay(templateCurrency(item.total), fields.itemTotal, rowY));
+      output.push(fieldOverlay(templateCurrency(item.unitPrice, false), fields.price, rowY));
+      output.push(fieldOverlay(templateCurrency(item.total, false), fields.itemTotal, rowY));
     });
+    if (showGrandTotal) output.push(fieldOverlay(templateCurrency(data.total, false), fields.grandTotal));
+    else output.push(fieldOverlay("Lanjut halaman berikutnya", fields.continuation));
+    output.push(fieldOverlay(data.company.signerName || "Atie Supriati", fields.signerName));
+  } else {
+    const description = pageItems.map((item) => item.description).join("; ");
+    const method = paymentMethod(data.method);
+    const paymentDescription = method === "-" ? description : `${description} (${method})`;
+    output.push(fieldOverlay(templateCurrency(data.total), fields.numericAmount));
+    output.push(fieldOverlay(paymentDescription, fields.description));
     if (showGrandTotal) {
       output.push(fieldOverlay(`#${terbilang(data.total)}#`, fields.amountInWords));
       output.push(fieldOverlay(templateCurrency(data.total, false), fields.grandTotal));
     }
-    output.push(fieldOverlay(data.company.signerTitle || "Keuangan", fields.signerRole));
-    output.push(fieldOverlay(`( ${data.company.signerName || "Atie Supriati"} )`, fields.signerName));
+    output.push(fieldOverlay(data.company.signerName || "Atie Supriati", fields.signerName));
   }
   return Promise.all(output);
 }

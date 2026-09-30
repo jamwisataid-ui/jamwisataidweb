@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { and, eq } from "drizzle-orm";
 
 import { requireDatabase } from "@/db";
-import { bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, registrations } from "@/db/schema";
+import { accommodations, bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, registrations } from "@/db/schema";
 import { requireAdminSession } from "@/lib/admin-session";
 import { formatDocumentNumber } from "@/lib/management/domain";
 import { renderTransactionPdf, renderTransactionPng, type TransactionPdfSnapshot } from "@/lib/management/document-renderer";
@@ -23,6 +23,7 @@ export async function POST(request: Request) {
     const booking = await db.query.bookings.findFirst({ where: eq(bookings.id, body.bookingId) });
     if (!booking) throw new Error("Booking tidak ditemukan.");
     const registrationRows = await db.select().from(registrations).where(eq(registrations.bookingId, booking.id));
+    const accommodationRows = await db.select().from(accommodations).where(eq(accommodations.departureId, booking.departureId));
     const settings = await db.query.managementSettings.findFirst({ where: eq(managementSettings.id, "default") });
     const accountRows = await db.select().from(financialAccounts).where(and(eq(financialAccounts.showOnInvoice, true), eq(financialAccounts.status, "active")));
     const issuedAt = new Date();
@@ -70,6 +71,13 @@ export async function POST(request: Request) {
       method: payment?.method,
       reference: payment?.reference,
       invoiceNumber: linkedInvoice?.number,
+      program: {
+        packageName: String(booking.packageSnapshot.name ?? "Paket umroh"),
+        departure: String(booking.packageSnapshot.dateLabel ?? booking.packageSnapshot.departureDate ?? "-"),
+        makkahHotel: accommodationRows.find((item) => /makk|mekk|mecca/i.test(item.city))?.hotelName ?? "-",
+        madinahHotel: accommodationRows.find((item) => /madin/i.test(item.city))?.hotelName ?? "-",
+        airline: String(booking.packageSnapshot.airline ?? "-"),
+      },
       accounts: accountRows.map(({ bankName, accountNumber, accountHolder }) => ({ bankName, accountNumber, accountHolder })),
       company: {
         name: settings?.companyName ?? "Jam Wisata",

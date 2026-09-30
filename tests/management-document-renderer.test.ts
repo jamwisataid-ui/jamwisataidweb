@@ -33,8 +33,8 @@ describe("renderer template transaksi", () => {
   });
 
   it("membuat halaman tambahan tanpa memperpanjang template", async () => {
-    const items = Array.from({ length: 4 }, (_, index) => ({ description: `Item ${index + 1}`, qty: 1, unitPrice: 5_000_000, total: 5_000_000 }));
-    const bytes = await renderer.renderTransactionPdf({ ...base, kind: "invoice", items, total: 20_000_000 });
+    const items = Array.from({ length: 6 }, (_, index) => ({ description: `Item ${index + 1}`, qty: 1, unitPrice: 5_000_000, total: 5_000_000 }));
+    const bytes = await renderer.renderTransactionPdf({ ...base, kind: "invoice", items, total: 30_000_000 });
     const pdf = await PDFDocument.load(bytes);
     expect(pdf.getPageCount()).toBe(2);
     expect(pdf.getPages().map((page) => page.getSize())).toEqual([{ width: 1024, height: 1536 }, { width: 1024, height: 1536 }]);
@@ -50,7 +50,7 @@ describe("renderer template transaksi", () => {
       items: [{ description: "Pembayaran cicilan paket umroh untuk keluarga dengan keterangan transaksi panjang", qty: 2, unitPrice: 123_456_789, total: 246_913_578 }],
       total: 246_913_578,
     });
-    await expect(sharp(png).metadata()).resolves.toMatchObject({ format: "png", width: 1536, height: 1024 });
+    await expect(sharp(png).metadata()).resolves.toMatchObject({ format: "png", width: 1600, height: 800 });
   });
 
   it("menjaga data ekstrem di dalam bounding box invoice dan kwitansi", async () => {
@@ -59,7 +59,7 @@ describe("renderer template transaksi", () => {
       ["INV/JAMWISATA/UMRAH-PREMIUM/2026/00000000012345", invoiceTemplate.fields.documentNumber],
       ["Rp. 1,185,185,184", invoiceTemplate.fields.grandTotal],
       ["Muhammad Rizky Fadhlurrahman Al-Hafizh bin Abdul Muthalib Pratama", receiptTemplate.fields.customerName],
-      ["Transfer Antarbank melalui Virtual Account Perusahaan", receiptTemplate.fields.paymentMethod],
+      ["Rp. 1.185.185.184", receiptTemplate.fields.numericAmount],
       ["#Satu miliar seratus delapan puluh lima juta seratus delapan puluh lima ribu seratus delapan puluh empat rupiah#", receiptTemplate.fields.amountInWords],
       ["1,185,185,184", receiptTemplate.fields.grandTotal],
     ] as const;

@@ -3,7 +3,7 @@ import "server-only";
 import { createHash, randomUUID } from "node:crypto";
 import { and, eq, sql } from "drizzle-orm";
 
-import { auditLogs, bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, registrations } from "@/db/schema";
+import { accommodations, auditLogs, bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, registrations } from "@/db/schema";
 import { withManagementTransaction } from "@/db/transaction";
 import { formatDocumentNumber } from "./domain";
 import { renderTransactionPdf, type TransactionPdfSnapshot } from "./document-renderer";
@@ -31,6 +31,7 @@ export async function issueTransactionDocument({ kind, bookingId, paymentId, inv
     const booking = await tx.query.bookings.findFirst({ where: eq(bookings.id, bookingId) });
     if (!booking) throw new Error("Booking tidak ditemukan.");
     const registrationRows = await tx.select().from(registrations).where(eq(registrations.bookingId, booking.id));
+    const accommodationRows = await tx.select().from(accommodations).where(eq(accommodations.departureId, booking.departureId));
     const settings = await tx.query.managementSettings.findFirst({ where: eq(managementSettings.id, "default") });
     const accountRows = await tx.select().from(financialAccounts).where(and(eq(financialAccounts.showOnInvoice, true), eq(financialAccounts.status, "active")));
     const issuedAt = new Date();
@@ -77,6 +78,13 @@ export async function issueTransactionDocument({ kind, bookingId, paymentId, inv
       method: payment?.method,
       reference: payment?.reference,
       invoiceNumber: linkedInvoice?.number,
+      program: {
+        packageName: String(booking.packageSnapshot.name ?? "Paket umroh"),
+        departure: String(booking.packageSnapshot.dateLabel ?? booking.packageSnapshot.departureDate ?? "-"),
+        makkahHotel: accommodationRows.find((item) => /makk|mekk|mecca/i.test(item.city))?.hotelName ?? "-",
+        madinahHotel: accommodationRows.find((item) => /madin/i.test(item.city))?.hotelName ?? "-",
+        airline: String(booking.packageSnapshot.airline ?? "-"),
+      },
       accounts: accountRows.map(({ bankName, accountNumber, accountHolder }) => ({ bankName, accountNumber, accountHolder })),
       company: { name: settings?.companyName ?? "Jam Wisata", address: settings?.companyAddress ?? "", phone: settings?.companyPhone ?? "", email: settings?.companyEmail ?? "", signerName: settings?.financeSignerName ?? "", signerTitle: settings?.financeSignerTitle ?? "Keuangan" },
     };
@@ -86,7 +94,7 @@ export async function issueTransactionDocument({ kind, bookingId, paymentId, inv
     const pdf = await renderTransactionPdf(snapshot);
     await putPrivateObject(objectKey, new Uint8Array(pdf), "application/pdf");
     const checksum = createHash("sha256").update(pdf).digest("hex");
-    await tx.insert(issuedDocuments).values({ id, kind, number: formatted.number, bookingId: booking.id, paymentId: payment?.id ?? null, sequenceId: sequence.id, snapshot, objectKey, checksum, templateVersion: "jamwisata-image-v2", issuedAt, createdBy: actorId });
+    await tx.insert(issuedDocuments).values({ id, kind, number: formatted.number, bookingId: booking.id, paymentId: payment?.id ?? null, sequenceId: sequence.id, snapshot, objectKey, checksum, templateVersion: "jamwisata-client-image-v3", issuedAt, createdBy: actorId });
     await tx.update(documentSequences).set({ nextNumber: formatted.nextNumber, currentPeriod: formatted.period, updatedAt: new Date() }).where(eq(documentSequences.id, sequence.id));
     await tx.insert(auditLogs).values({ actorId, action: "issue", entityType: kind, entityId: id, summary: `${kind === "invoice" ? "Invoice" : "Kwitansi"} ${formatted.number} diterbitkan` });
     return { id, number: formatted.number, existing: false };
