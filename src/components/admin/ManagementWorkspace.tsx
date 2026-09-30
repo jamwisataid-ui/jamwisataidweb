@@ -9,6 +9,7 @@ import { AdminPageHeader } from "./AdminUi";
 import { CsvImportForm } from "./CsvImportForm";
 import { DeleteButton } from "./DeleteButton";
 import { ReportDownloadFilters } from "./ReportDownloadFilters";
+import { ProfitLossReport } from "./ProfitLossReport";
 import { RoomListWorkspace } from "./RoomListWorkspace";
 import { UnifiedReportWorkspace } from "./UnifiedReportWorkspace";
 
@@ -91,9 +92,10 @@ function Reports({ data }: { data: Context }) {
     <>
       <AdminPageHeader
         eyebrow="PUSAT REKAP & LAPORAN EKSEKUTIF"
-        title="Pusat Laporan & Rekap Penjualan"
-        description="Satu tabel terpadu untuk melihat seluruh data penjualan, jamaah, kamar, agen, dan pembayaran dengan tombol unduh Excel & PDF resmi."
+        title="Pusat Laporan"
+        description="Pantau laba/rugi berbasis kas dan rekap penjualan, jamaah, kamar, agen, serta pembayaran dalam satu halaman."
       />
+      <ProfitLossReport data={data} />
       <UnifiedReportWorkspace data={data} />
     </>
   );

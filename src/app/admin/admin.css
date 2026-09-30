@@ -2296,6 +2296,9 @@
 .management-report-filters > span small { margin-top: 3px; color: #6f7e90; font-size: 11px; }
 .management-report-filters label > span { margin-bottom: 6px; color: #53667e; font-size: 11px; font-weight: 750; }
 .management-report-filters input,.management-report-filters select { width: 100%; min-height: 44px; padding: 8px 10px; border: 1px solid #bdc9d6; border-radius: 8px; background: #fff; color: #173251; font: inherit; }
+.management-profit-loss-filters { grid-template-columns: repeat(3,minmax(180px,1fr)); align-items: end; margin-bottom: 18px; }
+.management-profit-loss-kpis { grid-template-columns: repeat(5,minmax(0,1fr)); }
+.management-create-link[aria-disabled="true"] { pointer-events: none; opacity: .5; }
 .management-report-presets { display: flex; grid-column: 1/-1; gap: 8px; }
 .management-report-presets button { min-height: 38px; padding: 7px 13px; border: 1px solid #173d68; border-radius: 8px; background: #fff; color: #173d68; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
 .management-report-presets button:hover { background: #173d68; color: #fff; }
@@ -2534,6 +2537,7 @@
 
 @media (max-width: 1180px) {
   .management-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .management-profit-loss-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .management-dashboard-columns { grid-template-columns: 1fr; }
   .management-birthday-list { grid-template-columns: 1fr; }
   .management-account-grid,.management-inventory-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
@@ -2543,6 +2547,7 @@
 }
 @media (max-width: 720px) {
   .management-kpis,.management-form-grid.two,.management-settings-grid,.management-account-grid,.management-inventory-grid { grid-template-columns: 1fr; }
+  .management-profit-loss-kpis { grid-template-columns: 1fr; }
   .management-kpis > a,.management-kpis > article { min-height: 125px; }
   .management-panel { padding: 18px 14px; }
   .management-accounts-panel > header { align-items: stretch; flex-direction: column; }
@@ -3575,4 +3580,3 @@
     margin-left: auto;
   }
 }
-

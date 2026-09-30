@@ -51,7 +51,7 @@ export async function getManagementContext() {
     db.select().from(documentSequences).orderBy(desc(documentSequences.createdAt)),
     db.select().from(referralLeads).orderBy(desc(referralLeads.createdAt)),
     db.select().from(pilgrimDocuments).orderBy(desc(pilgrimDocuments.createdAt)),
-    db.select().from(cashTransactions).orderBy(desc(cashTransactions.transactionAt)).limit(500),
+    db.select().from(cashTransactions).orderBy(desc(cashTransactions.transactionAt)),
     db.select().from(accommodations).orderBy(asc(accommodations.sortOrder)),
   ]);
 
@@ -61,6 +61,9 @@ export async function getManagementContext() {
   const agentsById = new Map(agentRows.map((item) => [item.id, item]));
   const bookingsById = new Map(bookingRows.map((item) => [item.id, item]));
   const registrationsById = new Map(registrationRows.map((item) => [item.id, item]));
+  const paymentsById = new Map(paymentRows.map((item) => [item.id, item]));
+  const refundsById = new Map(refundRows.map((item) => [item.id, item]));
+  const categoriesById = new Map(categoryRows.map((item) => [item.id, item]));
   const validPaymentIds = new Set(
     paymentRows
       .filter((item) => item.status === "confirmed" && item.isIncludedInReports !== false)
@@ -129,6 +132,36 @@ export async function getManagementContext() {
     refunds: refundRows,
   });
 
+  const packageForRegistration = (registrationId?: string | null) => {
+    const registration = registrationId ? registrationsById.get(registrationId) : undefined;
+    const booking = registration ? bookingsById.get(registration.bookingId) : undefined;
+    const departure = booking ? departuresById.get(booking.departureId) : undefined;
+    return departure ? packagesById.get(departure.packageId) : undefined;
+  };
+  const commissionByTransactionId = new Map(commissionRows.flatMap((commission) => commission.payoutTransactionId ? [[commission.payoutTransactionId, commission] as const] : []));
+  const profitLossTransactions = cashRows.map((transaction) => {
+    const payment = transaction.paymentId ? paymentsById.get(transaction.paymentId) : undefined;
+    const paymentBooking = payment ? bookingsById.get(payment.bookingId) : undefined;
+    const paymentDeparture = paymentBooking ? departuresById.get(paymentBooking.departureId) : undefined;
+    const refund = transaction.refundId ? refundsById.get(transaction.refundId) : undefined;
+    const commission = commissionByTransactionId.get(transaction.id);
+    const linkedPackage = transaction.packageId
+      ? packagesById.get(transaction.packageId)
+      : paymentDeparture
+        ? packagesById.get(paymentDeparture.packageId)
+        : refund?.registrationId
+          ? packageForRegistration(refund.registrationId)
+          : commission
+            ? packageForRegistration(commission.registrationId)
+            : undefined;
+    return {
+      ...transaction,
+      resolvedPackageId: linkedPackage?.id ?? null,
+      packageName: linkedPackage?.name ?? null,
+      categoryName: transaction.categoryId ? categoriesById.get(transaction.categoryId)?.name ?? null : null,
+    };
+  });
+
   return {
     pilgrims: pilgrimRows,
     packages: packageRows,
@@ -152,6 +185,7 @@ export async function getManagementContext() {
     pilgrimDocuments: pilgrimDocumentRows,
     accommodations: accommodationRows,
     cashTransactions: cashRows,
+    profitLossTransactions,
     packageFinancials,
     upcomingBirthdays,
     dashboard: {
