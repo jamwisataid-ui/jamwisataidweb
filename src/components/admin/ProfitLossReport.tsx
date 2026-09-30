@@ -5,7 +5,7 @@ import { ChevronDown, Download } from "lucide-react";
 
 import type { getManagementContext } from "@/lib/management/data";
 import { rupiah } from "@/lib/management/domain";
-import { computeProfitLoss } from "@/lib/management/profit-loss";
+import { computeProfitLoss, getProfitLossOutcome } from "@/lib/management/profit-loss";
 
 type Context = Awaited<ReturnType<typeof getManagementContext>>;
 
@@ -32,6 +32,7 @@ export function ProfitLossReport({ data }: { data: Context }) {
     () => computeProfitLoss(data.profitLossTransactions, { from, to, packageId: packageId || undefined }),
     [data.profitLossTransactions, from, packageId, to],
   );
+  const outcome = getProfitLossOutcome(report.netProfit);
 
   function exportUrl(format: "pdf" | "xlsx") {
     const params = new URLSearchParams({ format });
@@ -58,7 +59,7 @@ export function ProfitLossReport({ data }: { data: Context }) {
     </div>
 
     <div className="management-profit-loss-summary">
-      <article className={report.netProfit >= 0 ? "is-profit" : "is-loss"}><span><small>HASIL PERIODE</small><strong>Laba/Rugi bersih</strong></span><b>{rupiah(report.netProfit)}</b></article>
+      <article className={`is-${outcome.kind}`}><span><small>HASIL PERIODE</small><strong>Hasil bersih</strong></span><b>{outcome.label} {rupiah(outcome.amount)}</b></article>
       <article><small>Pendapatan diterima</small><strong className="positive">{rupiah(report.revenue)}</strong></article>
       <article><small>Refund</small><strong className="negative">{rupiah(report.refunds)}</strong></article>
       <article><small>Biaya operasional</small><strong className="negative">{rupiah(report.operatingExpenses)}</strong></article>

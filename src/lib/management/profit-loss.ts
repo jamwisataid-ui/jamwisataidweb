@@ -18,6 +18,18 @@ export type ProfitLossFilters = {
   packageId?: string;
 };
 
+export type ProfitLossOutcome = {
+  kind: "profit" | "break-even" | "loss";
+  label: "Laba" | "Impas" | "Rugi";
+  amount: number;
+};
+
+export function getProfitLossOutcome(netProfit: number): ProfitLossOutcome {
+  if (netProfit > 0) return { kind: "profit", label: "Laba", amount: netProfit };
+  if (netProfit < 0) return { kind: "loss", label: "Rugi", amount: Math.abs(netProfit) };
+  return { kind: "break-even", label: "Impas", amount: 0 };
+}
+
 export type ProfitLossRow = ProfitLossTransaction & {
   dateKey: string;
   categoryLabel: string;

@@ -2316,6 +2316,7 @@
 .management-profit-loss-summary > article:first-child.is-loss b,.management-profit-loss-summary .negative { color: #a9342e; }
 .management-profit-loss-summary > article:first-child.is-profit b { color: #8fe0ad; }
 .management-profit-loss-summary > article:first-child.is-loss b { color: #ffaaa4; }
+.management-profit-loss-summary > article:first-child.is-break-even b { color: #f4dfab; }
 .management-profit-loss-details { overflow: hidden; border: 1px solid #e3ded3; border-radius: 11px; background: #fff; }
 .management-profit-loss-details > summary { display: flex; min-height: 66px; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 16px; color: #173252; cursor: pointer; list-style: none; }
 .management-profit-loss-details > summary::-webkit-details-marker { display: none; }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { computeProfitLoss, type ProfitLossTransaction } from "../src/lib/management/profit-loss";
+import { computeProfitLoss, getProfitLossOutcome, type ProfitLossTransaction } from "../src/lib/management/profit-loss";
 
 function transaction(overrides: Partial<ProfitLossTransaction> = {}): ProfitLossTransaction {
   return {
@@ -65,5 +65,40 @@ describe("laporan laba/rugi", () => {
     const packageOnly = computeProfitLoss(rows, { from: "2026-09-01", to: "2026-09-30", packageId: "package-a" });
     expect(packageOnly.rows.map((row) => row.id)).toEqual(["b"]);
     expect(packageOnly.netProfit).toBe(20_000_000);
+  });
+
+  it.each([
+    {
+      name: "laba",
+      transactions: [
+        transaction({ direction: "in", kind: "payment", amount: 20_000_000 }),
+        transaction({ kind: "expense", amount: 8_000_001 }),
+      ],
+      expectedNet: 11_999_999,
+      expectedOutcome: { kind: "profit", label: "Laba", amount: 11_999_999 },
+    },
+    {
+      name: "impas",
+      transactions: [
+        transaction({ direction: "in", kind: "payment", amount: 10_000_000 }),
+        transaction({ kind: "expense", amount: 10_000_000 }),
+      ],
+      expectedNet: 0,
+      expectedOutcome: { kind: "break-even", label: "Impas", amount: 0 },
+    },
+    {
+      name: "rugi",
+      transactions: [
+        transaction({ direction: "in", kind: "payment", amount: 338_000_001 }),
+        transaction({ kind: "expense", amount: 346_320_000 }),
+      ],
+      expectedNet: -8_319_999,
+      expectedOutcome: { kind: "loss", label: "Rugi", amount: 8_319_999 },
+    },
+  ])("menyajikan hasil $name dengan tanda dan nominal yang benar", ({ transactions, expectedNet, expectedOutcome }) => {
+    const report = computeProfitLoss(transactions);
+
+    expect(report.netProfit).toBe(expectedNet);
+    expect(getProfitLossOutcome(report.netProfit)).toEqual(expectedOutcome);
   });
 });

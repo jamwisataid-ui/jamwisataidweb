@@ -5,7 +5,7 @@ import { requireAdminSession } from "@/lib/admin-session";
 import { getManagementContext } from "@/lib/management/data";
 import { rupiah } from "@/lib/management/domain";
 import { renderReportPdf } from "@/lib/management/pdf";
-import { computeProfitLoss } from "@/lib/management/profit-loss";
+import { computeProfitLoss, getProfitLossOutcome } from "@/lib/management/profit-loss";
 
 type Report = { title: string; columns: string[]; rows: Array<Array<string | number>> };
 type Filters = { from?: Date; to?: Date; packageId?: string; departureId?: string };
@@ -83,6 +83,7 @@ function createReport(
       to: filters.to ? jakartaDateKey(filters.to) : undefined,
       packageId: filters.packageId,
     });
+    const outcome = getProfitLossOutcome(report.netProfit);
     return {
       title: "Laporan Laba Rugi (Basis Kas)",
       columns: ["Tanggal", "Keterangan", "Kategori", "Paket", "Pendapatan", "Beban"],
@@ -92,7 +93,7 @@ function createReport(
         ["", "REFUND", "", "", "", rupiah(report.refunds)],
         ["", "BIAYA OPERASIONAL", "", "", "", rupiah(report.operatingExpenses)],
         ["", "KOMISI DIBAYAR", "", "", "", rupiah(report.commissions)],
-        ["", "LABA/RUGI BERSIH", "", "", report.netProfit >= 0 ? rupiah(report.netProfit) : "", report.netProfit < 0 ? rupiah(Math.abs(report.netProfit)) : ""],
+        ["", `${outcome.label.toUpperCase()} BERSIH`, "", "", outcome.kind === "loss" ? "" : rupiah(outcome.amount), outcome.kind === "loss" ? rupiah(outcome.amount) : ""],
       ],
     };
   }

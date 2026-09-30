@@ -56,12 +56,12 @@ const receipt: TransactionPdfSnapshot = {
   items: [
     {
       description: "Pembayaran pelunasan Paket Umrah Premium Keluarga untuk dua belas jamaah termasuk biaya akomodasi dan transportasi selama perjalanan",
-      qty: 12,
-      unitPrice: 98_765_432,
-      total: 1_185_185_184,
+      qty: 1,
+      unitPrice: 33_900_000,
+      total: 33_900_000,
     },
   ],
-  total: 1_185_185_184,
+  total: 33_900_000,
 };
 
 async function main() {
