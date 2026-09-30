@@ -86,7 +86,7 @@ export async function issueTransactionDocument({ kind, bookingId, paymentId, inv
     const pdf = await renderTransactionPdf(snapshot);
     await putPrivateObject(objectKey, new Uint8Array(pdf), "application/pdf");
     const checksum = createHash("sha256").update(pdf).digest("hex");
-    await tx.insert(issuedDocuments).values({ id, kind, number: formatted.number, bookingId: booking.id, paymentId: payment?.id ?? null, sequenceId: sequence.id, snapshot, objectKey, checksum, templateVersion: "jamwisata-image-v1", issuedAt, createdBy: actorId });
+    await tx.insert(issuedDocuments).values({ id, kind, number: formatted.number, bookingId: booking.id, paymentId: payment?.id ?? null, sequenceId: sequence.id, snapshot, objectKey, checksum, templateVersion: "jamwisata-image-v2", issuedAt, createdBy: actorId });
     await tx.update(documentSequences).set({ nextNumber: formatted.nextNumber, currentPeriod: formatted.period, updatedAt: new Date() }).where(eq(documentSequences.id, sequence.id));
     await tx.insert(auditLogs).values({ actorId, action: "issue", entityType: kind, entityId: id, summary: `${kind === "invoice" ? "Invoice" : "Kwitansi"} ${formatted.number} diterbitkan` });
     return { id, number: formatted.number, existing: false };

@@ -36,53 +36,164 @@ function paymentMethod(value?: string) {
   return ({ transfer: "Transfer", cash: "Tunai", card: "Kartu", other: "Lainnya" } as Record<string, string>)[value ?? ""] ?? value ?? "-";
 }
 
-function fitLines(value: string, field: TemplateFieldConfig) {
-  const clean = value.replace(/\s+/g, " ").trim();
-  const maxLines = field.maxLines ?? 1;
-  let fontSize = field.fontSize;
-  const minimum = field.minFontSize ?? Math.max(10, field.fontSize * .72);
-  let lines: string[] = [];
-  while (fontSize >= minimum) {
-    const averageWidth = fontSize * (field.fontFamily === "serif" ? .48 : .55);
-    const characters = Math.max(4, Math.floor(field.width / averageWidth));
-    const words = clean.split(" ");
-    lines = [];
-    let current = "";
-    for (const word of words) {
-      const candidate = current ? `${current} ${word}` : word;
-      if (candidate.length <= characters || !current) current = candidate;
-      else { lines.push(current); current = word; }
-    }
-    if (current) lines.push(current);
-    if (lines.length <= maxLines && lines.length * field.lineHeight <= field.height) break;
-    fontSize -= 1;
-  }
-  if (lines.length > maxLines) {
-    lines = lines.slice(0, maxLines);
-    const last = lines.length - 1;
-    lines[last] = `${lines[last].slice(0, Math.max(1, lines[last].length - 1)).trimEnd()}…`;
-  }
-  return { fontSize, lines: lines.length ? lines : [""] };
-}
+type RenderedLine = { input: Buffer; width: number; height: number };
 
-async function fieldOverlay(value: string, config: TemplateFieldConfig, yOverride?: number): Promise<OverlayOptions> {
-  const field = yOverride === undefined ? config : { ...config, y: yOverride };
-  const { fontSize, lines } = fitLines(value, field);
-  const fontPath = field.fontFamily === "serif"
+export type FittedTextLayout = {
+  fontSize: number;
+  lineHeight: number;
+  lines: string[];
+  lineWidths: number[];
+  totalHeight: number;
+  truncated: boolean;
+};
+
+type LineMeasureCache = Map<string, { width: number; height: number }>;
+
+function fontPath(field: TemplateFieldConfig) {
+  return field.fontFamily === "serif"
     ? asset("/templates/fonts/CormorantGaramond-Italic.ttf")
     : field.fontStyle === "italic"
       ? asset("/templates/fonts/Montserrat-Italic.ttf")
       : asset("/templates/fonts/Montserrat.ttf");
-  const markup = `<span foreground="${field.color ?? "#111111"}" font_weight="${field.fontWeight ?? 400}" font_style="${field.fontStyle ?? "normal"}">${xml(lines.join("\n"))}</span>`;
+}
+
+function lineMarkup(value: string, field: TemplateFieldConfig) {
+  return `<span foreground="${field.color ?? "#111111"}" font_weight="${field.fontWeight ?? 400}" font_style="${field.fontStyle ?? "normal"}">${xml(value)}</span>`;
+}
+
+async function renderLine(value: string, field: TemplateFieldConfig, fontSize: number): Promise<RenderedLine> {
   const input = await sharp({ text: {
-    text: markup,
+    text: lineMarkup(value || " ", field),
     font: `${field.fontFamily === "serif" ? "Cormorant Garamond" : "Montserrat"} ${fontSize}`,
-    fontfile: fontPath,
-    width: Math.round(field.width),
-    height: Math.round(field.height),
-    align: field.textAlign ?? "left",
+    fontfile: fontPath(field),
     rgba: true,
+    dpi: 72,
   } }).png().toBuffer();
+  const metadata = await sharp(input).metadata();
+  return { input, width: metadata.width ?? 1, height: metadata.height ?? 1 };
+}
+
+async function measureLine(value: string, field: TemplateFieldConfig, fontSize: number, cache: LineMeasureCache) {
+  if (!value) return { width: 0, height: 0 };
+  const key = [field.fontFamily, field.fontStyle, field.fontWeight, fontSize, value].join("|");
+  const cached = cache.get(key);
+  if (cached) return cached;
+  const { width, height } = await renderLine(value, field, fontSize);
+  const measured = { width, height };
+  cache.set(key, measured);
+  return measured;
+}
+
+async function largestPrefixThatFits(value: string, field: TemplateFieldConfig, fontSize: number, maxWidth: number, cache: LineMeasureCache) {
+  let low = 1;
+  let high = value.length;
+  let best = 1;
+  while (low <= high) {
+    const middle = Math.floor((low + high) / 2);
+    const width = (await measureLine(value.slice(0, middle), field, fontSize, cache)).width;
+    if (width <= maxWidth) { best = middle; low = middle + 1; }
+    else high = middle - 1;
+  }
+  return best;
+}
+
+async function wrapAtSize(value: string, field: TemplateFieldConfig, fontSize: number, cache: LineMeasureCache) {
+  const words = value ? value.split(" ") : [""];
+  const lines: string[] = [];
+  let current = "";
+  for (const originalWord of words) {
+    let word = originalWord;
+    const candidate = current ? `${current} ${word}` : word;
+    if ((await measureLine(candidate, field, fontSize, cache)).width <= field.width) {
+      current = candidate;
+      continue;
+    }
+    if (current) { lines.push(current); current = ""; }
+    while (word && (await measureLine(word, field, fontSize, cache)).width > field.width) {
+      const splitAt = await largestPrefixThatFits(word, field, fontSize, field.width, cache);
+      lines.push(word.slice(0, splitAt));
+      word = word.slice(splitAt);
+    }
+    current = word;
+  }
+  if (current || !lines.length) lines.push(current);
+  return lines;
+}
+
+async function ellipsize(value: string, field: TemplateFieldConfig, fontSize: number, cache: LineMeasureCache) {
+  const suffix = "…";
+  if ((await measureLine(`${value}${suffix}`, field, fontSize, cache)).width <= field.width) return `${value}${suffix}`;
+  let low = 0;
+  let high = value.length;
+  let best = "";
+  while (low <= high) {
+    const middle = Math.floor((low + high) / 2);
+    const candidate = `${value.slice(0, middle).trimEnd()}${suffix}`;
+    if ((await measureLine(candidate, field, fontSize, cache)).width <= field.width) { best = candidate; low = middle + 1; }
+    else high = middle - 1;
+  }
+  return best || suffix;
+}
+
+function resolvedLineHeight(field: TemplateFieldConfig, fontSize: number) {
+  return Math.max(Math.ceil(fontSize * 1.12), Math.round(field.lineHeight * (fontSize / field.fontSize)));
+}
+
+export async function fitTextToBox(value: string, field: TemplateFieldConfig): Promise<FittedTextLayout> {
+  const clean = value.replace(/\s+/g, " ").trim();
+  const cache: LineMeasureCache = new Map();
+  const maxLines = Math.max(1, field.maxLines ?? 1);
+  const minimum = Math.max(8, Math.floor(field.minFontSize ?? field.fontSize * .72));
+  for (let fontSize = Math.round(field.fontSize); fontSize >= minimum; fontSize -= 1) {
+    const lineHeight = resolvedLineHeight(field, fontSize);
+    const lines = await wrapAtSize(clean, field, fontSize, cache);
+    if (lines.length <= maxLines && lines.length * lineHeight <= field.height) {
+      const lineWidths = await Promise.all(lines.map(async (line) => (await measureLine(line, field, fontSize, cache)).width));
+      return { fontSize, lineHeight, lines, lineWidths, totalHeight: lines.length * lineHeight, truncated: false };
+    }
+  }
+  const fontSize = minimum;
+  const lineHeight = resolvedLineHeight(field, fontSize);
+  const allLines = await wrapAtSize(clean, field, fontSize, cache);
+  const allowedLines = Math.max(1, Math.min(maxLines, Math.floor(field.height / lineHeight)));
+  const lines = allLines.slice(0, allowedLines);
+  const truncated = allLines.length > allowedLines;
+  if (truncated) lines[lines.length - 1] = await ellipsize(lines[lines.length - 1], field, fontSize, cache);
+  const lineWidths = await Promise.all(lines.map(async (line) => (await measureLine(line, field, fontSize, cache)).width));
+  return { fontSize, lineHeight, lines, lineWidths, totalHeight: lines.length * lineHeight, truncated };
+}
+
+async function fieldOverlay(value: string, config: TemplateFieldConfig, yOverride?: number): Promise<OverlayOptions> {
+  const field = yOverride === undefined ? config : { ...config, y: yOverride };
+  const layout = await fitTextToBox(value, field);
+  const canvas = sharp({ create: {
+    width: Math.max(1, Math.round(field.width)),
+    height: Math.max(1, Math.round(field.height)),
+    channels: 4,
+    background: { r: 0, g: 0, b: 0, alpha: 0 },
+  } });
+  const verticalOffset = field.verticalAlign === "bottom"
+    ? field.height - layout.totalHeight
+    : field.verticalAlign === "top"
+      ? 0
+      : (field.height - layout.totalHeight) / 2;
+  const composites: OverlayOptions[] = [];
+  for (let index = 0; index < layout.lines.length; index++) {
+    if (!layout.lines[index]) continue;
+    const rendered = await renderLine(layout.lines[index], field, layout.fontSize);
+    const lineX = field.textAlign === "right"
+      ? field.width - rendered.width
+      : field.textAlign === "center"
+        ? (field.width - rendered.width) / 2
+        : 0;
+    const lineY = verticalOffset + index * layout.lineHeight + (layout.lineHeight - rendered.height) / 2;
+    composites.push({
+      input: rendered.input,
+      left: Math.max(0, Math.min(Math.round(field.width - rendered.width), Math.round(lineX))),
+      top: Math.max(0, Math.min(Math.round(field.height - rendered.height), Math.round(lineY))),
+    });
+  }
+  const input = await canvas.composite(composites).png().toBuffer();
   return { input, left: Math.round(field.x), top: Math.round(field.y) };
 }
 
@@ -97,7 +208,8 @@ async function pageFields(data: TransactionPdfSnapshot, pageItems: TransactionPd
   if (data.kind === "invoice") {
     pageItems.forEach((item, index) => {
       const rowY = template.rows[index];
-      output.push(fieldOverlay(item.description, fields.description, rowY));
+      const descriptionField = pageItems.length === 1 ? { ...fields.description, height: 112, maxLines: 3, verticalAlign: "top" as const } : fields.description;
+      output.push(fieldOverlay(item.description, descriptionField, rowY));
       output.push(fieldOverlay(String(item.qty), fields.qty, rowY + 13));
       output.push(fieldOverlay(templateCurrency(item.unitPrice), fields.price, rowY + 13));
       output.push(fieldOverlay(templateCurrency(item.total), fields.itemTotal, rowY + 13));
@@ -109,7 +221,7 @@ async function pageFields(data: TransactionPdfSnapshot, pageItems: TransactionPd
     output.push(fieldOverlay(paymentMethod(data.method), fields.paymentMethod));
     pageItems.forEach((item, index) => {
       const rowY = template.rows[index];
-      const descriptionField = pageItems.length === 1 ? fields.description : { ...fields.description, height: 38, maxLines: 1, fontSize: 18, minFontSize: 14 };
+      const descriptionField = pageItems.length === 1 ? { ...fields.description, height: 120, maxLines: 3, verticalAlign: "top" as const } : { ...fields.description, height: 38, maxLines: 1, fontSize: 18, minFontSize: 14 };
       output.push(fieldOverlay(String(index + 1), fields.rowNumber, rowY));
       output.push(fieldOverlay(item.description, descriptionField, rowY));
       output.push(fieldOverlay(String(item.qty), fields.qty, rowY));
@@ -129,7 +241,17 @@ export async function renderTransactionImages(data: TransactionPdfSnapshot) {
   const template = documentTemplates[data.kind];
   const background = await readFile(asset(template.background));
   const pages = Math.max(1, Math.ceil(data.items.length / template.rows.length));
-  const signature = template.signature ? await readFile(asset(template.signature.src)) : null;
+  const signature = template.signature
+    ? await sharp(await readFile(asset(template.signature.src)))
+      .trim()
+      .resize(template.signature.width, template.signature.height, {
+        fit: "contain",
+        withoutEnlargement: true,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      })
+      .png()
+      .toBuffer()
+    : null;
   const output: Buffer[] = [];
   for (let pageIndex = 0; pageIndex < pages; pageIndex++) {
     const items = data.items.slice(pageIndex * template.rows.length, (pageIndex + 1) * template.rows.length);

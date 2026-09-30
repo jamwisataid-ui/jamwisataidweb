@@ -30,6 +30,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run",
+    "documents:samples": "node --conditions=react-server --import tsx scripts/render-document-layout-samples.ts after",
     "check": "npm run lint && npm run typecheck && npm run test:unit && npm run build",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
