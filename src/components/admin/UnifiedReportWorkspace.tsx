@@ -157,9 +157,9 @@ export function UnifiedReportWorkspace({ data }: { data: Context }) {
   const isColVisible = (key: ColumnKey) => !excludedColumns.has(key);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+    <div className="unified-report-workspace">
       {/* 1. RINGKASAN BESAR & JELAS */}
-      <section className="management-kpis reports" style={{ margin: 0 }}>
+      <section className="management-kpis reports unified-report-kpis">
         <article>
           <small>Total Jamaah Terpilih</small>
           <strong>{summary.totalPilgrims} Orang</strong>
@@ -182,6 +182,7 @@ export function UnifiedReportWorkspace({ data }: { data: Context }) {
 
       {/* 2. FILTER TUNGGAL & PENGATURAN TAMPILAN */}
       <section
+        className="unified-report-controls"
         style={{
           background: "#fff",
           border: "1px solid #e2e8f0",
@@ -190,10 +191,10 @@ export function UnifiedReportWorkspace({ data }: { data: Context }) {
           boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
         }}
       >
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "14px", alignItems: "flex-end", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "flex-end" }}>
+        <div className="unified-report-toolbar" style={{ display: "flex", flexWrap: "wrap", gap: "14px", alignItems: "flex-end", justifyContent: "space-between" }}>
+          <div className="unified-report-filters" style={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "flex-end" }}>
             {/* Filter Keberangkatan */}
-            <div>
+            <div className="unified-report-field">
               <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#1e293b", marginBottom: "6px" }}>
                 Jadwal Keberangkatan
               </label>
@@ -221,7 +222,7 @@ export function UnifiedReportWorkspace({ data }: { data: Context }) {
             </div>
 
             {/* Filter Paket */}
-            <div>
+            <div className="unified-report-field">
               <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#1e293b", marginBottom: "6px" }}>
                 Paket Umrah
               </label>
@@ -249,7 +250,7 @@ export function UnifiedReportWorkspace({ data }: { data: Context }) {
             </div>
 
             {/* Filter Status Bayar */}
-            <div>
+            <div className="unified-report-field">
               <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#1e293b", marginBottom: "6px" }}>
                 Status Pembayaran
               </label>
@@ -275,7 +276,7 @@ export function UnifiedReportWorkspace({ data }: { data: Context }) {
             </div>
 
             {/* Search Input */}
-            <div>
+            <div className="unified-report-field unified-report-search">
               <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#1e293b", marginBottom: "6px" }}>
                 Cari Jamaah / Agen / Paspor
               </label>
@@ -302,7 +303,7 @@ export function UnifiedReportWorkspace({ data }: { data: Context }) {
           </div>
 
           {/* Tombol Export & Tombol Atur Kolom */}
-          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <div className="unified-report-actions" style={{ display: "flex", gap: "10px", alignItems: "center" }}>
             <button
               type="button"
               onClick={() => setShowColumnToggles((prev) => !prev)}
@@ -376,13 +377,14 @@ export function UnifiedReportWorkspace({ data }: { data: Context }) {
         {/* DRAWER PILIHAN KECUALIKAN KOLOM */}
         {showColumnToggles && (
           <div
+            className="unified-report-column-drawer"
             style={{
               marginTop: "16px",
               paddingTop: "16px",
               borderTop: "1px dashed #cbd5e1",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+            <div className="unified-report-column-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
               <div>
                 <strong style={{ fontSize: "13px", color: "#0f172a" }}>Pilih Kolom yang Ingin Dikecualikan / Disembunyikan:</strong>
                 <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#64748b" }}>
@@ -408,7 +410,7 @@ export function UnifiedReportWorkspace({ data }: { data: Context }) {
               )}
             </div>
 
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+            <div className="unified-report-column-options" style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
               {AVAILABLE_COLUMNS.map((col) => {
                 const checked = !excludedColumns.has(col.key);
                 return (
@@ -445,7 +447,7 @@ export function UnifiedReportWorkspace({ data }: { data: Context }) {
       </section>
 
       {/* 3. TABEL TUNGGAL UTAMA: DETAIL KESELURUHAN LAPORAN */}
-      <section className="management-panel" style={{ margin: 0 }}>
+      <section className="management-panel unified-report-detail" style={{ margin: 0 }}>
         <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <small>DETAIL KESELURUHAN DATA ({filteredRegistrations.length} REKOR)</small>
@@ -463,8 +465,10 @@ export function UnifiedReportWorkspace({ data }: { data: Context }) {
             </p>
           </div>
         ) : (
-          <div className="management-table-wrap">
-            <table className="management-table">
+          <>
+            <p className="unified-report-scroll-hint">Geser tabel ke samping untuk melihat kolom lainnya.</p>
+            <div className="management-table-wrap unified-report-table-wrap">
+              <table className="management-table unified-report-table">
               <thead>
                 <tr>
                   <th style={{ width: "40px", textAlign: "center" }}>No</th>
@@ -489,13 +493,13 @@ export function UnifiedReportWorkspace({ data }: { data: Context }) {
                   const isLunas = reg.payment?.status === "Lunas";
                   return (
                     <tr key={reg.id}>
-                      <td style={{ textAlign: "center", color: "#94a3b8", fontSize: "12px" }}>{idx + 1}</td>
-                      <td>
+                      <td data-label="No" style={{ textAlign: "center", color: "#94a3b8", fontSize: "12px" }}>{idx + 1}</td>
+                      <td data-label="Jamaah">
                         <strong style={{ display: "block", color: "#0f172a" }}>{reg.pilgrim?.fullName}</strong>
                         <small style={{ color: "#64748b", fontSize: "11px" }}>{reg.booking?.bookingNumber}</small>
                       </td>
                       {isColVisible("gender") && (
-                        <td>
+                        <td data-label="Gender">
                           <span
                             style={{
                               fontSize: "12px",
@@ -507,54 +511,55 @@ export function UnifiedReportWorkspace({ data }: { data: Context }) {
                           </span>
                         </td>
                       )}
-                      {isColVisible("kontak") && <td style={{ fontSize: "12px" }}>{reg.pilgrim?.whatsapp || "—"}</td>}
-                      {isColVisible("paspor") && <td style={{ fontSize: "12px" }}>{reg.pilgrim?.passportNumber || "—"}</td>}
+                      {isColVisible("kontak") && <td data-label="WhatsApp" style={{ fontSize: "12px" }}>{reg.pilgrim?.whatsapp || "—"}</td>}
+                      {isColVisible("paspor") && <td data-label="Paspor" style={{ fontSize: "12px" }}>{reg.pilgrim?.passportNumber || "—"}</td>}
                       {isColVisible("paket") && (
-                        <td>
+                        <td data-label="Paket">
                           <strong style={{ fontSize: "13px", color: "#1e293b" }}>{reg.package?.name ?? "—"}</strong>
                         </td>
                       )}
                       {isColVisible("keberangkatan") && (
-                        <td style={{ fontSize: "12px", whiteSpace: "nowrap" }}>
+                        <td data-label="Jadwal" style={{ fontSize: "12px", whiteSpace: "nowrap" }}>
                           {reg.departure?.dateLabel ?? "—"}
                         </td>
                       )}
                       {isColVisible("kamar") && (
-                        <td>
+                        <td data-label="Tipe kamar">
                           <span style={{ fontSize: "11px", fontWeight: 700, padding: "2px 6px", borderRadius: "4px", background: "#f1f5f9", color: "#334155" }}>
                             {(reg.roomType || "quad").toUpperCase()}
                           </span>
                         </td>
                       )}
                       {isColVisible("kamar_mkh") && (
-                        <td style={{ fontSize: "12px", fontWeight: 600, color: "#92400e" }}>
+                        <td data-label="Kamar Makkah" style={{ fontSize: "12px", fontWeight: 600, color: "#92400e" }}>
                           {reg.makkahRoomNumber || reg.roomNumber || "—"}
                         </td>
                       )}
                       {isColVisible("kamar_mdn") && (
-                        <td style={{ fontSize: "12px", fontWeight: 600, color: "#1e3a8a" }}>
+                        <td data-label="Kamar Madinah" style={{ fontSize: "12px", fontWeight: 600, color: "#1e3a8a" }}>
                           {reg.madinahRoomNumber || "—"}
                         </td>
                       )}
                       {isColVisible("agen") && (
-                        <td>
+                        <td data-label="Agen">
                           <span style={{ fontSize: "12px", color: reg.agent ? "#0f172a" : "#64748b", fontWeight: reg.agent ? 600 : 400 }}>
                             {reg.agent?.name ?? "Langsung"}
                           </span>
                         </td>
                       )}
                       {isColVisible("harga") && (
-                        <td style={{ textAlign: "right", fontSize: "13px", fontWeight: 600 }}>
+                        <td data-label="Harga paket" style={{ textAlign: "right", fontSize: "13px", fontWeight: 600 }}>
                           {rupiah(reg.agreedPrice)}
                         </td>
                       )}
                       {isColVisible("bayar") && (
-                        <td style={{ textAlign: "right", fontSize: "13px", fontWeight: 700, color: "#166534" }}>
+                        <td data-label="Telah dibayar" style={{ textAlign: "right", fontSize: "13px", fontWeight: 700, color: "#166534" }}>
                           {rupiah(reg.payment?.netPaid ?? 0)}
                         </td>
                       )}
                       {isColVisible("piutang") && (
                         <td
+                          data-label="Sisa piutang"
                           style={{
                             textAlign: "right",
                             fontSize: "13px",
@@ -566,7 +571,7 @@ export function UnifiedReportWorkspace({ data }: { data: Context }) {
                         </td>
                       )}
                       {isColVisible("status_bayar") && (
-                        <td style={{ textAlign: "center" }}>
+                        <td data-label="Status" style={{ textAlign: "center" }}>
                           <span
                             style={{
                               fontSize: "11px",
@@ -586,8 +591,9 @@ export function UnifiedReportWorkspace({ data }: { data: Context }) {
                   );
                 })}
               </tbody>
-            </table>
-          </div>
+              </table>
+            </div>
+          </>
         )}
       </section>
     </div>

@@ -2344,7 +2344,35 @@
 .management-report-disclosure > summary > span:last-child::before { content: "Buka laporan"; font-size: 12px; }
 .management-report-disclosure[open] > summary { border-bottom: 1px solid #e5e0d7; }
 .management-report-disclosure[open] > summary > span:last-child::before { content: "Tutup laporan"; }
-.management-report-disclosure > div { display: grid; gap: 16px; padding: 18px; }
+.management-report-disclosure > div { display: grid; min-width: 0; gap: 16px; padding: 18px; }
+.management-report-disclosure > div > * { min-width: 0; }
+.unified-report-workspace { display: grid; width: 100%; min-width: 0; gap: 16px; }
+.unified-report-kpis { grid-template-columns: repeat(4,minmax(0,1fr)); margin: 0; }
+.unified-report-kpis > article { min-width: 0; min-height: 112px; padding: 17px; }
+.unified-report-kpis strong { font-size: clamp(17px,1.55vw,24px); overflow-wrap: anywhere; }
+.unified-report-controls { min-width: 0; padding: 16px !important; }
+.unified-report-toolbar { display: grid !important; min-width: 0; gap: 14px !important; }
+.unified-report-filters { display: grid !important; grid-template-columns: repeat(4,minmax(0,1fr)); min-width: 0; gap: 10px !important; }
+.unified-report-field { min-width: 0; }
+.unified-report-field label { display: block; margin-bottom: 6px; color: #53667e !important; font-size: 11px !important; }
+.unified-report-field select,.unified-report-field input { width: 100% !important; min-width: 0; }
+.unified-report-actions { display: flex !important; min-width: 0; flex-wrap: wrap; justify-content: flex-end; gap: 8px !important; }
+.unified-report-actions > * { min-width: 0; white-space: nowrap; }
+.unified-report-column-drawer { min-width: 0; }
+.unified-report-column-head { min-width: 0; gap: 18px; }
+.unified-report-column-head > div { min-width: 0; }
+.unified-report-column-options { display: grid !important; grid-template-columns: repeat(4,minmax(0,1fr)); min-width: 0; gap: 8px !important; }
+.unified-report-column-options label { min-width: 0; overflow-wrap: anywhere; }
+.unified-report-detail { min-width: 0; overflow: hidden; padding: 18px; }
+.unified-report-detail > header { min-width: 0; }
+.unified-report-detail > header > div { min-width: 0; }
+.unified-report-detail > header p { overflow-wrap: anywhere; }
+.unified-report-scroll-hint { margin: -5px 0 10px; color: #7b8797; font-size: 11px; }
+.unified-report-table-wrap { width: 100%; max-width: 100%; min-width: 0; overflow-x: auto; overscroll-behavior-inline: contain; }
+.unified-report-table { width: 100%; min-width: 1500px; }
+.unified-report-table th { white-space: nowrap; }
+.unified-report-table td { overflow-wrap: anywhere; }
+.unified-report-table td:nth-last-child(-n+4) { white-space: nowrap; }
 .management-create-link[aria-disabled="true"] { pointer-events: none; opacity: .5; }
 .management-report-presets { display: flex; grid-column: 1/-1; gap: 8px; }
 .management-report-presets button { min-height: 38px; padding: 7px 13px; border: 1px solid #173d68; border-radius: 8px; background: #fff; color: #173d68; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
@@ -2584,6 +2612,9 @@
 
 @media (max-width: 1180px) {
   .management-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .unified-report-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .unified-report-filters { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .unified-report-column-options { grid-template-columns: repeat(3,minmax(0,1fr)); }
   .management-dashboard-columns { grid-template-columns: 1fr; }
   .management-birthday-list { grid-template-columns: 1fr; }
   .management-account-grid,.management-inventory-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
@@ -2608,6 +2639,23 @@
   .management-report-disclosure > summary strong { font-size: 16px; }
   .management-report-disclosure > summary > span:last-child { padding: 7px 9px; font-size: 10px; }
   .management-report-disclosure > div { padding: 12px; }
+  .unified-report-kpis { grid-template-columns: 1fr; }
+  .unified-report-kpis > article { min-height: 96px; }
+  .unified-report-filters { grid-template-columns: 1fr; }
+  .unified-report-actions { display: grid !important; grid-template-columns: 1fr; }
+  .unified-report-actions > * { width: 100%; justify-content: center; }
+  .unified-report-column-head { align-items: flex-start !important; flex-direction: column; }
+  .unified-report-column-options { grid-template-columns: 1fr; }
+  .unified-report-detail { padding: 14px; }
+  .unified-report-detail > header { align-items: flex-start !important; }
+  .unified-report-table { min-width: 0; }
+  .management-table.unified-report-table td:first-child { display: flex; text-align: right !important; }
+  .unified-report-table td::before { flex: 0 0 108px; color: #748296; content: attr(data-label); font-size: 10px; font-weight: 800; letter-spacing: .05em; text-align: left; text-transform: uppercase; }
+  .unified-report-table td[data-label="Jamaah"] { display: grid; grid-template-columns: 108px minmax(0,1fr); align-items: start; }
+  .unified-report-table td[data-label="Jamaah"]::before { grid-row: 1 / span 2; }
+  .unified-report-table td[data-label="Jamaah"] > * { min-width: 0; overflow-wrap: anywhere; text-align: right; }
+  .unified-report-table td:nth-last-child(-n+4) { white-space: normal; }
+  .unified-report-scroll-hint { display: none; }
   .management-kpis > a,.management-kpis > article { min-height: 125px; }
   .management-panel { padding: 18px 14px; }
   .management-accounts-panel > header { align-items: stretch; flex-direction: column; }
