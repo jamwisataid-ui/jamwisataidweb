@@ -3,7 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { unstable_rethrow } from "next/navigation";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, ne, sql } from "drizzle-orm";
 
 import {
   agents,
@@ -56,6 +56,32 @@ function failure(error: unknown): ManagementActionState {
   unstable_rethrow(error);
   console.error("Management action failed:", error);
   return { ok: false, message: error instanceof Error ? error.message : "Terjadi kesalahan. Data belum disimpan." };
+}
+
+class ReferralCodeConflictError extends Error {}
+
+function isReferralCodeConflict(error: unknown) {
+  if (error instanceof ReferralCodeConflictError) return true;
+  let current = error;
+  for (let depth = 0; depth < 5 && current && typeof current === "object"; depth += 1) {
+    const candidate = current as { code?: string; constraint?: string; cause?: unknown };
+    if (candidate.code === "23505" && candidate.constraint === "agents_referral_code_idx") return true;
+    current = candidate.cause;
+  }
+  return false;
+}
+
+function agentFailure(error: unknown): ManagementActionState {
+  unstable_rethrow(error);
+  if (isReferralCodeConflict(error)) {
+    return {
+      ok: false,
+      message: "Kode referral sudah digunakan.",
+      errors: { referralCode: ["Pilih kode referral lain karena kode ini sudah dipakai agen lain."] },
+    };
+  }
+  console.error("Agent management action failed:", error);
+  return { ok: false, message: "Data agen gagal disimpan. Silakan coba lagi." };
 }
 
 export async function seedManagementDefaultsAction(): Promise<ManagementActionState> {
@@ -275,12 +301,14 @@ export async function createAgentAction(_state: ManagementActionState, formData:
     const session = await requireAdminSession();
     const id = randomUUID();
     await withManagementTransaction(async (tx) => {
+      const duplicate = await tx.query.agents.findFirst({ where: eq(agents.referralCode, parsed.data.referralCode) });
+      if (duplicate) throw new ReferralCodeConflictError();
       await tx.insert(agents).values({ id, ...parsed.data, email: parsed.data.email || null });
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "create", entityType: "agent", entityId: id, summary: `Agen ${parsed.data.name} ditambahkan` });
     });
     refresh();
     return { ok: true, message: "Agen dan link referral berhasil dibuat.", redirectTo: `/admin/manajemen/agen-referral/${id}` };
-  } catch (error) { return failure(error); }
+  } catch (error) { return agentFailure(error); }
 }
 
 export async function updateAgentAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
@@ -292,12 +320,14 @@ export async function updateAgentAction(_state: ManagementActionState, formData:
     await withManagementTransaction(async (tx) => {
       const existing = await tx.query.agents.findFirst({ where: eq(agents.id, id) });
       if (!existing) throw new Error("Agen tidak ditemukan.");
+      const duplicate = await tx.query.agents.findFirst({ where: and(eq(agents.referralCode, parsed.data.referralCode), ne(agents.id, id)) });
+      if (duplicate) throw new ReferralCodeConflictError();
       await tx.update(agents).set({ ...parsed.data, email: parsed.data.email || null, updatedAt: new Date() }).where(eq(agents.id, id));
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "update", entityType: "agent", entityId: id, summary: `Agen ${parsed.data.name} diperbarui` });
     });
     refresh();
     return { ok: true, message: "Perubahan agen berhasil disimpan.", redirectTo: `/admin/manajemen/agen-referral/${id}` };
-  } catch (error) { return failure(error); }
+  } catch (error) { return agentFailure(error); }
 }
 
 export async function setManagementRecordStatusAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {

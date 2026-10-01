@@ -36,22 +36,23 @@ const managementInitialState: ManagementActionState = { ok: false, message: "" }
 
 function Feedback({ state }: { state: ManagementActionState }) {
   const router = useRouter();
+  const fieldIssues = useMemo(() => Object.values(state.errors ?? {}).flat().filter(Boolean), [state.errors]);
   useEffect(() => {
     if (!state.message) return;
     if (state.ok) toast.success(state.message);
-    else toast.error(state.message);
+    else toast.error(fieldIssues[0] ?? state.message);
     if (state.ok && state.redirectTo) {
       router.replace(state.redirectTo);
       router.refresh();
     }
-  }, [router, state]);
+  }, [fieldIssues, router, state]);
   if (!state.message) return null;
-  return <div className={`management-feedback ${state.ok ? "success" : "error"}`} role="status">{state.ok ? <CheckCircle2 /> : <CircleAlert />}<span>{state.message}</span></div>;
+  return <div className={`management-feedback ${state.ok ? "success" : "error"}`} role={state.ok ? "status" : "alert"}>{state.ok ? <CheckCircle2 /> : <CircleAlert />}<span><strong>{state.message}</strong>{!state.ok && fieldIssues.length ? <ul>{fieldIssues.map((message) => <li key={message}>{message}</li>)}</ul> : null}</span></div>;
 }
 
 function ErrorText({ state, name }: { state: ManagementActionState; name: string }) {
   const message = state.errors?.[name]?.[0];
-  return message ? <small className="management-field-error">{message}</small> : null;
+  return message ? <small className="management-field-error" id={`${name}-error`}>{message}</small> : null;
 }
 
 function SubmitButton({ children, disabled = false }: { children: React.ReactNode; disabled?: boolean }) {
@@ -91,13 +92,25 @@ type AgentValues = { id: string; name: string; whatsapp: string; email: string |
 
 export function AgentForm({ values }: { values?: AgentValues }) {
   const [state, action, pending] = useActionState(values ? updateAgentAction : createAgentAction, managementInitialState);
+  const [form, setForm] = useState({
+    name: values?.name ?? "",
+    whatsapp: values?.whatsapp ?? "",
+    email: values?.email ?? "",
+    referralCode: values?.referralCode ?? "",
+    defaultCommission: String(values?.defaultCommission ?? 500000),
+  });
+  const change = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const value = event.target.name === "referralCode" ? event.target.value.toLowerCase() : event.target.value;
+    setForm((current) => ({ ...current, [event.target.name]: value }));
+  };
+  const invalid = (name: string) => Boolean(state.errors?.[name]?.length);
   return <form action={action} className="management-form">{values ? <input type="hidden" name="id" value={values.id} /> : null}<Feedback state={state} />
     <div className="management-form-grid two">
-      <label><span>Nama agen *</span><input name="name" defaultValue={values?.name} required /><ErrorText state={state} name="name" /></label>
-      <label><span>WhatsApp *</span><input name="whatsapp" inputMode="tel" defaultValue={values?.whatsapp} required /><ErrorText state={state} name="whatsapp" /></label>
-      <label><span>Email <i>opsional</i></span><input name="email" type="email" defaultValue={values?.email ?? ""} /><ErrorText state={state} name="email" /></label>
-      <label><span>Kode link referral *</span><input name="referralCode" placeholder="nama-agen" defaultValue={values?.referralCode} required /><ErrorText state={state} name="referralCode" /></label>
-      <label><span>Komisi default</span><select name="defaultCommission" defaultValue={String(values?.defaultCommission ?? 500000)}><option value="500000">Rp500.000 / jamaah</option><option value="1000000">Rp1.000.000 / jamaah</option></select></label>
+      <label className={invalid("name") ? "has-error" : undefined}><span>Nama agen *</span><input name="name" value={form.name} onChange={change} aria-invalid={invalid("name")} aria-describedby={invalid("name") ? "name-error" : undefined} required /><ErrorText state={state} name="name" /></label>
+      <label className={invalid("whatsapp") ? "has-error" : undefined}><span>WhatsApp *</span><input name="whatsapp" inputMode="tel" autoComplete="tel" placeholder="08xxxxxxxxxx atau 62xxxxxxxxxx" value={form.whatsapp} onChange={change} aria-invalid={invalid("whatsapp")} aria-describedby={invalid("whatsapp") ? "whatsapp-error" : undefined} required /><ErrorText state={state} name="whatsapp" /></label>
+      <label className={invalid("email") ? "has-error" : undefined}><span>Email <i>opsional</i></span><input name="email" type="email" autoComplete="email" value={form.email} onChange={change} aria-invalid={invalid("email")} aria-describedby={invalid("email") ? "email-error" : undefined} /><ErrorText state={state} name="email" /></label>
+      <label className={invalid("referralCode") ? "has-error" : undefined}><span>Kode link referral *</span><input name="referralCode" placeholder="nama-agen" value={form.referralCode} onChange={change} aria-invalid={invalid("referralCode")} aria-describedby={invalid("referralCode") ? "referralCode-error" : "referral-code-hint"} required /><small id="referral-code-hint">Link: /ref/{form.referralCode || "nama-agen"}</small><ErrorText state={state} name="referralCode" /></label>
+      <label className={invalid("defaultCommission") ? "has-error" : undefined}><span>Komisi default</span><select name="defaultCommission" value={form.defaultCommission} onChange={change} aria-invalid={invalid("defaultCommission")} aria-describedby={invalid("defaultCommission") ? "defaultCommission-error" : undefined}><option value="500000">Rp500.000 / jamaah</option><option value="1000000">Rp1.000.000 / jamaah</option></select><ErrorText state={state} name="defaultCommission" /></label>
     </div>
     <SubmitButton>{pending ? "Menyimpan…" : values ? "Simpan perubahan" : "Simpan agen"}</SubmitButton>
   </form>;

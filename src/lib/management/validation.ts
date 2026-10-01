@@ -3,6 +3,33 @@ import { z } from "zod";
 const money = z.coerce.number().int().min(0).max(Number.MAX_SAFE_INTEGER);
 const requiredText = (label: string) => z.string().trim().min(2, `${label} wajib diisi.`);
 
+export function normalizeWhatsapp(value: string) {
+  const input = value.trim();
+  if (!/^\+?[\d\s().-]+$/.test(input)) return input;
+  const digits = input.replace(/\D/g, "");
+  if (digits.startsWith("0")) return `62${digits.slice(1)}`;
+  if (digits.startsWith("8")) return `62${digits}`;
+  return digits;
+}
+
+const whatsapp = z.preprocess(
+  (value) => typeof value === "string" ? normalizeWhatsapp(value) : value,
+  z.string().regex(/^628\d{7,12}$/, "Nomor WhatsApp harus berupa nomor Indonesia yang valid, misalnya 081234567890 atau 6281234567890."),
+);
+
+const optionalEmail = z.preprocess(
+  (value) => typeof value === "string" ? value.trim() || undefined : value,
+  z.string().email("Format email tidak valid.").optional(),
+);
+
+const referralCode = z.preprocess(
+  (value) => typeof value === "string" ? value.trim().toLowerCase() : value,
+  z.string()
+    .min(3, "Kode referral minimal 3 karakter.")
+    .max(60, "Kode referral maksimal 60 karakter.")
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Gunakan huruf kecil, angka, dan strip di antara kata; contoh: nama-agen."),
+);
+
 export const pilgrimSchema = z.object({
   fullName: requiredText("Nama jamaah"),
   whatsapp: z.string().trim().min(8, "Nomor WhatsApp minimal 8 digit."),
@@ -17,9 +44,9 @@ export const pilgrimSchema = z.object({
 
 export const agentSchema = z.object({
   name: requiredText("Nama agen"),
-  whatsapp: z.string().trim().min(8, "Nomor WhatsApp minimal 8 digit."),
-  email: z.union([z.literal(""), z.string().trim().email("Format email tidak valid.")]).optional(),
-  referralCode: z.string().trim().min(3).regex(/^[a-z0-9-]+$/, "Kode hanya boleh huruf kecil, angka, dan strip."),
+  whatsapp,
+  email: optionalEmail,
+  referralCode,
   defaultCommission: money.refine((value) => value === 500_000 || value === 1_000_000, "Komisi hanya Rp500.000 atau Rp1.000.000."),
 });
 
