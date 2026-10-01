@@ -29,7 +29,7 @@ import {
   updateAgentAction,
   updatePilgrimAction,
 } from "@/lib/management/actions";
-import { formatDocumentNumber, generateDefaultRoomNumber, rupiah } from "@/lib/management/domain";
+import { DOCUMENT_NUMBER_PATTERN, formatDocumentNumber, generateDefaultRoomNumber, rupiah } from "@/lib/management/domain";
 import type { ManagementActionState } from "@/lib/management/validation";
 
 const managementInitialState: ManagementActionState = { ok: false, message: "" };
@@ -407,7 +407,9 @@ type SequenceValues = { pattern: string; nextNumber: number; padding: number; re
 
 export function SequenceForm({ kind, values }: { kind: "invoice" | "receipt"; values?: SequenceValues }) {
   const [state, action, pending] = useActionState(saveSequenceAction, managementInitialState);
-  const nextDocumentNumber = values ? formatDocumentNumber(values, new Date()).number : kind === "invoice" ? "9933/jamw/300828" : "0066/jamw/300826";
+  const nextDocumentNumber = values
+    ? formatDocumentNumber({ ...values, pattern: DOCUMENT_NUMBER_PATTERN }, new Date()).number
+    : formatDocumentNumber({ pattern: DOCUMENT_NUMBER_PATTERN, padding: 4, nextNumber: 1, reset: "never", currentPeriod: null }, new Date()).number;
   return <form action={action} className="management-form compact"><Feedback state={state} /><input type="hidden" name="kind" value={kind} /><div className="management-form-grid">
     <label><span>Nomor {kind === "invoice" ? "invoice" : "kwitansi"} berikutnya *</span><input name="nextDocumentNumber" defaultValue={nextDocumentNumber} required /><small>Nomor ini boleh diedit manual. Setelah dokumen diterbitkan, angka depannya naik otomatis.</small></label>
   </div><SubmitButton>{pending ? "Menyimpan…" : `Simpan nomor ${kind === "invoice" ? "invoice" : "kwitansi"}`}</SubmitButton></form>;
@@ -613,4 +615,3 @@ export function RoomListForm({
     </form>
   );
 }
-

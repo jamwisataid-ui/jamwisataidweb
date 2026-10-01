@@ -46,21 +46,47 @@ export type NumberingConfig = {
   currentPeriod: string | null;
 };
 
+export const DOCUMENT_NUMBER_PATTERN = "{seq}/jamw/{DD}{MM}{YY}";
+
+export function parseDocumentSequenceInput(value: string) {
+  const match = /^(\d{1,12})(?:\/jamw\/\d{6})?$/i.exec(value.trim());
+  if (!match) return null;
+  const nextNumber = Number(match[1]);
+  if (!Number.isSafeInteger(nextNumber) || nextNumber < 1) return null;
+  return {
+    nextNumber,
+    padding: match[1].length,
+    pattern: DOCUMENT_NUMBER_PATTERN,
+  };
+}
+
+function jakartaDateParts(date: Date) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Jakarta",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return { day: values.day, month: values.month, year: values.year };
+}
+
 export function documentPeriod(reset: NumberingConfig["reset"], date: Date) {
   if (reset === "never") return "all";
-  const year = date.getFullYear().toString();
-  return reset === "yearly" ? year : `${year}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+  const { month, year } = jakartaDateParts(date);
+  return reset === "yearly" ? year : `${year}-${month}`;
 }
 
 export function formatDocumentNumber(config: NumberingConfig, issuedAt: Date) {
   const period = documentPeriod(config.reset, issuedAt);
   const sequence = config.currentPeriod && config.currentPeriod !== period ? 1 : config.nextNumber;
+  const { day, month, year } = jakartaDateParts(issuedAt);
   const replacements: Record<string, string> = {
     "{seq}": String(sequence).padStart(config.padding, "0"),
-    "{DD}": String(issuedAt.getDate()).padStart(2, "0"),
-    "{MM}": String(issuedAt.getMonth() + 1).padStart(2, "0"),
-    "{YY}": String(issuedAt.getFullYear()).slice(-2),
-    "{YYYY}": String(issuedAt.getFullYear()),
+    "{DD}": day,
+    "{MM}": month,
+    "{YY}": year.slice(-2),
+    "{YYYY}": year,
   };
   return {
     number: Object.entries(replacements).reduce((result, [token, replacement]) => result.replaceAll(token, replacement), config.pattern),

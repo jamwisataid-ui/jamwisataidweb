@@ -32,7 +32,7 @@ import {
 import { withManagementTransaction } from "@/db/transaction";
 import { requireAdminSession } from "@/lib/admin-session";
 import { issueTransactionDocument } from "./issue-document";
-import { paymentStatus, rupiah } from "./domain";
+import { parseDocumentSequenceInput, paymentStatus, rupiah } from "./domain";
 import { deletePrivateObject } from "./storage";
 import { agentSchema, bookingSchema, cashSchema, fields, type ManagementActionState, paymentSchema, pilgrimSchema, stockMovementSchema } from "./validation";
 
@@ -550,12 +550,9 @@ export async function saveSequenceAction(_state: ManagementActionState, formData
     const session = await requireAdminSession();
     const kind = formData.get("kind") === "receipt" ? "receipt" : "invoice";
     const fullNumber = String(formData.get("nextDocumentNumber") ?? "").trim();
-    const numberParts = /^(\d{1,12})(.+)$/.exec(fullNumber);
-    if (!numberParts) return { ok: false, message: `Nomor ${kind === "invoice" ? "invoice" : "kwitansi"} harus diawali angka, contohnya ${kind === "invoice" ? "9933/jamw/300828" : "0066/jamw/300826"}.` };
-    const [, sequenceDigits, suffix] = numberParts;
-    const nextNumber = Number(sequenceDigits);
-    const padding = sequenceDigits.length;
-    const pattern = `{seq}${suffix}`;
+    const parsedNumber = parseDocumentSequenceInput(fullNumber);
+    if (!parsedNumber) return { ok: false, message: `Nomor ${kind === "invoice" ? "invoice" : "kwitansi"} harus berupa angka urut atau format angka/jamw/DDMMYY.` };
+    const { nextNumber, padding, pattern } = parsedNumber;
     if (!Number.isSafeInteger(nextNumber) || nextNumber < 1 || fullNumber.length > 100) return { ok: false, message: "Nomor berikutnya tidak valid." };
     await withManagementTransaction(async (tx) => {
       await tx.update(documentSequences).set({ active: false, updatedAt: new Date() }).where(eq(documentSequences.kind, kind));
@@ -1113,4 +1110,3 @@ export async function toggleReportInclusionAction(
     return failure(error);
   }
 }
-
