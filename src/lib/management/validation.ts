@@ -12,7 +12,7 @@ export function normalizeWhatsapp(value: string) {
   return digits;
 }
 
-const whatsapp = z.preprocess(
+export const indonesianWhatsappSchema = z.preprocess(
   (value) => typeof value === "string" ? normalizeWhatsapp(value) : value,
   z.string().regex(/^628\d{7,12}$/, "Nomor WhatsApp harus berupa nomor Indonesia yang valid, misalnya 081234567890 atau 6281234567890."),
 );
@@ -32,7 +32,7 @@ const referralCode = z.preprocess(
 
 export const pilgrimSchema = z.object({
   fullName: requiredText("Nama jamaah"),
-  whatsapp: z.string().trim().min(8, "Nomor WhatsApp minimal 8 digit."),
+  whatsapp: indonesianWhatsappSchema,
   email: z.union([z.literal(""), z.string().trim().email("Format email tidak valid.")]).optional(),
   gender: z.enum(["", "Laki-laki", "Perempuan"]).optional(),
   birthDate: z.string().optional(),
@@ -44,7 +44,7 @@ export const pilgrimSchema = z.object({
 
 export const agentSchema = z.object({
   name: requiredText("Nama agen"),
-  whatsapp,
+  whatsapp: indonesianWhatsappSchema,
   email: optionalEmail,
   referralCode,
   defaultCommission: money.refine((value) => value === 500_000 || value === 1_000_000, "Komisi hanya Rp500.000 atau Rp1.000.000."),

@@ -3,7 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { unstable_rethrow } from "next/navigation";
-import { and, eq, inArray, ne, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
 
 import {
   agents,
@@ -35,6 +35,7 @@ import { issueTransactionDocument } from "./issue-document";
 import { parseDocumentSequenceInput, paymentStatus, rupiah } from "./domain";
 import { deletePrivateObject } from "./storage";
 import { agentSchema, bookingSchema, cashSchema, fields, type ManagementActionState, paymentSchema, pilgrimSchema, stockMovementSchema } from "./validation";
+import { findMatchingReferralLead, latestLeadPerPilgrim } from "./referral-attribution";
 
 function raw(formData: FormData) {
   return Object.fromEntries(formData.entries());
@@ -120,6 +121,14 @@ export async function createPilgrimAction(_state: ManagementActionState, formDat
         createdBy: session.user.id,
         updatedBy: session.user.id,
       });
+      const openLeads = await tx.query.referralLeads.findMany({
+        where: and(isNull(referralLeads.convertedPilgrimId), ne(referralLeads.status, "closed")),
+        orderBy: desc(referralLeads.createdAt),
+      });
+      const referralLead = findMatchingReferralLead(openLeads, parsed.data);
+      if (referralLead) {
+        await tx.update(referralLeads).set({ convertedPilgrimId: id, status: "converted", updatedAt: new Date() }).where(eq(referralLeads.id, referralLead.id));
+      }
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "create", entityType: "pilgrim", entityId: id, summary: `Jamaah ${parsed.data.fullName} ditambahkan` });
     });
     refresh();
@@ -137,6 +146,17 @@ export async function updatePilgrimAction(_state: ManagementActionState, formDat
       const existing = await tx.query.pilgrims.findFirst({ where: eq(pilgrims.id, id) });
       if (!existing) throw new Error("Data jamaah tidak ditemukan.");
       await tx.update(pilgrims).set({ ...parsed.data, email: parsed.data.email || null, gender: parsed.data.gender || null, birthDate: parsed.data.birthDate || null, passportNumber: parsed.data.passportNumber || null, passportExpiry: parsed.data.passportExpiry || null, notes: parsed.data.notes || null, updatedBy: session.user.id, updatedAt: new Date() }).where(eq(pilgrims.id, id));
+      const existingReferral = await tx.query.referralLeads.findFirst({ where: eq(referralLeads.convertedPilgrimId, id) });
+      if (!existingReferral) {
+        const openLeads = await tx.query.referralLeads.findMany({
+          where: and(isNull(referralLeads.convertedPilgrimId), ne(referralLeads.status, "closed")),
+          orderBy: desc(referralLeads.createdAt),
+        });
+        const referralLead = findMatchingReferralLead(openLeads, parsed.data);
+        if (referralLead) {
+          await tx.update(referralLeads).set({ convertedPilgrimId: id, status: "converted", updatedAt: new Date() }).where(eq(referralLeads.id, referralLead.id));
+        }
+      }
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "update", entityType: "pilgrim", entityId: id, summary: `Data jamaah ${parsed.data.fullName} diperbarui` });
     });
     refresh();
@@ -361,6 +381,17 @@ export async function createBookingAction(_state: ManagementActionState, formDat
       const pkg = await tx.query.packages.findFirst({ where: eq(packages.id, departure.packageId) });
       if (!pkg) throw new Error("Paket tidak ditemukan.");
       const settings = await tx.query.managementSettings.findFirst({ where: eq(managementSettings.id, "default") });
+      const linkedLeads = latestLeadPerPilgrim(await tx.query.referralLeads.findMany({
+        where: inArray(referralLeads.convertedPilgrimId, parsed.data.pilgrimIds),
+        orderBy: desc(referralLeads.createdAt),
+      }));
+      const referralAgentIds = [...new Set(linkedLeads.map((lead) => lead.agentId))];
+      if (referralAgentIds.length > 1) throw new Error("Jamaah terpilih berasal dari agen referral yang berbeda. Buat pendaftaran terpisah untuk setiap agen.");
+      const referralLead = linkedLeads[0] ?? null;
+      const resolvedAgentId = referralLead?.agentId ?? (parsed.data.agentId || null);
+      const resolvedAgent = resolvedAgentId ? await tx.query.agents.findFirst({ where: eq(agents.id, resolvedAgentId) }) : null;
+      if (resolvedAgentId && !resolvedAgent) throw new Error("Agen referral tidak ditemukan atau sudah tidak tersedia.");
+      const resolvedCommission = referralLead && resolvedAgent ? resolvedAgent.defaultCommission : resolvedAgentId ? parsed.data.commissionAmount : 0;
       const bookingNumber = `REG-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-${bookingId.slice(0, 6).toUpperCase()}`;
       const finalPrice = Math.max(0, parsed.data.agreedPrice - parsed.data.discountAmount);
       await tx.insert(bookings).values({
@@ -370,7 +401,8 @@ export async function createBookingAction(_state: ManagementActionState, formDat
         payerName: parsed.data.payerName,
         payerWhatsapp: parsed.data.payerWhatsapp,
         payerEmail: parsed.data.payerEmail || null,
-        agentId: parsed.data.agentId || null,
+        agentId: resolvedAgentId,
+        referralLeadId: referralLead?.id ?? null,
         packageSnapshot: { packageId: pkg.id, name: pkg.name, departureDate: departure.departureDate, dateLabel: departure.dateLabel, airline: departure.airline, listPrice: Number(departure.price) },
         createdBy: session.user.id,
       });
@@ -379,11 +411,11 @@ export async function createBookingAction(_state: ManagementActionState, formDat
         discountAmount: parsed.data.discountAmount,
         roomType: parsed.data.roomType,
         dpTarget: parsed.data.dpTarget || settings?.defaultDpAmount || 5_000_000,
-        commissionAmount: parsed.data.agentId ? parsed.data.commissionAmount : 0,
+        commissionAmount: resolvedCommission,
       }));
       await tx.insert(registrations).values(registrationRows);
-      if (parsed.data.agentId && parsed.data.commissionAmount > 0) {
-        await tx.insert(commissions).values(registrationRows.map((item) => ({ agentId: parsed.data.agentId!, registrationId: item.id, amount: parsed.data.commissionAmount })));
+      if (resolvedAgentId && resolvedCommission > 0) {
+        await tx.insert(commissions).values(registrationRows.map((item) => ({ agentId: resolvedAgentId, registrationId: item.id, amount: resolvedCommission })));
       }
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "create", entityType: "booking", entityId: bookingId, summary: `${bookingNumber} dibuat untuk ${registrationRows.length} jamaah` });
     });

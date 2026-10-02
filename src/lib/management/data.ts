@@ -185,7 +185,7 @@ export async function getManagementContext() {
     commissions: commissionRows.map((commission) => ({ ...commission, agent: agentsById.get(commission.agentId), registration: registrationsById.get(commission.registrationId), pilgrim: pilgrimsById.get(registrationsById.get(commission.registrationId)?.pilgrimId ?? "") })),
     documents: documentRows,
     sequences: sequenceRows,
-    leads: leadRows.map((lead) => ({ ...lead, agent: agentsById.get(lead.agentId), package: lead.packageId ? packagesById.get(lead.packageId) : undefined })),
+    leads: leadRows.map((lead) => ({ ...lead, agent: agentsById.get(lead.agentId), package: lead.packageId ? packagesById.get(lead.packageId) : undefined, convertedPilgrim: lead.convertedPilgrimId ? pilgrimsById.get(lead.convertedPilgrimId) : undefined })),
     pilgrimDocuments: pilgrimDocumentRows,
     accommodations: accommodationRows,
     cashTransactions: cashRows,

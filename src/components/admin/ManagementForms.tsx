@@ -117,7 +117,7 @@ export function AgentForm({ values }: { values?: AgentValues }) {
 }
 
 type BookingFormProps = {
-  pilgrims: Array<{ id: string; fullName: string; whatsapp: string; email: string | null }>;
+  pilgrims: Array<{ id: string; fullName: string; whatsapp: string; email: string | null; referralAgentId?: string; referralAgentName?: string }>;
   departures: Array<{ id: string; departureDate: string; price: string; package?: { name: string } }>;
   agents: Array<{ id: string; name: string; defaultCommission: number }>;
   defaultDpAmount: number;
@@ -138,14 +138,16 @@ export function BookingForm({ pilgrims, departures, agents, defaultDpAmount }: B
   const [pilgrimSearch, setPilgrimSearch] = useState("");
   const selectedDeparture = departures.find((item) => item.id === departureId);
   const selectedAgent = agents.find((item) => item.id === agentId);
+  const referralAgentIds = [...new Set(pilgrimIds.map((id) => pilgrims.find((item) => item.id === id)?.referralAgentId).filter((id): id is string => Boolean(id)))];
+  const referralConflict = referralAgentIds.length > 1;
   const finalPrice = Math.max(0, Number(agreedPrice || 0) - Number(discountAmount || 0));
   const totalBill = finalPrice * pilgrimIds.length;
   const filteredPilgrims = pilgrims.filter((item) => `${item.fullName} ${item.whatsapp}`.toLowerCase().includes(pilgrimSearch.toLowerCase().trim()));
   const priceReady = Boolean(departureId && Number(agreedPrice) > 0 && Number(dpTarget) > 0 && finalPrice > 0);
   const payerReady = payerName.trim().length >= 2 && payerWhatsapp.replace(/\D/g, "").length >= 8;
   const pilgrimsReady = pilgrimIds.length > 0;
-  const formReady = priceReady && payerReady && pilgrimsReady;
-  const missing = [!priceReady && "paket dan nominal", !payerReady && "data pembayar", !pilgrimsReady && "jamaah yang berangkat"].filter(Boolean).join(", ");
+  const formReady = priceReady && payerReady && pilgrimsReady && !referralConflict;
+  const missing = [!priceReady && "paket dan nominal", !payerReady && "data pembayar", !pilgrimsReady && "jamaah yang berangkat", referralConflict && "pisahkan jamaah dari agen referral yang berbeda"].filter(Boolean).join(", ");
   function selectDeparture(value: string) {
     setDepartureId(value);
     const departure = departures.find((item) => item.id === value);
@@ -157,7 +159,12 @@ export function BookingForm({ pilgrims, departures, agents, defaultDpAmount }: B
     setCommissionAmount(agent ? String(agent.defaultCommission) : "0");
   }
   function togglePilgrim(id: string, checked: boolean) {
-    setPilgrimIds((current) => checked ? [...current, id] : current.filter((item) => item !== id));
+    setPilgrimIds((current) => {
+      const next = checked ? [...current, id] : current.filter((item) => item !== id);
+      const linkedAgentIds = [...new Set(next.map((pilgrimId) => pilgrims.find((item) => item.id === pilgrimId)?.referralAgentId).filter((linkedAgentId): linkedAgentId is string => Boolean(linkedAgentId)))];
+      if (linkedAgentIds.length === 1) selectAgent(linkedAgentIds[0]);
+      return next;
+    });
   }
   function copyPayer(id: string) {
     const pilgrim = pilgrims.find((item) => item.id === id);
@@ -169,7 +176,7 @@ export function BookingForm({ pilgrims, departures, agents, defaultDpAmount }: B
   return <form action={action} className="management-form"><Feedback state={state} />
     <details className="management-booking-help" open>
       <summary><span><BookOpen /><span><strong>Cara Penggunaan — ikuti dari nomor 1 sampai 4</strong><small>Panduan ini terbuka otomatis. Klik di sini jika ingin menutupnya.</small></span></span><i>+</i></summary>
-      <ol><li><strong>1. Pilih paket dan harga</strong><span>Harga masuk otomatis. Atur DP dan diskon bila ada.</span></li><li><strong>2. Isi orang yang membayar</strong><span>Bisa disalin dari data jamaah agar tidak perlu mengetik ulang.</span></li><li><strong>3. Pilih agen bila ada</strong><span>Jika bukan dari agen, biarkan “Tanpa agen”.</span></li><li><strong>4. Centang jamaah</strong><span>Periksa ringkasan, lalu tekan “Simpan pendaftaran”.</span></li></ol>
+      <ol><li><strong>1. Pilih paket dan harga</strong><span>Harga masuk otomatis. Atur DP dan diskon bila ada.</span></li><li><strong>2. Isi orang yang membayar</strong><span>Bisa disalin dari data jamaah agar tidak perlu mengetik ulang.</span></li><li><strong>3. Periksa agen</strong><span>Agen terisi otomatis untuk jamaah dari link referral; pilih manual hanya bila diperlukan.</span></li><li><strong>4. Centang jamaah</strong><span>Periksa ringkasan, lalu tekan “Simpan pendaftaran”.</span></li></ol>
     </details>
 
     <section className="management-booking-step">
@@ -225,9 +232,9 @@ export function BookingForm({ pilgrims, departures, agents, defaultDpAmount }: B
     </section>
 
     <section className="management-booking-step">
-      <header><b>3</b><span><strong>Apakah pendaftaran berasal dari agen?</strong><small>Jika tidak, biarkan pilihan “Tanpa agen”.</small></span><em className="optional">Opsional</em></header>
+      <header><b>3</b><span><strong>Apakah pendaftaran berasal dari agen?</strong><small>Agen otomatis terisi jika jamaah berasal dari link referral.</small></span><em className="optional">Otomatis</em></header>
       <div className="management-form-grid two">
-        <label><span>Agen <i>opsional</i></span><select name="agentId" value={agentId} onChange={(event) => selectAgent(event.target.value)}><option value="">Tanpa agen / pendaftaran langsung</option>{agents.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select><small>Pilih agen asal agar referral dan komisinya tercatat pada pendaftaran ini.</small><ErrorText state={state} name="agentId" /></label>
+        <label><span>Agen <i>opsional</i></span><select name="agentId" value={agentId} onChange={(event) => selectAgent(event.target.value)}><option value="">Tanpa agen / pendaftaran langsung</option>{agents.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select><small>{referralAgentIds.length === 1 ? "Terdeteksi otomatis dari link referral jamaah. Server akan mempertahankan agen asal ini." : "Pilih manual hanya untuk jamaah yang tidak masuk melalui link referral."}</small><ErrorText state={state} name="agentId" /></label>
         <label><span>Komisi per jamaah</span><select name="commissionAmount" value={commissionAmount} onChange={(event) => setCommissionAmount(event.target.value)} disabled={!agentId}><option value="0">Tanpa komisi</option><option value="500000">Rp500.000</option><option value="1000000">Rp1.000.000</option></select>{!agentId ? <input type="hidden" name="commissionAmount" value="0" /> : null}<small>{selectedAgent ? `Otomatis mengikuti default ${selectedAgent.name}: ${rupiah(selectedAgent.defaultCommission)}. Komisi baru sah setelah jamaah lunas.` : "Aktif setelah agen dipilih. Tanpa agen, komisi otomatis Rp0."}</small><ErrorText state={state} name="commissionAmount" /></label>
       </div>
     </section>
@@ -236,7 +243,7 @@ export function BookingForm({ pilgrims, departures, agents, defaultDpAmount }: B
       <header><b>4</b><span><strong>Pilih jamaah yang akan berangkat</strong><small>Centang nama jamaah satu per satu.</small></span><em className={pilgrimsReady ? "complete" : "incomplete"}>{pilgrimsReady ? <CheckCircle2 /> : <CircleAlert />}{pilgrimsReady ? `${pilgrimIds.length} dipilih` : "Belum dipilih"}</em></header>
       <label className="management-pilgrim-search"><span>Cari jamaah</span><input type="search" value={pilgrimSearch} onChange={(event) => setPilgrimSearch(event.target.value)} placeholder="Ketik nama atau nomor WhatsApp" /><small>{filteredPilgrims.length} nama ditemukan. Jamaah yang sudah dicentang tetap tersimpan saat pencarian diubah.</small></label>
       {pilgrimIds.map((id) => <input key={id} type="hidden" name="pilgrimIds" value={id} />)}
-      <fieldset className="management-choice-list"><legend>{pilgrimIds.length ? `${pilgrimIds.length} jamaah sudah dipilih` : "Pilih minimal satu jamaah *"}</legend>{filteredPilgrims.length ? filteredPilgrims.map((item) => <label className={pilgrimIds.includes(item.id) ? "selected" : ""} key={item.id}><input type="checkbox" value={item.id} checked={pilgrimIds.includes(item.id)} onChange={(event) => togglePilgrim(item.id, event.target.checked)} /><span><strong>{item.fullName}</strong><small>{item.whatsapp}</small></span></label>) : <p className="management-no-search-result">Nama jamaah tidak ditemukan. Coba kata pencarian lain.</p>}<ErrorText state={state} name="pilgrimIds" /></fieldset>
+      <fieldset className="management-choice-list"><legend>{pilgrimIds.length ? `${pilgrimIds.length} jamaah sudah dipilih` : "Pilih minimal satu jamaah *"}</legend>{filteredPilgrims.length ? filteredPilgrims.map((item) => <label className={pilgrimIds.includes(item.id) ? "selected" : ""} key={item.id}><input type="checkbox" value={item.id} checked={pilgrimIds.includes(item.id)} onChange={(event) => togglePilgrim(item.id, event.target.checked)} /><span><strong>{item.fullName}</strong><small>{item.whatsapp}{item.referralAgentName ? ` · Referral ${item.referralAgentName}` : ""}</small></span></label>) : <p className="management-no-search-result">Nama jamaah tidak ditemukan. Coba kata pencarian lain.</p>}<ErrorText state={state} name="pilgrimIds" />{referralConflict ? <small className="management-field-error">Jamaah terpilih berasal dari agen berbeda. Pisahkan menjadi pendaftaran yang berbeda agar komisi tidak salah.</small> : null}</fieldset>
     </section>
 
     <div className="management-booking-summary"><WalletCards /><span><small>PERIKSA SEBELUM DISIMPAN</small><strong>{selectedDeparture?.package?.name ?? "Paket belum dipilih"}</strong><dl><div><dt>Harga awal / jamaah</dt><dd>{rupiah(Number(agreedPrice || 0))}</dd></div><div><dt>Diskon / jamaah</dt><dd>− {rupiah(Number(discountAmount || 0))}</dd></div><div><dt>Harga akhir / jamaah</dt><dd>{rupiah(finalPrice)}</dd></div><div><dt>Jumlah jamaah</dt><dd>{pilgrimIds.length} orang</dd></div><div className="total"><dt>Total tagihan</dt><dd>{rupiah(totalBill)}</dd></div></dl>{agentId ? <em>Agen {selectedAgent?.name} · komisi {rupiah(Number(commissionAmount))} / jamaah</em> : <em>Pendaftaran langsung tanpa agen</em>}</span></div>
