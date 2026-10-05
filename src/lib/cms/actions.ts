@@ -254,6 +254,14 @@ export async function savePackageAction(_state: ActionState, formData: FormData)
     await database.insert(accommodations).values([
       { departureId: departure.id, city: "Makkah", hotelName: data.makkahHotel, star: data.makkahStar, distance: data.makkahDistance || null, sortOrder: 0 },
       { departureId: departure.id, city: "Madinah", hotelName: data.madinahHotel, star: data.madinahStar, distance: data.madinahDistance || null, sortOrder: 1 },
+      ...data.plusHotels.map((hotel, index) => ({
+        departureId: departure.id,
+        city: hotel.destination,
+        hotelName: hotel.hotelName,
+        star: hotel.star,
+        distance: null,
+        sortOrder: index + 2,
+      })),
     ]);
 
     const itemGroups = [

@@ -6,6 +6,22 @@ const slug = z
   .min(3, "Slug minimal 3 karakter.")
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung.");
 
+const plusHotelSchema = z.object({
+  destination: z.string().trim().min(2, "Kota atau destinasi hotel plus wajib diisi."),
+  hotelName: z.string().trim().min(2, "Nama hotel program plus wajib diisi."),
+  star: z.coerce.number().int().min(3, "Bintang hotel minimal 3.").max(5, "Bintang hotel maksimal 5."),
+});
+
+const plusHotels = z.preprocess((input) => {
+  if (Array.isArray(input)) return input;
+  if (typeof input !== "string" || !input.trim()) return [];
+  try {
+    return JSON.parse(input);
+  } catch {
+    return [];
+  }
+}, z.array(plusHotelSchema).max(10, "Maksimal 10 hotel program plus."));
+
 export const packageFormSchema = z.object({
   id: z.string().trim().min(3),
   departureId: z.string().uuid().optional().or(z.literal("")),
@@ -44,6 +60,7 @@ export const packageFormSchema = z.object({
   madinahHotel: z.string().trim().min(2, "Hotel Madinah wajib diisi."),
   madinahStar: z.coerce.number().int().refine((value) => value === 3 || value === 4 || value === 5, "Bintang hotel Madinah hanya boleh 3, 4, atau 5.").default(4),
   madinahDistance: z.string().trim().optional(),
+  plusHotels,
   facilities: z.string().default(""),
   highlights: z.string().default(""),
   includes: z.string().default(""),
@@ -51,7 +68,11 @@ export const packageFormSchema = z.object({
   terms: z.string().default(""),
   destinations: z.string().default(""),
   itinerary: z.string().default("[]"),
-});
+}).superRefine((data, context) => {
+  if (data.packageType === "plus" && data.plusHotels.length === 0) {
+    context.addIssue({ code: "custom", path: ["plusHotels"], message: "Tambahkan minimal satu hotel untuk Program Umroh Plus." });
+  }
+}).transform((data) => data.packageType === "plus" ? data : { ...data, plusHotels: [] });
 
 export const entryFormSchema = z.object({
   id: z.string().uuid().optional(),

@@ -73,6 +73,9 @@ export async function getPackageAdmin(id: string) {
   const byKind = (kind: typeof children[number]["kind"]) => children.filter((child) => child.kind === kind).map((child) => child.value).join("\n");
   const makkah = hotels.find((hotel) => hotel.city.toLowerCase() === "makkah");
   const madinah = hotels.find((hotel) => hotel.city.toLowerCase() === "madinah");
+  const plusHotels = hotels
+    .filter((hotel) => hotel.sortOrder >= 2)
+    .map((hotel) => ({ destination: hotel.city, hotelName: hotel.hotelName, star: hotel.star ?? 3 }));
 
   return {
     id: item.id,
@@ -111,6 +114,7 @@ export async function getPackageAdmin(id: string) {
     madinahHotel: madinah?.hotelName ?? "",
     madinahStar: madinah?.star ?? 4,
     madinahDistance: madinah?.distance ?? "",
+    plusHotels: JSON.stringify(plusHotels),
     facilities: byKind("facility"),
     highlights: byKind("highlight"),
     includes: byKind("include"),

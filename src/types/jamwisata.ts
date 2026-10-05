@@ -23,6 +23,11 @@ export type TravelPackage = {
     star?: number;
     distance?: string;
   };
+  plusHotels?: Array<{
+    destination: string;
+    name: string;
+    star?: number;
+  }>;
   facilities?: string[];
   destination?: string[];
   priceFrom?: number;

@@ -24,6 +24,7 @@ import { FormFeedback } from "./FormFeedback";
 
 type Values = Record<string, unknown>;
 type ItineraryDay = { day: number; title: string; description: string };
+type PlusHotel = { destination: string; hotelName: string; star: number };
 const initialState: ActionState = { ok: false, message: "" };
 const field = (values: Values, key: string, fallback = "") => String(values[key] ?? fallback);
 
@@ -95,6 +96,20 @@ const parseLines = (text: unknown): string[] => {
   return text.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
 };
 
+const parsePlusHotels = (value: unknown): PlusHotel[] => {
+  try {
+    const parsed = Array.isArray(value) ? value : JSON.parse(typeof value === "string" && value.trim() ? value : "[]");
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((hotel) => ({
+      destination: String(hotel?.destination ?? ""),
+      hotelName: String(hotel?.hotelName ?? ""),
+      star: Math.min(5, Math.max(3, Number(hotel?.star) || 3)),
+    }));
+  } catch {
+    return [];
+  }
+};
+
 const preservedFields = [
   ["id", ""], ["departureId", ""], ["slug", ""], ["summary", ""],
   ["featured", "false"], ["sortOrder", "0"], ["detailUrl", ""],
@@ -113,6 +128,7 @@ export function PackageForm({ values = {} }: { values?: Values }) {
   const [durationDays, setDurationDays] = useState(() => field(values, "durationDays", "9"));
   const [category, setCategory] = useState(() => field(values, "category", "umrah"));
   const [packageType, setPackageType] = useState(() => field(values, "packageType", "reguler"));
+  const [plusHotels, setPlusHotels] = useState<PlusHotel[]>(() => parsePlusHotels(values.plusHotels));
   const [itinerary, setItinerary] = useState<ItineraryDay[]>(() => {
     try {
       const parsed = JSON.parse(field(values, "itinerary", "[]"));
@@ -224,6 +240,7 @@ export function PackageForm({ values = {} }: { values?: Values }) {
         <input key={name} type="hidden" name={name} value={field(values, name, fallback)} />
       ))}
       <input type="hidden" name="itinerary" value={JSON.stringify(itinerary)} />
+      <input type="hidden" name="plusHotels" value={JSON.stringify(plusHotels)} />
       <input type="hidden" name="includes" value={includes.map((s) => s.trim()).filter(Boolean).join("\n")} />
       <input type="hidden" name="highlights" value={highlights.map((s) => s.trim()).filter(Boolean).join("\n")} />
       <input type="hidden" name="excludes" value={excludes.map((s) => s.trim()).filter(Boolean).join("\n")} />
@@ -405,6 +422,27 @@ export function PackageForm({ values = {} }: { values?: Values }) {
           </label>
         </div>
       </section>
+
+      {category === "umrah" && packageType === "plus" ? (
+        <section className="admin-form-section admin-plus-hotels-section">
+          <div>
+            <p>Hotel Program Plus</p>
+            <span>Tambahkan hotel di setiap kota atau destinasi tambahan di luar Makkah dan Madinah.</span>
+          </div>
+          <div className="admin-plus-hotels-editor">
+            {plusHotels.length ? plusHotels.map((hotel, index) => (
+              <div className="admin-plus-hotel-row" key={index}>
+                <label><span>Kota / destinasi</span><input value={hotel.destination} onChange={(event) => setPlusHotels((current) => current.map((item, row) => row === index ? { ...item, destination: event.target.value } : item))} placeholder="Contoh: Istanbul" required /></label>
+                <label><span>Nama hotel</span><input value={hotel.hotelName} onChange={(event) => setPlusHotels((current) => current.map((item, row) => row === index ? { ...item, hotelName: event.target.value } : item))} placeholder="Contoh: Ramada Plaza Istanbul" required /></label>
+                <label><span>Bintang hotel</span><select value={hotel.star} onChange={(event) => setPlusHotels((current) => current.map((item, row) => row === index ? { ...item, star: Number(event.target.value) } : item))}>{[5, 4, 3].map((star) => <option value={star} key={star}>Bintang {star}</option>)}</select></label>
+                <button type="button" className="admin-icon-button admin-plus-hotel-remove" aria-label={`Hapus hotel ${index + 1}`} onClick={() => setPlusHotels((current) => current.filter((_, row) => row !== index))}><Trash2 size={16} /></button>
+              </div>
+            )) : <p className="admin-itinerary-empty">Belum ada hotel Program Plus. Tambahkan minimal satu hotel untuk menerbitkan paket ini.</p>}
+            {error("plusHotels") ? <small className="admin-upload-error">{error("plusHotels")}</small> : null}
+            <button type="button" className="admin-secondary-button admin-itinerary-add" onClick={() => setPlusHotels((current) => [...current, { destination: "", hotelName: "", star: 4 }])}><Plus size={16} /> Tambah hotel / destinasi</button>
+          </div>
+        </section>
+      ) : null}
 
       <section className="admin-form-section">
         <div><p>Detail &amp; itinerary</p><span>Di bagian ini admin bisa mengubah urutan perjalanan harian yang tampil di halaman detail paket.</span></div>

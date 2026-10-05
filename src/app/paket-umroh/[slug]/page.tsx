@@ -4,11 +4,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
+  Building2,
   Check,
   CheckCircle2,
   ChevronRight,
   FileText,
   MessageCircle,
+  MapPin,
   ShieldCheck,
   Sparkles,
   TrainFront,
@@ -61,7 +63,10 @@ export async function generatePackageMetadata({ params }: PackageDetailProps, ca
   }
 
   const title = `Paket ${pkg.name} (${pkg.departureDate}) | Jam Wisata`;
-  const description = `Paket ${pkg.name} Jam Wisata berangkat ${pkg.departureDate} via ${pkg.airline}. Hotel Makkah: ${pkg.makkahHotel?.name}, Hotel Madinah: ${pkg.madinahHotel?.name}. Harga All In Rp ${formatIDR(pkg.priceFrom ?? 0)} /pax.`;
+  const plusHotelSummary = pkg.packageType === "plus" && pkg.plusHotels?.length
+    ? ` Hotel Program Plus: ${pkg.plusHotels.map((hotel) => `${hotel.name} di ${hotel.destination}`).join(", ")}.`
+    : "";
+  const description = `Paket ${pkg.name} Jam Wisata berangkat ${pkg.departureDate} via ${pkg.airline}. Hotel Makkah: ${pkg.makkahHotel?.name}, Hotel Madinah: ${pkg.madinahHotel?.name}.${plusHotelSummary} Harga All In Rp ${formatIDR(pkg.priceFrom ?? 0)} /pax.`;
   const imageUrl = resolveAbsoluteImageUrl(pkg.image);
 
   return {
@@ -122,7 +127,7 @@ export async function renderPackageDetail({ params }: PackageDetailProps, catego
     "@context": "https://schema.org",
     "@type": "TouristTrip",
     name: `Paket ${pkg.name} — Jam Wisata`,
-    description: `${config.tripDescription} ${pkg.name} bersama Jam Wisata keberangkatan ${pkg.departureDate}. Maskapai: ${pkg.airline}, Hotel Makkah: ${pkg.makkahHotel?.name}, Hotel Madinah: ${pkg.madinahHotel?.name}.`,
+    description: `${config.tripDescription} ${pkg.name} bersama Jam Wisata keberangkatan ${pkg.departureDate}. Maskapai: ${pkg.airline}, Hotel Makkah: ${pkg.makkahHotel?.name}, Hotel Madinah: ${pkg.madinahHotel?.name}.${pkg.packageType === "plus" && pkg.plusHotels?.length ? ` Hotel Program Plus: ${pkg.plusHotels.map((hotel) => `${hotel.name} (${hotel.destination})`).join(", ")}.` : ""}`,
     touristType: config.touristType,
     provider: {
       "@type": "TravelAgency",
@@ -240,6 +245,22 @@ export async function renderPackageDetail({ params }: PackageDetailProps, catego
                   Program <strong>{pkg.name}</strong> Jam Wisata dijadwalkan berangkat pada <strong>{pkg.departureDate}</strong> melalui <strong>{pkg.departureAirport}</strong> dengan maskapai <strong>{pkg.airline}</strong>. Fasilitas akomodasi meliputi hotel <strong>{pkg.makkahHotel?.name}</strong> ({pkg.makkahHotel?.distance}) di Makkah dan <strong>{pkg.madinahHotel?.name}</strong> ({pkg.madinahHotel?.distance}) di Madinah. Harga paket All In mulai dari <strong>Rp {formatIDR(pkg.priceFrom ?? 0)} /pax</strong>.
                 </p>
               </div>
+
+              {pkg.packageType === "plus" && pkg.plusHotels?.length ? (
+                <div className="rounded-2xl border border-[#D5A12B]/30 bg-white p-6 sm:p-7 shadow-xs">
+                  <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#D5A12B]"><Building2 className="size-4" /><span>Hotel Program Plus</span></div>
+                  <h2 className="mt-2 font-[family-name:var(--font-cinzel)] text-xl font-bold text-[#061A2F]">Akomodasi destinasi tambahan</h2>
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                    {pkg.plusHotels.map((hotel, index) => (
+                      <div className="rounded-xl border border-[#061A2F]/10 bg-slate-50 p-4" key={`${hotel.destination}-${hotel.name}-${index}`}>
+                        <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-[#D5A12B]"><MapPin className="size-3.5" />{hotel.destination}</span>
+                        <strong className="mt-2 block text-sm text-[#061A2F]">{hotel.name}</strong>
+                        <div className="mt-2"><HotelStarRating rating={hotel.star} /></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
 
               {/* Highlights */}
               {pkg.highlights && (
@@ -375,10 +396,16 @@ export async function renderPackageDetail({ params }: PackageDetailProps, catego
                     <span className="text-slate-400">Hotel Makkah</span>
                     <span className="ml-4 flex min-w-0 items-center justify-end gap-3 text-right font-semibold text-white"><span>{pkg.makkahHotel?.name}</span><HotelStarRating rating={pkg.makkahHotel?.star} variant="dark" /></span>
                   </div>
-                  <div className="flex justify-between py-1">
+                  <div className={`flex justify-between py-1 ${pkg.packageType === "plus" && pkg.plusHotels?.length ? "border-b border-white/5" : ""}`}>
                     <span className="text-slate-400">Hotel Madinah</span>
                     <span className="ml-4 flex min-w-0 items-center justify-end gap-3 text-right font-semibold text-white"><span>{pkg.madinahHotel?.name}</span><HotelStarRating rating={pkg.madinahHotel?.star} variant="dark" /></span>
                   </div>
+                  {pkg.packageType === "plus" ? pkg.plusHotels?.map((hotel, index) => (
+                    <div className={`flex justify-between gap-4 py-1 ${index < pkg.plusHotels!.length - 1 ? "border-b border-white/5" : ""}`} key={`${hotel.destination}-${hotel.name}-${index}`}>
+                      <span className="text-slate-400">Hotel {hotel.destination}</span>
+                      <span className="flex min-w-0 items-center justify-end gap-3 text-right font-semibold text-white"><span>{hotel.name}</span><HotelStarRating rating={hotel.star} variant="dark" /></span>
+                    </div>
+                  )) : null}
                 </div>
 
                 <div className="mt-6 space-y-2.5">

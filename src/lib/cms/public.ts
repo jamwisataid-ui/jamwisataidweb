@@ -78,6 +78,9 @@ const queryPackages = unstable_cache(
         itemRows.filter((entry) => entry.packageId === item.id && entry.kind === kind).map((entry) => entry.value);
       const makkah = packageHotelRows.find((hotel) => hotel.city.toLowerCase() === "makkah");
       const madinah = packageHotelRows.find((hotel) => hotel.city.toLowerCase() === "madinah");
+      const plusHotels = item.type === "plus"
+        ? packageHotelRows.filter((hotel) => hotel.sortOrder >= 2).map((hotel) => ({ destination: hotel.city, name: hotel.hotelName, star: hotel.star ?? undefined }))
+        : [];
 
       return {
         id: item.id,
@@ -96,6 +99,7 @@ const queryPackages = unstable_cache(
         arrivalAirport: departure?.arrivalAirport ?? undefined,
         makkahHotel: makkah ? { name: makkah.hotelName, star: makkah.star ?? undefined, distance: makkah.distance ?? undefined } : undefined,
         madinahHotel: madinah ? { name: madinah.hotelName, star: madinah.star ?? undefined, distance: madinah.distance ?? undefined } : undefined,
+        plusHotels,
         facilities: byKind("facility"),
         highlights: byKind("highlight"),
         includes: byKind("include"),
