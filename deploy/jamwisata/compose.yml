@@ -23,8 +23,8 @@ services:
     ports:
       - "127.0.0.1:3300:3000"
     networks:
-      - internal
       - edge
+      - outbound
     mem_limit: 1536m
     cpus: 1.0
     pids_limit: 256
@@ -133,3 +133,6 @@ networks:
   edge:
     external: true
     name: erp-retail_backend
+  outbound:
+    name: jamwisata-outbound
+    driver: bridge
