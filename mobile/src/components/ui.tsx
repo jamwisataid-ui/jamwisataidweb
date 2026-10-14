@@ -1,6 +1,8 @@
 import type { PropsWithChildren, ReactNode } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, type TextInputProps, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { colors, shadow } from "@/theme";
 
 export function Screen({ children, scroll = true }: PropsWithChildren<{ scroll?: boolean }>) {
@@ -13,6 +15,10 @@ export function Button({ label, onPress, loading, secondary, disabled }: { label
 export function Field({ label, error, ...props }: TextInputProps & { label: string; error?: string }) { return <View style={{ gap: 7 }}><Text style={styles.label}>{label}</Text><TextInput placeholderTextColor="#9298A2" style={[styles.input, error && { borderColor: colors.danger }]} {...props} />{error ? <Text style={styles.error}>{error}</Text> : null}</View>; }
 export function Empty({ children }: PropsWithChildren) { return <Card><Text style={{ color: colors.muted, lineHeight: 22, textAlign: "center" }}>{children}</Text></Card>; }
 export function Section({ title, action, children }: PropsWithChildren<{ title: string; action?: ReactNode }>) { return <View style={{ gap: 12 }}><View style={styles.sectionHead}><Text style={styles.sectionTitle}>{title}</Text>{action}</View>{children}</View>; }
+export function GuestGate({ title = "Masuk untuk melanjutkan", body, next }: { title?: string; body: string; next: string }) {
+  const loginHref = `/login?next=${encodeURIComponent(next)}`;
+  return <Card><View style={styles.guestIcon}><Ionicons name="lock-closed" size={25} color={colors.gold} /></View><Text style={styles.guestTitle}>{title}</Text><Text style={styles.guestBody}>{body}</Text><Button label="Masuk ke akun jamaah" onPress={() => router.push(loginHref as never)} /><Button secondary label="Kembali lihat paket" onPress={() => router.replace("/(tabs)/packages")} /></Card>;
+}
 
 const styles = StyleSheet.create({
   safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: colors.ivory }, content: { width: "100%", padding: 20, paddingBottom: 40, gap: 20 },
@@ -21,4 +27,5 @@ const styles = StyleSheet.create({
   button: { minHeight: 52, backgroundColor: colors.navy, borderRadius: 14, alignItems: "center", justifyContent: "center", paddingHorizontal: 18 }, buttonSecondary: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line }, buttonText: { color: colors.white, fontFamily: "DMSans_700Bold", fontSize: 15 },
   label: { color: colors.ink, fontFamily: "DMSans_700Bold", fontSize: 14 }, input: { minHeight: 52, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, borderRadius: 14, paddingHorizontal: 15, color: colors.ink, fontFamily: "DMSans_400Regular", fontSize: 16 }, error: { color: colors.danger, fontFamily: "DMSans_400Regular", fontSize: 13 },
   sectionHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 }, sectionTitle: { color: colors.navy, fontFamily: "PlayfairDisplay_700Bold", fontSize: 21 },
+  guestIcon: { width: 54, height: 54, borderRadius: 18, backgroundColor: "#FFF0D5", alignItems: "center", justifyContent: "center" }, guestTitle: { color: colors.navy, fontFamily: "PlayfairDisplay_700Bold", fontSize: 22 }, guestBody: { color: colors.muted, fontFamily: "DMSans_400Regular", lineHeight: 22 },
 } as const);
