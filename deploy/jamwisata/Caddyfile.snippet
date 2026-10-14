@@ -14,6 +14,11 @@ live-staging.43-156-31-71.sslip.io {
     reverse_proxy 172.17.0.1:7880
 }
 
+jamwisata-app-staging.43-156-31-71.sslip.io {
+    encode zstd gzip
+    reverse_proxy jamwisata-mobile-preview:80
+}
+
 # Enable these blocks only after both production DNS records point to the VPS.
 # jamwisata.id, www.jamwisata.id {
 #     encode zstd gzip

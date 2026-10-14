@@ -13,6 +13,7 @@
     ],
     "ios": { "supportsTablet": false, "bundleIdentifier": "com.jamwisata.mobile" },
     "android": { "package": "com.jamwisata.mobile", "adaptiveIcon": { "backgroundColor": "#021730" } },
+    "web": { "bundler": "metro", "output": "single" },
     "extra": { "router": { "origin": false } }
   }
 }

@@ -15,7 +15,7 @@ export function Empty({ children }: PropsWithChildren) { return <Card><Text styl
 export function Section({ title, action, children }: PropsWithChildren<{ title: string; action?: ReactNode }>) { return <View style={{ gap: 12 }}><View style={styles.sectionHead}><Text style={styles.sectionTitle}>{title}</Text>{action}</View>{children}</View>; }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.ivory }, content: { padding: 20, paddingBottom: 40, gap: 20 },
+  safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: colors.ivory }, content: { width: "100%", padding: 20, paddingBottom: 40, gap: 20 },
   title: { color: colors.navy, fontFamily: "PlayfairDisplay_700Bold", fontSize: 30, lineHeight: 37 }, subtitle: { color: colors.muted, fontFamily: "DMSans_400Regular", fontSize: 15, lineHeight: 22 },
   card: { backgroundColor: colors.white, borderRadius: 20, padding: 17, gap: 12, borderWidth: 1, borderColor: colors.line, ...shadow },
   button: { minHeight: 52, backgroundColor: colors.navy, borderRadius: 14, alignItems: "center", justifyContent: "center", paddingHorizontal: 18 }, buttonSecondary: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line }, buttonText: { color: colors.white, fontFamily: "DMSans_700Bold", fontSize: 15 },

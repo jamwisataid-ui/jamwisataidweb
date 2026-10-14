@@ -80,6 +80,37 @@ services:
         max-size: 5m
         max-file: "2"
 
+  mobile-preview:
+    build:
+      context: ../..
+      dockerfile: deploy/jamwisata/Dockerfile.mobile-web
+      args:
+        EXPO_PUBLIC_API_URL: ${MOBILE_API_URL}
+    image: jamwisata-mobile-preview:${JAMWISATA_IMAGE_TAG:-latest}
+    container_name: jamwisata-mobile-preview
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3301:80"
+    networks:
+      - edge
+    mem_limit: 128m
+    cpus: 0.25
+    pids_limit: 128
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "2"
+    profiles: ["preview"]
+
   livekit:
     image: livekit/livekit-server:v1.13.9
     container_name: jamwisata-livekit
@@ -105,7 +136,6 @@ services:
           enabled: true
           udp_port: 3478
           domain: ${LIVEKIT_TURN_DOMAIN}
-    command: ["--config-body", "$${LIVEKIT_CONFIG}"]
     mem_limit: 2g
     cpus: 1.0
     pids_limit: 512
