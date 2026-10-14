@@ -153,6 +153,7 @@ export const bookings = pgTable("bookings", {
   reviewedBy: text("reviewed_by").references(() => users.id, { onDelete: "set null" }),
   reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
   reviewNote: text("review_note"),
+  preferredPaymentMethod: text("preferred_payment_method"),
   createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
   ...timestamps,
 }, (table) => [
