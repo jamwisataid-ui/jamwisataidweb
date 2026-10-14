@@ -12,7 +12,7 @@ import { colors, shadow } from "@/theme";
 function Slide({ item, width, height }: { item: OnboardingSlide; width: number; height: number }) {
   const compact = height < 720;
   const heroHeight = Math.min(Math.max(height * (compact ? 0.43 : 0.48), 300), 460);
-  return <View style={[styles.slide, { width }]}><View style={[styles.hero, { height: heroHeight }]}><Image source={item.image} resizeMode="cover" style={StyleSheet.absoluteFill} /><LinearGradient colors={["transparent", "rgba(255,249,240,0.28)", "#FFF9F0"]} locations={[0.62, 0.82, 1]} style={StyleSheet.absoluteFill} /></View><View style={[styles.copy, compact && styles.copyCompact]}><Text style={[styles.title, compact && styles.titleCompact]}>{item.title}</Text><Text style={[styles.description, compact && styles.descriptionCompact]}>{item.description}</Text></View></View>;
+  return <View style={[styles.slide, { width }]}><View style={[styles.hero, { height: heroHeight }]}><Image alt="" source={item.image} resizeMode="cover" style={StyleSheet.absoluteFill} /><LinearGradient colors={["transparent", "rgba(255,249,240,0.28)", "#FFF9F0"]} locations={[0.62, 0.82, 1]} style={StyleSheet.absoluteFill} /></View><View style={[styles.copy, compact && styles.copyCompact]}><Text style={[styles.title, compact && styles.titleCompact]}>{item.title}</Text><Text style={[styles.description, compact && styles.descriptionCompact]}>{item.description}</Text></View></View>;
 }
 
 export default function OnboardingScreen() {

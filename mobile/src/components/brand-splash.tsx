@@ -1,18 +1,18 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Animated, Image, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const pattern = require("../../assets/splash/islamic-pattern.jpg");
-const kaaba = require("../../assets/splash/kaaba-masjidil-haram.jpg");
-const emblem = require("../../assets/splash/logo-emblem.png");
+import pattern from "../../assets/splash/islamic-pattern.jpg";
+import kaaba from "../../assets/splash/kaaba-masjidil-haram.jpg";
+import emblem from "../../assets/splash/logo-emblem.png";
 
 export function BrandSplash({ ready, onFinished }: { ready: boolean; onFinished: () => void }) {
   const { width, height } = useWindowDimensions();
   const compact = height < 720;
-  const progress = useRef(new Animated.Value(0.08)).current;
-  const opacity = useRef(new Animated.Value(1)).current;
+  const [progress] = useState(() => new Animated.Value(0.08));
+  const [opacity] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
     Animated.timing(progress, { toValue: 0.86, duration: 1800, useNativeDriver: false }).start();
@@ -35,15 +35,15 @@ export function BrandSplash({ ready, onFinished }: { ready: boolean; onFinished:
   return <Animated.View accessibilityLabel="Memuat aplikasi Jam Wisata" style={[styles.root, { opacity }]}>
     <StatusBar style="light" />
     <LinearGradient colors={["#003E73", "#00355F", "#002B50"]} locations={[0, 0.5, 1]} style={StyleSheet.absoluteFill} />
-    <Image source={pattern} resizeMode="cover" style={[styles.pattern, { height: height * 0.57 }]} />
+    <Image alt="" source={pattern} resizeMode="cover" style={[styles.pattern, { height: height * 0.57 }]} />
     <View style={[styles.kaabaLayer, { width, height: kaabaHeight }]}>
-      <Image source={kaaba} resizeMode="cover" style={[styles.kaabaImage, { width, height: kaabaHeight }]} />
+      <Image alt="" source={kaaba} resizeMode="cover" style={[styles.kaabaImage, { width, height: kaabaHeight }]} />
       <LinearGradient colors={["#00355F", "rgba(0,53,95,0.82)", "rgba(0,47,85,0.2)", "transparent"]} locations={[0, 0.22, 0.48, 0.7]} style={styles.imageBlend} />
       <LinearGradient colors={["transparent", "rgba(0,30,58,0.34)"]} style={StyleSheet.absoluteFill} />
     </View>
     <SafeAreaView pointerEvents="none" style={styles.safe}>
       <View style={[styles.logoArea, { top: compact ? "16%" : "20%", width: logoWidth }]}>
-        <Image source={emblem} resizeMode="contain" style={{ width: emblemSize, height: emblemSize }} />
+        <Image alt="Logo Jam Wisata" source={emblem} resizeMode="contain" style={{ width: emblemSize, height: emblemSize }} />
         <Text style={[styles.eyebrow, compact && styles.eyebrowCompact]}>JARIS AMMAR MADANI</Text>
         <Text adjustsFontSizeToFit numberOfLines={1} style={[styles.brand, compact && styles.brandCompact]}>JAM WISATA</Text>
         <View style={styles.taglineRow}>

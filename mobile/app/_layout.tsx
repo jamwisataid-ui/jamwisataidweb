@@ -28,7 +28,7 @@ export default function RootLayout() {
     let active = true;
     void Promise.allSettled([
       hydrate(),
-      client.prefetchQuery({ queryKey: ["packages"], queryFn: () => api<Package[]>("/packages") }),
+      client.prefetchQuery({ queryKey: ["packages", "umrah"], queryFn: () => api<Package[]>("/packages?category=umrah") }),
       client.prefetchQuery({ queryKey: ["onboarding"], queryFn: fetchOnboardingSlides }),
       new Promise((resolve) => setTimeout(resolve, 1500)),
     ]).then(() => { if (active) setBootstrapReady(true); });
@@ -36,5 +36,5 @@ export default function RootLayout() {
   }, [client, hydrate]);
   const fontsReady = (dmLoaded || Boolean(dmError)) && (playfairLoaded || Boolean(playfairError));
   const appReady = bootstrapReady && fontsReady;
-  return <SafeAreaProvider><QueryClientProvider client={client}>{showSplash ? <BrandSplash ready={appReady} onFinished={() => setShowSplash(false)} /> : <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.ivory } }}><Stack.Screen name="(tabs)" /><Stack.Screen name="login" /><Stack.Screen name="activate" /><Stack.Screen name="package/[slug]" /><Stack.Screen name="register/[departureId]" /><Stack.Screen name="journey" /><Stack.Screen name="payments" /><Stack.Screen name="documents" /></Stack>}</QueryClientProvider></SafeAreaProvider>;
+  return <SafeAreaProvider><QueryClientProvider client={client}>{showSplash ? <BrandSplash ready={appReady} onFinished={() => setShowSplash(false)} /> : <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.ivory } }}><Stack.Screen name="(tabs)" /><Stack.Screen name="login" /><Stack.Screen name="activate" /><Stack.Screen name="package/[slug]" /><Stack.Screen name="register/[departureId]" /><Stack.Screen name="journey" /><Stack.Screen name="payments" /><Stack.Screen name="documents" /><Stack.Screen name="search" /><Stack.Screen name="schedule" /><Stack.Screen name="prayer-times" /><Stack.Screen name="quran" /><Stack.Screen name="duas" /><Stack.Screen name="live-muthowif" /></Stack>}</QueryClientProvider></SafeAreaProvider>;
 }

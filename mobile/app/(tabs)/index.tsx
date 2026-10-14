@@ -1,22 +1,65 @@
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
-import { Ionicons } from "@expo/vector-icons";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import { HeroBanner } from "@/components/home/hero-banner";
+import { HomeHeader } from "@/components/home/home-header";
+import { PackagePreviewCard, PackagePreviewSkeleton } from "@/components/home/package-preview-card";
+import { QuickMenuGrid } from "@/components/home/quick-menu-grid";
+import { HomeSectionHeader } from "@/components/home/section-header";
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
-import type { Journey, Package } from "@/types";
-import { Card, Screen, Section } from "@/components/ui";
 import { colors } from "@/theme";
+import type { Package } from "@/types";
 
-const shortcuts = [{ label: "Perjalanan", icon: "map", href: "/journey" }, { label: "Pembayaran", icon: "wallet", href: "/payments" }, { label: "Dokumen", icon: "document-text", href: "/documents" }, { label: "Panduan", icon: "book", href: "/(tabs)/worship" }] as const;
-const rupiah = (value?: number) => value ? new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(value) : "Hubungi kami";
+type HomeNotification = { id: string; readAt?: string | null };
 
 export default function HomeScreen() {
   const tokens = useAuthStore((state) => state.tokens);
   const user = useAuthStore((state) => state.user);
-  const packages = useQuery({ queryKey: ["packages"], queryFn: () => api<Package[]>("/packages") });
-  const journey = useQuery({ queryKey: ["journey", user?.id], queryFn: () => api<Journey[]>("/journey"), enabled: Boolean(tokens) });
-  const featured = packages.data?.[0];
-  return <Screen><View style={styles.hero}><View style={styles.heroTop}><View style={{ flex: 1 }}><Text style={styles.greeting}>Assalamu’alaikum,</Text><Text style={styles.name}>{user?.fullName || "Tamu Jam Wisata"}</Text></View>{!tokens ? <Pressable onPress={() => router.push("/login")} style={styles.loginButton}><Text style={styles.loginText}>Masuk</Text></Pressable> : null}</View><Text style={styles.heroCopy}>{tokens ? "Semoga perjalanan Anda dimudahkan dan penuh keberkahan." : "Lihat paket dan layanan kami tanpa perlu membuat akun."}</Text></View><View style={styles.shortcuts}>{shortcuts.map((item) => <Pressable accessibilityRole="button" onPress={() => router.push(item.href)} key={item.label} style={styles.shortcut}><View style={styles.shortcutIcon}><Ionicons name={item.icon} size={24} color={colors.gold} /></View><Text style={styles.shortcutText}>{item.label}</Text></Pressable>)}</View>{journey.data?.[0] ? <Section title="Perjalanan Anda"><Card><Text style={styles.cardKicker}>{journey.data[0].status === "pending" ? "MENUNGGU KONFIRMASI" : "PAKET AKTIF"}</Text><Text style={styles.cardTitle}>{journey.data[0].package.name}</Text><Text style={styles.cardCopy}>{journey.data[0].departure.dateLabel} · {journey.data[0].departure.airline}</Text></Card></Section> : null}{featured ? <Section title="Paket pilihan"><Pressable onPress={() => router.push(`/package/${featured.slug}`)} style={styles.package}><Image source={{ uri: featured.image }} style={styles.image} alt={featured.name} /><View style={styles.packageBody}><Text style={styles.cardKicker}>{featured.badge || "PAKET UMROH"}</Text><Text numberOfLines={2} style={styles.cardTitle}>{featured.name}</Text><Text style={styles.price}>{rupiah(featured.priceFrom)}</Text></View></Pressable></Section> : null}</Screen>;
+  const packages = useQuery({
+    queryKey: ["packages", "umrah"],
+    queryFn: () => api<Package[]>("/packages?category=umrah"),
+  });
+  const notifications = useQuery({
+    queryKey: ["notifications"],
+    queryFn: () => api<HomeNotification[]>("/notifications"),
+    enabled: Boolean(tokens),
+  });
+  const unreadCount = notifications.data?.filter((item) => !item.readAt).length ?? 0;
+  const featuredPackages = packages.data?.slice(0, 2) ?? [];
+
+  return (
+    <SafeAreaView edges={["top"]} style={styles.safe}>
+      <HomeHeader name={user?.fullName} unreadCount={unreadCount} />
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <HeroBanner />
+        <QuickMenuGrid />
+
+        <View style={styles.packageSection}>
+          <HomeSectionHeader
+            title="Paket Pilihan"
+            actionLabel="Lihat Semua"
+            onAction={() => router.push("/(tabs)/packages")}
+          />
+          {packages.isPending ? <PackagePreviewSkeleton /> : null}
+          {featuredPackages.map((item) => <PackagePreviewCard key={item.id} item={item} />)}
+          {!packages.isPending && featuredPackages.length === 0 ? (
+            <View style={styles.empty}>
+              <Text style={styles.emptyText}>Paket pilihan sedang diperbarui. Silakan cek kembali beberapa saat lagi.</Text>
+            </View>
+          ) : null}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
 }
-const styles = StyleSheet.create({ hero: { backgroundColor: colors.navy, marginHorizontal: -20, marginTop: -20, padding: 24, paddingTop: 30, paddingBottom: 36, borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }, heroTop: { flexDirection: "row", alignItems: "center", gap: 12 }, greeting: { color: "#CAD3DD", fontFamily: "DMSans_400Regular", fontSize: 15 }, name: { color: colors.white, fontFamily: "PlayfairDisplay_700Bold", fontSize: 28, marginTop: 4 }, heroCopy: { color: "#C9D2DC", fontFamily: "DMSans_400Regular", marginTop: 10, lineHeight: 20 }, loginButton: { borderWidth: 1, borderColor: "#7F92A8", borderRadius: 20, paddingHorizontal: 15, paddingVertical: 9 }, loginText: { color: colors.white, fontFamily: "DMSans_700Bold", fontSize: 13 }, shortcuts: { flexDirection: "row", justifyContent: "space-between", gap: 8, marginTop: -3 }, shortcut: { flex: 1, alignItems: "center", gap: 8 }, shortcutIcon: { width: 56, height: 56, borderRadius: 18, backgroundColor: colors.white, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: colors.line }, shortcutText: { color: colors.ink, fontFamily: "DMSans_500Medium", fontSize: 11, textAlign: "center" }, cardKicker: { color: colors.gold, fontFamily: "DMSans_700Bold", fontSize: 11, letterSpacing: 1 }, cardTitle: { color: colors.navy, fontFamily: "PlayfairDisplay_700Bold", fontSize: 20 }, cardCopy: { color: colors.muted, fontFamily: "DMSans_400Regular" }, package: { borderRadius: 20, overflow: "hidden", backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line }, image: { width: "100%", height: 180, backgroundColor: "#DCE3E8" }, packageBody: { padding: 16, gap: 7 }, price: { color: colors.navy, fontFamily: "DMSans_700Bold", fontSize: 15 } } as const);
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: "#00365F" },
+  content: { paddingHorizontal: 18, paddingTop: 18, paddingBottom: 34, gap: 25, backgroundColor: colors.ivory },
+  packageSection: { gap: 13 },
+  empty: { padding: 18, borderRadius: 18, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white },
+  emptyText: { color: colors.muted, fontFamily: "DMSans_400Regular", fontSize: 14, lineHeight: 21, textAlign: "center" },
+});
