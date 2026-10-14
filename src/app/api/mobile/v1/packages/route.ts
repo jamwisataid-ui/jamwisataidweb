@@ -7,7 +7,7 @@ export async function GET(request: Request) {
     const query = url.searchParams.get("q")?.trim().toLowerCase();
     const category = url.searchParams.get("category");
     const packages = (await getPublishedPackages()).filter((item) => (!query || `${item.name} ${item.destination?.join(" ") ?? ""}`.toLowerCase().includes(query)) && (!category || item.category === category));
-    return mobileData(packages);
+    return mobileData(packages, { headers: { "Cache-Control": "no-store, max-age=0" } });
   } catch (error) {
     return mobileError(error, "packages-list");
   }

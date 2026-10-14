@@ -1,17 +1,45 @@
-import { Image, StyleSheet, Text } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
-import type { Package } from "@/types";
-import { Button, Card, Empty, Screen, Section } from "@/components/ui";
-import { colors } from "@/theme";
+import { router, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
+import { ScrollView, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const rp = (value?: number) => value ? new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(value) : "Hubungi kami";
+import { PackageDetailContent } from "@/components/package-detail/package-detail-content";
+import { PackageDetailError, PackageDetailSkeleton } from "@/components/package-detail/package-detail-state";
+import { PackageDetailTabs, type DetailTab } from "@/components/package-detail/package-detail-tabs";
+import { PackageHero } from "@/components/package-detail/package-hero";
+import { PackageSummaryCard } from "@/components/package-detail/package-summary-card";
+import { StickyRegistrationCTA } from "@/components/package-detail/sticky-registration-cta";
+import { api } from "@/lib/api";
+import { colors } from "@/theme";
+import type { Package } from "@/types";
+
 export default function PackageDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
+  const [tab, setTab] = useState<DetailTab>("detail");
+  const [favorite, setFavorite] = useState(false);
   const query = useQuery({ queryKey: ["package", slug], queryFn: () => api<Package>(`/packages/${slug}`), enabled: Boolean(slug) });
   const item = query.data;
-  if (!item) return <Screen><Empty>Detail paket sedang dimuat.</Empty></Screen>;
-  return <Screen><Image source={{ uri: item.image }} style={styles.image} alt={item.name} /><Text style={styles.badge}>{item.badge || "PAKET PERJALANAN"}</Text><Text style={styles.title}>{item.name}</Text><Text style={styles.meta}>{item.durationDays ? `${item.durationDays} hari` : "Durasi menyesuaikan"} · {item.departureDate || "Jadwal tersedia"}</Text><Card><Text style={styles.price}>{rp(item.priceFrom)}</Text><Text style={styles.meta}>Harga mulai per jamaah</Text></Card>{item.makkahHotel || item.madinahHotel || item.plusHotels?.length ? <Section title="Akomodasi"><Card>{item.makkahHotel ? <Text style={styles.hotel}>Makkah · {item.makkahHotel.name}</Text> : null}{item.madinahHotel ? <Text style={styles.hotel}>Madinah · {item.madinahHotel.name}</Text> : null}{item.plusHotels?.map((hotel) => <Text key={`${hotel.destination}-${hotel.name}`} style={styles.hotel}>{hotel.destination} · {hotel.name}</Text>)}</Card></Section> : null}{item.highlights?.length ? <Section title="Keunggulan"><Card>{item.highlights.map((value) => <Text key={value} style={styles.list}>• {value}</Text>)}</Card></Section> : null}<Button label={item.status === "available" || item.status === "limited" ? "Ajukan pendaftaran" : "Pendaftaran belum tersedia"} disabled={!item.departureId || !["available", "limited"].includes(item.status)} onPress={() => item.departureId && router.push(`/register/${item.departureId}`)} /></Screen>;
+
+  if (query.isPending) return <SafeAreaView edges={[]} style={styles.safe}><PackageDetailSkeleton /></SafeAreaView>;
+  if (query.isError || !item) return <SafeAreaView style={styles.safe}><PackageDetailError onRetry={() => void query.refetch()} /></SafeAreaView>;
+
+  const canRegister = Boolean(item.departureId) && (item.status === "available" || item.status === "limited");
+
+  return (
+    <SafeAreaView edges={["bottom"]} style={styles.safe}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <PackageHero item={item} favorite={favorite} onToggleFavorite={() => setFavorite((value) => !value)} />
+        <PackageSummaryCard item={item} />
+        <PackageDetailTabs value={tab} onChange={setTab} />
+        <PackageDetailContent item={item} tab={tab} />
+      </ScrollView>
+      <StickyRegistrationCTA status={item.status} enabled={canRegister} onPress={() => item.departureId && router.push(`/register/${item.departureId}`)} />
+    </SafeAreaView>
+  );
 }
-const styles = StyleSheet.create({ image: { height: 235, marginHorizontal: -20, marginTop: -20, backgroundColor: "#DDE3E8" }, badge: { color: colors.gold, fontFamily: "DMSans_700Bold", fontSize: 11, letterSpacing: 1 }, title: { color: colors.navy, fontFamily: "PlayfairDisplay_700Bold", fontSize: 30, lineHeight: 37 }, meta: { color: colors.muted, fontFamily: "DMSans_400Regular" }, price: { color: colors.navy, fontFamily: "DMSans_700Bold", fontSize: 24 }, hotel: { color: colors.ink, fontFamily: "DMSans_500Medium", lineHeight: 22 }, list: { color: colors.muted, fontFamily: "DMSans_400Regular", lineHeight: 22 } } as const);
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: "#FFFDF8" },
+  content: { paddingBottom: 28, backgroundColor: colors.ivory },
+});

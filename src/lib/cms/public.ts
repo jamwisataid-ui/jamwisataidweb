@@ -49,8 +49,7 @@ export type PublicArticle = {
   updatedAt: Date;
 };
 
-const queryPackages = unstable_cache(
-  async (): Promise<TravelPackage[]> => {
+async function queryPackages(): Promise<TravelPackage[]> {
     if (!db) return umrahPackages;
 
     const packageRows = await db
@@ -117,10 +116,7 @@ const queryPackages = unstable_cache(
         whatsappMessage: item.whatsappMessage,
       } satisfies TravelPackage;
     });
-  },
-  ["cms-published-packages"],
-  { tags: ["cms:packages"], revalidate: 3600 },
-);
+}
 
 export const getPublishedPackages = cache(queryPackages);
 
