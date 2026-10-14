@@ -30,13 +30,14 @@ export function BrandSplash({ ready, onFinished }: { ready: boolean; onFinished:
   const logoWidth = Math.min(width * (compact ? 0.58 : 0.64), 310);
   const emblemSize = Math.min(width * (compact ? 0.22 : 0.27), compact ? 92 : 122);
   const progressWidth = Math.min(Math.max(width * 0.36, 124), 154);
+  const kaabaHeight = height * (compact ? 0.7 : 0.68);
 
   return <Animated.View accessibilityLabel="Memuat aplikasi Jam Wisata" style={[styles.root, { opacity }]}>
     <StatusBar style="light" />
     <LinearGradient colors={["#003E73", "#00355F", "#002B50"]} locations={[0, 0.5, 1]} style={StyleSheet.absoluteFill} />
     <Image source={pattern} resizeMode="cover" style={[styles.pattern, { height: height * 0.57 }]} />
-    <View style={[styles.kaabaLayer, { height: height * (compact ? 0.7 : 0.68) }]}>
-      <Image source={kaaba} resizeMode="cover" style={StyleSheet.absoluteFill} />
+    <View style={[styles.kaabaLayer, { width, height: kaabaHeight }]}>
+      <Image source={kaaba} resizeMode="cover" style={[styles.kaabaImage, { width, height: kaabaHeight }]} />
       <LinearGradient colors={["#00355F", "rgba(0,53,95,0.82)", "rgba(0,47,85,0.2)", "transparent"]} locations={[0, 0.22, 0.48, 0.7]} style={styles.imageBlend} />
       <LinearGradient colors={["transparent", "rgba(0,30,58,0.34)"]} style={StyleSheet.absoluteFill} />
     </View>
@@ -65,6 +66,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, width: "100%", alignItems: "center" },
   pattern: { position: "absolute", top: 0, left: 0, right: 0, width: "100%", opacity: 0.34 },
   kaabaLayer: { position: "absolute", left: 0, right: 0, bottom: 0, overflow: "hidden" },
+  kaabaImage: { position: "absolute", left: 0, top: 0 },
   imageBlend: { position: "absolute", top: 0, left: 0, right: 0, height: "58%" },
   logoArea: { position: "absolute", alignItems: "center" },
   eyebrow: { marginTop: 8, color: "#FFFFFF", fontFamily: "DMSans_500Medium", fontSize: 12, letterSpacing: 2.2, textAlign: "center" },
