@@ -6,7 +6,7 @@ export type Tokens = { accessToken: string; refreshToken: string; accessExpiresA
 type User = { id: string; fullName: string; whatsapp: string; email?: string | null };
 type AuthState = { ready: boolean; seenOnboarding: boolean; tokens: Tokens | null; user: User | null; hydrate: () => Promise<void>; completeOnboarding: () => Promise<void>; signIn: (tokens: Tokens, user?: User | null) => Promise<void>; setTokens: (tokens: Tokens) => Promise<void>; signOut: () => Promise<void>; setUser: (user: User | null) => void };
 const KEY = "jamwisata_mobile_session";
-const ONBOARDING_KEY = "jamwisata_mobile_onboarding";
+const ONBOARDING_KEY = "jamwisata_mobile_onboarding_v2";
 
 async function getStoredValue(key: string) {
   if (Platform.OS !== "web") return SecureStore.getItemAsync(key);

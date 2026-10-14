@@ -25,7 +25,8 @@ export type PublicContentType =
   | "faq"
   | "service"
   | "homepage"
-  | "site-settings";
+  | "site-settings"
+  | "mobile-onboarding";
 
 export type PublicContentEntry = {
   id: string;

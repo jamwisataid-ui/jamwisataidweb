@@ -76,7 +76,7 @@ export const packageFormSchema = z.object({
 
 export const entryFormSchema = z.object({
   id: z.string().uuid().optional(),
-  type: z.enum(["testimonial", "gallery", "destination", "faq", "service", "homepage", "site-settings"]),
+  type: z.enum(["testimonial", "gallery", "destination", "faq", "service", "homepage", "site-settings", "mobile-onboarding"]),
   key: slug,
   title: z.string().trim().min(2),
   sortOrder: z.coerce.number().int().min(0).default(0),

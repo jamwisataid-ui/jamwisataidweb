@@ -8,7 +8,7 @@ import { AdminImageUpload } from "./AdminImageUpload";
 import { DeleteButton } from "./DeleteButton";
 import { FormFeedback } from "./FormFeedback";
 
-type EntryType = "testimonial" | "gallery" | "destination" | "faq" | "service" | "homepage" | "site-settings";
+type EntryType = "testimonial" | "gallery" | "destination" | "faq" | "service" | "homepage" | "site-settings" | "mobile-onboarding";
 type Values = Record<string, unknown>;
 
 const config: Record<EntryType, { title: string; help: string; fields: Array<[string, string, "input" | "textarea" | "image", boolean?]> }> = {
@@ -19,6 +19,7 @@ const config: Record<EntryType, { title: string; help: string; fields: Array<[st
   service: { title: "Layanan", help: "Jelaskan layanan dengan bahasa yang mudah dipahami.", fields: [["primary", "Penjelasan", "textarea", true], ["secondary", "Daftar layanan (satu baris untuk satu layanan)", "textarea"]] },
   homepage: { title: "Bagian homepage", help: "Isi tulisan utama dan pilih foto yang sesuai.", fields: [["primary", "Tulisan kecil di atas judul", "input"], ["secondary", "Judul utama", "input", true], ["tertiary", "Penjelasan", "textarea"], ["quaternary", "Pilih foto", "image"]] },
   "site-settings": { title: "Informasi situs", help: "Ubah informasi kontak utama Jam Wisata.", fields: [["primary", "Nama Jam Wisata", "input", true], ["secondary", "Nomor WhatsApp", "input", true], ["tertiary", "Email", "input"], ["quaternary", "Alamat kantor", "textarea"]] },
+  "mobile-onboarding": { title: "Slide onboarding aplikasi", help: "Atur gambar, pesan, dan urutan slide yang tampil sesudah splash screen.", fields: [["primary", "Gambar slide", "image", true], ["secondary", "Headline", "textarea", true], ["tertiary", "Deskripsi", "textarea", true], ["quaternary", "Teks tombol", "input"]] },
 };
 
 const initial: ActionState = { ok: false, message: "" };
@@ -38,7 +39,7 @@ export function ContentEntryForm({ type, values = {} }: { type: EntryType; value
       {values.id ? <input type="hidden" name="id" value={text(values, "id")} /> : null}
       <input type="hidden" name="title" value={text(values, "title")} />
       <input type="hidden" name="key" value={text(values, "key")} />
-      <input type="hidden" name="sortOrder" value="0" />
+      {type === "mobile-onboarding" ? <label className="admin-span-2"><span>Urutan slide</span><input name="sortOrder" type="number" min="0" defaultValue={text(values, "sortOrder") || "0"} /></label> : <input type="hidden" name="sortOrder" value="0" />}
       <section className="admin-form-section">
         <div><p>{details.title}</p><span>{details.help}</span></div>
         <div className="admin-form-grid">

@@ -26,6 +26,7 @@ import {
   PlaneTakeoff,
   ReceiptText,
   SquareArrowOutUpRight,
+  Smartphone,
   UsersRound,
   WalletCards,
   Settings2,
@@ -35,6 +36,7 @@ import {
 const cmsNav = [
   { label: "Menu utama", items: [["/admin", "Beranda", House], ["/admin/paket?category=umrah", "Paket Umrah", PackageOpen], ["/admin/paket?category=halal-tour", "Paket Wisata", PackageOpen], ["/admin/artikel", "Artikel", BookOpenText]] },
   { label: "Konten homepage", items: [["/admin/konten/gallery", "Galeri foto", GalleryHorizontal], ["/admin/konten/testimonial", "Video jamaah", MessageSquareQuote], ["/admin/konten/faq", "Tanya jawab", FileQuestion]] },
+  { label: "Aplikasi mobile", items: [["/admin/konten/mobile-onboarding", "Onboarding", Smartphone]] },
 ] as const;
 
 const managementNav = [

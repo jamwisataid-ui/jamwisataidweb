@@ -20,7 +20,7 @@ export const packageCategory = pgEnum("package_category", ["umrah", "hajj", "hal
 export const packageType = pgEnum("package_type", ["bintang-5", "plus", "reguler", "tour"]);
 export const departureStatus = pgEnum("departure_status", ["open", "limited", "full", "closed", "coming-soon"]);
 export const packageItemKind = pgEnum("package_item_kind", ["facility", "highlight", "include", "exclude", "term", "destination"]);
-export const entryType = pgEnum("entry_type", ["testimonial", "gallery", "destination", "faq", "service", "homepage", "site-settings"]);
+export const entryType = pgEnum("entry_type", ["testimonial", "gallery", "destination", "faq", "service", "homepage", "site-settings", "mobile-onboarding"]);
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

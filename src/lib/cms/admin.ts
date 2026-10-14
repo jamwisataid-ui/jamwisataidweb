@@ -144,6 +144,7 @@ export async function getEntryAdmin(type: string, id: string) {
     service: [String(data.description ?? ""), Array.isArray(data.items) ? data.items.join("\n") : "", "", ""],
     homepage: [String(data.eyebrow ?? ""), String(data.headline ?? ""), String(data.description ?? ""), String(data.imageUrl ?? "")],
     "site-settings": [String(data.brandName ?? ""), String(data.whatsapp ?? ""), String(data.email ?? ""), String(data.address ?? "")],
+    "mobile-onboarding": [String(data.imageUrl ?? ""), String(data.headline ?? ""), String(data.description ?? ""), String(data.ctaLabel ?? "Selanjutnya")],
   }[type] ?? ["", "", "", ""];
   return {
     id: entry.id,

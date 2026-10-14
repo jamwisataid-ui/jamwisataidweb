@@ -12,6 +12,7 @@ const contentConfig = {
   service: ["Layanan", "Tambah atau ubah informasi layanan Jam Wisata.", "Tambah layanan"],
   homepage: ["Konten homepage", "Ubah tulisan dan foto pada halaman depan.", "Tambah bagian"],
   "site-settings": ["Informasi situs", "Ubah nomor WhatsApp, email, dan alamat.", "Tambah informasi"],
+  "mobile-onboarding": ["Onboarding aplikasi", "Atur slide pembuka dan materi promosi yang tampil di aplikasi mobile.", "Tambah slide"],
 } as const;
 type EntryType = keyof typeof contentConfig;
 

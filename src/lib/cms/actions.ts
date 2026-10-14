@@ -305,6 +305,7 @@ function entryData(type: string, data: { primary?: string; secondary?: string; t
   if (type === "faq") return { question: data.primary ?? "", answer: data.secondary ?? "", scope: data.tertiary || "homepage" };
   if (type === "service") return { description: data.primary ?? "", items: lines(data.secondary ?? "") };
   if (type === "homepage") return { eyebrow: data.primary ?? "", headline: data.secondary ?? "", description: data.tertiary ?? "", imageUrl: data.quaternary ?? "" };
+  if (type === "mobile-onboarding") return { imageUrl: data.primary ?? "", headline: data.secondary ?? "", description: data.tertiary ?? "", ctaLabel: data.quaternary || "Selanjutnya" };
   return { brandName: data.primary ?? "Jam Wisata", whatsapp: data.secondary ?? "", email: data.tertiary ?? "", address: data.quaternary ?? "" };
 }
 
@@ -323,6 +324,7 @@ export async function saveEntryAction(_state: ActionState, formData: FormData): 
       service: "Layanan Jam Wisata",
       homepage: value(formData, "secondary") || "Bagian homepage",
       "site-settings": value(formData, "primary") || "Informasi situs",
+      "mobile-onboarding": value(formData, "secondary") || "Slide onboarding aplikasi",
     }[type] ?? "Konten website";
     const title = value(formData, "title") || suggestedTitle;
     const key = value(formData, "key") || `${slugify(title) || "konten"}-${id.slice(0, 8)}`;
@@ -332,7 +334,7 @@ export async function saveEntryAction(_state: ActionState, formData: FormData): 
     const database = requireDatabase();
     const input = parsed.data;
     const entryId = input.id ?? id;
-    const sortOrder = 0;
+    const sortOrder = input.sortOrder;
     let data: Record<string, unknown>;
     try {
       data = entryData(input.type, input);

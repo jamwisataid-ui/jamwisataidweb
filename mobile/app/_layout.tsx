@@ -9,6 +9,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { api } from "@/lib/api";
 import type { Package } from "@/types";
 import { BrandSplash } from "@/components/brand-splash";
+import { fetchOnboardingSlides } from "@/lib/onboarding";
 import { colors } from "@/theme";
 import { useDeviceNotifications } from "@/lib/notifications";
 
@@ -28,6 +29,7 @@ export default function RootLayout() {
     void Promise.allSettled([
       hydrate(),
       client.prefetchQuery({ queryKey: ["packages"], queryFn: () => api<Package[]>("/packages") }),
+      client.prefetchQuery({ queryKey: ["onboarding"], queryFn: fetchOnboardingSlides }),
       new Promise((resolve) => setTimeout(resolve, 1500)),
     ]).then(() => { if (active) setBootstrapReady(true); });
     return () => { active = false; };
