@@ -27,7 +27,7 @@ const timestamps = {
 export const recordStatus = pgEnum("management_record_status", ["active", "archived"]);
 export const documentKind = pgEnum("pilgrim_document_kind", ["ktp", "kk", "akta_lahir", "buku_nikah", "ijazah", "paspor", "buku_vaksin", "other"]);
 export const documentReviewStatus = pgEnum("document_review_status", ["pending", "verified", "rejected"]);
-export const bookingStatus = pgEnum("booking_status", ["active", "cancelled", "completed"]);
+export const bookingStatus = pgEnum("booking_status", ["pending", "active", "cancelled", "completed"]);
 export const paymentMethod = pgEnum("payment_method", ["cash", "transfer", "card", "other"]);
 export const paymentRecordStatus = pgEnum("payment_record_status", ["confirmed", "void"]);
 export const refundStatus = pgEnum("refund_status", ["confirmed", "void"]);
@@ -149,6 +149,10 @@ export const bookings = pgTable("bookings", {
   packageSnapshot: jsonb("package_snapshot").$type<Record<string, unknown>>().notNull(),
   status: bookingStatus("status").notNull().default("active"),
   cancellationReason: text("cancellation_reason"),
+  source: text("source").notNull().default("admin"),
+  reviewedBy: text("reviewed_by").references(() => users.id, { onDelete: "set null" }),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  reviewNote: text("review_note"),
   createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
   ...timestamps,
 }, (table) => [

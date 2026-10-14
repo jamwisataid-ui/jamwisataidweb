@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "Jam Wisata",
+    "slug": "jam-wisata",
+    "scheme": "jamwisata",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      ["expo-notifications", { "defaultChannel": "informasi-perjalanan" }]
+    ],
+    "ios": { "supportsTablet": false, "bundleIdentifier": "com.jamwisata.mobile" },
+    "android": { "package": "com.jamwisata.mobile", "adaptiveIcon": { "backgroundColor": "#021730" } },
+    "extra": { "router": { "origin": false } }
+  }
+}

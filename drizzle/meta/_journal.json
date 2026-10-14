@@ -127,6 +127,13 @@
       "when": 1790820000000,
       "tag": "0017_dynamic_document_number_dates",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1791950400000,
+      "tag": "0018_mobile_core",
+      "breakpoints": true
     }
   ]
 }

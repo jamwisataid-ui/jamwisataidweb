@@ -8,6 +8,7 @@ export type TravelPackage = {
   image: string;
   durationDays?: number;
   departureDate?: string;
+  departureId?: string;
   departureMonth?: string;
   airline?: string;
   highSpeedTrain?: string;

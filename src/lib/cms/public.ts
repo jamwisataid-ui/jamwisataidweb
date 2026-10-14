@@ -71,6 +71,7 @@ const queryPackages = unstable_cache(
       ? await db.select().from(accommodations).where(inArray(accommodations.departureId, departureIds)).orderBy(asc(accommodations.sortOrder))
       : [];
 
+    const todayJakarta = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     return packageRows.map((item) => {
       const departure = departureRows.find((candidate) => candidate.packageId === item.id);
       const packageHotelRows = departure ? hotelRows.filter((hotel) => hotel.departureId === departure.id) : [];
@@ -92,6 +93,7 @@ const queryPackages = unstable_cache(
         image: item.imageUrl,
         durationDays: item.durationDays ?? undefined,
         departureDate: departure?.dateLabel,
+        departureId: departure?.id,
         departureMonth: departure?.departureDate.slice(0, 7),
         airline: departure?.airline,
         highSpeedTrain: departure?.highSpeedTrain ?? undefined,
@@ -109,7 +111,7 @@ const queryPackages = unstable_cache(
         itinerary: itineraryRows.filter((day) => day.packageId === item.id).map((day) => ({ day: day.day, title: day.title, description: day.description })),
         priceFrom: departure ? Number(departure.price) : undefined,
         currency: "IDR" as const,
-        status: departure?.status === "limited" ? "limited" as const : departure?.status === "full" || departure?.status === "closed" ? "sold-out" as const : departure?.status === "coming-soon" ? "coming-soon" as const : "available" as const,
+        status: departure && departure.departureDate < todayJakarta ? "sold-out" as const : departure?.status === "limited" ? "limited" as const : departure?.status === "full" || departure?.status === "closed" ? "sold-out" as const : departure?.status === "coming-soon" ? "coming-soon" as const : "available" as const,
         detailUrl: item.detailUrl ?? undefined,
         whatsappMessage: item.whatsappMessage,
       } satisfies TravelPackage;

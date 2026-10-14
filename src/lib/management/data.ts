@@ -107,12 +107,12 @@ export async function getManagementContext() {
   });
 
   const packageFinancials = packageRows.map((pkg) => {
-    const packageRegistrationIds = new Set(registrationSummaries.filter((item) => item.package?.id === pkg.id).map((item) => item.id));
+    const packageRegistrationIds = new Set(registrationSummaries.filter((item) => item.status === "active" && item.package?.id === pkg.id).map((item) => item.id));
     const income = allocationRows.filter((item) => packageRegistrationIds.has(item.registrationId) && validPaymentIds.has(item.paymentId)).reduce((sum, item) => sum + item.amount, 0);
     const refunded = refundRows.filter((item) => item.registrationId && packageRegistrationIds.has(item.registrationId) && item.status === "confirmed").reduce((sum, item) => sum + item.amount, 0);
     const directExpenses = cashRows.filter((item) => item.isIncludedInReports !== false && item.packageId === pkg.id && item.direction === "out" && item.kind !== "refund" && item.kind !== "commission").reduce((sum, item) => sum + item.amount, 0);
     const paidCommissions = commissionRows.filter((item) => packageRegistrationIds.has(item.registrationId) && item.status === "paid").reduce((sum, item) => sum + item.amount, 0);
-    const receivables = registrationSummaries.filter((item) => item.package?.id === pkg.id).reduce((sum, item) => sum + item.payment.outstanding, 0);
+    const receivables = registrationSummaries.filter((item) => item.status === "active" && item.package?.id === pkg.id).reduce((sum, item) => sum + item.payment.outstanding, 0);
     return { packageId: pkg.id, packageName: pkg.name, income, refunded, expenses: directExpenses, commissions: paidCommissions, receivables, realizedProfit: income - refunded - directExpenses - paidCommissions };
   });
 
@@ -197,8 +197,8 @@ export async function getManagementContext() {
       activePackages: packageRows.filter((item) => item.status === "published").length,
       registrations: registrationRows.filter((item) => item.status === "active").length,
       netCash: accountBalances.reduce((sum, item) => sum + item.balance, 0),
-      receivables: registrationSummaries.reduce((sum, item) => sum + item.payment.outstanding, 0),
-      dueSoon: registrationSummaries.filter((item) => item.payment.status !== "Lunas" && item.dueAt && item.dueAt <= new Date(Date.now() + 14 * 86400000)).length,
+      receivables: registrationSummaries.filter((item) => item.status === "active").reduce((sum, item) => sum + item.payment.outstanding, 0),
+      dueSoon: registrationSummaries.filter((item) => item.status === "active" && item.payment.status !== "Lunas" && item.dueAt && item.dueAt <= new Date(Date.now() + 14 * 86400000)).length,
       incompleteDocuments: pilgrimRows.filter((pilgrim) => {
         const kinds = new Set(pilgrimDocumentRows.filter((doc) => doc.pilgrimId === pilgrim.id && doc.reviewStatus !== "rejected").map((doc) => doc.kind));
         return !hasMinimumRequiredPilgrimDocuments(kinds);

@@ -2418,6 +2418,27 @@
 .management-detail-grid > div:nth-child(odd) { border-right: 1px solid #e3ded2; }
 .management-detail-grid dt { margin-bottom: 5px; color: #747b89; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
 .management-detail-grid dd { margin: 0; color: #0b2344; font-size: 16px; font-weight: 700; overflow-wrap: anywhere; }
+.management-mobile-activation { display:grid; gap:14px; }
+.management-mobile-activation p { margin:8px 0 0; color:#64748b; }
+.management-mobile-activation-actions,.management-mobile-activation-link { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.management-mobile-activation-actions button,.management-mobile-activation-link button,.management-mobile-activation-link a { display:inline-flex; align-items:center; gap:8px; border:0; border-radius:10px; padding:10px 14px; font:inherit; font-weight:750; cursor:pointer; text-decoration:none; }
+.management-mobile-activation-actions svg,.management-mobile-activation-link svg { width:16px; height:16px; }
+.management-mobile-activation-link { padding:12px; border:1px solid #e3ded2; border-radius:12px; background:#faf8f3; }
+.management-mobile-activation-link code { min-width:0; flex:1 1 300px; overflow-wrap:anywhere; color:#102a4c; }
+.management-mobile-activation-link button { background:#e9edf2; color:#102a4c; }
+.management-mobile-activation-link a { background:#16834b; color:white; }
+.management-mobile-review { display:grid; gap:12px; }
+.management-mobile-review label { display:grid; gap:7px; color:#102a4c; font-weight:750; }
+.management-mobile-review textarea { width:100%; resize:vertical; border:1px solid #d8d2c5; border-radius:10px; padding:11px; font:inherit; }
+.management-mobile-review > div { display:flex; flex-wrap:wrap; gap:10px; }
+.management-mobile-review button { display:inline-flex; align-items:center; gap:8px; border:0; border-radius:10px; padding:10px 14px; font:inherit; font-weight:750; cursor:pointer; }
+.management-mobile-review button svg { width:17px; height:17px; }
+.management-mobile-notification { display:grid; gap:10px; margin-top:18px; padding-top:18px; border-top:1px solid #e3ded2; }
+.management-mobile-notification > div { display:grid; gap:8px; }
+.management-mobile-notification input,.management-mobile-notification textarea { width:100%; border:1px solid #d8d2c5; border-radius:10px; padding:11px; font:inherit; }
+.management-mobile-notification textarea { resize:vertical; }
+.management-mobile-notification button { width:max-content; display:inline-flex; align-items:center; gap:8px; border:0; border-radius:10px; padding:10px 14px; font:inherit; font-weight:750; cursor:pointer; }
+.management-mobile-notification button svg { width:17px; height:17px; }
 .management-missing-value { display: inline-flex; align-items: center; padding: 5px 9px; border-radius: 999px; background: #fff0ed; color: #a43127; font-size: 12px; font-weight: 750; }
 .management-clickable-row { position: relative; cursor: pointer; transition: background .18s ease; }
 .management-clickable-row:hover { background: #fffaf0; }
