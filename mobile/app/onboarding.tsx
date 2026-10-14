@@ -21,10 +21,12 @@ export default function OnboardingScreen() {
   const list = useRef<FlatList<OnboardingSlide>>(null);
   const [index, setIndex] = useState(0);
   const complete = useAuthStore((state) => state.completeOnboarding);
-  const tokens = useAuthStore((state) => state.tokens);
   const query = useQuery({ queryKey: ["onboarding"], queryFn: fetchOnboardingSlides, staleTime: 5 * 60_000 });
   const slides = query.data?.length ? query.data : defaultOnboardingSlides;
-  const finish = async () => { await complete(); router.replace(tokens ? "/(tabs)" : "/login"); };
+  const finish = async () => {
+    await complete();
+    router.replace("/(tabs)");
+  };
   const next = () => { if (index >= slides.length - 1) { void finish(); return; } list.current?.scrollToIndex({ index: index + 1, animated: true }); setIndex(index + 1); };
   const onMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => setIndex(Math.round(event.nativeEvent.contentOffset.x / width));
 
