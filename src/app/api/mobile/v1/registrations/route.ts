@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { and, eq, inArray } from "drizzle-orm";
 import { requireDatabase } from "@/db";
 import { agents, bookings, departures, managementSettings, mobileNotifications, packages, referralLeads, registrations } from "@/db/schema";
+import { withManagementTransaction } from "@/db/transaction";
 import { requireMobileSession } from "@/lib/mobile/auth";
 import { mobileData, mobileError, MobileApiError, zodFieldErrors } from "@/lib/mobile/api";
 import { mobileRegistrationSchema } from "@/lib/mobile/validation";
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
     const registrationId = randomUUID();
     const bookingNumber = `APP-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-${bookingId.slice(0, 6).toUpperCase()}`;
     const price = Number(selected.departure.price);
-    await database.transaction(async (tx) => {
+    await withManagementTransaction(async (tx) => {
       await tx.insert(bookings).values({
         id: bookingId,
         bookingNumber,

@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { eq, sql } from "drizzle-orm";
 
-import { requireDatabase } from "@/db";
 import { mobileAccounts, pilgrims, referralLeads } from "@/db/schema";
+import { withManagementTransaction } from "@/db/transaction";
 import { createMobileSession } from "@/lib/mobile/auth";
 import { mobileData, mobileError, MobileApiError, requestMetadata, zodFieldErrors } from "@/lib/mobile/api";
 import { mobileSelfRegistrationSchema } from "@/lib/mobile/validation";
@@ -14,14 +14,13 @@ export async function POST(request: Request) {
     const parsed = mobileSelfRegistrationSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) throw new MobileApiError(400, "VALIDATION_ERROR", "Periksa data jamaah.", zodFieldErrors(parsed.error));
 
-    const database = requireDatabase();
     const pilgrimId = randomUUID();
     const pinHash = await hashPassword(parsed.data.pin);
     // PIN only belongs to the mobile account; never persist it on pilgrim data.
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { pin: _pin, ...profile } = parsed.data;
 
-    const account = await database.transaction(async (tx) => {
+    const account = await withManagementTransaction(async (tx) => {
       // Serializes sign-ups for the same normalized WhatsApp without changing
       // the existing dashboard schema or imposing a new global unique index.
       await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${profile.whatsapp}))`);
