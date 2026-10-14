@@ -9,6 +9,7 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
+      ["expo-splash-screen", { "backgroundColor": "#00355F", "image": "./assets/splash/logo-emblem.png", "imageWidth": 132, "resizeMode": "contain" }],
       ["expo-notifications", { "defaultChannel": "informasi-perjalanan" }]
     ],
     "ios": { "supportsTablet": false, "bundleIdentifier": "com.jamwisata.mobile" },
