@@ -1,0 +1,25 @@
+# Staging routes can be enabled before the production DNS cutover.
+jamwisata-staging.43-156-31-71.sslip.io {
+    encode zstd gzip
+    reverse_proxy jamwisata-web:3000
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+}
+
+live-staging.43-156-31-71.sslip.io {
+    reverse_proxy 172.17.0.1:7880
+}
+
+# Enable these blocks only after both production DNS records point to the VPS.
+# jamwisata.id, www.jamwisata.id {
+#     encode zstd gzip
+#     reverse_proxy jamwisata-web:3000
+# }
+#
+# live.jamwisata.id {
+#     reverse_proxy 172.17.0.1:7880
+# }
