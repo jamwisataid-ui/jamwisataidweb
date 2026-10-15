@@ -11,7 +11,7 @@ import { PrayerTimeList } from "@/components/prayer/prayer-time-list";
 import { PrayerTimesState } from "@/components/prayer/prayer-times-state";
 import { PrayerUtilityGrid } from "@/components/prayer/prayer-utility-grid";
 import { api } from "@/lib/api";
-import { loadPrayerCache, savePrayerCache, type PrayerCache } from "@/lib/prayer-cache";
+import { loadPrayerCache, loadPrayerLocation, savePrayerCache, savePrayerLocation, type PrayerCache } from "@/lib/prayer-cache";
 import { dateInTimezone, hijriMonths, prayerLocations, qiblaBearing, type PrayerLocation } from "@/lib/prayer-times";
 import { colors } from "@/theme";
 import type { PrayerTimes } from "@/types";
@@ -40,6 +40,14 @@ export default function PrayerTimesScreen() {
   useEffect(() => { const timer = setInterval(() => setNow(new Date()), 30_000); return () => clearInterval(timer); }, []);
   useEffect(() => {
     let active = true;
+    void loadPrayerLocation().then((id) => {
+      const saved = prayerLocations.find((item) => item.id === id);
+      if (active && saved) setLocation(saved);
+    });
+    return () => { active = false; };
+  }, []);
+  useEffect(() => {
+    let active = true;
     void loadPrayerCache(location.id, date).then((value) => { if (active) setCache(value); });
     return () => { active = false; };
   }, [date, location.id]);
@@ -52,7 +60,7 @@ export default function PrayerTimesScreen() {
     { label: "Doa Setelah Sholat", icon: "book-outline" as const, onPress: () => router.push("/duas") },
   ] : [], [data, hijriLabel]);
 
-  const changeLocation = (next: PrayerLocation) => { setCache(null); setLocation(next); };
+  const changeLocation = (next: PrayerLocation) => { setCache(null); setLocation(next); void savePrayerLocation(next.id); };
   return <SafeAreaView edges={["top", "bottom"]} style={styles.safe}><AppBar /><LocationSelector value={location} open={pickerOpen} onOpen={() => setPickerOpen(true)} onClose={() => setPickerOpen(false)} onChange={changeLocation} />{showingCache ? <View style={styles.cacheBanner}><Ionicons name="cloud-offline-outline" size={15} color={colors.muted} /><Text style={styles.cacheText}>Jadwal tersimpan · diperbarui {new Date(cache!.savedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}</Text></View> : null}{data ? <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}><PrayerDateHeader data={data} /><PrayerTimeList data={data} now={now} /><Text style={styles.method}>{data.calculation}</Text><PrayerUtilityGrid items={utilities} /></ScrollView> : <PrayerTimesState loading={query.isPending} onRetry={() => void query.refetch()} />}</SafeAreaView>;
 }
 
