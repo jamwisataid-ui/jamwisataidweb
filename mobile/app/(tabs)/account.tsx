@@ -1,21 +1,54 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import { router } from "expo-router";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { AccountError, AccountSkeleton } from "@/components/account/account-state";
+import { AccountHeader } from "@/components/account/account-header";
+import { AccountMenuItem } from "@/components/account/account-menu-item";
+import { LogoutConfirmationModal } from "@/components/account/logout-confirmation-modal";
+import { ProfileSummaryCard } from "@/components/account/profile-summary-card";
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
-import { Button, Card, Screen, Title } from "@/components/ui";
 import { colors } from "@/theme";
+import type { AccountProfile } from "@/types";
 
-type Profile = { id: string; fullName: string; whatsapp: string; email?: string | null; passportNumber?: string | null; passportExpiry?: string | null };
-const menus = [{ label: "Perjalanan saya", href: "/journey", icon: "map" }, { label: "Pembayaran", href: "/payments", icon: "wallet" }, { label: "Dokumen", href: "/documents", icon: "document-text" }] as const;
+type Notification = { id: string; readAt?: string | null };
 
 export default function AccountScreen() {
   const tokens = useAuthStore((state) => state.tokens);
   const signOut = useAuthStore((state) => state.signOut);
-  const profile = useQuery({ queryKey: ["me"], queryFn: () => api<Profile>("/me"), enabled: Boolean(tokens) });
-  const logout = async () => { await api("/auth/logout", { method: "POST" }).catch(() => undefined); await signOut(); router.replace("/(tabs)"); };
-  if (!tokens) return <Screen><Title subtitle="Anda sedang menjelajah sebagai tamu.">Akun jamaah</Title><Card><View style={styles.avatar}><Ionicons name="person-outline" size={28} color={colors.gold} /></View><Text style={styles.name}>Masuk saat Anda membutuhkannya</Text><Text style={styles.meta}>Paket dan panduan dapat dilihat tanpa akun. Masuk untuk membuka data perjalanan, pembayaran, dokumen, dan notifikasi pribadi.</Text><Button label="Masuk ke akun jamaah" onPress={() => router.push("/login")} /></Card></Screen>;
-  return <Screen><Title subtitle="Data ini terhubung langsung dengan data jamaah di Jam Wisata.">Akun saya</Title><Card><View style={styles.avatar}><Text>{profile.data?.fullName?.slice(0, 1).toUpperCase() || "J"}</Text></View><Text style={styles.name}>{profile.data?.fullName || "Memuat..."}</Text><Text style={styles.meta}>{profile.data?.whatsapp}</Text><Text style={styles.meta}>{profile.data?.email || "Email belum diisi"}</Text></Card><View style={styles.menu}>{menus.map((item) => <Pressable key={item.label} onPress={() => router.push(item.href)} style={styles.row}><Ionicons name={item.icon} size={22} color={colors.gold} /><Text>{item.label}</Text><Ionicons name="chevron-forward" size={18} color={colors.muted} /></Pressable>)}</View><Button secondary label="Keluar dari aplikasi" onPress={logout} /></Screen>;
+  const client = useQueryClient();
+  const [confirmLogout, setConfirmLogout] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const profile = useQuery({ queryKey: ["me"], queryFn: () => api<AccountProfile>("/me"), enabled: Boolean(tokens) });
+  const notifications = useQuery({ queryKey: ["notifications"], queryFn: () => api<Notification[]>("/notifications"), enabled: Boolean(tokens) });
+  const unread = notifications.data?.filter((item) => !item.readAt).length ?? 0;
+
+  async function logout() {
+    setLoggingOut(true);
+    await api("/auth/logout", { method: "POST" }).catch(() => undefined);
+    client.clear();
+    await signOut();
+    setLoggingOut(false);
+    setConfirmLogout(false);
+    router.replace("/(tabs)");
+  }
+
+  return <SafeAreaView edges={["top"]} style={styles.safe}><ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}><AccountHeader />{!tokens ? <View style={styles.guestContent}><View style={styles.guestCard}><View style={styles.guestIcon}><Ionicons name="person-outline" size={30} color={colors.navy} /></View><Text style={styles.guestTitle}>Masuk ke Area Jamaah</Text><Text style={styles.guestBody}>Akses profil, dokumen, pembayaran, itinerary, dan notifikasi perjalanan Anda.</Text><Pressable onPress={() => router.push("/login?next=%2F(tabs)%2Faccount" as never)} style={styles.login}><Text style={styles.loginText}>Masuk / Daftar</Text><Ionicons name="arrow-forward" size={19} color={colors.navy} /></Pressable><Text style={styles.guestNote}>Anda tetap dapat melihat paket dan memakai panduan ibadah tanpa masuk.</Text></View></View> : profile.isLoading ? <AccountSkeleton /> : profile.isError || !profile.data ? <AccountError onRetry={() => profile.refetch()} onLogout={() => setConfirmLogout(true)} /> : <><ProfileSummaryCard profile={profile.data} /><View style={styles.menu}><AccountMenuItem icon="person-outline" title="Profil Saya" subtitle="Data personal jamaah" onPress={() => router.push("/account/profile")} /><AccountMenuItem icon="document-text-outline" title="Dokumen Saya" subtitle="Paspor, KTP, visa, dan dokumen lainnya" onPress={() => router.push("/documents")} /><AccountMenuItem icon="wallet-outline" title="Pembayaran" subtitle="Status dan riwayat pembayaran" onPress={() => router.push("/payments")} /><AccountMenuItem icon="map-outline" title="Itinerary Saya" subtitle="Jadwal keberangkatan dan perjalanan" onPress={() => router.push("/journey")} /><AccountMenuItem icon="notifications-outline" title="Notifikasi" subtitle="Informasi terbaru" badge={unread} onPress={() => router.push("/(tabs)/notifications")} /><AccountMenuItem icon="help-circle-outline" title="Pertanyaan & Bantuan" subtitle="FAQ dan hubungi admin" onPress={() => router.push("/help")} /><AccountMenuItem icon="log-out-outline" title="Keluar" danger last onPress={() => setConfirmLogout(true)} /></View></>}</ScrollView><LogoutConfirmationModal visible={confirmLogout} busy={loggingOut} onCancel={() => setConfirmLogout(false)} onConfirm={logout} /></SafeAreaView>;
 }
-const styles = StyleSheet.create({ avatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: "#FFF0D5", alignItems: "center", justifyContent: "center" }, name: { color: colors.navy, fontFamily: "PlayfairDisplay_700Bold", fontSize: 22 }, meta: { color: colors.muted, fontFamily: "DMSans_400Regular" }, menu: { backgroundColor: colors.white, borderRadius: 18, borderWidth: 1, borderColor: colors.line, overflow: "hidden" }, row: { minHeight: 58, flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 16, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line }, } as const);
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: colors.ivory },
+  content: { paddingBottom: 32, gap: 20 },
+  menu: { marginHorizontal: 18, overflow: "hidden", borderWidth: 1, borderColor: colors.line, borderRadius: 18, backgroundColor: colors.white },
+  guestContent: { marginTop: -51, paddingHorizontal: 18, paddingBottom: 40 },
+  guestCard: { padding: 22, alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.line, borderRadius: 21, backgroundColor: colors.white },
+  guestIcon: { width: 62, height: 62, borderRadius: 31, alignItems: "center", justifyContent: "center", backgroundColor: "#FFF2D8", borderWidth: 2, borderColor: "#E8B659" },
+  guestTitle: { color: colors.navy, fontFamily: "DMSans_700Bold", fontSize: 21, textAlign: "center" },
+  guestBody: { maxWidth: 330, color: colors.muted, fontFamily: "DMSans_400Regular", fontSize: 14, lineHeight: 21, textAlign: "center" },
+  login: { alignSelf: "stretch", height: 54, marginTop: 5, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9, borderRadius: 16, backgroundColor: colors.gold },
+  loginText: { color: colors.navy, fontFamily: "DMSans_700Bold", fontSize: 16 },
+  guestNote: { color: colors.muted, fontFamily: "DMSans_400Regular", fontSize: 11.5, lineHeight: 17, textAlign: "center" },
+});

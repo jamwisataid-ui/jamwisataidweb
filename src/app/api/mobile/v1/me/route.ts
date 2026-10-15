@@ -1,7 +1,7 @@
-import { and, eq, ne } from "drizzle-orm";
+import { and, desc, eq, ne } from "drizzle-orm";
 
 import { requireDatabase } from "@/db";
-import { pilgrims } from "@/db/schema";
+import { bookings, departures, pilgrims, registrations } from "@/db/schema";
 import { requireMobileSession } from "@/lib/mobile/auth";
 import { mobileData, mobileError, MobileApiError, zodFieldErrors } from "@/lib/mobile/api";
 import { mobilePilgrimProfileSchema } from "@/lib/mobile/validation";
@@ -9,6 +9,20 @@ import { mobilePilgrimProfileSchema } from "@/lib/mobile/validation";
 export async function GET(request: Request) {
   try {
     const { pilgrim } = await requireMobileSession(request);
+    const database = requireDatabase();
+    const [journey] = await database
+      .select({
+        bookingNumber: bookings.bookingNumber,
+        status: registrations.status,
+        departureDate: departures.departureDate,
+        departureLabel: departures.dateLabel,
+      })
+      .from(registrations)
+      .innerJoin(bookings, eq(registrations.bookingId, bookings.id))
+      .innerJoin(departures, eq(bookings.departureId, departures.id))
+      .where(eq(registrations.pilgrimId, pilgrim.id))
+      .orderBy(desc(departures.departureDate), desc(registrations.createdAt))
+      .limit(1);
     return mobileData({
       id: pilgrim.id,
       fullName: pilgrim.fullName,
@@ -19,6 +33,12 @@ export async function GET(request: Request) {
       nationality: pilgrim.nationality,
       passportNumber: pilgrim.passportNumber,
       passportExpiry: pilgrim.passportExpiry,
+      jamaahNumber: journey?.bookingNumber ?? null,
+      journey: journey ? {
+        departureDate: journey.departureDate,
+        departureLabel: journey.departureLabel,
+        status: journey.status,
+      } : null,
     });
   } catch (error) {
     return mobileError(error, "me");
