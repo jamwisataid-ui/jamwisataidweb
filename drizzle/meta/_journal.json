@@ -148,6 +148,13 @@
       "when": 1791972000000,
       "tag": "0020_add_booking_payment_preference",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1792051200000,
+      "tag": "0021_add_live_muthowif",
+      "breakpoints": true
     }
   ]
 }

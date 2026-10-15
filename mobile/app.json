@@ -9,10 +9,12 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
+      "@livekit/react-native-expo-plugin",
+      "@config-plugins/react-native-webrtc",
       ["expo-splash-screen", { "backgroundColor": "#06152B", "image": "./assets/splash/logo-emblem.png", "imageWidth": 132, "resizeMode": "contain" }],
       ["expo-notifications", { "defaultChannel": "informasi-perjalanan" }]
     ],
-    "ios": { "supportsTablet": false, "bundleIdentifier": "com.jamwisata.mobile" },
+    "ios": { "supportsTablet": false, "bundleIdentifier": "com.jamwisata.mobile", "infoPlist": { "UIBackgroundModes": ["audio"] } },
     "android": { "package": "com.jamwisata.mobile", "adaptiveIcon": { "backgroundColor": "#06152B" } },
     "web": { "bundler": "metro", "output": "single" },
     "extra": { "router": { "origin": false } }

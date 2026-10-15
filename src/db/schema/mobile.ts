@@ -1,6 +1,7 @@
 import { index, integer, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
 import { users } from "./auth";
+import { departures } from "./content";
 import { pilgrims } from "./management";
 
 const timestamps = {
@@ -10,6 +11,8 @@ const timestamps = {
 
 export const mobileAccountStatus = pgEnum("mobile_account_status", ["pending", "active", "locked", "revoked"]);
 export const mobileDevicePlatform = pgEnum("mobile_device_platform", ["android", "ios"]);
+export const liveMuthowifSessionStatus = pgEnum("live_muthowif_session_status", ["scheduled", "live", "ended", "cancelled"]);
+export const liveMuthowifSessionType = pgEnum("live_muthowif_session_type", ["thawaf", "sai", "kajian", "ziarah", "briefing", "other"]);
 
 export const mobileAccounts = pgTable("mobile_accounts", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -79,3 +82,25 @@ export const mobileNotifications = pgTable("mobile_notifications", {
   createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [index("mobile_notifications_pilgrim_idx").on(table.pilgrimId, table.createdAt)]);
+
+export const liveMuthowifSessions = pgTable("live_muthowif_sessions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  departureId: uuid("departure_id").notNull().references(() => departures.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  type: liveMuthowifSessionType("type").notNull().default("other"),
+  status: liveMuthowifSessionStatus("status").notNull().default("scheduled"),
+  muthowifName: text("muthowif_name").notNull(),
+  muthowifAvatarUrl: text("muthowif_avatar_url"),
+  roomName: text("room_name").notNull(),
+  startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
+  endsAt: timestamp("ends_at", { withTimezone: true }),
+  location: text("location"),
+  imageUrl: text("image_url"),
+  listenerCount: integer("listener_count").notNull().default(0),
+  capacity: integer("capacity").notNull().default(45),
+  createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
+  ...timestamps,
+}, (table) => [
+  uniqueIndex("live_muthowif_sessions_room_idx").on(table.roomName),
+  index("live_muthowif_sessions_departure_status_idx").on(table.departureId, table.status, table.startsAt),
+]);

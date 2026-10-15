@@ -2,6 +2,7 @@ import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import { create } from "zustand";
 import { clearJourneyCache } from "./journey-cache";
+import { clearLiveMuthowifCache } from "./live-muthowif-cache";
 
 export type Tokens = { accessToken: string; refreshToken: string; accessExpiresAt: string; refreshExpiresAt: string };
 type User = { id: string; fullName: string; whatsapp: string; email?: string | null };
@@ -40,6 +41,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   completeOnboarding: async () => { await setStoredValue(ONBOARDING_KEY, "done", true); set({ seenOnboarding: true }); },
   signIn: async (tokens, user = null) => { await setStoredValue(KEY, JSON.stringify(tokens)); set({ tokens, user }); },
   setTokens: async (tokens) => { await setStoredValue(KEY, JSON.stringify(tokens)); set({ tokens }); },
-  signOut: async () => { await Promise.all([deleteStoredValue(KEY), clearJourneyCache()]); set({ tokens: null, user: null }); },
+  signOut: async () => { await Promise.all([deleteStoredValue(KEY), clearJourneyCache(), clearLiveMuthowifCache()]); set({ tokens: null, user: null }); },
   setUser: (user) => set({ user }),
 }));
