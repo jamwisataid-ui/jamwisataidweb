@@ -54,6 +54,7 @@ export default async function PackagesAdminPage({ searchParams }: { searchParams
                     <td data-label="Jadwal">
                       <div>
                         <strong style={{ fontSize: "13px", fontWeight: "600" }}>{item.dateLabel || "-"}</strong>
+                        {item.departureCount > 1 ? <small style={{ display: "block", color: "#9a6c05", fontWeight: 700 }}>{item.departureCount} jadwal keberangkatan</small> : null}
                         <small style={{ display: "block", color: "#64748b" }}>{item.airline || "-"}</small>
                       </div>
                     </td>

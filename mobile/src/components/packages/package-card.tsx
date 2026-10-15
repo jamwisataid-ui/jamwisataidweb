@@ -59,9 +59,9 @@ export function PackageCard({ item }: { item: Package }) {
         </Text>
 
         <View style={styles.metaList}>
+          <PackageMetaRow icon="calendar-outline" text={item.departures && item.departures.length > 1 ? `${item.departures.length} jadwal · mulai ${item.departures[0].dateLabel}` : item.departureDate || "Jadwal segera tersedia"} />
           {item.airline ? <PackageMetaRow icon="airplane-outline" text={item.airline} /> : null}
           {hotels.map((hotel, index) => <PackageMetaRow key={`${hotel}-${index}`} icon="business-outline" text={hotel} />)}
-          {!item.airline && hotels.length === 0 ? <PackageMetaRow icon="calendar-outline" text={item.departureDate || "Jadwal segera tersedia"} /> : null}
         </View>
 
         <View style={styles.footer}>

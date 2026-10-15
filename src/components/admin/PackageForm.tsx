@@ -25,6 +25,15 @@ import { FormFeedback } from "./FormFeedback";
 type Values = Record<string, unknown>;
 type ItineraryDay = { day: number; title: string; description: string };
 type PlusHotel = { destination: string; hotelName: string; star: number };
+type DepartureInput = {
+  id?: string;
+  departureDate: string;
+  returnDate: string;
+  price: string;
+  capacity: string;
+  availableSeats: string;
+  status: "open" | "limited" | "full" | "closed" | "coming-soon";
+};
 const initialState: ActionState = { ok: false, message: "" };
 const field = (values: Values, key: string, fallback = "") => String(values[key] ?? fallback);
 
@@ -110,12 +119,38 @@ const parsePlusHotels = (value: unknown): PlusHotel[] => {
   }
 };
 
+const parseDepartures = (values: Values): DepartureInput[] => {
+  try {
+    const raw = values.departures;
+    const parsed = Array.isArray(raw) ? raw : JSON.parse(typeof raw === "string" && raw.trim() ? raw : "[]");
+    if (Array.isArray(parsed) && parsed.length) {
+      return parsed.map((departure) => ({
+        id: departure?.id ? String(departure.id) : undefined,
+        departureDate: String(departure?.departureDate ?? ""),
+        returnDate: String(departure?.returnDate ?? ""),
+        price: formatRupiahInput(departure?.price ?? ""),
+        capacity: String(departure?.capacity ?? ""),
+        availableSeats: String(departure?.availableSeats ?? ""),
+        status: departure?.status ?? "open",
+      }));
+    }
+  } catch {}
+  return [{
+    id: field(values, "departureId") || undefined,
+    departureDate: field(values, "departureDate"),
+    returnDate: field(values, "returnDate"),
+    price: formatRupiahInput(field(values, "price")),
+    capacity: field(values, "capacity"),
+    availableSeats: field(values, "availableSeats"),
+    status: field(values, "departureStatus", "open") as DepartureInput["status"],
+  }];
+};
+
 const preservedFields = [
   ["id", ""], ["departureId", ""], ["slug", ""], ["summary", ""],
   ["featured", "false"], ["sortOrder", "0"], ["detailUrl", ""],
-  ["seoTitle", ""], ["seoDescription", ""], ["returnDate", ""],
-  ["manasikDate", ""], ["departureAirport", "Jakarta"], ["arrivalAirport", ""],
-  ["capacity", ""], ["availableSeats", ""], ["departureStatus", "open"],
+  ["seoTitle", ""], ["seoDescription", ""], ["manasikDate", ""],
+  ["departureAirport", "Jakarta"], ["arrivalAirport", ""],
   ["makkahDistance", ""], ["madinahDistance", ""],
   ["facilities", ""],
   ["destinations", ""],
@@ -124,7 +159,7 @@ const preservedFields = [
 export function PackageForm({ values = {} }: { values?: Values }) {
   const [state, action, pending] = useActionState(savePackageAction, initialState);
   const [imageUrl, setImageUrl] = useState(field(values, "imageUrl"));
-  const [displayPrice, setDisplayPrice] = useState(() => formatRupiahInput(field(values, "price")));
+  const [departures, setDepartures] = useState<DepartureInput[]>(() => parseDepartures(values));
   const [durationDays, setDurationDays] = useState(() => field(values, "durationDays", "9"));
   const [category, setCategory] = useState(() => field(values, "category", "umrah"));
   const [packageType, setPackageType] = useState(() => field(values, "packageType", "reguler"));
@@ -224,13 +259,10 @@ export function PackageForm({ values = {} }: { values?: Values }) {
   const isPublished = field(values, "status") === "published";
   const hasDraftChanges = values.hasDraftChanges === true;
 
-  const rawDigits = cleanRupiahInput(displayPrice);
-  const terbilangText = terbilangRupiah(rawDigits);
   const error = (key: string) => state.errors?.[key]?.[0];
 
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatRupiahInput(e.target.value);
-    setDisplayPrice(formatted);
+  const updateDeparture = (index: number, patch: Partial<DepartureInput>) => {
+    setDepartures((current) => current.map((departure, itemIndex) => itemIndex === index ? { ...departure, ...patch } : departure));
   };
 
   return (
@@ -240,6 +272,13 @@ export function PackageForm({ values = {} }: { values?: Values }) {
         <input key={name} type="hidden" name={name} value={field(values, name, fallback)} />
       ))}
       <input type="hidden" name="itinerary" value={JSON.stringify(itinerary)} />
+      <input type="hidden" name="departures" value={JSON.stringify(departures.map((departure) => ({ ...departure, price: cleanRupiahInput(departure.price) })))} />
+      <input type="hidden" name="departureDate" value={departures[0]?.departureDate ?? ""} />
+      <input type="hidden" name="returnDate" value={departures[0]?.returnDate ?? ""} />
+      <input type="hidden" name="price" value={cleanRupiahInput(departures[0]?.price ?? "")} />
+      <input type="hidden" name="capacity" value={departures[0]?.capacity ?? ""} />
+      <input type="hidden" name="availableSeats" value={departures[0]?.availableSeats ?? ""} />
+      <input type="hidden" name="departureStatus" value={departures[0]?.status ?? "open"} />
       <input type="hidden" name="plusHotels" value={JSON.stringify(plusHotels)} />
       <input type="hidden" name="includes" value={includes.map((s) => s.trim()).filter(Boolean).join("\n")} />
       <input type="hidden" name="highlights" value={highlights.map((s) => s.trim()).filter(Boolean).join("\n")} />
@@ -331,14 +370,30 @@ export function PackageForm({ values = {} }: { values?: Values }) {
       <section className="admin-form-section">
         <div>
           <p>Jadwal, Hotel &amp; Harga</p>
-          <span>Tanggal berangkat, maskapai, kereta cepat, hotel Makkah &amp; Madinah, serta harga All In per jamaah.</span>
+          <span>Satu paket dapat memiliki banyak keberangkatan. Harga, kuota, tanggal pulang, dan status dapat berbeda pada setiap jadwal.</span>
         </div>
         <div className="admin-form-grid">
-          <label>
-            <span>Tanggal keberangkatan</span>
-            <input name="departureDate" type="date" defaultValue={field(values, "departureDate")} required />
-            {error("departureDate") ? <small className="admin-upload-error">{error("departureDate")}</small> : null}
-          </label>
+          <div className="admin-span-2 admin-departure-editor">
+            <div className="admin-departure-editor__heading">
+              <div><strong>Keberangkatan</strong><small>Urutan di website otomatis dari tanggal terdekat.</small></div>
+              <button type="button" className="admin-secondary-button" onClick={() => setDepartures((current) => [...current, { departureDate: "", returnDate: "", price: current.at(-1)?.price ?? "", capacity: "", availableSeats: "", status: "open" }])}>
+                <Plus className="size-4" /> Tambah Keberangkatan
+              </button>
+            </div>
+            {departures.map((departure, index) => (
+              <div className="admin-departure-row" key={departure.id ?? `new-${index}`}>
+                <div className="admin-departure-row__title"><strong>Keberangkatan {index + 1}</strong>{departures.length > 1 ? <button type="button" onClick={() => setDepartures((current) => current.filter((_, itemIndex) => itemIndex !== index))}><Trash2 className="size-4" /> Hapus</button> : null}</div>
+                <label><span>Tanggal</span><input type="date" value={departure.departureDate} onChange={(event) => updateDeparture(index, { departureDate: event.target.value })} required /></label>
+                <label><span>Tanggal pulang <em>opsional</em></span><input type="date" value={departure.returnDate} onChange={(event) => updateDeparture(index, { returnDate: event.target.value })} /></label>
+                <label><span>Harga per jamaah</span><div className="admin-input-prefix"><span>Rp</span><input inputMode="numeric" value={departure.price} onChange={(event) => updateDeparture(index, { price: formatRupiahInput(event.target.value) })} placeholder="33.900.000" required /></div></label>
+                <label><span>Kuota <em>opsional</em></span><input type="number" min="1" value={departure.capacity} onChange={(event) => updateDeparture(index, { capacity: event.target.value })} placeholder="45" /></label>
+                <label><span>Sisa kuota <em>opsional</em></span><input type="number" min="0" value={departure.availableSeats} onChange={(event) => updateDeparture(index, { availableSeats: event.target.value })} placeholder="45" /></label>
+                <label><span>Status</span><select value={departure.status} onChange={(event) => updateDeparture(index, { status: event.target.value as DepartureInput["status"] })}><option value="open">Tersedia</option><option value="limited">Hampir penuh</option><option value="full">Kuota penuh</option><option value="coming-soon">Segera dibuka</option><option value="closed">Ditutup</option></select></label>
+                {departure.price ? <small className="admin-departure-row__amount">Rp {departure.price} · {terbilangRupiah(cleanRupiahInput(departure.price))}</small> : null}
+              </div>
+            ))}
+            {error("departures") ? <small className="admin-upload-error">{error("departures")}</small> : null}
+          </div>
           <label>
             <span>Maskapai</span>
             <input name="airline" defaultValue={field(values, "airline")} placeholder="Contoh: Qatar Airways" required />
@@ -377,48 +432,6 @@ export function PackageForm({ values = {} }: { values?: Values }) {
               <option value="3">Bintang 3</option>
             </select>
             {error("madinahStar") ? <small className="admin-upload-error">{error("madinahStar")}</small> : null}
-          </label>
-          <label className="admin-span-2">
-            <span>Harga per jamaah (All In)</span>
-            <div className="admin-input-prefix">
-              <span>Rp</span>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={displayPrice}
-                onChange={handlePriceChange}
-                placeholder="33.000.000"
-                style={{ fontSize: "1.15rem", fontWeight: "600", letterSpacing: "0.03em" }}
-                required
-              />
-            </div>
-            <input type="hidden" name="price" value={rawDigits} />
-            
-            {rawDigits ? (
-              <div className="admin-price-badge">
-                <span>💰 Terbaca: <strong>Rp {displayPrice}</strong></span>
-                {terbilangText ? <small>({terbilangText})</small> : null}
-              </div>
-            ) : (
-              <small className="admin-field-hint">
-                Ketik angka saja, titik pemisah ribuan otomatis muncul (contoh: ketik 33000000 otomatis jadi 33.000.000).
-              </small>
-            )}
-
-            <div className="admin-quick-prices">
-              <span>Preset cepat:</span>
-              {[30_000_000, 32_500_000, 33_900_000, 35_000_000, 36_900_000, 38_500_000].map((preset) => (
-                <button
-                  key={preset}
-                  type="button"
-                  onClick={() => setDisplayPrice(formatRupiahInput(preset))}
-                  className="admin-price-chip"
-                >
-                  Rp {formatRupiahInput(preset)}
-                </button>
-              ))}
-            </div>
-            {error("price") ? <small className="admin-upload-error">{error("price")}</small> : null}
           </label>
         </div>
       </section>

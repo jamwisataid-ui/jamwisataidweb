@@ -1459,6 +1459,16 @@
 .admin-form-grid .admin-input-prefix > span { left: 18px; }
 
 .admin-itinerary-editor { display: grid; gap: 14px; }
+.admin-departure-editor { display: grid; gap: 14px; }
+.admin-departure-editor__heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.admin-departure-editor__heading > div { display: grid; gap: 3px; }
+.admin-departure-editor__heading small { color: #7d8592; }
+.admin-departure-row { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; padding: 16px; border: 1px solid rgba(6,26,47,.12); border-radius: 12px; background: #fffdf8; }
+.admin-departure-row__title { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; color: #061a2f; }
+.admin-departure-row__title button { display: inline-flex; align-items: center; gap: 5px; color: #a53d35; font-size: 12px; font-weight: 700; }
+.admin-departure-row label { display: grid; gap: 7px; }
+.admin-departure-row label > span { font-size: 12px; font-weight: 700; color: #59616d; }
+.admin-departure-row__amount { grid-column: 1 / -1; color: #8b650d; }
 .admin-icon-button { display: inline-grid; place-items: center; width: 42px; height: 42px; border: 1px solid currentColor; border-radius: 9px; background: #fff; cursor: pointer; }
 .admin-itinerary-row { display: grid; grid-template-columns: 88px minmax(180px, .8fr) minmax(240px, 1.4fr) 42px; gap: 12px; align-items: end; padding: 16px; border: 1px solid rgba(6,26,47,.12); border-radius: 12px; background: #fffdf8; }
 .admin-itinerary-row label { display: grid; gap: 7px; }
@@ -1476,6 +1486,8 @@
 .admin-plus-hotel-remove { color: #a53d35; }
 
 @media (max-width: 620px) {
+  .admin-departure-editor__heading { align-items: stretch; flex-direction: column; }
+  .admin-departure-row { grid-template-columns: 1fr; }
   .admin-form-grid .admin-input-prefix input { padding-left: 58px !important; }
   .admin-form-grid .admin-input-prefix > span { left: 16px; }
   .admin-itinerary-row { grid-template-columns: 1fr 1fr 42px; }

@@ -115,10 +115,10 @@ export async function savePackageAction(_state: ActionState, formData: FormData)
     const intent = value(formData, "intent") === "publish" ? "publish" : "draft";
     const raw = Object.fromEntries(formData.entries());
     const name = value(formData, "name").trim();
-    const departureDate = value(formData, "departureDate").trim();
     const baseSlug = value(formData, "slug") || slugify(name) || "paket-umroh";
+    const departureDate = value(formData, "departureDate").trim();
     const departureLabel = formatSafeDepartureLabel(departureDate);
-    const whatsappMessage = `Assalamu’alaikum Jam Wisata, saya ingin konsultasi mengenai ${name}${departureLabel ? ` (keberangkatan ${departureLabel})` : ""}. Mohon informasi selengkapnya.`;
+    const whatsappMessage = `Assalamu’alaikum Jam Wisata, saya ingin konsultasi mengenai paket ${name}. Mohon informasi selengkapnya.`;
     
     const parsed = packageFormSchema.safeParse({
       ...raw,
@@ -227,42 +227,49 @@ export async function savePackageAction(_state: ActionState, formData: FormData)
     await database.delete(packageItems).where(eq(packageItems.packageId, data.id));
     await database.delete(itineraryDays).where(eq(itineraryDays.packageId, data.id));
 
-    const existingDeparture = data.departureId
-      ? await database.query.departures.findFirst({ where: and(eq(departures.id, data.departureId), eq(departures.packageId, data.id)) })
-      : await database.query.departures.findFirst({ where: eq(departures.packageId, data.id) });
-    const departureValues = {
-      departureDate: data.departureDate,
-      returnDate: data.returnDate || null,
-      manasikDate: data.manasikDate || null,
-      dateLabel: data.departureLabel,
-      airline: data.airline,
-      highSpeedTrain: data.highSpeedTrain || null,
-      departureAirport: data.departureAirport,
-      arrivalAirport: data.arrivalAirport || null,
-      price: String(data.price),
-      capacity: (data.capacity === "" || data.capacity === null || data.capacity === undefined) ? null : Number(data.capacity),
-      availableSeats: (data.availableSeats === "" || data.availableSeats === null || data.availableSeats === undefined) ? null : Number(data.availableSeats),
-      status: data.departureStatus,
-      updatedAt: new Date(),
-    } as const;
-    const departure = existingDeparture
-      ? (await database.update(departures).set(departureValues).where(eq(departures.id, existingDeparture.id)).returning({ id: departures.id }))[0]
-      : (await database.insert(departures).values({ packageId: data.id, ...departureValues }).returning({ id: departures.id }))[0];
+    const existingDepartures = await database.select({ id: departures.id }).from(departures).where(eq(departures.packageId, data.id));
+    const existingIds = new Set(existingDepartures.map((departure) => departure.id));
+    const keptIds: string[] = [];
 
-    await database.delete(accommodations).where(eq(accommodations.departureId, departure.id));
+    for (const [index, input] of data.departures.entries()) {
+      const departureValues = {
+        departureDate: input.departureDate,
+        returnDate: input.returnDate || null,
+        manasikDate: data.manasikDate || null,
+        dateLabel: formatSafeDepartureLabel(input.departureDate),
+        airline: data.airline,
+        highSpeedTrain: data.highSpeedTrain || null,
+        departureAirport: data.departureAirport,
+        arrivalAirport: data.arrivalAirport || null,
+        price: String(input.price),
+        capacity: input.capacity === "" || input.capacity == null ? null : Number(input.capacity),
+        availableSeats: input.availableSeats === "" || input.availableSeats == null ? null : Number(input.availableSeats),
+        status: input.status,
+        sortOrder: index,
+        updatedAt: new Date(),
+      } as const;
+      const saved = input.id && existingIds.has(input.id)
+        ? (await database.update(departures).set(departureValues).where(and(eq(departures.id, input.id), eq(departures.packageId, data.id))).returning({ id: departures.id }))[0]
+        : (await database.insert(departures).values({ packageId: data.id, ...departureValues }).returning({ id: departures.id }))[0];
+      keptIds.push(saved.id);
 
-    await database.insert(accommodations).values([
-      { departureId: departure.id, city: "Makkah", hotelName: data.makkahHotel, star: data.makkahStar, distance: data.makkahDistance || null, sortOrder: 0 },
-      { departureId: departure.id, city: "Madinah", hotelName: data.madinahHotel, star: data.madinahStar, distance: data.madinahDistance || null, sortOrder: 1 },
-      ...data.plusHotels.map((hotel, index) => ({
-        departureId: departure.id,
-        city: hotel.destination,
-        hotelName: hotel.hotelName,
-        star: hotel.star,
-        distance: null,
-        sortOrder: index + 2,
-      })),
-    ]);
+      await database.delete(accommodations).where(eq(accommodations.departureId, saved.id));
+      await database.insert(accommodations).values([
+        { departureId: saved.id, city: "Makkah", hotelName: data.makkahHotel, star: data.makkahStar, distance: data.makkahDistance || null, sortOrder: 0 },
+        { departureId: saved.id, city: "Madinah", hotelName: data.madinahHotel, star: data.madinahStar, distance: data.madinahDistance || null, sortOrder: 1 },
+        ...data.plusHotels.map((hotel, hotelIndex) => ({ departureId: saved.id, city: hotel.destination, hotelName: hotel.hotelName, star: hotel.star, distance: null, sortOrder: hotelIndex + 2 })),
+      ]);
+    }
+
+    const removedIds = existingDepartures.map((departure) => departure.id).filter((id) => !keptIds.includes(id));
+    if (removedIds.length) {
+      const referenced = await database.select({ departureId: bookings.departureId }).from(bookings).where(inArray(bookings.departureId, removedIds));
+      const referencedIds = new Set(referenced.map((row) => row.departureId));
+      const deletableIds = removedIds.filter((id) => !referencedIds.has(id));
+      const protectedIds = removedIds.filter((id) => referencedIds.has(id));
+      if (deletableIds.length) await database.delete(departures).where(inArray(departures.id, deletableIds));
+      if (protectedIds.length) await database.update(departures).set({ status: "closed", updatedAt: new Date() }).where(inArray(departures.id, protectedIds));
+    }
 
     const itemGroups = [
       ["facility", lines(data.facilities)],

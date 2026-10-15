@@ -203,7 +203,7 @@ export default async function PaketUmrohHubPage() {
                     <div className="mt-4 space-y-2.5 text-xs text-[#59616D]">
                       <div className="flex items-center gap-2">
                         <Calendar className="size-4 text-[#D5A12B] shrink-0" />
-                        <span>Jadwal: <strong>{pkg.departureDate}</strong></span>
+                        <span>{pkg.departures && pkg.departures.length > 1 ? <><strong>{pkg.departures.length} jadwal keberangkatan</strong><br /><small>Mulai {pkg.departures[0].dateLabel}</small></> : <>Jadwal: <strong>{pkg.departureDate}</strong></>}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Plane className="size-4 text-[#D5A12B] shrink-0" />
@@ -251,13 +251,13 @@ export default async function PaketUmrohHubPage() {
                         Detail &amp; Itinerary
                       </Link>
                       <a
-                        href={whatsappHref(pkg.whatsappMessage, `Katalog Paket — ${pkg.name}`)}
-                        target="_blank"
+                        href={pkg.departures && pkg.departures.length > 1 ? `/paket-umroh/${pkg.slug}#pilih-keberangkatan` : whatsappHref(pkg.departures?.[0] ? `Assalamu’alaikum Jam Wisata, saya tertarik dengan:\n\nPaket: ${pkg.name}\nKeberangkatan: ${pkg.departures[0].dateLabel}\nHarga: Rp${formatIDR(pkg.departures[0].price ?? pkg.priceFrom ?? 0)}` : pkg.whatsappMessage, `Katalog Paket — ${pkg.name}`)}
+                        target={pkg.departures && pkg.departures.length > 1 ? undefined : "_blank"}
                         rel="noopener noreferrer"
                         className="flex h-11 items-center justify-center gap-1.5 rounded-xl bg-gradient-gold-rich text-xs font-bold text-[#061A2F] shadow-sm hover:scale-[1.02] transition"
                       >
                         <MessageCircle className="size-3.5" />
-                        <span>Konsultasi</span>
+                        <span>{pkg.departures && pkg.departures.length > 1 ? "Pilih Jadwal" : "Konsultasi"}</span>
                       </a>
                     </div>
                   </div>
@@ -299,7 +299,7 @@ export default async function PaketUmrohHubPage() {
                   <tr key={pkg.id} className="hover:bg-slate-50/80 transition">
                     <td className="p-4 font-bold text-[#061A2F]">{pkg.name}</td>
                     <td className="p-4 text-[#59616D]">{pkg.durationDays} Hari</td>
-                    <td className="p-4 text-[#59616D] whitespace-nowrap">{pkg.departureDate}</td>
+                    <td className="p-4 text-[#59616D] whitespace-nowrap">{pkg.departures && pkg.departures.length > 1 ? `${pkg.departures.length} jadwal · mulai ${pkg.departures[0].dateLabel}` : pkg.departureDate}</td>
                     <td className="p-4 text-[#59616D]">{pkg.airline}</td>
                     <td className="p-4 text-[#59616D]"><span className="flex items-center justify-between gap-3">{pkg.makkahHotel?.name}<HotelStarRating rating={pkg.makkahHotel?.star} /></span></td>
                     <td className="p-4 text-[#59616D]"><span className="flex items-center justify-between gap-3">{pkg.madinahHotel?.name}<HotelStarRating rating={pkg.madinahHotel?.star} /></span></td>

@@ -73,7 +73,10 @@ async function queryPackages(): Promise<TravelPackage[]> {
 
     const todayJakarta = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     return packageRows.map((item) => {
-      const departure = departureRows.find((candidate) => candidate.packageId === item.id);
+      const packageDepartures = departureRows.filter((candidate) => candidate.packageId === item.id);
+      const futureDepartures = packageDepartures.filter((candidate) => candidate.departureDate >= todayJakarta && candidate.status !== "closed");
+      const selectableDepartures = futureDepartures.filter((candidate) => candidate.status === "open" || candidate.status === "limited");
+      const departure = selectableDepartures[0] ?? futureDepartures[0] ?? packageDepartures.at(-1);
       const packageHotelRows = departure ? hotelRows.filter((hotel) => hotel.departureId === departure.id) : [];
       const byKind = (kind: typeof itemRows[number]["kind"]) =>
         itemRows.filter((entry) => entry.packageId === item.id && entry.kind === kind).map((entry) => entry.value);
@@ -82,6 +85,25 @@ async function queryPackages(): Promise<TravelPackage[]> {
       const plusHotels = item.type === "plus"
         ? packageHotelRows.filter((hotel) => hotel.sortOrder >= 2).map((hotel) => ({ destination: hotel.city, name: hotel.hotelName, star: hotel.star ?? undefined }))
         : [];
+      const publicDepartures = futureDepartures.map((candidate) => ({
+        id: candidate.id,
+        departureDate: candidate.departureDate,
+        dateLabel: candidate.dateLabel,
+        returnDate: candidate.returnDate ?? undefined,
+        price: Number(candidate.price),
+        quota: candidate.capacity ?? undefined,
+        remainingQuota: candidate.availableSeats ?? undefined,
+        status: candidate.status === "limited" ? "limited" as const : candidate.status === "full" || candidate.status === "closed" ? "sold-out" as const : candidate.status === "coming-soon" ? "coming-soon" as const : "available" as const,
+        selectable: candidate.status === "open" || candidate.status === "limited",
+      }));
+      const activePrices = selectableDepartures.map((candidate) => Number(candidate.price)).filter(Number.isFinite);
+      const packageStatus = selectableDepartures.some((candidate) => candidate.status === "open")
+        ? "available" as const
+        : selectableDepartures.some((candidate) => candidate.status === "limited")
+          ? "limited" as const
+          : futureDepartures.some((candidate) => candidate.status === "coming-soon")
+            ? "coming-soon" as const
+            : "sold-out" as const;
 
       return {
         id: item.id,
@@ -95,6 +117,7 @@ async function queryPackages(): Promise<TravelPackage[]> {
         departureDate: departure?.dateLabel,
         departureId: departure?.id,
         departureMonth: departure?.departureDate.slice(0, 7),
+        departures: publicDepartures,
         airline: departure?.airline,
         highSpeedTrain: departure?.highSpeedTrain ?? undefined,
         departureAirport: departure?.departureAirport,
@@ -109,9 +132,9 @@ async function queryPackages(): Promise<TravelPackage[]> {
         terms: byKind("term"),
         destination: byKind("destination"),
         itinerary: itineraryRows.filter((day) => day.packageId === item.id).map((day) => ({ day: day.day, title: day.title, description: day.description })),
-        priceFrom: departure ? Number(departure.price) : undefined,
+        priceFrom: activePrices.length ? Math.min(...activePrices) : departure ? Number(departure.price) : undefined,
         currency: "IDR" as const,
-        status: departure && departure.departureDate < todayJakarta ? "sold-out" as const : departure?.status === "limited" ? "limited" as const : departure?.status === "full" || departure?.status === "closed" ? "sold-out" as const : departure?.status === "coming-soon" ? "coming-soon" as const : "available" as const,
+        status: packageStatus,
         detailUrl: item.detailUrl ?? undefined,
         whatsappMessage: item.whatsappMessage,
       } satisfies TravelPackage;

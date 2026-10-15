@@ -22,6 +22,25 @@ const plusHotels = z.preprocess((input) => {
   }
 }, z.array(plusHotelSchema).max(10, "Maksimal 10 hotel program plus."));
 
+const departureSchema = z.object({
+  id: z.string().uuid().optional().or(z.literal("")),
+  departureDate: z.string().trim().min(4, "Tanggal keberangkatan wajib diisi."),
+  returnDate: z.string().trim().optional(),
+  price: z.preprocess(
+    (val) => (typeof val === "string" ? Number(val.replace(/\D/g, "")) : typeof val === "number" ? val : NaN),
+    z.number().int().positive("Harga harus lebih dari 0."),
+  ),
+  capacity: z.union([z.coerce.number().int().positive(), z.literal(""), z.null()]).optional(),
+  availableSeats: z.union([z.coerce.number().int().min(0), z.literal(""), z.null()]).optional(),
+  status: z.enum(["open", "limited", "full", "closed", "coming-soon"]).default("open"),
+});
+
+const packageDepartures = z.preprocess((input) => {
+  if (Array.isArray(input)) return input;
+  if (typeof input !== "string" || !input.trim()) return [];
+  try { return JSON.parse(input); } catch { return []; }
+}, z.array(departureSchema).min(1, "Tambahkan minimal satu tanggal keberangkatan."));
+
 export const packageFormSchema = z.object({
   id: z.string().trim().min(3),
   departureId: z.string().uuid().optional().or(z.literal("")),
@@ -54,6 +73,7 @@ export const packageFormSchema = z.object({
   capacity: z.union([z.coerce.number().int().positive(), z.literal(""), z.null()]).optional(),
   availableSeats: z.union([z.coerce.number().int().min(0), z.literal(""), z.null()]).optional(),
   departureStatus: z.enum(["open", "limited", "full", "closed", "coming-soon"]).default("open"),
+  departures: packageDepartures.optional().default([]),
   makkahHotel: z.string().trim().min(2, "Hotel Makkah wajib diisi."),
   makkahStar: z.coerce.number().int().refine((value) => value === 3 || value === 4 || value === 5, "Bintang hotel Makkah hanya boleh 3, 4, atau 5.").default(5),
   makkahDistance: z.string().trim().optional(),
@@ -72,7 +92,30 @@ export const packageFormSchema = z.object({
   if (data.packageType === "plus" && data.plusHotels.length === 0) {
     context.addIssue({ code: "custom", path: ["plusHotels"], message: "Tambahkan minimal satu hotel untuk Program Umroh Plus." });
   }
-}).transform((data) => data.packageType === "plus" ? data : { ...data, plusHotels: [] });
+  if (data.departures.length === 0 && !data.departureDate) {
+    context.addIssue({ code: "custom", path: ["departures"], message: "Tambahkan minimal satu tanggal keberangkatan." });
+  }
+  const dates = data.departures.map((departure) => departure.departureDate);
+  if (new Set(dates).size !== dates.length) {
+    context.addIssue({ code: "custom", path: ["departures"], message: "Tanggal keberangkatan dalam satu paket tidak boleh duplikat." });
+  }
+  data.departures.forEach((departure, index) => {
+    if (typeof departure.capacity === "number" && typeof departure.availableSeats === "number" && departure.availableSeats > departure.capacity) {
+      context.addIssue({ code: "custom", path: ["departures", index, "availableSeats"], message: "Sisa kuota tidak boleh melebihi kuota." });
+    }
+  });
+}).transform((data) => ({
+  ...(data.packageType === "plus" ? data : { ...data, plusHotels: [] }),
+  departures: data.departures.length ? data.departures : [{
+    id: data.departureId,
+    departureDate: data.departureDate,
+    returnDate: data.returnDate,
+    price: data.price,
+    capacity: data.capacity,
+    availableSeats: data.availableSeats,
+    status: data.departureStatus,
+  }],
+}));
 
 export const entryFormSchema = z.object({
   id: z.string().uuid().optional(),

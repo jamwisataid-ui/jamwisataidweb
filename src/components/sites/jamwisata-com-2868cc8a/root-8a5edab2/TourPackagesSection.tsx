@@ -35,7 +35,7 @@ export function TourPackagesSection({ packages }: { packages: TravelPackage[] })
                   <div className="p-5 sm:p-6">
                     <h3 className="font-[family-name:var(--font-cinzel)] text-xl font-bold text-white group-hover:text-[#F5D97A]">{pkg.name}</h3>
                     <div className="mt-4 space-y-2 text-xs text-white/65">
-                      {pkg.departureDate ? <p className="flex items-center gap-2"><CalendarDays className="size-3.5 text-[#D5A12B]" />{pkg.departureDate}</p> : null}
+                      {pkg.departureDate ? <p className="flex items-center gap-2"><CalendarDays className="size-3.5 text-[#D5A12B]" />{pkg.departures && pkg.departures.length > 1 ? `${pkg.departures.length} jadwal · mulai ${pkg.departures[0].dateLabel}` : pkg.departureDate}</p> : null}
                       {pkg.airline ? <p className="flex items-center gap-2"><Plane className="size-3.5 text-[#D5A12B]" />{pkg.airline}</p> : null}
                       <p className="flex items-center gap-2"><MapPinned className="size-3.5 text-[#D5A12B]" />{pkg.destination?.slice(0, 2).join(" · ") || "Perjalanan bersama Jam Wisata"}</p>
                     </div>

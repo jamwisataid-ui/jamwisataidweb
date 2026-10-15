@@ -159,7 +159,7 @@ export default async function HargaUmrohPage() {
                     {pkg.name}
                   </h2>
                   <p className="mt-1 text-xs text-[#59616D]">
-                    {pkg.durationDays} Hari — Berangkat {pkg.departureDate}
+                    {pkg.durationDays} Hari — {pkg.departures && pkg.departures.length > 1 ? `${pkg.departures.length} jadwal, mulai ${pkg.departures[0].dateLabel}` : `Berangkat ${pkg.departureDate}`}
                   </p>
 
                   <div className="mt-5 py-4 border-y border-slate-100">

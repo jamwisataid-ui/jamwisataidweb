@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   ChevronRight,
   FileText,
-  MessageCircle,
   MapPin,
   ShieldCheck,
   Sparkles,
@@ -23,7 +22,8 @@ import { ModernProofFooter } from "@/components/sites/jamwisata-com-2868cc8a/roo
 import { PremiumHeader } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/PremiumHeader";
 import { WhatsAppConcierge } from "@/components/sites/jamwisata-com-2868cc8a/root-8a5edab2/WhatsAppConcierge";
 import { AdminDetailFloatingBar } from "@/components/admin/AdminDetailFloatingBar";
-import { formatIDR, whatsappHref } from "@/data/jamwisata";
+import { PackageDepartureSelector } from "@/components/package/PackageDepartureSelector";
+import { formatIDR } from "@/data/jamwisata";
 import { getPublishedPackagesByCategory, type PublicPackageCategory } from "@/lib/cms/public";
 import { resolveAbsoluteImageUrl, SITE_URL } from "@/lib/seo";
 
@@ -62,11 +62,12 @@ export async function generatePackageMetadata({ params }: PackageDetailProps, ca
     };
   }
 
-  const title = `Paket ${pkg.name} (${pkg.departureDate}) | Jam Wisata`;
+  const scheduleLabel = pkg.departures && pkg.departures.length > 1 ? `${pkg.departures.length} pilihan keberangkatan mulai ${pkg.departures[0].dateLabel}` : pkg.departureDate;
+  const title = `Paket ${pkg.name} (${scheduleLabel}) | Jam Wisata`;
   const plusHotelSummary = pkg.packageType === "plus" && pkg.plusHotels?.length
     ? ` Hotel Program Plus: ${pkg.plusHotels.map((hotel) => `${hotel.name} di ${hotel.destination}`).join(", ")}.`
     : "";
-  const description = `Paket ${pkg.name} Jam Wisata berangkat ${pkg.departureDate} via ${pkg.airline}. Hotel Makkah: ${pkg.makkahHotel?.name}, Hotel Madinah: ${pkg.madinahHotel?.name}.${plusHotelSummary} Harga All In Rp ${formatIDR(pkg.priceFrom ?? 0)} /pax.`;
+  const description = `Paket ${pkg.name} Jam Wisata memiliki ${scheduleLabel} via ${pkg.airline}. Hotel Makkah: ${pkg.makkahHotel?.name}, Hotel Madinah: ${pkg.madinahHotel?.name}.${plusHotelSummary} Harga All In Rp ${formatIDR(pkg.priceFrom ?? 0)} /pax.`;
   const imageUrl = resolveAbsoluteImageUrl(pkg.image);
 
   return {
@@ -123,11 +124,13 @@ export async function renderPackageDetail({ params }: PackageDetailProps, catego
     notFound();
   }
 
+  const scheduleLabel = pkg.departures && pkg.departures.length > 1 ? `${pkg.departures.length} pilihan keberangkatan mulai ${pkg.departures[0].dateLabel}` : pkg.departureDate;
+
   const touristTripSchema = {
     "@context": "https://schema.org",
     "@type": "TouristTrip",
     name: `Paket ${pkg.name} — Jam Wisata`,
-    description: `${config.tripDescription} ${pkg.name} bersama Jam Wisata keberangkatan ${pkg.departureDate}. Maskapai: ${pkg.airline}, Hotel Makkah: ${pkg.makkahHotel?.name}, Hotel Madinah: ${pkg.madinahHotel?.name}.${pkg.packageType === "plus" && pkg.plusHotels?.length ? ` Hotel Program Plus: ${pkg.plusHotels.map((hotel) => `${hotel.name} (${hotel.destination})`).join(", ")}.` : ""}`,
+    description: `${config.tripDescription} ${pkg.name} bersama Jam Wisata dengan ${scheduleLabel}. Maskapai: ${pkg.airline}, Hotel Makkah: ${pkg.makkahHotel?.name}, Hotel Madinah: ${pkg.madinahHotel?.name}.${pkg.packageType === "plus" && pkg.plusHotels?.length ? ` Hotel Program Plus: ${pkg.plusHotels.map((hotel) => `${hotel.name} (${hotel.destination})`).join(", ")}.` : ""}`,
     touristType: config.touristType,
     provider: {
       "@type": "TravelAgency",
@@ -223,7 +226,7 @@ export async function renderPackageDetail({ params }: PackageDetailProps, catego
             </h1>
 
             <p className="mt-3 font-[family-name:var(--font-cormorant)] text-lg sm:text-2xl italic text-[#F5D97A]">
-              Keberangkatan: {pkg.departureDate} — Bersama {pkg.airline}
+              {scheduleLabel} — Bersama {pkg.airline}
             </p>
           </div>
         </div>
@@ -242,7 +245,7 @@ export async function renderPackageDetail({ params }: PackageDetailProps, catego
                   <span>Fakta Program Perjalanan</span>
                 </div>
                 <p className="mt-3 text-sm sm:text-base leading-relaxed text-[#061A2F]">
-                  Program <strong>{pkg.name}</strong> Jam Wisata dijadwalkan berangkat pada <strong>{pkg.departureDate}</strong> melalui <strong>{pkg.departureAirport}</strong> dengan maskapai <strong>{pkg.airline}</strong>. Fasilitas akomodasi meliputi hotel <strong>{pkg.makkahHotel?.name}</strong> ({pkg.makkahHotel?.distance}) di Makkah dan <strong>{pkg.madinahHotel?.name}</strong> ({pkg.madinahHotel?.distance}) di Madinah. Harga paket All In mulai dari <strong>Rp {formatIDR(pkg.priceFrom ?? 0)} /pax</strong>.
+                  Program <strong>{pkg.name}</strong> Jam Wisata memiliki <strong>{scheduleLabel}</strong> melalui <strong>{pkg.departureAirport}</strong> dengan maskapai <strong>{pkg.airline}</strong>. Fasilitas akomodasi meliputi hotel <strong>{pkg.makkahHotel?.name}</strong> ({pkg.makkahHotel?.distance}) di Makkah dan <strong>{pkg.madinahHotel?.name}</strong> ({pkg.madinahHotel?.distance}) di Madinah. Harga paket All In mulai dari <strong>Rp {formatIDR(pkg.priceFrom ?? 0)} /pax</strong>.
                 </p>
               </div>
 
@@ -380,7 +383,7 @@ export async function renderPackageDetail({ params }: PackageDetailProps, catego
                   </div>
                   <div className="flex justify-between py-1 border-b border-white/5">
                     <span className="text-slate-400">Keberangkatan</span>
-                    <span className="font-semibold text-white">{pkg.departureDate}</span>
+                    <span className="max-w-[190px] text-right font-semibold text-white">{scheduleLabel}</span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-white/5">
                     <span className="text-slate-400">Maskapai</span>
@@ -408,17 +411,8 @@ export async function renderPackageDetail({ params }: PackageDetailProps, catego
                   )) : null}
                 </div>
 
-                <div className="mt-6 space-y-2.5">
-                  <a
-                    href={whatsappHref(pkg.whatsappMessage, `Paket Detail — ${pkg.name}`)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="lift-soft sheen-gold flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-gold-rich text-xs font-extrabold uppercase tracking-wider text-[#061A2F] shadow-lg transition hover:scale-105"
-                  >
-                    <MessageCircle className="size-4" />
-                    <span>Konsultasi WhatsApp</span>
-                  </a>
-
+                <PackageDepartureSelector packageName={pkg.name} departures={pkg.departures ?? []} />
+                <div className="mt-3 space-y-2.5">
                   {pkg.detailUrl && (
                     <a
                       href={pkg.detailUrl}

@@ -11,7 +11,7 @@ function destinationLabel(item: Package) {
   return `${item.durationDays ? `${item.durationDays} hari · ` : ""}${places.join(" · ")}`;
 }
 
-export function PackageSummaryCard({ item }: { item: Package }) {
+export function PackageSummaryCard({ item, price = item.priceFrom }: { item: Package; price?: number }) {
   return (
     <View style={styles.card}>
       <View style={styles.headingRow}>
@@ -22,8 +22,8 @@ export function PackageSummaryCard({ item }: { item: Package }) {
         </View>
       </View>
       <MetallicGold style={styles.pricePill}>
-        <Text adjustsFontSizeToFit numberOfLines={1} style={styles.price}>{item.priceFrom ? `Rp ${money.format(item.priceFrom)}` : "Hubungi kami"}</Text>
-        {item.priceFrom ? <Text style={styles.person}>/jamaah</Text> : null}
+        <Text adjustsFontSizeToFit numberOfLines={1} style={styles.price}>{price ? `Rp ${money.format(price)}` : "Hubungi kami"}</Text>
+        {price ? <Text style={styles.person}>/jamaah</Text> : null}
       </MetallicGold>
     </View>
   );

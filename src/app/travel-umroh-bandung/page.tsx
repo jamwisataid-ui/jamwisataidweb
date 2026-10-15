@@ -377,7 +377,7 @@ export default async function TravelUmrohBandungPage() {
                     <div className="mt-3 space-y-2 text-xs text-[#59616D]">
                       <div className="flex items-center gap-2">
                         <Calendar className="size-3.5 text-[#D5A12B] shrink-0" />
-                        <span>Keberangkatan: <strong>{pkg.departureDate}</strong></span>
+                        <span>{pkg.departures && pkg.departures.length > 1 ? <><strong>{pkg.departures.length} jadwal keberangkatan</strong> · mulai {pkg.departures[0].dateLabel}</> : <>Keberangkatan: <strong>{pkg.departureDate}</strong></>}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Plane className="size-3.5 text-[#D5A12B] shrink-0" />

@@ -43,12 +43,15 @@ export async function listPackagesAdmin(category?: CmsPackageCategory) {
   const allDepartures = await database.select().from(departures).orderBy(asc(departures.departureDate));
 
   return packageList.map((pkg) => {
-    const dep = allDepartures.find((d) => d.packageId === pkg.id);
+    const packageDepartures = allDepartures.filter((d) => d.packageId === pkg.id);
+    const dep = packageDepartures[0];
+    const prices = packageDepartures.map((departure) => Number(departure.price)).filter(Number.isFinite);
     return {
       ...pkg,
-      price: dep?.price ? Number(dep.price) : null,
+      price: prices.length ? Math.min(...prices) : null,
       airline: dep?.airline ?? null,
       dateLabel: dep?.dateLabel ?? null,
+      departureCount: packageDepartures.length,
     };
   });
 }
@@ -62,11 +65,12 @@ export async function getPackageAdmin(id: string) {
   if (draft) return { ...(draft.payload as Record<string, unknown>), status: item?.status ?? "draft", hasDraftChanges: true };
 
   if (!item) return null;
-  const [departure, children, itinerary] = await Promise.all([
-    database.query.departures.findFirst({ where: eq(departures.packageId, id), orderBy: [asc(departures.departureDate)] }),
+  const [packageDepartures, children, itinerary] = await Promise.all([
+    database.select().from(departures).where(eq(departures.packageId, id)).orderBy(asc(departures.departureDate)),
     database.select().from(packageItems).where(eq(packageItems.packageId, id)).orderBy(asc(packageItems.sortOrder)),
     database.select().from(itineraryDays).where(eq(itineraryDays.packageId, id)).orderBy(asc(itineraryDays.day)),
   ]);
+  const departure = packageDepartures[0];
   const hotels = departure
     ? await database.select().from(accommodations).where(eq(accommodations.departureId, departure.id)).orderBy(asc(accommodations.sortOrder))
     : [];
@@ -108,6 +112,15 @@ export async function getPackageAdmin(id: string) {
     capacity: departure?.capacity ?? "",
     availableSeats: departure?.availableSeats ?? "",
     departureStatus: departure?.status ?? "open",
+    departures: JSON.stringify(packageDepartures.map((entry) => ({
+      id: entry.id,
+      departureDate: entry.departureDate,
+      returnDate: entry.returnDate ?? "",
+      price: Number(entry.price),
+      capacity: entry.capacity ?? "",
+      availableSeats: entry.availableSeats ?? "",
+      status: entry.status,
+    }))),
     makkahHotel: makkah?.hotelName ?? "",
     makkahStar: makkah?.star ?? 5,
     makkahDistance: makkah?.distance ?? "",

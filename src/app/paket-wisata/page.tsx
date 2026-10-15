@@ -50,7 +50,7 @@ export default async function TourPackagesPage() {
                     <div className="p-6">
                       <h2 className="font-[family-name:var(--font-cinzel)] text-xl font-bold text-[#061A2F]">{pkg.name}</h2>
                       <div className="mt-4 space-y-2.5 text-xs text-[#59616D]">
-                        <p className="flex items-center gap-2"><CalendarDays className="size-4 shrink-0 text-[#D5A12B]" />Jadwal: <strong>{pkg.departureDate}</strong></p>
+                        <p className="flex items-center gap-2"><CalendarDays className="size-4 shrink-0 text-[#D5A12B]" />{pkg.departures && pkg.departures.length > 1 ? <><strong>{pkg.departures.length} jadwal</strong> · mulai {pkg.departures[0].dateLabel}</> : <>Jadwal: <strong>{pkg.departureDate}</strong></>}</p>
                         <p className="flex items-center gap-2"><Plane className="size-4 shrink-0 text-[#D5A12B]" />Maskapai: <strong>{pkg.airline}</strong></p>
                         {pkg.highSpeedTrain ? <p className="flex items-center gap-2"><TrainFront className="size-4 shrink-0 text-[#D5A12B]" />Kereta Cepat: <strong>{pkg.highSpeedTrain}</strong></p> : null}
                         <p className="flex items-center gap-2"><Hotel className="size-4 shrink-0 text-[#D5A12B]" /><span className="flex min-w-0 flex-1 items-center justify-between gap-3"><span>Makkah: <strong>{pkg.makkahHotel?.name}</strong></span><HotelStarRating rating={pkg.makkahHotel?.star} /></span></p>

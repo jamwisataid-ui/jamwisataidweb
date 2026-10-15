@@ -8,6 +8,7 @@ import { PackageDetailContent } from "@/components/package-detail/package-detail
 import { PackageDetailError, PackageDetailSkeleton } from "@/components/package-detail/package-detail-state";
 import { PackageDetailTabs, type DetailTab } from "@/components/package-detail/package-detail-tabs";
 import { PackageHero } from "@/components/package-detail/package-hero";
+import { PackageDeparturePicker } from "@/components/package-detail/package-departure-picker";
 import { PackageSummaryCard } from "@/components/package-detail/package-summary-card";
 import { StickyRegistrationCTA } from "@/components/package-detail/sticky-registration-cta";
 import { api } from "@/lib/api";
@@ -19,6 +20,7 @@ export default function PackageDetailScreen() {
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
   const [tab, setTab] = useState<DetailTab>("detail");
   const [favorite, setFavorite] = useState(false);
+  const [selectedDepartureId, setSelectedDepartureId] = useState("");
   const query = useQuery({
     queryKey: ["package", slug],
     queryFn: () => api<Package>(`/packages/${encodeURIComponent(slug!)}`),
@@ -29,17 +31,22 @@ export default function PackageDetailScreen() {
   if (query.isPending) return <SafeAreaView edges={[]} style={styles.safe}><PackageDetailSkeleton /></SafeAreaView>;
   if (query.isError || !item) return <SafeAreaView style={styles.safe}><PackageDetailError onRetry={() => void query.refetch()} /></SafeAreaView>;
 
-  const canRegister = Boolean(item.departureId) && (item.status === "available" || item.status === "limited");
+  const departures = item.departures ?? [];
+  const automaticDepartureId = departures.filter((departure) => departure.selectable).length === 1 ? departures.find((departure) => departure.selectable)?.id ?? "" : "";
+  const effectiveDepartureId = selectedDepartureId || automaticDepartureId || (!departures.length ? item.departureId ?? "" : "");
+  const selectedDeparture = departures.find((departure) => departure.id === effectiveDepartureId);
+  const canRegister = Boolean(effectiveDepartureId) && (selectedDeparture ? selectedDeparture.selectable : item.status === "available" || item.status === "limited");
 
   return (
     <SafeAreaView edges={["bottom"]} style={styles.safe}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <PackageHero item={item} favorite={favorite} onToggleFavorite={() => setFavorite((value) => !value)} />
-        <PackageSummaryCard item={item} />
+        <PackageSummaryCard item={item} price={selectedDeparture?.price ?? item.priceFrom} />
+        <PackageDeparturePicker departures={departures} value={effectiveDepartureId} onChange={setSelectedDepartureId} />
         <PackageDetailTabs value={tab} onChange={setTab} />
         <PackageDetailContent item={item} tab={tab} />
       </ScrollView>
-      <StickyRegistrationCTA status={item.status} enabled={canRegister} onPress={() => item.departureId && router.push(`/register/${item.departureId}`)} />
+      <StickyRegistrationCTA status={selectedDeparture?.status ?? item.status} enabled={canRegister} onPress={() => effectiveDepartureId && router.push(`/register/${effectiveDepartureId}`)} />
     </SafeAreaView>
   );
 }

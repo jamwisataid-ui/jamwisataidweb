@@ -10,6 +10,7 @@ export type TravelPackage = {
   departureDate?: string;
   departureId?: string;
   departureMonth?: string;
+  departures?: PackageDeparture[];
   airline?: string;
   highSpeedTrain?: string;
   departureAirport?: string;
@@ -45,6 +46,18 @@ export type TravelPackage = {
     description: string;
   }>;
   terms?: string[];
+};
+
+export type PackageDeparture = {
+  id: string;
+  departureDate: string;
+  dateLabel: string;
+  returnDate?: string;
+  price?: number;
+  quota?: number;
+  remainingQuota?: number;
+  status: "available" | "limited" | "sold-out" | "coming-soon";
+  selectable: boolean;
 };
 
 export type ArticlePreview = {

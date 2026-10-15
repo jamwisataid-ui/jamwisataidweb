@@ -52,16 +52,16 @@ export const metadata: Metadata = {
   },
 };
 
-const jadwalSchema = (umrahPackages: TravelPackage[]) => ({
+const jadwalSchema = (schedule: Array<{ pkg: TravelPackage; dateLabel: string }>) => ({
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "ItemList",
       name: "Jadwal Keberangkatan Umroh Jam Wisata",
-      itemListElement: umrahPackages.map((pkg, index) => ({
+      itemListElement: schedule.map(({ pkg, dateLabel }, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        name: `${pkg.name} — ${pkg.departureDate}`,
+        name: `${pkg.name} — ${dateLabel}`,
         url: `https://jamwisata.id/paket-umroh/${pkg.slug}`,
       })),
     },
@@ -87,10 +87,10 @@ const jadwalSchema = (umrahPackages: TravelPackage[]) => ({
 
 export default async function JadwalUmrohPage() {
   const umrahPackages = await getPublishedPackagesByCategory("umrah");
-  const displayedPackages = umrahPackages.slice(0, 10);
+  const displayedDepartures = umrahPackages.flatMap((pkg) => (pkg.departures?.length ? pkg.departures : pkg.departureDate ? [{ id: pkg.departureId ?? pkg.id, dateLabel: pkg.departureDate, price: pkg.priceFrom, selectable: true }] : []).map((departure) => ({ pkg, departure }))).slice(0, 30);
   return (
     <main className="jam-page min-h-screen bg-white text-[#333333]">
-      <JsonLd schema={jadwalSchema(displayedPackages)} />
+      <JsonLd schema={jadwalSchema(displayedDepartures.map(({ pkg, departure }) => ({ pkg, dateLabel: departure.dateLabel })))} />
       <PremiumHeader />
 
       {/* Hero */}
@@ -140,15 +140,15 @@ export default async function JadwalUmrohPage() {
       <section className="bg-white py-16 sm:py-20 border-b border-[#061A2F]/8">
         <div className="jam-container">
           <div className="space-y-6">
-            {displayedPackages.map((pkg) => (
+            {displayedDepartures.map(({ pkg, departure }) => (
               <div
-                key={pkg.id}
+                key={`${pkg.id}-${departure.id}`}
                 className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 rounded-2xl border border-[#061A2F]/12 bg-white p-6 sm:p-7 shadow-xs hover:border-[#D5A12B]/40 hover:shadow-md transition"
               >
                 <div className="space-y-2 max-w-[500px]">
                   <div className="inline-flex items-center gap-2 rounded-md bg-[#061A2F] px-2.5 py-1 text-xs font-bold text-[#F5D97A]">
                     <Calendar className="size-3.5 text-[#D5A12B]" />
-                    <span>{pkg.departureDate}</span>
+                    <span>{departure.dateLabel}</span>
                   </div>
                   <h2 className="font-[family-name:var(--font-cinzel)] text-xl font-bold text-[#061A2F]">
                     {pkg.name} ({pkg.durationDays} Hari)
@@ -162,7 +162,7 @@ export default async function JadwalUmrohPage() {
                   <div className="text-left sm:text-right">
                     <span className="text-xs text-slate-500 font-medium block">Harga All In</span>
                     <span className="text-xl font-extrabold text-[#061A2F]">
-                      Rp {formatIDR(pkg.priceFrom ?? 0)}
+                      Rp {formatIDR(departure.price ?? pkg.priceFrom ?? 0)}
                     </span>
                   </div>
 
@@ -175,7 +175,7 @@ export default async function JadwalUmrohPage() {
                     </Link>
                     <a
                       href={whatsappHref(
-                        `Assalamu’alaikum, saya ingin reservasi seat untuk jadwal keberangkatan ${pkg.departureDate} (${pkg.name}).`,
+                        `Assalamu’alaikum, saya ingin reservasi seat untuk ${pkg.name}.\nKeberangkatan: ${departure.dateLabel}\nHarga: Rp${formatIDR(departure.price ?? pkg.priceFrom ?? 0)}.`,
                         `Jadwal Page — ${pkg.name}`
                       )}
                       target="_blank"
