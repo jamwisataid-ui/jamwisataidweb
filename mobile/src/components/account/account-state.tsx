@@ -18,9 +18,9 @@ const styles = StyleSheet.create({
   row: { height: 66, flexDirection: "row", alignItems: "center", gap: 14, paddingHorizontal: 16, backgroundColor: colors.white },
   icon: { width: 40, height: 40, borderRadius: 14 },
   error: { marginTop: -51, marginHorizontal: 18, padding: 22, alignItems: "center", gap: 10, borderRadius: 21, backgroundColor: colors.white },
-  errorTitle: { color: colors.navy, fontFamily: "DMSans_700Bold", fontSize: 18, textAlign: "center" },
-  errorText: { color: colors.muted, fontFamily: "DMSans_400Regular", lineHeight: 20, textAlign: "center" },
+  errorTitle: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 18, textAlign: "center" },
+  errorText: { color: colors.muted, fontFamily: "Montserrat_400Regular", lineHeight: 20, textAlign: "center" },
   retry: { marginTop: 5, minWidth: 130, height: 46, borderRadius: 14, alignItems: "center", justifyContent: "center", backgroundColor: colors.gold },
-  retryText: { color: colors.navy, fontFamily: "DMSans_700Bold" },
-  logout: { color: colors.danger, fontFamily: "DMSans_500Medium", padding: 8 },
+  retryText: { color: colors.navy, fontFamily: "Montserrat_700Bold" },
+  logout: { color: colors.danger, fontFamily: "Montserrat_500Medium", padding: 8 },
 });

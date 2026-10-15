@@ -23,11 +23,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#D84444",
     borderWidth: 2,
-    borderColor: "#00365F",
+    borderColor: "#0A1D3A",
   },
   text: {
     color: "#FFFFFF",
-    fontFamily: "DMSans_700Bold",
+    fontFamily: "Montserrat_700Bold",
     fontSize: 9,
     lineHeight: 11,
   },

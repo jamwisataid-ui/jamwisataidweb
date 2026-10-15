@@ -45,6 +45,6 @@ export default function PackageDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: "#FFFDF8" },
+  safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: "#FBFAF6" },
   content: { paddingBottom: 28, backgroundColor: colors.ivory },
 });

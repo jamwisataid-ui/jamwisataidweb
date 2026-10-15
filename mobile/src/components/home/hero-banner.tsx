@@ -8,7 +8,7 @@ export function HeroBanner() {
     <View style={styles.hero}>
       <Image alt="Ka'bah dan Masjidil Haram" source={heroImage} resizeMode="cover" style={styles.image} />
       <LinearGradient
-        colors={["rgba(0,27,52,0.18)", "rgba(0,30,56,0.88)"]}
+        colors={["rgba(6,21,43,0.18)", "rgba(10,29,58,0.88)"]}
         start={{ x: 0.7, y: 0 }}
         end={{ x: 0.1, y: 1 }}
         style={styles.overlay}
@@ -24,7 +24,7 @@ export function HeroBanner() {
 }
 
 const styles = StyleSheet.create({
-  hero: { width: "100%", aspectRatio: 3, borderRadius: 20, overflow: "hidden", backgroundColor: "#00365F" },
+  hero: { width: "100%", aspectRatio: 3, borderRadius: 20, overflow: "hidden", backgroundColor: "#0A1D3A" },
   image: { width: "100%", aspectRatio: 3 },
   overlay: {
     position: "absolute",
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     padding: 18,
   },
   copy: { gap: 2, maxWidth: "72%" },
-  eyebrow: { color: "#F5C25A", fontFamily: "DMSans_700Bold", fontSize: 10, letterSpacing: 1.8 },
-  brand: { color: "#FFFFFF", fontFamily: "PlayfairDisplay_700Bold", fontSize: 26, lineHeight: 31 },
-  tagline: { color: "rgba(255,255,255,0.86)", fontFamily: "DMSans_400Regular", fontSize: 12 },
+  eyebrow: { color: "#D4AF37", fontFamily: "Montserrat_700Bold", fontSize: 10, letterSpacing: 1.8 },
+  brand: { color: "#FFFFFF", fontFamily: "Cinzel_700Bold", fontSize: 26, lineHeight: 31 },
+  tagline: { color: "rgba(255,255,255,0.86)", fontFamily: "CormorantGaramond_600SemiBold", fontSize: 16, lineHeight: 19 },
 });

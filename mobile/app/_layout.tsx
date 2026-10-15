@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useFonts as useDmSans, DMSans_400Regular, DMSans_500Medium, DMSans_700Bold } from "@expo-google-fonts/dm-sans";
-import { useFonts as usePlayfair, PlayfairDisplay_700Bold } from "@expo-google-fonts/playfair-display";
-import { useFonts as useNotoNaskh, NotoNaskhArabic_400Regular } from "@expo-google-fonts/noto-naskh-arabic";
+import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_500Medium, Montserrat_600SemiBold, Montserrat_700Bold } from "@expo-google-fonts/montserrat";
+import { useFonts as useCinzel, Cinzel_600SemiBold, Cinzel_700Bold } from "@expo-google-fonts/cinzel";
+import { useFonts as useCormorant, CormorantGaramond_500Medium, CormorantGaramond_600SemiBold } from "@expo-google-fonts/cormorant-garamond";
+import { useFonts as useReemKufi, ReemKufi_400Regular, ReemKufi_600SemiBold } from "@expo-google-fonts/reem-kufi";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useAuthStore } from "@/lib/auth-store";
 import { api } from "@/lib/api";
@@ -20,9 +21,10 @@ export default function RootLayout() {
   const [client] = useState(() => new QueryClient({ defaultOptions: { queries: { staleTime: 60_000, retry: 1 } } }));
   const [showSplash, setShowSplash] = useState(true);
   const [bootstrapReady, setBootstrapReady] = useState(false);
-  const [dmLoaded, dmError] = useDmSans({ DMSans_400Regular, DMSans_500Medium, DMSans_700Bold });
-  const [playfairLoaded, playfairError] = usePlayfair({ PlayfairDisplay_700Bold });
-  const [naskhLoaded, naskhError] = useNotoNaskh({ NotoNaskhArabic_400Regular });
+  const [montserratLoaded, montserratError] = useMontserrat({ Montserrat_400Regular, Montserrat_500Medium, Montserrat_600SemiBold, Montserrat_700Bold });
+  const [cinzelLoaded, cinzelError] = useCinzel({ Cinzel_600SemiBold, Cinzel_700Bold });
+  const [cormorantLoaded, cormorantError] = useCormorant({ CormorantGaramond_500Medium, CormorantGaramond_600SemiBold });
+  const [reemLoaded, reemError] = useReemKufi({ ReemKufi_400Regular, ReemKufi_600SemiBold });
   const hydrate = useAuthStore((state) => state.hydrate);
   useDeviceNotifications();
   useEffect(() => { void SplashScreen.hideAsync(); }, []);
@@ -36,7 +38,7 @@ export default function RootLayout() {
     ]).then(() => { if (active) setBootstrapReady(true); });
     return () => { active = false; };
   }, [client, hydrate]);
-  const fontsReady = (dmLoaded || Boolean(dmError)) && (playfairLoaded || Boolean(playfairError)) && (naskhLoaded || Boolean(naskhError));
+  const fontsReady = (montserratLoaded || Boolean(montserratError)) && (cinzelLoaded || Boolean(cinzelError)) && (cormorantLoaded || Boolean(cormorantError)) && (reemLoaded || Boolean(reemError));
   const appReady = bootstrapReady && fontsReady;
   return <SafeAreaProvider><QueryClientProvider client={client}>{showSplash ? <BrandSplash ready={appReady} onFinished={() => setShowSplash(false)} /> : <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.ivory } }}><Stack.Screen name="(tabs)" /><Stack.Screen name="login" /><Stack.Screen name="activate" /><Stack.Screen name="package/[slug]" /><Stack.Screen name="register/[departureId]" /><Stack.Screen name="payment/[registrationId]" /><Stack.Screen name="journey" /><Stack.Screen name="payments" /><Stack.Screen name="documents" /><Stack.Screen name="account/profile" /><Stack.Screen name="help" /><Stack.Screen name="search" /><Stack.Screen name="schedule" /><Stack.Screen name="prayer-times" /><Stack.Screen name="quran/index" /><Stack.Screen name="quran/[surah]" /><Stack.Screen name="duas/index" /><Stack.Screen name="duas/[collection]/index" /><Stack.Screen name="duas/[collection]/[item]" /><Stack.Screen name="live-muthowif" /></Stack>}</QueryClientProvider></SafeAreaProvider>;
 }

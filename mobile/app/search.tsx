@@ -63,9 +63,9 @@ const styles = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", gap: 10 },
   backButton: { width: 42, height: 42, borderRadius: 14, alignItems: "center", justifyContent: "center", backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
   heading: { flex: 1, gap: 2 },
-  title: { color: colors.navy, fontFamily: "PlayfairDisplay_700Bold", fontSize: 24, lineHeight: 29 },
-  subtitle: { color: colors.muted, fontFamily: "DMSans_400Regular", fontSize: 13, lineHeight: 18 },
+  title: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 24, lineHeight: 29 },
+  subtitle: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 13, lineHeight: 18 },
   search: { minHeight: 52, flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 15, borderRadius: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
-  input: { flex: 1, color: colors.ink, fontFamily: "DMSans_400Regular", fontSize: 15 },
-  empty: { color: colors.muted, fontFamily: "DMSans_400Regular", textAlign: "center", lineHeight: 22, paddingVertical: 24 },
+  input: { flex: 1, color: colors.ink, fontFamily: "Montserrat_400Regular", fontSize: 15 },
+  empty: { color: colors.muted, fontFamily: "Montserrat_400Regular", textAlign: "center", lineHeight: 22, paddingVertical: 24 },
 });

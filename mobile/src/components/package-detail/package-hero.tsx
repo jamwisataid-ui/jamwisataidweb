@@ -25,7 +25,7 @@ export function PackageHero({ item, favorite, onToggleFavorite }: { item: Packag
   return (
     <View style={[styles.hero, { height }]}>
       <Image alt={item.name} source={{ uri: item.image }} resizeMode="cover" style={styles.image} />
-      <LinearGradient colors={["rgba(1,23,48,0.55)", "transparent", "rgba(1,23,48,0.32)"]} locations={[0, 0.42, 1]} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={["rgba(10,29,58,0.55)", "transparent", "rgba(10,29,58,0.32)"]} locations={[0, 0.42, 1]} style={StyleSheet.absoluteFill} />
       <View style={styles.controls}>
         <FloatingAction icon="arrow-back" label="Kembali" onPress={() => router.back()} />
         <View style={styles.rightControls}>

@@ -11,7 +11,7 @@ export function PrayerTimeList({ data, now }: { data: PrayerTimes; now: Date }) 
 }
 
 const styles = StyleSheet.create({
-  list: { marginHorizontal: 18 }, row: { minHeight: 55, paddingHorizontal: 12, flexDirection: "row", alignItems: "center", gap: 11, borderBottomWidth: 1, borderBottomColor: "#EEE9DF" }, active: { marginVertical: 4, minHeight: 58, borderBottomWidth: 0, borderRadius: 14, backgroundColor: "#F3C66C" },
+  list: { marginHorizontal: 18 }, row: { minHeight: 55, paddingHorizontal: 12, flexDirection: "row", alignItems: "center", gap: 11, borderBottomWidth: 1, borderBottomColor: "#EEE9DF" }, active: { marginVertical: 4, minHeight: 58, borderBottomWidth: 0, borderRadius: 14, backgroundColor: "#D4AF37" },
   icon: { width: 34, height: 34, borderRadius: 11, alignItems: "center", justifyContent: "center", backgroundColor: "#F5F0E7" }, activeIcon: { backgroundColor: "rgba(255,255,255,.34)" },
-  nameWrap: { flex: 1 }, name: { color: colors.navy, fontFamily: "DMSans_700Bold", fontSize: 15 }, next: { marginTop: 1, color: colors.navy, fontFamily: "DMSans_700Bold", fontSize: 8.5, letterSpacing: .65 }, time: { color: colors.navy, fontFamily: "DMSans_700Bold", fontSize: 16, fontVariant: ["tabular-nums"] },
+  nameWrap: { flex: 1 }, name: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 15 }, next: { marginTop: 1, color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 8.5, letterSpacing: .65 }, time: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 16, fontVariant: ["tabular-nums"] },
 });

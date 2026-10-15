@@ -8,7 +8,7 @@ export function AccountHeader() {
 }
 
 const styles = StyleSheet.create({
-  header: { height: 112, backgroundColor: "#003B6F", flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", paddingHorizontal: 18, paddingTop: 20 },
+  header: { height: 112, backgroundColor: "#0A1D3A", flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", paddingHorizontal: 18, paddingTop: 20 },
   back: { width: 42, height: 42, alignItems: "center", justifyContent: "center" },
-  title: { color: colors.white, fontFamily: "DMSans_700Bold", fontSize: 21, paddingTop: 8 },
+  title: { color: colors.white, fontFamily: "Montserrat_700Bold", fontSize: 21, paddingTop: 8 },
 });

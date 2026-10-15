@@ -18,6 +18,6 @@ const styles = StyleSheet.create({
   line: { height: 13, borderRadius: 7, backgroundColor: "#E7E3DC" }, tabLine: { height: 48, marginHorizontal: 18, borderBottomWidth: 3, borderBottomColor: "#E7E3DC" },
   row: { marginHorizontal: 18, flexDirection: "row", alignItems: "center", gap: 12 }, circle: { width: 31, height: 31, borderRadius: 10, backgroundColor: "#E7E3DC" },
   errorRoot: { flex: 1, padding: 18, backgroundColor: colors.ivory }, back: { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
-  errorCard: { flex: 1, alignItems: "center", justifyContent: "center", gap: 10 }, errorTitle: { color: colors.navy, fontFamily: "PlayfairDisplay_700Bold", fontSize: 23 },
-  errorBody: { color: colors.muted, fontFamily: "DMSans_400Regular", fontSize: 14 }, retry: { marginTop: 8, minHeight: 44, paddingHorizontal: 20, borderRadius: 13, alignItems: "center", justifyContent: "center", backgroundColor: colors.navy }, retryText: { color: colors.white, fontFamily: "DMSans_700Bold" },
+  errorCard: { flex: 1, alignItems: "center", justifyContent: "center", gap: 10 }, errorTitle: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 23 },
+  errorBody: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 14 }, retry: { marginTop: 8, minHeight: 44, paddingHorizontal: 20, borderRadius: 13, alignItems: "center", justifyContent: "center", backgroundColor: colors.navy }, retryText: { color: colors.white, fontFamily: "Montserrat_700Bold" },
 });

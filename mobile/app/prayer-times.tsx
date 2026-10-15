@@ -66,7 +66,7 @@ export default function PrayerTimesScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: colors.ivory },
-  appBar: { minHeight: 58, paddingHorizontal: 12, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, back: { width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" }, title: { color: colors.navy, fontFamily: "PlayfairDisplay_700Bold", fontSize: 22 },
-  content: { paddingBottom: 38 }, method: { marginTop: 10, color: colors.muted, fontFamily: "DMSans_400Regular", fontSize: 10.5, textAlign: "center" },
-  cacheBanner: { marginHorizontal: 20, marginTop: 10, flexDirection: "row", alignItems: "center", gap: 7 }, cacheText: { flex: 1, color: colors.muted, fontFamily: "DMSans_400Regular", fontSize: 11.5 },
+  appBar: { minHeight: 58, paddingHorizontal: 12, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, back: { width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" }, title: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 22 },
+  content: { paddingBottom: 38 }, method: { marginTop: 10, color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 10.5, textAlign: "center" },
+  cacheBanner: { marginHorizontal: 20, marginTop: 10, flexDirection: "row", alignItems: "center", gap: 7 }, cacheText: { flex: 1, color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 11.5 },
 });

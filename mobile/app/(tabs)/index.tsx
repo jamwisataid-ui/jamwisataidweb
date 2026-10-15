@@ -57,9 +57,9 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: "#00365F" },
+  safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: "#0A1D3A" },
   content: { paddingHorizontal: 18, paddingTop: 18, paddingBottom: 34, gap: 25, backgroundColor: colors.ivory },
   packageSection: { gap: 13 },
   empty: { padding: 18, borderRadius: 18, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white },
-  emptyText: { color: colors.muted, fontFamily: "DMSans_400Regular", fontSize: 14, lineHeight: 21, textAlign: "center" },
+  emptyText: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 14, lineHeight: 21, textAlign: "center" },
 });

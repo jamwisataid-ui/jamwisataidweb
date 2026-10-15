@@ -34,12 +34,12 @@ export function BrandSplash({ ready, onFinished }: { ready: boolean; onFinished:
 
   return <Animated.View accessibilityLabel="Memuat aplikasi Jam Wisata" style={[styles.root, { opacity }]}>
     <StatusBar style="light" />
-    <LinearGradient colors={["#003E73", "#00355F", "#002B50"]} locations={[0, 0.5, 1]} style={StyleSheet.absoluteFill} />
+    <LinearGradient colors={["#1E3A5F", "#0A1D3A", "#06152B"]} locations={[0, 0.5, 1]} style={StyleSheet.absoluteFill} />
     <Image alt="" source={pattern} resizeMode="cover" style={[styles.pattern, { height: height * 0.57 }]} />
     <View style={[styles.kaabaLayer, { width, height: kaabaHeight }]}>
       <Image alt="" source={kaaba} resizeMode="cover" style={[styles.kaabaImage, { width, height: kaabaHeight }]} />
-      <LinearGradient colors={["#00355F", "rgba(0,53,95,0.82)", "rgba(0,47,85,0.2)", "transparent"]} locations={[0, 0.22, 0.48, 0.7]} style={styles.imageBlend} />
-      <LinearGradient colors={["transparent", "rgba(0,30,58,0.34)"]} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={["#0A1D3A", "rgba(10,29,58,0.82)", "rgba(10,29,58,0.2)", "transparent"]} locations={[0, 0.22, 0.48, 0.7]} style={styles.imageBlend} />
+      <LinearGradient colors={["transparent", "rgba(6,21,43,0.34)"]} style={StyleSheet.absoluteFill} />
     </View>
     <SafeAreaView pointerEvents="none" style={styles.safe}>
       <View style={[styles.logoArea, { top: compact ? "16%" : "20%", width: logoWidth }]}>
@@ -62,21 +62,21 @@ export function BrandSplash({ ready, onFinished }: { ready: boolean; onFinished:
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, width: "100%", backgroundColor: "#00355F", overflow: "hidden" },
+  root: { flex: 1, width: "100%", backgroundColor: "#0A1D3A", overflow: "hidden" },
   safe: { flex: 1, width: "100%", alignItems: "center" },
   pattern: { position: "absolute", top: 0, left: 0, right: 0, width: "100%", opacity: 0.34 },
   kaabaLayer: { position: "absolute", left: 0, right: 0, bottom: 0, overflow: "hidden" },
   kaabaImage: { position: "absolute", left: 0, top: 0 },
   imageBlend: { position: "absolute", top: 0, left: 0, right: 0, height: "58%" },
   logoArea: { position: "absolute", alignItems: "center" },
-  eyebrow: { marginTop: 8, color: "#FFFFFF", fontFamily: "DMSans_500Medium", fontSize: 12, letterSpacing: 2.2, textAlign: "center" },
+  eyebrow: { marginTop: 8, color: "#FFFFFF", fontFamily: "Montserrat_500Medium", fontSize: 12, letterSpacing: 2.2, textAlign: "center" },
   eyebrowCompact: { marginTop: 4, fontSize: 10 },
-  brand: { marginTop: 1, color: "#FFFFFF", fontFamily: "PlayfairDisplay_700Bold", fontSize: 38, letterSpacing: 1, textAlign: "center" },
+  brand: { marginTop: 1, color: "#FFFFFF", fontFamily: "Cinzel_700Bold", fontSize: 38, letterSpacing: 1, textAlign: "center" },
   brandCompact: { fontSize: 31 },
   taglineRow: { marginTop: 5, width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
-  tagline: { flexShrink: 1, color: "#F3B93F", fontFamily: "DMSans_500Medium", fontSize: 12, fontStyle: "italic", textAlign: "center" },
-  goldLine: { width: 24, height: 1, backgroundColor: "#DFAE36" },
+  tagline: { flexShrink: 1, color: "#E8C967", fontFamily: "CormorantGaramond_600SemiBold", fontSize: 16, fontStyle: "italic", textAlign: "center" },
+  goldLine: { width: 24, height: 1, backgroundColor: "#B8860B" },
   progressWrap: { position: "absolute", left: 0, right: 0, bottom: 30, alignItems: "center" },
   progressTrack: { height: 5, borderRadius: 99, overflow: "hidden", backgroundColor: "rgba(151,193,220,0.3)" },
-  progressFill: { height: "100%", borderRadius: 99, backgroundColor: "#F3B93F" },
+  progressFill: { height: "100%", borderRadius: 99, backgroundColor: "#D4AF37" },
 });

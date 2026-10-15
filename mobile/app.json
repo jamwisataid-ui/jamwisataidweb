@@ -9,11 +9,11 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      ["expo-splash-screen", { "backgroundColor": "#00355F", "image": "./assets/splash/logo-emblem.png", "imageWidth": 132, "resizeMode": "contain" }],
+      ["expo-splash-screen", { "backgroundColor": "#06152B", "image": "./assets/splash/logo-emblem.png", "imageWidth": 132, "resizeMode": "contain" }],
       ["expo-notifications", { "defaultChannel": "informasi-perjalanan" }]
     ],
     "ios": { "supportsTablet": false, "bundleIdentifier": "com.jamwisata.mobile" },
-    "android": { "package": "com.jamwisata.mobile", "adaptiveIcon": { "backgroundColor": "#021730" } },
+    "android": { "package": "com.jamwisata.mobile", "adaptiveIcon": { "backgroundColor": "#06152B" } },
     "web": { "bundler": "metro", "output": "single" },
     "extra": { "router": { "origin": false } }
   }

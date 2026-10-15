@@ -11,5 +11,5 @@ export function QuranTabs({ value, onChange }: { value: QuranTab; onChange: (tab
 const styles = StyleSheet.create({
   wrap: { marginHorizontal: 18, padding: 4, flexDirection: "row", gap: 5, borderRadius: 17, backgroundColor: "#EEEAE2" },
   tab: { flex: 1, minHeight: 38, borderRadius: 13, alignItems: "center", justifyContent: "center" }, active: { backgroundColor: colors.navy },
-  label: { color: colors.navy, fontFamily: "DMSans_700Bold", fontSize: 13 }, activeLabel: { color: colors.white },
+  label: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 13 }, activeLabel: { color: colors.white },
 });

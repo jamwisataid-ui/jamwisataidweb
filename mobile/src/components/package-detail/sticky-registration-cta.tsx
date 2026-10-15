@@ -28,5 +28,5 @@ const styles = StyleSheet.create({
   button: { minHeight: 56, borderRadius: 18, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9, backgroundColor: colors.softGold },
   disabled: { backgroundColor: "#DED9D0" },
   pressed: { opacity: 0.82, transform: [{ scale: 0.99 }] },
-  label: { color: colors.navy, fontFamily: "DMSans_700Bold", fontSize: 16 },
+  label: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 16 },
 });

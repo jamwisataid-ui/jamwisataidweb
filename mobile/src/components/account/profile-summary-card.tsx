@@ -12,8 +12,8 @@ export function ProfileSummaryCard({ profile }: { profile: AccountProfile }) {
 const styles = StyleSheet.create({
   card: { marginTop: -51, marginHorizontal: 18, minHeight: 108, padding: 16, flexDirection: "row", alignItems: "center", gap: 14, backgroundColor: colors.white, borderRadius: 21, borderWidth: 1, borderColor: colors.line, ...shadow },
   copy: { flex: 1, gap: 5 },
-  name: { color: colors.navy, fontFamily: "DMSans_700Bold", fontSize: 19, lineHeight: 24 },
-  number: { color: colors.muted, fontFamily: "DMSans_400Regular", fontSize: 12.5 },
-  journey: { alignSelf: "flex-start", maxWidth: "100%", marginTop: 3, paddingHorizontal: 9, paddingVertical: 5, borderRadius: 10, backgroundColor: "#FFF2D8" },
-  journeyText: { color: colors.navy, fontFamily: "DMSans_500Medium", fontSize: 11.5 },
+  name: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 19, lineHeight: 24 },
+  number: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 12.5 },
+  journey: { alignSelf: "flex-start", maxWidth: "100%", marginTop: 3, paddingHorizontal: 9, paddingVertical: 5, borderRadius: 10, backgroundColor: "#F8F1DC" },
+  journeyText: { color: colors.navy, fontFamily: "Montserrat_500Medium", fontSize: 11.5 },
 });

@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: colors.ivory },
   appBar: { minHeight: 58, paddingHorizontal: 12, flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: colors.ivory },
   iconButton: { width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  title: { color: colors.navy, fontFamily: "PlayfairDisplay_700Bold", fontSize: 22 },
+  title: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 22 },
   filterFrame: { borderBottomWidth: 1, borderBottomColor: "#EEE8DE" },
   list: { paddingHorizontal: 18, paddingTop: 17, paddingBottom: 34 },
   emptyList: { flexGrow: 1 },

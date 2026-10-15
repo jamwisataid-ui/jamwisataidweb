@@ -11,6 +11,6 @@ export function HomeSectionHeader({ title, actionLabel, onAction }: { title: str
 
 const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
-  title: { color: "#021730", fontFamily: "PlayfairDisplay_700Bold", fontSize: 21 },
-  action: { color: "#B67720", fontFamily: "DMSans_700Bold", fontSize: 13 },
+  title: { color: "#0A1D3A", fontFamily: "Cinzel_700Bold", fontSize: 21 },
+  action: { color: "#B67720", fontFamily: "Montserrat_700Bold", fontSize: 13 },
 });

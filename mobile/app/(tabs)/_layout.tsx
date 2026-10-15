@@ -43,7 +43,7 @@ export default function TabLayout() {
           shadowOffset: { width: 0, height: -4 },
           elevation: 8,
         },
-        tabBarLabelStyle: { fontFamily: "DMSans_500Medium", fontSize: 11 },
+        tabBarLabelStyle: { fontFamily: "Montserrat_500Medium", fontSize: 11 },
         tabBarIcon: ({ color, size, focused }) => (
           <Ionicons name={focused ? icons[route.name] : `${icons[route.name]}-outline` as keyof typeof Ionicons.glyphMap} color={color} size={size} />
         ),

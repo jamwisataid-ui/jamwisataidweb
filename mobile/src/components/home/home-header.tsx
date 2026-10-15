@@ -41,7 +41,7 @@ export function HomeHeader({ name, unreadCount }: { name?: string | null; unread
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: "#00365F",
+    backgroundColor: "#0A1D3A",
     paddingHorizontal: 20,
     paddingTop: 18,
     paddingBottom: 20,
@@ -51,8 +51,8 @@ const styles = StyleSheet.create({
   },
   row: { flexDirection: "row", alignItems: "center", gap: 16 },
   greetingBlock: { flex: 1, gap: 3 },
-  eyebrow: { color: "rgba(255,255,255,0.78)", fontFamily: "DMSans_400Regular", fontSize: 13 },
-  greeting: { color: "#FFFFFF", fontFamily: "DMSans_700Bold", fontSize: 22, lineHeight: 28 },
+  eyebrow: { color: "rgba(255,255,255,0.78)", fontFamily: "Montserrat_400Regular", fontSize: 13 },
+  greeting: { color: "#FFFFFF", fontFamily: "Montserrat_700Bold", fontSize: 22, lineHeight: 28 },
   bell: {
     width: 42,
     height: 42,
@@ -74,5 +74,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   searchPressed: { backgroundColor: "#F5F2EB" },
-  searchText: { flex: 1, color: "#788191", fontFamily: "DMSans_400Regular", fontSize: 14 },
+  searchText: { flex: 1, color: "#788191", fontFamily: "Montserrat_400Regular", fontSize: 14 },
 });

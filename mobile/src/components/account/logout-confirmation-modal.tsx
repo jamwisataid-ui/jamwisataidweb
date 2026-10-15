@@ -8,11 +8,11 @@ export function LogoutConfirmationModal({ visible, busy, onCancel, onConfirm }: 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: "rgba(2,23,48,.54)", justifyContent: "center", padding: 24 },
   dialog: { width: "100%", maxWidth: 420, alignSelf: "center", padding: 20, gap: 12, borderRadius: 22, backgroundColor: colors.white, ...shadow },
-  title: { color: colors.navy, fontFamily: "DMSans_700Bold", fontSize: 20 },
-  body: { color: colors.muted, fontFamily: "DMSans_400Regular", fontSize: 14, lineHeight: 21 },
+  title: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 20 },
+  body: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 14, lineHeight: 21 },
   actions: { flexDirection: "row", gap: 10, marginTop: 5 },
   cancel: { flex: 1, height: 48, borderRadius: 14, borderWidth: 1, borderColor: colors.line, alignItems: "center", justifyContent: "center" },
   confirm: { flex: 1, height: 48, borderRadius: 14, backgroundColor: colors.danger, alignItems: "center", justifyContent: "center" },
-  cancelText: { color: colors.navy, fontFamily: "DMSans_700Bold" },
-  confirmText: { color: colors.white, fontFamily: "DMSans_700Bold" },
+  cancelText: { color: colors.navy, fontFamily: "Montserrat_700Bold" },
+  confirmText: { color: colors.white, fontFamily: "Montserrat_700Bold" },
 });

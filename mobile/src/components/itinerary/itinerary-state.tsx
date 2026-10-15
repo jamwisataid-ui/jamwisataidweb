@@ -17,8 +17,8 @@ const styles = StyleSheet.create({
   line: { height: 13, borderRadius: 7, backgroundColor: "#E8E4DC" },
   short: { width: "88%", height: 10 },
   state: { flex: 1, padding: 28, alignItems: "center", justifyContent: "center", gap: 9 },
-  title: { color: colors.navy, fontFamily: "PlayfairDisplay_700Bold", fontSize: 21, textAlign: "center" },
-  body: { maxWidth: 300, color: colors.muted, fontFamily: "DMSans_400Regular", fontSize: 13.5, lineHeight: 20, textAlign: "center" },
+  title: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 21, textAlign: "center" },
+  body: { maxWidth: 300, color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 13.5, lineHeight: 20, textAlign: "center" },
   button: { marginTop: 8, minHeight: 44, paddingHorizontal: 20, borderRadius: 13, alignItems: "center", justifyContent: "center", backgroundColor: colors.navy },
-  buttonText: { color: colors.white, fontFamily: "DMSans_700Bold", fontSize: 13.5 },
+  buttonText: { color: colors.white, fontFamily: "Montserrat_700Bold", fontSize: 13.5 },
 });

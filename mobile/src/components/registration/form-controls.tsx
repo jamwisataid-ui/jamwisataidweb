@@ -26,9 +26,9 @@ export function GenderSelector({ value, onChange, error }: { value: string; onCh
 }
 
 const styles = StyleSheet.create({
-  group: { gap: 7 }, label: { color: colors.ink, fontFamily: "DMSans_700Bold", fontSize: 14 }, optional: { color: colors.muted, fontFamily: "DMSans_400Regular", fontSize: 12 },
-  input: { minHeight: 56, borderWidth: 1, borderColor: "#D8DDE3", backgroundColor: colors.white, borderRadius: 14, paddingHorizontal: 15, color: colors.ink, fontFamily: "DMSans_400Regular", fontSize: 16 },
-  multiline: { minHeight: 92, paddingTop: 14, textAlignVertical: "top" }, inputError: { borderColor: colors.danger }, error: { color: colors.danger, fontFamily: "DMSans_400Regular", fontSize: 12.5 },
-  dateButton: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, dateText: { flex: 1, color: colors.ink, fontFamily: "DMSans_400Regular", fontSize: 15 },
-  genderRow: { flexDirection: "row", gap: 24, minHeight: 48, alignItems: "center" }, radioOption: { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 44 }, radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: "#A8AFB9", alignItems: "center", justifyContent: "center" }, radioSelected: { borderColor: colors.navy }, radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.navy }, radioText: { color: colors.ink, fontFamily: "DMSans_500Medium", fontSize: 15 },
+  group: { gap: 7 }, label: { color: colors.ink, fontFamily: "Montserrat_700Bold", fontSize: 14 }, optional: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 12 },
+  input: { minHeight: 56, borderWidth: 1, borderColor: "#D8DDE3", backgroundColor: colors.white, borderRadius: 14, paddingHorizontal: 15, color: colors.ink, fontFamily: "Montserrat_400Regular", fontSize: 16 },
+  multiline: { minHeight: 92, paddingTop: 14, textAlignVertical: "top" }, inputError: { borderColor: colors.danger }, error: { color: colors.danger, fontFamily: "Montserrat_400Regular", fontSize: 12.5 },
+  dateButton: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, dateText: { flex: 1, color: colors.ink, fontFamily: "Montserrat_400Regular", fontSize: 15 },
+  genderRow: { flexDirection: "row", gap: 24, minHeight: 48, alignItems: "center" }, radioOption: { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 44 }, radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: "#A8AFB9", alignItems: "center", justifyContent: "center" }, radioSelected: { borderColor: colors.navy }, radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.navy }, radioText: { color: colors.ink, fontFamily: "Montserrat_500Medium", fontSize: 15 },
 });

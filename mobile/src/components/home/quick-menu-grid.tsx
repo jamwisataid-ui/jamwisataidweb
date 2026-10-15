@@ -23,7 +23,7 @@ function QuickMenuItem({ label, icon, href }: (typeof items)[number]) {
       style={({ pressed }) => [styles.item, pressed && styles.pressed]}
     >
       <View style={styles.iconWrap}>
-        <Ionicons name={icon} size={24} color="#00365F" />
+        <Ionicons name={icon} size={24} color="#0A1D3A" />
         <View style={styles.accent} />
       </View>
       <Text numberOfLines={2} style={styles.label}>{label}</Text>
@@ -45,10 +45,10 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFF2D8",
+    backgroundColor: "#F8F1DC",
     borderWidth: 1,
     borderColor: "#F4DFC0",
   },
-  accent: { position: "absolute", right: 8, top: 8, width: 6, height: 6, borderRadius: 3, backgroundColor: "#E39B33" },
-  label: { minHeight: 31, color: "#102D4B", fontFamily: "DMSans_500Medium", fontSize: 11.5, lineHeight: 15, textAlign: "center" },
+  accent: { position: "absolute", right: 8, top: 8, width: 6, height: 6, borderRadius: 3, backgroundColor: "#D4AF37" },
+  label: { minHeight: 31, color: "#1E3A5F", fontFamily: "Montserrat_500Medium", fontSize: 10.5, lineHeight: 14, textAlign: "center" },
 });
