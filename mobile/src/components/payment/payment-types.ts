@@ -10,4 +10,5 @@ export type PaymentDetail = {
   selectedMethod?: string | null;
   methods: PaymentMethod[];
   bankAccounts: Array<{ id: string; name: string; bankName?: string | null; accountNumber?: string | null; accountHolder?: string | null }>;
+  paymentContactWhatsapp?: string | null;
 };

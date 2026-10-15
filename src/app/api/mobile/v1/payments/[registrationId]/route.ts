@@ -2,7 +2,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
 import { requireDatabase } from "@/db";
-import { bookings, departures, financialAccounts, packages, paymentAllocations, payments, refunds, registrations } from "@/db/schema";
+import { bookings, departures, financialAccounts, managementSettings, packages, paymentAllocations, payments, refunds, registrations } from "@/db/schema";
 import { requireMobileSession } from "@/lib/mobile/auth";
 import { mobileData, mobileError, MobileApiError, zodFieldErrors } from "@/lib/mobile/api";
 
@@ -26,10 +26,11 @@ async function paymentDetail(registrationId: string, pilgrimId: string) {
   const context = await contextFor(registrationId, pilgrimId);
   const allocations = await database.select().from(paymentAllocations).where(eq(paymentAllocations.registrationId, registrationId));
   const paymentIds = allocations.map((row) => row.paymentId);
-  const [paymentRows, refundRows, bankAccounts] = await Promise.all([
+  const [paymentRows, refundRows, bankAccounts, settings] = await Promise.all([
     paymentIds.length ? database.select().from(payments).where(inArray(payments.id, paymentIds)) : [],
     database.select().from(refunds).where(eq(refunds.registrationId, registrationId)),
     database.select({ id: financialAccounts.id, name: financialAccounts.name, bankName: financialAccounts.bankName, accountNumber: financialAccounts.accountNumber, accountHolder: financialAccounts.accountHolder }).from(financialAccounts).where(and(eq(financialAccounts.status, "active"), eq(financialAccounts.showOnInvoice, true))),
+    database.query.managementSettings.findFirst({ where: eq(managementSettings.id, "default") }),
   ]);
   const confirmedIds = new Set(paymentRows.filter((row) => row.status === "confirmed").map((row) => row.id));
   const paid = allocations.filter((row) => confirmedIds.has(row.paymentId)).reduce((sum, row) => sum + row.amount, 0);
@@ -55,6 +56,7 @@ async function paymentDetail(registrationId: string, pilgrimId: string) {
     selectedMethod: context.booking.preferredPaymentMethod,
     methods,
     bankAccounts,
+    paymentContactWhatsapp: settings?.companyPhone || "6281809627499",
   };
 }
 
