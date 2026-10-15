@@ -7,6 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import pattern from "../../assets/splash/islamic-pattern.jpg";
 import kaaba from "../../assets/splash/kaaba-masjidil-haram.jpg";
 import emblem from "../../assets/splash/logo-emblem.png";
+import { MetallicGold } from "@/components/metallic-gold";
 
 export function BrandSplash({ ready, onFinished }: { ready: boolean; onFinished: () => void }) {
   const { width, height } = useWindowDimensions();
@@ -54,7 +55,7 @@ export function BrandSplash({ ready, onFinished }: { ready: boolean; onFinished:
       </View>
       <View style={styles.progressWrap}>
         <View style={[styles.progressTrack, { width: progressWidth }]}>
-          <Animated.View style={[styles.progressFill, { width: progress.interpolate({ inputRange: [0, 1], outputRange: [0, progressWidth] }) }]} />
+          <Animated.View style={[styles.progressFill, { width: progress.interpolate({ inputRange: [0, 1], outputRange: [0, progressWidth] }) }]}><MetallicGold style={styles.progressGold} /></Animated.View>
         </View>
       </View>
     </SafeAreaView>
@@ -78,5 +79,6 @@ const styles = StyleSheet.create({
   goldLine: { width: 24, height: 1, backgroundColor: "#B8860B" },
   progressWrap: { position: "absolute", left: 0, right: 0, bottom: 30, alignItems: "center" },
   progressTrack: { height: 5, borderRadius: 99, overflow: "hidden", backgroundColor: "rgba(151,193,220,0.3)" },
-  progressFill: { height: "100%", borderRadius: 99, backgroundColor: "#D4AF37" },
+  progressFill: { height: "100%", borderRadius: 99, overflow: "hidden" },
+  progressGold: { flex: 1, borderRadius: 99 },
 });

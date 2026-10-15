@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { colors, shadow } from "@/theme";
+import { MetallicGold } from "@/components/metallic-gold";
 import type { Package } from "@/types";
 
 const money = new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 });
@@ -18,6 +19,7 @@ function PackageBadge({ item }: { item: Package }) {
   const status = statusContent[item.status];
   const label = item.badge || (item.packageType === "plus" ? "Plus" : status?.label || "Umroh");
   const tone = item.badge ? "gold" : item.packageType === "plus" ? "navy" : status?.tone || "navy";
+  if (tone === "gold") return <MetallicGold style={styles.badge}><Text style={styles.badgeText}>{label}</Text></MetallicGold>;
   return <View style={[styles.badge, styles[`${tone}Badge`]]}><Text style={[styles.badgeText, tone === "navy" && styles.lightBadgeText]}>{label}</Text></View>;
 }
 
@@ -67,10 +69,7 @@ export function PackageCard({ item }: { item: Package }) {
             <Text style={styles.price}>{item.priceFrom ? `Rp ${money.format(item.priceFrom)}` : "Hubungi kami"}</Text>
             {item.priceFrom ? <Text style={styles.perPerson}>/jamaah</Text> : null}
           </View>
-          <View style={[styles.detailButton, disabled && styles.disabledButton]}>
-            <Text style={styles.detailButtonText}>{disabled ? "Lihat Paket" : "Lihat Detail"}</Text>
-            <Ionicons name="arrow-forward" size={15} color={colors.navy} />
-          </View>
+          {disabled ? <View style={[styles.detailButton, styles.disabledButton]}><Text style={styles.detailButtonText}>Lihat Paket</Text><Ionicons name="arrow-forward" size={15} color={colors.navy} /></View> : <MetallicGold style={styles.detailButton}><Text style={styles.detailButtonText}>Lihat Detail</Text><Ionicons name="arrow-forward" size={15} color={colors.navy} /></MetallicGold>}
         </View>
       </View>
     </Pressable>
@@ -97,7 +96,6 @@ const styles = StyleSheet.create({
   imageFrame: { width: "100%", aspectRatio: 16 / 7, backgroundColor: "#DCE3E8" },
   image: { width: "100%", height: "100%" },
   badge: { position: "absolute", top: 11, right: 11, minHeight: 29, paddingHorizontal: 12, borderRadius: 12, alignItems: "center", justifyContent: "center" },
-  goldBadge: { backgroundColor: colors.softGold },
   navyBadge: { backgroundColor: colors.navy },
   redBadge: { backgroundColor: "#FCE2DE" },
   badgeText: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 11 },
@@ -112,7 +110,7 @@ const styles = StyleSheet.create({
   priceBlock: { flex: 1, flexDirection: "row", alignItems: "baseline", flexWrap: "wrap", gap: 3 },
   price: { color: "#B42318", fontFamily: "Montserrat_700Bold", fontSize: 18, lineHeight: 23 },
   perPerson: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 11 },
-  detailButton: { minHeight: 40, paddingHorizontal: 15, borderRadius: 12, backgroundColor: colors.softGold, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 },
+  detailButton: { minHeight: 40, paddingHorizontal: 15, borderRadius: 12, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, overflow: "hidden" },
   disabledButton: { backgroundColor: "#E8E2D7" },
   detailButtonText: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 12.5 },
   skeletonCard: { width: "100%", borderRadius: 20, overflow: "hidden", backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },

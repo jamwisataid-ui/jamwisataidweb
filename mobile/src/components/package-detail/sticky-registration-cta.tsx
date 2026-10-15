@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors } from "@/theme";
+import { MetallicGold } from "@/components/metallic-gold";
 
 const labels: Record<string, string> = {
   available: "Daftar Sekarang",
@@ -16,8 +17,7 @@ export function StickyRegistrationCTA({ status, enabled, onPress }: { status: st
   return (
     <View style={[styles.frame, { paddingBottom: Math.max(insets.bottom, 10) }]}>
       <Pressable accessibilityRole="button" disabled={!enabled} onPress={onPress} style={({ pressed }) => [styles.button, !enabled && styles.disabled, pressed && enabled && styles.pressed]}>
-        <Text style={styles.label}>{labels[status] || "Pendaftaran Belum Tersedia"}</Text>
-        {enabled ? <Ionicons name="arrow-forward" size={19} color={colors.navy} /> : null}
+        {enabled ? <MetallicGold style={styles.buttonFill}><Text style={styles.label}>{labels[status] || "Pendaftaran Belum Tersedia"}</Text><Ionicons name="arrow-forward" size={19} color={colors.navy} /></MetallicGold> : <Text style={styles.label}>{labels[status] || "Pendaftaran Belum Tersedia"}</Text>}
       </Pressable>
     </View>
   );
@@ -25,7 +25,8 @@ export function StickyRegistrationCTA({ status, enabled, onPress }: { status: st
 
 const styles = StyleSheet.create({
   frame: { paddingTop: 11, paddingHorizontal: 18, backgroundColor: "rgba(255,253,248,0.98)", borderTopWidth: 1, borderTopColor: "#EDE7DC" },
-  button: { minHeight: 56, borderRadius: 18, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9, backgroundColor: colors.softGold },
+  button: { minHeight: 56, borderRadius: 18, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+  buttonFill: { position: "absolute", inset: 0, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9 },
   disabled: { backgroundColor: "#DED9D0" },
   pressed: { opacity: 0.82, transform: [{ scale: 0.99 }] },
   label: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 16 },

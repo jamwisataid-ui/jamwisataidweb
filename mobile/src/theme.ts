@@ -31,7 +31,10 @@ export const typography = {
 
 export const gradients = {
   navy: ["#06152B", "#0A1D3A", "#1E3A5F"] as const,
-  gold: ["#B8860B", "#D4AF37", "#F5D97A"] as const,
+  gold: ["#8C6708", "#B8860B", "#D4AF37", "#F5D97A", "#D4AF37", "#B8860B", "#8C6708"] as const,
+  goldLocations: [0, 0.18, 0.4, 0.58, 0.76, 0.92, 1] as const,
+  goldHighlight: ["rgba(255,235,170,0.46)", "rgba(255,235,170,0.10)", "transparent", "rgba(11,27,43,0.16)"] as const,
+  goldHighlightLocations: [0, 0.3, 0.66, 1] as const,
   goldSoft: ["#E8C967", "#D4AF37", "#B8860B"] as const,
 } as const;
 
