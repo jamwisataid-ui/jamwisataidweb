@@ -5,7 +5,7 @@ import { clearJourneyCache } from "./journey-cache";
 import { clearLiveMuthowifCache } from "./live-muthowif-cache";
 
 export type Tokens = { accessToken: string; refreshToken: string; accessExpiresAt: string; refreshExpiresAt: string };
-type User = { id: string; fullName: string; whatsapp: string; email?: string | null };
+type User = { id: string; fullName: string; whatsapp?: string; email?: string | null; role?: "jamaah" | "muthowif" };
 type AuthState = { ready: boolean; seenOnboarding: boolean; tokens: Tokens | null; user: User | null; hydrate: () => Promise<void>; completeOnboarding: () => Promise<void>; signIn: (tokens: Tokens, user?: User | null) => Promise<void>; setTokens: (tokens: Tokens) => Promise<void>; signOut: () => Promise<void>; setUser: (user: User | null) => void };
 const KEY = "jamwisata_mobile_session";
 const ONBOARDING_KEY = "jamwisata_mobile_onboarding_v2";
@@ -36,11 +36,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   hydrate: async () => {
     const [value, onboarding] = await Promise.all([getStoredValue(KEY), getStoredValue(ONBOARDING_KEY)]);
-    set({ tokens: value ? JSON.parse(value) as Tokens : null, seenOnboarding: onboarding === "done", ready: true });
+    const stored = value ? JSON.parse(value) as Tokens | { tokens: Tokens; user: User | null } : null;
+    set({ tokens: stored && "tokens" in stored ? stored.tokens : stored, user: stored && "tokens" in stored ? stored.user : null, seenOnboarding: onboarding === "done", ready: true });
   },
   completeOnboarding: async () => { await setStoredValue(ONBOARDING_KEY, "done", true); set({ seenOnboarding: true }); },
-  signIn: async (tokens, user = null) => { await setStoredValue(KEY, JSON.stringify(tokens)); set({ tokens, user }); },
-  setTokens: async (tokens) => { await setStoredValue(KEY, JSON.stringify(tokens)); set({ tokens }); },
+  signIn: async (tokens, user = null) => { await setStoredValue(KEY, JSON.stringify({ tokens, user })); set({ tokens, user }); },
+  setTokens: async (tokens) => { const user = useAuthStore.getState().user; await setStoredValue(KEY, JSON.stringify({ tokens, user })); set({ tokens }); },
   signOut: async () => { await Promise.all([deleteStoredValue(KEY), clearJourneyCache(), clearLiveMuthowifCache()]); set({ tokens: null, user: null }); },
   setUser: (user) => set({ user }),
 }));

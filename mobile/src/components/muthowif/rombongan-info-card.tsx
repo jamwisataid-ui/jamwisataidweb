@@ -1,0 +1,9 @@
+import { Ionicons } from "@expo/vector-icons";
+import { StyleSheet, Text, View } from "react-native";
+
+import { colors, typography } from "@/theme";
+import type { MuthowifSession } from "@/types";
+
+function Row({ icon, label, value }: { icon: keyof typeof Ionicons.glyphMap; label: string; value: string }) { return <View style={styles.row}><View style={styles.icon}><Ionicons name={icon} size={16} color={colors.navy} /></View><View style={styles.text}><Text style={styles.label}>{label}</Text><Text style={styles.value}>{value}</Text></View></View>; }
+export function RombonganInfoCard({ session, listeners, duration }: { session: MuthowifSession; listeners: number; duration: string }) { return <View style={styles.card}><Text style={styles.heading}>Informasi Rombongan</Text><Row icon="people-outline" label="Nama Rombongan" value={session.rombongan.name} /><Row icon="person-add-outline" label="Jamaah Terhubung" value={`${listeners} / ${session.capacity}`} /><Row icon="location-outline" label="Lokasi Saat Ini" value={session.location || "Belum ditentukan"} /><Row icon="time-outline" label="Durasi Siaran" value={duration} /><Row icon="person-circle-outline" label="Muthowif" value={session.muthowifName} /></View>; }
+const styles = StyleSheet.create({ card: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: 17, padding: 16, gap: 13 }, heading: { color: colors.navy, fontFamily: typography.bold, fontSize: 17, marginBottom: 2 }, row: { flexDirection: "row", alignItems: "center", gap: 11 }, icon: { width: 32, height: 32, borderRadius: 10, backgroundColor: colors.goldPale, alignItems: "center", justifyContent: "center" }, text: { flex: 1 }, label: { color: colors.muted, fontFamily: typography.body, fontSize: 10, marginBottom: 2 }, value: { color: colors.navy, fontFamily: typography.semibold, fontSize: 12, lineHeight: 17 } });

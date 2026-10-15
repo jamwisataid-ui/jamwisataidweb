@@ -4,7 +4,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { and, eq, gt, isNull } from "drizzle-orm";
 
 import { requireDatabase } from "@/db";
-import { mobileAccounts, mobileSessions, pilgrims } from "@/db/schema";
+import { mobileAccounts, mobileSessions, pilgrims, users } from "@/db/schema";
 import { MobileApiError } from "./api";
 
 const ACCESS_DURATION_MS = 15 * 60 * 1000;
@@ -51,10 +51,33 @@ export async function requireMobileSession(request: Request) {
       gt(mobileSessions.accessExpiresAt, new Date()),
       isNull(mobileSessions.revokedAt),
       eq(mobileAccounts.status, "active"),
+      eq(mobileAccounts.role, "jamaah"),
       eq(pilgrims.status, "active"),
     ))
     .limit(1);
   if (!result) throw new MobileApiError(401, "SESSION_EXPIRED", "Sesi berakhir. Silakan masuk kembali.");
+  await database.update(mobileSessions).set({ lastUsedAt: new Date() }).where(eq(mobileSessions.id, result.session.id));
+  return result;
+}
+
+export async function requireMuthowifSession(request: Request) {
+  const database = requireDatabase();
+  const token = bearerToken(request);
+  const [result] = await database
+    .select({ session: mobileSessions, account: mobileAccounts, user: users })
+    .from(mobileSessions)
+    .innerJoin(mobileAccounts, eq(mobileSessions.accountId, mobileAccounts.id))
+    .innerJoin(users, eq(mobileAccounts.userId, users.id))
+    .where(and(
+      eq(mobileSessions.accessTokenHash, hashMobileToken(token)),
+      gt(mobileSessions.accessExpiresAt, new Date()),
+      isNull(mobileSessions.revokedAt),
+      eq(mobileAccounts.status, "active"),
+      eq(mobileAccounts.role, "muthowif"),
+      eq(users.role, "muthowif"),
+    ))
+    .limit(1);
+  if (!result) throw new MobileApiError(403, "MUTHOWIF_REQUIRED", "Akun ini tidak memiliki akses panel muthowif.");
   await database.update(mobileSessions).set({ lastUsedAt: new Date() }).where(eq(mobileSessions.id, result.session.id));
   return result;
 }

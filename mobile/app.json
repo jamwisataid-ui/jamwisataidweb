@@ -14,8 +14,8 @@
       ["expo-splash-screen", { "backgroundColor": "#06152B", "image": "./assets/splash/logo-emblem.png", "imageWidth": 132, "resizeMode": "contain" }],
       ["expo-notifications", { "defaultChannel": "informasi-perjalanan" }]
     ],
-    "ios": { "supportsTablet": false, "bundleIdentifier": "com.jamwisata.mobile", "infoPlist": { "UIBackgroundModes": ["audio"] } },
-    "android": { "package": "com.jamwisata.mobile", "adaptiveIcon": { "backgroundColor": "#06152B" } },
+    "ios": { "supportsTablet": false, "bundleIdentifier": "com.jamwisata.mobile", "infoPlist": { "UIBackgroundModes": ["audio"], "NSMicrophoneUsageDescription": "Mikrofon digunakan oleh muthowif untuk menyiarkan panduan ibadah secara langsung." } },
+    "android": { "package": "com.jamwisata.mobile", "permissions": ["RECORD_AUDIO", "MODIFY_AUDIO_SETTINGS", "FOREGROUND_SERVICE", "FOREGROUND_SERVICE_MICROPHONE", "WAKE_LOCK"], "adaptiveIcon": { "backgroundColor": "#06152B" } },
     "web": { "bundler": "metro", "output": "single" },
     "extra": { "router": { "origin": false } }
   }

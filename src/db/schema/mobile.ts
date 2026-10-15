@@ -10,13 +10,16 @@ const timestamps = {
 };
 
 export const mobileAccountStatus = pgEnum("mobile_account_status", ["pending", "active", "locked", "revoked"]);
+export const mobileAccountRole = pgEnum("mobile_account_role", ["jamaah", "muthowif"]);
 export const mobileDevicePlatform = pgEnum("mobile_device_platform", ["android", "ios"]);
 export const liveMuthowifSessionStatus = pgEnum("live_muthowif_session_status", ["scheduled", "live", "ended", "cancelled"]);
 export const liveMuthowifSessionType = pgEnum("live_muthowif_session_type", ["thawaf", "sai", "kajian", "ziarah", "briefing", "other"]);
 
 export const mobileAccounts = pgTable("mobile_accounts", {
   id: uuid("id").defaultRandom().primaryKey(),
-  pilgrimId: uuid("pilgrim_id").notNull().references(() => pilgrims.id, { onDelete: "cascade" }),
+  pilgrimId: uuid("pilgrim_id").references(() => pilgrims.id, { onDelete: "cascade" }),
+  userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
+  role: mobileAccountRole("role").notNull().default("jamaah"),
   pinHash: text("pin_hash"),
   status: mobileAccountStatus("status").notNull().default("pending"),
   failedLoginAttempts: integer("failed_login_attempts").notNull().default(0),
@@ -24,7 +27,10 @@ export const mobileAccounts = pgTable("mobile_accounts", {
   activatedAt: timestamp("activated_at", { withTimezone: true }),
   lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
   ...timestamps,
-}, (table) => [uniqueIndex("mobile_accounts_pilgrim_idx").on(table.pilgrimId)]);
+}, (table) => [
+  uniqueIndex("mobile_accounts_pilgrim_idx").on(table.pilgrimId),
+  uniqueIndex("mobile_accounts_user_idx").on(table.userId),
+]);
 
 export const mobileActivationTokens = pgTable("mobile_activation_tokens", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -90,10 +96,13 @@ export const liveMuthowifSessions = pgTable("live_muthowif_sessions", {
   type: liveMuthowifSessionType("type").notNull().default("other"),
   status: liveMuthowifSessionStatus("status").notNull().default("scheduled"),
   muthowifName: text("muthowif_name").notNull(),
+  muthowifUserId: text("muthowif_user_id").references(() => users.id, { onDelete: "set null" }),
   muthowifAvatarUrl: text("muthowif_avatar_url"),
   roomName: text("room_name").notNull(),
   startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
   endsAt: timestamp("ends_at", { withTimezone: true }),
+  liveStartedAt: timestamp("live_started_at", { withTimezone: true }),
+  liveEndedAt: timestamp("live_ended_at", { withTimezone: true }),
   location: text("location"),
   imageUrl: text("image_url"),
   listenerCount: integer("listener_count").notNull().default(0),
@@ -103,4 +112,5 @@ export const liveMuthowifSessions = pgTable("live_muthowif_sessions", {
 }, (table) => [
   uniqueIndex("live_muthowif_sessions_room_idx").on(table.roomName),
   index("live_muthowif_sessions_departure_status_idx").on(table.departureId, table.status, table.startsAt),
+  index("live_muthowif_sessions_muthowif_idx").on(table.muthowifUserId, table.status, table.startsAt),
 ]);
