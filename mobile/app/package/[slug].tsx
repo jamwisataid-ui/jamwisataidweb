@@ -15,10 +15,15 @@ import { colors } from "@/theme";
 import type { Package } from "@/types";
 
 export default function PackageDetailScreen() {
-  const { slug } = useLocalSearchParams<{ slug: string }>();
+  const params = useLocalSearchParams<{ slug: string | string[] }>();
+  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
   const [tab, setTab] = useState<DetailTab>("detail");
   const [favorite, setFavorite] = useState(false);
-  const query = useQuery({ queryKey: ["package", slug], queryFn: () => api<Package>(`/packages/${slug}`), enabled: Boolean(slug) });
+  const query = useQuery({
+    queryKey: ["package", slug],
+    queryFn: () => api<Package>(`/packages/${encodeURIComponent(slug!)}`),
+    enabled: Boolean(slug),
+  });
   const item = query.data;
 
   if (query.isPending) return <SafeAreaView edges={[]} style={styles.safe}><PackageDetailSkeleton /></SafeAreaView>;

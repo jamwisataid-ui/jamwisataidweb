@@ -42,7 +42,7 @@ export function PackageCard({ item }: { item: Package }) {
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`Lihat detail ${item.name}`}
-      onPress={() => router.push(`/package/${item.slug}`)}
+      onPress={() => router.push({ pathname: "/package/[slug]", params: { slug: item.id } })}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <View style={styles.imageFrame}>

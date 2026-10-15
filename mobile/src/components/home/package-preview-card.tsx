@@ -18,7 +18,7 @@ export function PackagePreviewCard({ item }: { item: Package }) {
   return (
     <Pressable
       accessibilityRole="button"
-      onPress={() => router.push(`/package/${item.slug}`)}
+      onPress={() => router.push({ pathname: "/package/[slug]", params: { slug: item.id } })}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <Image source={{ uri: item.image }} resizeMode="cover" style={styles.image} alt={item.name} />
