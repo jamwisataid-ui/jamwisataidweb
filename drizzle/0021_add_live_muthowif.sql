@@ -24,7 +24,7 @@ CREATE TABLE "live_muthowif_sessions" (
 --> statement-breakpoint
 ALTER TABLE "live_muthowif_sessions" ADD CONSTRAINT "live_muthowif_sessions_departure_id_departures_id_fk" FOREIGN KEY ("departure_id") REFERENCES "public"."departures"("id") ON DELETE cascade ON UPDATE no action;
 --> statement-breakpoint
-ALTER TABLE "live_muthowif_sessions" ADD CONSTRAINT "live_muthowif_sessions_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;
+ALTER TABLE "live_muthowif_sessions" ADD CONSTRAINT "live_muthowif_sessions_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;
 --> statement-breakpoint
 CREATE UNIQUE INDEX "live_muthowif_sessions_room_idx" ON "live_muthowif_sessions" USING btree ("room_name");
 --> statement-breakpoint
