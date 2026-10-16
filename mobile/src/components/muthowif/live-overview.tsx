@@ -7,17 +7,17 @@ import type { MuthowifSession } from "@/types";
 export type BroadcastState = "idle" | "starting" | "live" | "muted" | "reconnecting" | "ended";
 export type ConnectionLevel = "good" | "medium" | "poor";
 
-function statusLabel(state: BroadcastState) {
+function statusLabel(state: BroadcastState, sessionStatus: MuthowifSession["status"]) {
   if (state === "starting") return "Menyiapkan siaran...";
   if (state === "reconnecting") return "Menyambungkan kembali...";
   if (state === "ended") return "Siaran telah berakhir";
   if (state === "live" || state === "muted") return "Siaran Sedang Berjalan";
-  return "Siaran Belum Dimulai";
+  return sessionStatus === "live" ? "Siaran Perlu Disambungkan Kembali" : "Siaran Belum Dimulai";
 }
 
 export function LiveStatusCard({ session, state, timer }: { session: MuthowifSession; state: BroadcastState; timer: string }) {
   const active = state === "live" || state === "muted" || state === "reconnecting";
-  return <View style={styles.card}><View style={styles.statusRow}><View style={styles.statusLeft}><View style={[styles.dot, { backgroundColor: active ? "#22C55E" : colors.silver }]} /><Text style={[styles.status, active && styles.active]}>{statusLabel(state)}</Text></View><Text style={styles.timer}>{timer}</Text></View><Text style={styles.title}>{session.title}</Text><Text style={styles.meta}>{session.rombongan.name}</Text><Text style={styles.meta}>{new Date(session.startsAt).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}</Text></View>;
+  return <View style={styles.card}><View style={styles.statusRow}><View style={styles.statusLeft}><View style={[styles.dot, { backgroundColor: active ? "#22C55E" : colors.silver }]} /><Text style={[styles.status, active && styles.active]}>{statusLabel(state, session.status)}</Text></View><Text style={styles.timer}>{timer}</Text></View><Text style={styles.title}>{session.title}</Text><Text style={styles.meta}>{session.rombongan.name}</Text><Text style={styles.meta}>{new Date(session.startsAt).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}</Text></View>;
 }
 
 export function MetricsRow({ listeners, capacity, quality }: { listeners: number; capacity: number; quality: ConnectionLevel }) {

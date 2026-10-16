@@ -25,7 +25,7 @@ export function BroadcastRoom({ serverUrl, token, microphoneEnabled, onState, on
       if (disposed) return;
       callbacksRef.current.onListeners(0);
       callbacksRef.current.onState("idle");
-      callbacksRef.current.onError("Koneksi siaran terputus. Tekan Mulai Kembali untuk melanjutkan sesi.");
+      callbacksRef.current.onError("Koneksi siaran terputus. Tekan Sambungkan Siaran untuk melanjutkan sesi.");
     });
     void room.connect(serverUrl, token).then(async () => {
       await room.localParticipant.setMicrophoneEnabled(microphoneRef.current);
