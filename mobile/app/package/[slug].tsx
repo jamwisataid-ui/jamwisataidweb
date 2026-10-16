@@ -16,11 +16,12 @@ import { colors } from "@/theme";
 import type { Package } from "@/types";
 
 export default function PackageDetailScreen() {
-  const params = useLocalSearchParams<{ slug: string | string[] }>();
+  const params = useLocalSearchParams<{ slug: string | string[]; departureId?: string | string[] }>();
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+  const requestedDepartureId = Array.isArray(params.departureId) ? params.departureId[0] : params.departureId;
   const [tab, setTab] = useState<DetailTab>("detail");
   const [favorite, setFavorite] = useState(false);
-  const [selectedDepartureId, setSelectedDepartureId] = useState("");
+  const [selectedDepartureId, setSelectedDepartureId] = useState(requestedDepartureId ?? "");
   const query = useQuery({
     queryKey: ["package", slug],
     queryFn: () => api<Package>(`/packages/${encodeURIComponent(slug!)}`),
