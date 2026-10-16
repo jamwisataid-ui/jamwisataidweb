@@ -4,6 +4,7 @@ import { requireMobileSession } from "@/lib/mobile/auth";
 import { MobileApiError, mobileData, mobileError } from "@/lib/mobile/api";
 import { findAuthorizedLiveSession } from "@/lib/mobile/live-muthowif";
 import { assertLiveSessionJoinable } from "@/lib/mobile/live-session-policy";
+import { readLiveListenerCount } from "@/lib/mobile/livekit-room";
 
 export async function POST(request: Request, { params }: { params: Promise<{ sessionId: string }> }) {
   try {
@@ -11,7 +12,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ ses
     const { sessionId } = await params;
     const { session } = await findAuthorizedLiveSession(pilgrim.id, sessionId);
 
-    assertLiveSessionJoinable(session);
+    const activeListenerCount = await readLiveListenerCount(session.roomName);
+    assertLiveSessionJoinable({ ...session, listenerCount: activeListenerCount ?? session.listenerCount });
 
     const apiKey = process.env.LIVEKIT_API_KEY;
     const apiSecret = process.env.LIVEKIT_API_SECRET;

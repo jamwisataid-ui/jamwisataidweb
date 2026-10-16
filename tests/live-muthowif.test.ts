@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { MobileApiError } from "../src/lib/mobile/api";
 import { assertLiveSessionJoinable } from "../src/lib/mobile/live-session-policy";
+import { countJamaahParticipants, liveKitHttpUrl } from "../src/lib/mobile/livekit-room";
 
 describe("assertLiveSessionJoinable", () => {
   it("allows an active room with remaining capacity", () => {
@@ -19,5 +20,23 @@ describe("assertLiveSessionJoinable", () => {
 
   it("rejects a full room", () => {
     expect(() => assertLiveSessionJoinable({ status: "live", listenerCount: 45, capacity: 45 })).toThrowError("Sesi sedang penuh");
+  });
+});
+
+describe("LiveKit room metrics", () => {
+  it.each([
+    ["wss://live.example.com", "https://live.example.com"],
+    ["ws://127.0.0.1:7880", "http://127.0.0.1:7880"],
+    ["https://live.example.com", "https://live.example.com"],
+  ])("converts %s to its service URL", (input, expected) => {
+    expect(liveKitHttpUrl(input)).toBe(expected);
+  });
+
+  it("counts only jamaah and excludes the muthowif publisher", () => {
+    expect(countJamaahParticipants([
+      { identity: "muthowif-1" },
+      { identity: "jamaah-1" },
+      { identity: "jamaah-2" },
+    ])).toBe(2);
   });
 });

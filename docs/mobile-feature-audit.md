@@ -6,7 +6,7 @@ Dokumen ini mencatat kondisi fitur berdasarkan implementasi dan integrasi backen
 
 1. **Paket dan pendaftaran** — selesai. Multi-keberangkatan, pilihan tanggal, harga keberangkatan, validasi status, detail paket, dan pendaftaran sudah konsisten.
 2. **Area jamaah dan alur setelah login** — selesai di kode. Profil, dokumen, pembayaran transfer, notifikasi, itinerary, dan hub ibadah dirapikan agar setiap aksi memiliki loading, error, dan tujuan yang jelas.
-3. **LIVE MUTHOWIF dan komunikasi realtime** — berikutnya. Fokus pada uji LiveKit perangkat nyata, background audio, reconnect, microphone permission, kapasitas room, serta akses berdasarkan rombongan.
+3. **LIVE MUTHOWIF dan komunikasi realtime** — selesai di kode. Akses rombongan, token terbatas, kapasitas room realtime, permission mikrofon, reconnect, heartbeat, listener count, dan konfigurasi background audio sudah diperkuat. Acceptance audio saat layar terkunci tetap harus diuji pada Android/iPhone fisik.
 4. **Release hardening Android/iOS** — terakhir. Push notification production, build perangkat, accessibility, performa, offline recovery, observability, dan checklist distribusi store.
 
 ## Status fitur
@@ -25,8 +25,8 @@ Dokumen ini mencatat kondisi fitur berdasarkan implementasi dan integrasi backen
 | Jadwal sholat | Berfungsi | Data lokasi/timezone, cache, waktu berikutnya, arah kiblat berbasis derajat, dan tanggal Hijriyah tersedia. |
 | Mushaf Qur'an | Berfungsi | 114 surah offline, pencarian, juz, bookmark, dan last read tersedia. |
 | Doa dan dzikir | Berfungsi | Dataset offline, kategori, detail, dan favorit tersedia. |
-| LIVE MUTHOWIF | Terintegrasi, perlu uji perangkat | Token, room, listener, broadcaster, dan pembatasan rombongan tersedia; background/reconnect diuji di Tahap 3. |
-| Panel Muthowif | Terintegrasi, perlu uji perangkat | Session selector, microphone, listener count, quality, dan end-live tersedia. |
+| LIVE MUTHOWIF | Berfungsi di kode, perlu acceptance perangkat | Token subscriber-only, pembatasan rombongan, reconnect otomatis, status koneksi, kapasitas aktual LiveKit, dan cache jadwal tersedia. |
+| Panel Muthowif | Berfungsi di kode, perlu acceptance perangkat | Permission mikrofon, publish audio, mute, reconnect, heartbeat, listener count realtime, quality, metadata sesi, dan end-live tersedia. |
 
 ## Batasan yang disengaja
 

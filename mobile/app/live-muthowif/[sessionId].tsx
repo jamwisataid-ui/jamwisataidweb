@@ -1,11 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { LiveRoom } from "@/components/live/live-room";
+import { api, ApiError } from "@/lib/api";
 import { useLiveRoomStore } from "@/lib/live-room-store";
+import type { LiveJoinCredentials } from "@/types";
 import { colors, gradients, typography } from "@/theme";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -13,10 +15,30 @@ export default function LiveMuthowifListenerScreen() {
   const { sessionId } = useLocalSearchParams<{ sessionId: string }>();
   const credentials = useLiveRoomStore((state) => state.credentials);
   const setCredentials = useLiveRoomStore((state) => state.setCredentials);
-  const leave = useCallback(() => { setCredentials(null); router.replace("/live-muthowif" as never); }, [setCredentials]);
+  const [connectionError, setConnectionError] = useState("");
+  const [retrying, setRetrying] = useState(false);
+  const reconnectingRef = useRef(false);
+  const leavingRef = useRef(false);
+  const leave = useCallback(() => { leavingRef.current = true; setCredentials(null); router.replace("/live-muthowif" as never); }, [setCredentials]);
+  const reconnect = useCallback(async () => {
+    if (!sessionId || reconnectingRef.current || leavingRef.current) return;
+    reconnectingRef.current = true;
+    setRetrying(true);
+    setConnectionError("");
+    try {
+      const next = await api<LiveJoinCredentials>(`/live-muthowif/${sessionId}/token`, { method: "POST" });
+      setCredentials(next);
+    } catch (error) {
+      setConnectionError(error instanceof ApiError ? error.message : "Siaran belum dapat disambungkan kembali.");
+    } finally {
+      reconnectingRef.current = false;
+      setRetrying(false);
+    }
+  }, [sessionId, setCredentials]);
+  const handleDisconnected = useCallback(() => { void reconnect(); }, [reconnect]);
   useEffect(() => { if (!credentials || credentials.session.id !== sessionId) router.replace("/live-muthowif" as never); }, [credentials, sessionId]);
   if (!credentials || credentials.session.id !== sessionId) return null;
-  return <SafeAreaView edges={["top", "bottom"]} style={styles.safe}><LinearGradient colors={gradients.navy} style={styles.screen}><View style={styles.header}><Pressable onPress={leave} style={styles.back}><Ionicons name="arrow-back" size={23} color={colors.white} /></Pressable><Text style={styles.headerTitle}>LIVE MUTHOWIF</Text><View style={styles.back} /></View><View style={styles.content}><View style={styles.broadcast}><View style={styles.outer}><View style={styles.inner}><Ionicons name="headset" size={58} color={colors.gold} /></View></View></View><Text style={styles.live}>SIARAN LANGSUNG</Text><Text style={styles.title}>{credentials.session.title}</Text><Text style={styles.muthowif}>{credentials.session.muthowifName}</Text><LiveRoom serverUrl={credentials.serverUrl} token={credentials.token} onDisconnected={leave} /><Text style={styles.hint}>Pastikan volume perangkat aktif. Anda bergabung sebagai pendengar.</Text></View><Pressable onPress={leave} style={styles.leave}><Ionicons name="exit-outline" size={20} color={colors.white} /><Text style={styles.leaveText}>Keluar dari Siaran</Text></Pressable></LinearGradient></SafeAreaView>;
+  return <SafeAreaView edges={["top", "bottom"]} style={styles.safe}><LinearGradient colors={gradients.navy} style={styles.screen}><View style={styles.header}><Pressable onPress={leave} style={styles.back}><Ionicons name="arrow-back" size={23} color={colors.white} /></Pressable><Text style={styles.headerTitle}>LIVE MUTHOWIF</Text><View style={styles.back} /></View><View style={styles.content}><View style={styles.broadcast}><View style={styles.outer}><View style={styles.inner}><Ionicons name="headset" size={58} color={colors.gold} /></View></View></View><Text style={styles.live}>SIARAN LANGSUNG</Text><Text style={styles.title}>{credentials.session.title}</Text><Text style={styles.muthowif}>{credentials.session.muthowifName}</Text><LiveRoom serverUrl={credentials.serverUrl} token={credentials.token} onDisconnected={handleDisconnected} />{connectionError ? <View style={styles.connectionError}><Text style={styles.connectionErrorText}>{connectionError}</Text><Pressable disabled={retrying} onPress={() => void reconnect()} style={styles.retry}><Text style={styles.retryText}>{retrying ? "Menyambungkan..." : "Coba Sambungkan"}</Text></Pressable></View> : null}<Text style={styles.hint}>Pastikan volume perangkat aktif. Anda bergabung sebagai pendengar.</Text></View><Pressable onPress={leave} style={styles.leave}><Ionicons name="exit-outline" size={20} color={colors.white} /><Text style={styles.leaveText}>Keluar dari Siaran</Text></Pressable></LinearGradient></SafeAreaView>;
 }
 
 const styles = StyleSheet.create({
@@ -33,6 +55,10 @@ const styles = StyleSheet.create({
   title: { color: colors.white, fontFamily: typography.heading, fontSize: 26, lineHeight: 34, textAlign: "center" },
   muthowif: { color: "rgba(255,255,255,.72)", fontFamily: typography.medium, fontSize: 14, marginTop: 8, marginBottom: 22 },
   hint: { maxWidth: 300, color: "rgba(255,255,255,.55)", fontFamily: typography.body, fontSize: 11.5, lineHeight: 18, textAlign: "center", marginTop: 16 },
+  connectionError: { maxWidth: 320, alignItems: "center", gap: 10, marginTop: 16 },
+  connectionErrorText: { color: "#FFD6D0", fontFamily: typography.medium, fontSize: 12, lineHeight: 18, textAlign: "center" },
+  retry: { minHeight: 40, justifyContent: "center", paddingHorizontal: 18, borderRadius: 12, backgroundColor: colors.gold },
+  retryText: { color: colors.navyDeep, fontFamily: typography.bold, fontSize: 12 },
   leave: { minHeight: 52, borderRadius: 14, borderWidth: 1, borderColor: "rgba(255,255,255,.23)", backgroundColor: "rgba(255,255,255,.08)", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9 },
   leaveText: { color: colors.white, fontFamily: typography.bold, fontSize: 14 },
 });

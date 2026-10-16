@@ -16,6 +16,7 @@ import { SessionSelector, sessionTypeTitle } from "@/components/muthowif/session
 import { Button } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
+import { requestBroadcastMicrophonePermission } from "@/lib/microphone-permission";
 import { colors, typography } from "@/theme";
 import type { MuthowifBroadcastCredentials, MuthowifSession } from "@/types";
 
@@ -62,18 +63,25 @@ export default function MuthowifPanelScreen() {
   }, [session, updateCachedSession]);
   const handleListeners = useCallback((count: number) => setListeners(count), []);
   const handleQuality = useCallback((value: ConnectionLevel) => setQuality(value), []);
-  const handleRoomError = useCallback((value: string) => { setMessage(value); setCredentials(null); }, []);
+  const handleRoomError = useCallback((value: string) => { setMessage(value); setListeners(0); setCredentials(null); }, []);
 
   useEffect(() => {
     if (!session || !credentials || (state !== "live" && state !== "muted")) return;
-    const id = setTimeout(() => { void api(`/muthowif/sessions/${session.id}`, { method: "PATCH", body: JSON.stringify({ action: "heartbeat", listenerCount: listeners }) }); }, 1000);
-    return () => clearTimeout(id);
+    const heartbeat = () => { void api(`/muthowif/sessions/${session.id}`, { method: "PATCH", body: JSON.stringify({ action: "heartbeat", listenerCount: listeners }) }).catch(() => undefined); };
+    heartbeat();
+    const id = setInterval(heartbeat, 15_000);
+    return () => clearInterval(id);
   }, [credentials, listeners, session, state]);
 
   async function startBroadcast() {
     if (!session) return;
     setState("starting"); setMessage(""); setMicrophoneEnabled(true);
     try {
+      if (!await requestBroadcastMicrophonePermission()) {
+        setState("idle");
+        setMessage("Izin mikrofon diperlukan. Aktifkan izin mikrofon Jam Wisata dari pengaturan perangkat, lalu coba kembali.");
+        return;
+      }
       const result = await api<MuthowifBroadcastCredentials>(`/muthowif/sessions/${session.id}/token`, { method: "POST" });
       setCredentials(result);
     } catch (error) { setState("idle"); setMessage(error instanceof ApiError ? error.message : "Siaran belum dapat dimulai."); }
