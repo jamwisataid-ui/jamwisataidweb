@@ -5,6 +5,7 @@ import * as Notifications from "expo-notifications";
 
 import { api } from "./api";
 import { useAuthStore } from "./auth-store";
+import { notificationDeepLink } from "./notification-links";
 
 export function useDeviceNotifications() {
   const accessToken = useAuthStore((state) => state.tokens?.accessToken);
@@ -22,7 +23,8 @@ export function useDeviceNotifications() {
     })().catch(() => undefined);
     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
       const deepLink = response.notification.request.content.data?.deepLink;
-      if (typeof deepLink === "string" && deepLink.startsWith("/")) router.push(deepLink as never);
+      const destination = typeof deepLink === "string" ? notificationDeepLink(deepLink) : null;
+      if (destination) router.push(destination as never);
     });
     return () => { active = false; subscription.remove(); };
   }, [accessToken]);
