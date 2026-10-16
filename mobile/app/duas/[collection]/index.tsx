@@ -4,7 +4,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { DuaContentListItem } from "@/components/dua/dua-list-item";
 import { getDuaCollection } from "@/lib/dua-dhikr";
-import { colors } from "@/theme";
+import { colors, typography } from "@/theme";
 
 export default function DuaCollectionScreen() {
   const { collection: id } = useLocalSearchParams<{ collection: string }>();
@@ -14,4 +14,4 @@ export default function DuaCollectionScreen() {
   return <SafeAreaView edges={["top", "bottom"]} style={styles.safe}><FlatList contentContainerStyle={styles.bottom} data={collection.items} initialNumToRender={12} keyExtractor={(item) => item.id} ListHeaderComponent={header} renderItem={({ item }) => <DuaContentListItem item={item} onPress={() => router.push({ pathname: "/duas/[collection]/[item]", params: { collection: collection.id, item: item.id } })} />} showsVerticalScrollIndicator={false} /></SafeAreaView>;
 }
 
-const styles = StyleSheet.create({ safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: colors.ivory }, appBar: { minHeight: 58, paddingHorizontal: 12, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, back: { width: 44, height: 44, alignItems: "center", justifyContent: "center" }, title: { flex: 1, color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 20, textAlign: "center" }, intro: { margin: 18, marginBottom: 5, padding: 18, borderRadius: 18, backgroundColor: colors.navy }, introTitle: { color: colors.white, fontFamily: "Montserrat_700Bold", fontSize: 18 }, introBody: { marginTop: 5, color: "#CAD6E2", fontFamily: "Montserrat_400Regular", fontSize: 12.5, lineHeight: 18 }, bottom: { paddingBottom: 28 }, missing: { margin: 30, color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 16 } });
+const styles = StyleSheet.create({ safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: colors.ivory }, appBar: { minHeight: 58, paddingHorizontal: 12, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, back: { width: 44, height: 44, alignItems: "center", justifyContent: "center" }, title: { flex: 1, color: colors.navy, fontFamily: typography.quranLatin, fontWeight: "700", fontSize: 20, textAlign: "center" }, intro: { margin: 18, marginBottom: 5, padding: 18, borderRadius: 18, backgroundColor: colors.navy }, introTitle: { color: colors.white, fontFamily: typography.quranLatin, fontWeight: "700", fontSize: 18 }, introBody: { marginTop: 5, color: "#CAD6E2", fontFamily: typography.quranLatin, fontSize: 12.5, lineHeight: 18 }, bottom: { paddingBottom: 28 }, missing: { margin: 30, color: colors.navy, fontFamily: typography.quranLatin, fontWeight: "700", fontSize: 16 } });

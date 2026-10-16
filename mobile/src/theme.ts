@@ -27,8 +27,6 @@ export const typography = {
   editorialSemibold: "CormorantGaramond_600SemiBold",
   quranLatin: "Georgia",
   quranArabic: "Georgia",
-  arabic: "ReemKufi_400Regular",
-  arabicSemibold: "ReemKufi_600SemiBold",
 } as const;
 
 export const gradients = {

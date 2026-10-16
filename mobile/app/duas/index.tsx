@@ -9,7 +9,7 @@ import { DuaEmptyState } from "@/components/dua/dua-empty-state";
 import { DuaContentListItem, DuaListItem } from "@/components/dua/dua-list-item";
 import { dhikrTabCollections, doaTabCollections, getDuaItemById, selectedItems, type DuaCollection, type DuaItem } from "@/lib/dua-dhikr";
 import { loadDuaFavorites, type DuaFavorite } from "@/lib/dua-favorites";
-import { colors } from "@/theme";
+import { colors, typography } from "@/theme";
 
 function AppBar() { return <View style={styles.appBar}><Pressable accessibilityLabel="Kembali" onPress={() => router.canGoBack() ? router.back() : router.replace("/(tabs)")} style={styles.back}><Ionicons name="arrow-back" size={23} color={colors.navy} /></Pressable><Text style={styles.title}>Doa &amp; Dzikir</Text><View style={styles.back} /></View>; }
 const openCollection = (collection: DuaCollection) => router.push({ pathname: "/duas/[collection]", params: { collection: collection.id } });
@@ -26,4 +26,4 @@ export default function DuaDhikrScreen() {
   return <SafeAreaView edges={["top", "bottom"]} style={styles.safe}><FlatList contentContainerStyle={data.length ? styles.bottom : undefined} data={data} keyExtractor={(item) => item.id} ListEmptyComponent={tab === "favorite" ? <DuaEmptyState /> : null} ListHeaderComponent={header} renderItem={({ item }) => <DuaContentListItem favorite={tab === "favorite"} item={item} onPress={() => openItem(item)} />} showsVerticalScrollIndicator={false} /></SafeAreaView>;
 }
 
-const styles = StyleSheet.create({ safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: colors.ivory }, appBar: { minHeight: 58, paddingHorizontal: 12, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, back: { width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" }, title: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 22 }, bottom: { paddingBottom: 28 } });
+const styles = StyleSheet.create({ safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: colors.ivory }, appBar: { minHeight: 58, paddingHorizontal: 12, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, back: { width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" }, title: { color: colors.navy, fontFamily: typography.quranLatin, fontWeight: "700", fontSize: 22 }, bottom: { paddingBottom: 28 } });
