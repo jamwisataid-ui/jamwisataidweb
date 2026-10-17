@@ -1,6 +1,7 @@
 import { and, asc, count, desc, eq } from "drizzle-orm";
 
 import { requireDatabase } from "@/db";
+import { testimonialVideoUrl } from "./testimonial-video";
 import {
   accommodations,
   articles,
@@ -150,7 +151,7 @@ export async function getEntryAdmin(type: string, id: string) {
   if (!entry) return null;
   const data = entry.data;
   const mapped = {
-    testimonial: [String(data.youtubeId ?? ""), String(data.program ?? ""), String(data.year ?? ""), ""],
+    testimonial: [testimonialVideoUrl(data), String(data.program ?? ""), String(data.year ?? ""), ""],
     gallery: [String(data.imageUrl ?? ""), String(data.alt ?? ""), String(data.caption ?? ""), ""],
     destination: [String(data.name ?? ""), String(data.places ?? ""), String(data.imageUrl ?? ""), ""],
     faq: [String(data.question ?? ""), String(data.answer ?? ""), String(data.scope ?? "homepage"), ""],

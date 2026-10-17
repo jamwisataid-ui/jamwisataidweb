@@ -158,12 +158,17 @@ export function extractYoutubeId(value: string) {
 
   try {
     const url = new URL(direct);
-    if (url.hostname === "youtu.be") return url.pathname.slice(1).split("/")[0] || null;
-    if (url.hostname.includes("youtube.com")) {
-      if (url.pathname.startsWith("/shorts/")) return url.pathname.split("/")[2] || null;
-      if (url.pathname.startsWith("/embed/")) return url.pathname.split("/")[2] || null;
-      return url.searchParams.get("v");
-    }
+    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+    const host = url.hostname.toLowerCase();
+    const isYoutube = host === "youtube.com" || host.endsWith(".youtube.com");
+    const isShort = host === "youtu.be" || host === "www.youtu.be";
+    if (!isYoutube && !isShort) return null;
+    const id = isShort
+      ? url.pathname.slice(1).split("/")[0]
+      : url.pathname.startsWith("/shorts/") || url.pathname.startsWith("/embed/")
+        ? url.pathname.split("/")[2]
+        : url.searchParams.get("v");
+    return id && /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : null;
   } catch {
     return null;
   }

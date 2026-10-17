@@ -24,11 +24,11 @@ import {
   type ActionState,
   articleFormSchema,
   entryFormSchema,
-  extractYoutubeId,
   lines,
   packageFormSchema,
   slugify,
 } from "./validation";
+import { testimonialVideoData } from "./testimonial-video";
 
 const value = (formData: FormData, key: string) => String(formData.get(key) ?? "");
 
@@ -303,9 +303,7 @@ export async function savePackageAction(_state: ActionState, formData: FormData)
 
 function entryData(type: string, data: { primary?: string; secondary?: string; tertiary?: string; quaternary?: string }) {
   if (type === "testimonial") {
-    const youtubeId = extractYoutubeId(data.primary ?? "");
-    if (!youtubeId) throw new Error("URL YouTube tidak valid.");
-    return { youtubeId, program: data.secondary ?? "", year: data.tertiary ?? "", orientation: "portrait" };
+    return { ...testimonialVideoData(data.primary ?? ""), program: data.secondary ?? "", year: data.tertiary ?? "", orientation: "portrait" };
   }
   if (type === "gallery") return { imageUrl: data.primary ?? "", alt: data.secondary ?? "", caption: data.tertiary ?? "" };
   if (type === "destination") return { name: data.primary ?? "", places: data.secondary ?? "", imageUrl: data.tertiary ?? "" };
