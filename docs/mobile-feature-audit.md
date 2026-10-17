@@ -19,7 +19,7 @@ Dokumen ini mencatat kondisi fitur berdasarkan implementasi dan integrasi backen
 | Pendaftaran jamaah | Berfungsi | Akun baru dibuat saat diperlukan; akun lama memakai profil tersimpan. |
 | Dokumen jamaah | Berfungsi | Kondisi kosong, upload, ganti, preview, download, review status, dan Buku Vaksin tersedia. |
 | Pembayaran transfer bank | Berfungsi | Menampilkan rekening resmi, sisa tagihan, dan pengiriman bukti melalui WhatsApp; status hanya berubah setelah konfirmasi admin. |
-| VA, kartu, dan e-wallet | Belum diaktifkan | UI disabled dengan keterangan yang jelas karena payment gateway belum tersedia. |
+| VA, kartu, dan e-wallet | Simulasi tampilan | Jamaah dapat melihat pratinjau alur, tetapi tidak ada transaksi atau perubahan status tagihan sebelum payment gateway terhubung. |
 | Itinerary | Berfungsi | Mengikuti pendaftaran user dan mempunyai cache offline terakhir. |
 | Notifikasi dalam aplikasi | Berfungsi | Read state dan deep link internal sudah terhubung. Push production diverifikasi pada Tahap 4. |
 | Jadwal sholat | Berfungsi | Data lokasi/timezone, cache, waktu berikutnya, arah kiblat berbasis derajat, dan tanggal Hijriyah tersedia. |
@@ -31,7 +31,7 @@ Dokumen ini mencatat kondisi fitur berdasarkan implementasi dan integrasi backen
 ## Batasan yang disengaja
 
 - Aplikasi tidak menandai pembayaran sebagai lunas dari sisi frontend.
-- Virtual Account, kartu, dan e-wallet tidak dibuat seolah aktif sebelum payment gateway benar-benar terhubung.
+- Virtual Account, kartu, dan e-wallet hanya menyediakan pratinjau berlabel simulasi; backend tetap menolak pemilihan metode tersebut sampai payment gateway benar-benar terhubung.
 - Arah kiblat saat ini menampilkan bearing berdasarkan lokasi; layar kompas native penuh masuk tahap release hardening jika diperlukan.
 - Kalender Hijriyah saat ini menampilkan tanggal aktif; navigasi kalender bulanan belum menjadi blocker flow jamaah.
 
