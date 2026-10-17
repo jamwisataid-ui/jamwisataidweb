@@ -15,6 +15,7 @@ import {
 import { umrahPackages } from "@/data/jamwisata";
 import type { TravelPackage } from "@/types/jamwisata";
 import { filterPackagesByCategory, type ManagedPackageCategory } from "./package-category";
+import { isDepartureSelectable } from "./departure-availability";
 
 export { packagePublicPath } from "./package-category";
 
@@ -75,7 +76,7 @@ async function queryPackages(): Promise<TravelPackage[]> {
     return packageRows.map((item) => {
       const packageDepartures = departureRows.filter((candidate) => candidate.packageId === item.id);
       const futureDepartures = packageDepartures.filter((candidate) => candidate.departureDate >= todayJakarta && candidate.status !== "closed");
-      const selectableDepartures = futureDepartures.filter((candidate) => candidate.status === "open" || candidate.status === "limited");
+      const selectableDepartures = futureDepartures.filter(isDepartureSelectable);
       const departure = selectableDepartures[0] ?? futureDepartures[0] ?? packageDepartures.at(-1);
       const packageHotelRows = departure ? hotelRows.filter((hotel) => hotel.departureId === departure.id) : [];
       const byKind = (kind: typeof itemRows[number]["kind"]) =>
@@ -93,8 +94,8 @@ async function queryPackages(): Promise<TravelPackage[]> {
         price: Number(candidate.price),
         quota: candidate.capacity ?? undefined,
         remainingQuota: candidate.availableSeats ?? undefined,
-        status: candidate.status === "limited" ? "limited" as const : candidate.status === "full" || candidate.status === "closed" ? "sold-out" as const : candidate.status === "coming-soon" ? "coming-soon" as const : "available" as const,
-        selectable: candidate.status === "open" || candidate.status === "limited",
+        status: !isDepartureSelectable(candidate) && candidate.status !== "coming-soon" ? "sold-out" as const : candidate.status === "limited" ? "limited" as const : candidate.status === "coming-soon" ? "coming-soon" as const : "available" as const,
+        selectable: isDepartureSelectable(candidate),
       }));
       const activePrices = selectableDepartures.map((candidate) => Number(candidate.price)).filter(Number.isFinite);
       const packageStatus = selectableDepartures.some((candidate) => candidate.status === "open")

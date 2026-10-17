@@ -6,6 +6,7 @@ import { withManagementTransaction } from "@/db/transaction";
 import { requireMobileSession } from "@/lib/mobile/auth";
 import { mobileData, mobileError, MobileApiError, zodFieldErrors } from "@/lib/mobile/api";
 import { mobileRegistrationSchema } from "@/lib/mobile/validation";
+import { isDepartureSelectable } from "@/lib/cms/departure-availability";
 
 export async function POST(request: Request) {
   try {
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
     const database = requireDatabase();
     const [selected] = await database.select({ departure: departures, package: packages }).from(departures).innerJoin(packages, eq(departures.packageId, packages.id)).where(and(eq(departures.id, parsed.data.departureId), eq(packages.status, "published"))).limit(1);
     const todayJakarta = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
-    if (!selected || selected.departure.departureDate < todayJakarta || !["open", "limited"].includes(selected.departure.status)) throw new MobileApiError(400, "DEPARTURE_UNAVAILABLE", "Keberangkatan ini belum tersedia untuk pendaftaran.");
+    if (!selected || selected.departure.departureDate < todayJakarta || !isDepartureSelectable(selected.departure)) throw new MobileApiError(400, "DEPARTURE_UNAVAILABLE", "Keberangkatan ini belum tersedia untuk pendaftaran.");
     const existingRegistrations = await database.select({ registration: registrations, booking: bookings }).from(registrations).innerJoin(bookings, eq(registrations.bookingId, bookings.id)).where(and(eq(registrations.pilgrimId, pilgrim.id), eq(bookings.departureId, selected.departure.id), inArray(registrations.status, ["pending", "active"])));
     if (existingRegistrations.length) throw new MobileApiError(409, "REGISTRATION_EXISTS", "Anda sudah memiliki pendaftaran untuk keberangkatan ini.");
     const settings = await database.query.managementSettings.findFirst({ where: eq(managementSettings.id, "default") });

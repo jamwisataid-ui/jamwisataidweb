@@ -69,14 +69,18 @@ function lineMarkup(value: string, field: TemplateFieldConfig) {
   return `<span foreground="${field.color ?? "#111111"}" font_weight="${field.fontWeight ?? 400}" font_style="${field.fontStyle ?? "normal"}">${xml(value)}</span>`;
 }
 
-async function renderLine(value: string, field: TemplateFieldConfig, fontSize: number): Promise<RenderedLine> {
-  const input = await sharp({ text: {
+function textInput(value: string, field: TemplateFieldConfig, fontSize: number) {
+  return { text: {
     text: lineMarkup(value || " ", field),
     font: `${field.fontFamily === "serif" ? "Cormorant Garamond" : "Montserrat"} ${fontSize}`,
     fontfile: fontPath(field),
     rgba: true,
     dpi: 72,
-  } }).png().toBuffer();
+  } } as const;
+}
+
+async function renderLine(value: string, field: TemplateFieldConfig, fontSize: number): Promise<RenderedLine> {
+  const input = await sharp(textInput(value, field, fontSize)).png().toBuffer();
   const metadata = await sharp(input).metadata();
   return { input, width: metadata.width ?? 1, height: metadata.height ?? 1 };
 }
@@ -86,7 +90,7 @@ async function measureLine(value: string, field: TemplateFieldConfig, fontSize: 
   const key = [field.fontFamily, field.fontStyle, field.fontWeight, fontSize, value].join("|");
   const cached = cache.get(key);
   if (cached) return cached;
-  const { width, height } = await renderLine(value, field, fontSize);
+  const { width = 1, height = 1 } = await sharp(textInput(value, field, fontSize)).metadata();
   const measured = { width, height };
   cache.set(key, measured);
   return measured;
