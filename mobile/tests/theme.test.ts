@@ -18,6 +18,6 @@ describe("Jam Wisata mobile brand theme", () => {
     expect(typography.heading).toBe("Cinzel_700Bold");
     expect(typography.editorial).toBe("CormorantGaramond_500Medium");
     expect(typography.quranLatin).toBe("Georgia");
-    expect(typography.quranArabic).toBe("Georgia");
+    expect(typography.quranArabic).toBe("QPCUthmaniHafs");
   });
 });

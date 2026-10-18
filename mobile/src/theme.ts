@@ -26,7 +26,7 @@ export const typography = {
   editorial: "CormorantGaramond_500Medium",
   editorialSemibold: "CormorantGaramond_600SemiBold",
   quranLatin: "Georgia",
-  quranArabic: "Georgia",
+  quranArabic: "QPCUthmaniHafs",
 } as const;
 
 export const gradients = {
