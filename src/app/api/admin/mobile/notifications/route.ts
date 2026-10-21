@@ -5,7 +5,9 @@ import { requireDatabase } from "@/db";
 import { mobileNotifications } from "@/db/schema";
 import { requireAdminSession } from "@/lib/admin-session";
 
-const schema = z.object({ pilgrimId: z.uuid(), title: z.string().trim().min(3).max(100), body: z.string().trim().min(3).max(500), deepLink: z.string().trim().max(300).optional() });
+const allowedActions = new Set(["/(tabs)/account", "/(tabs)/notifications", "/documents", "/journey", "/payments", "/live-muthowif", "/download-app"]);
+const notificationAction = z.string().trim().max(300).refine((value) => allowedActions.has(value) || /^\/payment\/[0-9a-f-]{36}(?:\?.*)?$/i.test(value), "Action notifikasi tidak valid.");
+const schema = z.object({ pilgrimId: z.uuid(), title: z.string().trim().min(3).max(100), body: z.string().trim().min(3).max(500), deepLink: notificationAction.optional() });
 
 export async function POST(request: Request) {
   const session = await requireAdminSession();

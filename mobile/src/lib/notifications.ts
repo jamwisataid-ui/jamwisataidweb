@@ -1,11 +1,11 @@
 import { useEffect } from "react";
-import { Platform } from "react-native";
+import { Linking, Platform } from "react-native";
 import { router } from "expo-router";
 import * as Notifications from "expo-notifications";
 
 import { api } from "./api";
 import { useAuthStore } from "./auth-store";
-import { notificationDeepLink } from "./notification-links";
+import { notificationDeepLink, notificationDownloadUrl } from "./notification-links";
 
 export function useDeviceNotifications() {
   const accessToken = useAuthStore((state) => state.tokens?.accessToken);
@@ -25,6 +25,10 @@ export function useDeviceNotifications() {
       const deepLink = response.notification.request.content.data?.deepLink;
       const destination = typeof deepLink === "string" ? notificationDeepLink(deepLink) : null;
       if (destination) router.push(destination as never);
+      else if (typeof deepLink === "string") {
+        const downloadUrl = notificationDownloadUrl(deepLink);
+        if (downloadUrl) void Linking.openURL(downloadUrl);
+      }
     });
     return () => { active = false; subscription.remove(); };
   }, [accessToken]);
