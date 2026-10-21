@@ -53,6 +53,7 @@ playwright-report/
 .playwright-cli/
 dev-server*.log
 artifacts/document-layout/
+artifacts/android/
 mobile/.expo/
 mobile/node_modules/
 mobile/dist-test/

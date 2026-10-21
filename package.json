@@ -40,7 +40,8 @@
     "admin:create": "tsx scripts/create-admin.ts",
     "mobile:install": "npm --prefix mobile install",
     "mobile:start": "npm --prefix mobile run start",
-    "mobile:typecheck": "npm --prefix mobile run typecheck"
+    "mobile:typecheck": "npm --prefix mobile run typecheck",
+    "mobile:release:upload": "node --conditions=react-server --import tsx scripts/upload-mobile-release.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1121.0",

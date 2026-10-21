@@ -24,6 +24,8 @@ export default function RootLayout() {
   const [montserratLoaded, montserratError] = useMontserrat({ Montserrat_400Regular, Montserrat_500Medium, Montserrat_600SemiBold, Montserrat_700Bold });
   const [cinzelLoaded, cinzelError] = useCinzel({ Cinzel_600SemiBold, Cinzel_700Bold });
   const [cormorantLoaded, cormorantError] = useCormorant({ CormorantGaramond_500Medium, CormorantGaramond_600SemiBold });
+  // Expo requires a static CommonJS asset reference so Metro can bundle the local font.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const [quranFontLoaded, quranFontError] = useQuranFont({ QPCUthmaniHafs: require("../assets/fonts/UthmanicHafs_V22.ttf") });
   const hydrate = useAuthStore((state) => state.hydrate);
   useDeviceNotifications();
