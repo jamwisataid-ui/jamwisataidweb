@@ -39,7 +39,7 @@ export default function PackageDetailScreen() {
   const canRegister = Boolean(effectiveDepartureId) && (selectedDeparture ? selectedDeparture.selectable : item.status === "available" || item.status === "limited");
 
   return (
-    <SafeAreaView edges={["bottom"]} style={styles.safe}>
+    <SafeAreaView edges={["top", "bottom"]} style={styles.safe}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <PackageHero item={item} favorite={favorite} onToggleFavorite={() => setFavorite((value) => !value)} />
         <PackageSummaryCard item={item} price={selectedDeparture?.price ?? item.priceFrom} />
