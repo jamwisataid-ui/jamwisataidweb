@@ -1,6 +1,6 @@
 import { useAuthStore, type Tokens } from "./auth-store";
 
-const API_URL = (process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000/api/mobile/v1").replace(/\/$/, "");
+const API_URL = (process.env.EXPO_PUBLIC_API_URL || "https://www.jamwisata.id/api/mobile/v1").replace(/\/$/, "");
 type ApiEnvelope<T> = { data: T; meta?: Record<string, unknown> };
 type ApiFailure = { error?: { code?: string; message?: string; fieldErrors?: Record<string, string[]> } };
 
