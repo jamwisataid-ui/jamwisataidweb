@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Jam Wisata",
-    "slug": "jam-wisata",
+    "slug": "matt",
     "scheme": "jamwisata",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -31,8 +31,8 @@
     "web": { "bundler": "metro", "output": "single" },
     "extra": {
       "router": { "origin": false },
-      "eas": { "projectId": "13817aeb-10d3-4b87-8222-43d262e158e8" }
+      "eas": { "projectId": "d18e9906-12f6-4cd1-96c5-9804d510a282" }
     },
-    "owner": "sqcb002s-team"
+    "owner": "matthmd28s-team"
   }
 }
