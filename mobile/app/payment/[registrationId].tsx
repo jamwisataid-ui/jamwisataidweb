@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, View, type ScrollViewInstance } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -20,7 +20,7 @@ export default function PaymentScreen() {
   const tokens = useAuthStore((state) => state.tokens);
   const insets = useSafeAreaInsets();
   const client = useQueryClient();
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   const query = useQuery({ queryKey: ["payment", registrationId], queryFn: () => api<PaymentDetail>(`/payments/${registrationId}`), enabled: Boolean(tokens && registrationId) });
   const [selected, setSelected] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

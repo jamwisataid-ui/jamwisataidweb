@@ -1,49 +1,26 @@
-import { AudioSession, registerGlobals } from "@livekit/react-native";
-import { ConnectionQuality, Room, RoomEvent } from "livekit-client";
-import { useEffect, useRef } from "react";
+import Constants, { ExecutionEnvironment } from "expo-constants";
+import type { ComponentType } from "react";
+import { useEffect, useState } from "react";
 
 import type { BroadcastState, ConnectionLevel } from "./live-overview";
 
-registerGlobals();
 type Props = { serverUrl: string; token: string; microphoneEnabled: boolean; onState: (state: BroadcastState) => void; onListeners: (count: number) => void; onQuality: (quality: ConnectionLevel) => void; onError: (message: string) => void };
-const mapQuality = (quality: ConnectionQuality): ConnectionLevel => quality === ConnectionQuality.Poor || quality === ConnectionQuality.Lost ? "poor" : quality === ConnectionQuality.Unknown ? "medium" : "good";
+type NativeRoom = ComponentType<Props>;
 
-export function BroadcastRoom({ serverUrl, token, microphoneEnabled, onState, onListeners, onQuality, onError }: Props) {
-  const roomRef = useRef<Room | null>(null);
-  const callbacksRef = useRef({ onState, onListeners, onQuality, onError });
-  const microphoneRef = useRef(microphoneEnabled);
-  useEffect(() => { callbacksRef.current = { onState, onListeners, onQuality, onError }; }, [onError, onListeners, onQuality, onState]);
+export function BroadcastRoom(props: Props) {
+  const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+  const [NativeRoomComponent, setNativeRoomComponent] = useState<NativeRoom | null>(null);
   useEffect(() => {
-    const room = new Room({ adaptiveStream: true, dynacast: true });
-    let disposed = false;
-    roomRef.current = room;
-    const listeners = () => callbacksRef.current.onListeners(room.remoteParticipants.size);
-    room.on(RoomEvent.ParticipantConnected, listeners);
-    room.on(RoomEvent.ParticipantDisconnected, listeners);
-    room.on(RoomEvent.ConnectionQualityChanged, (quality, participant) => { if (participant.isLocal) callbacksRef.current.onQuality(mapQuality(quality)); });
-    room.on(RoomEvent.Reconnecting, () => callbacksRef.current.onState("reconnecting"));
-    room.on(RoomEvent.Reconnected, () => callbacksRef.current.onState(microphoneRef.current ? "live" : "muted"));
-    room.on(RoomEvent.Disconnected, () => {
-      if (disposed) return;
-      callbacksRef.current.onListeners(0);
-      callbacksRef.current.onState("idle");
-      callbacksRef.current.onError("Koneksi siaran terputus. Tekan Sambungkan Siaran untuk melanjutkan sesi.");
+    if (isExpoGo) {
+      props.onState("idle");
+      props.onError("Audio LIVE MUTHOWIF hanya tersedia pada build aplikasi native. Mode Expo Go dapat digunakan untuk menguji tampilan dan alur.");
+      return;
+    }
+    let active = true;
+    void import("./broadcast-room.livekit.native").then(({ NativeBroadcastRoom }) => {
+      if (active) setNativeRoomComponent(() => NativeBroadcastRoom);
     });
-    void (async () => {
-      try {
-        await AudioSession.startAudioSession();
-        await room.connect(serverUrl, token);
-        await room.localParticipant.setMicrophoneEnabled(microphoneRef.current);
-        listeners();
-        callbacksRef.current.onQuality(mapQuality(room.localParticipant.connectionQuality));
-        callbacksRef.current.onState(microphoneRef.current ? "live" : "muted");
-      } catch (error) {
-        callbacksRef.current.onError(error instanceof Error && /permission/i.test(error.message) ? "Izin mikrofon diperlukan untuk memulai siaran." : "Siaran belum dapat dihubungkan. Silakan coba kembali.");
-        callbacksRef.current.onState("idle");
-      }
-    })();
-    return () => { disposed = true; room.disconnect(); roomRef.current = null; void AudioSession.stopAudioSession(); };
-  }, [serverUrl, token]);
-  useEffect(() => { microphoneRef.current = microphoneEnabled; const room = roomRef.current; if (room?.state === "connected") void room.localParticipant.setMicrophoneEnabled(microphoneEnabled).then(() => callbacksRef.current.onState(microphoneEnabled ? "live" : "muted")).catch(() => callbacksRef.current.onError("Mikrofon belum dapat diubah.")); }, [microphoneEnabled]);
-  return null;
+    return () => { active = false; };
+  }, [isExpoGo]);
+  return NativeRoomComponent ? <NativeRoomComponent {...props} /> : null;
 }

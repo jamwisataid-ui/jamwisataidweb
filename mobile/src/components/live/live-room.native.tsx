@@ -1,31 +1,37 @@
-import { AudioSession, LiveKitRoom, registerGlobals, useConnectionState } from "@livekit/react-native";
-import { ConnectionState } from "livekit-client";
-import { useEffect } from "react";
+import Constants, { ExecutionEnvironment } from "expo-constants";
+import type { ComponentType } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { colors, typography } from "@/theme";
 
-registerGlobals();
+type Props = { serverUrl: string; token: string; onDisconnected: () => void };
+type NativeRoom = ComponentType<Props>;
 
-function RoomStatus() {
-  const connection = useConnectionState();
-  const connected = connection === ConnectionState.Connected;
-  const reconnecting = connection === ConnectionState.Reconnecting || connection === ConnectionState.SignalReconnecting;
-  const label = connected ? "Terhubung ke siaran" : reconnecting ? "Menyambungkan kembali..." : "Menghubungkan ke siaran...";
-  return <View style={styles.status}><View style={[styles.liveDot, !connected && styles.waitingDot]} /><Text style={styles.label}>{label}</Text></View>;
-}
-
-export function LiveRoom({ serverUrl, token, onDisconnected }: { serverUrl: string; token: string; onDisconnected: () => void }) {
+export function LiveRoom(props: Props) {
+  const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+  const [NativeRoomComponent, setNativeRoomComponent] = useState<NativeRoom | null>(null);
   useEffect(() => {
-    void AudioSession.startAudioSession();
-    return () => { void AudioSession.stopAudioSession(); };
-  }, []);
-  return <LiveKitRoom serverUrl={serverUrl} token={token} connect audio={false} video={false} onDisconnected={onDisconnected} onError={onDisconnected}><RoomStatus /></LiveKitRoom>;
+    if (isExpoGo) return;
+    let active = true;
+    void import("./live-room.livekit.native").then(({ NativeLiveRoom }) => {
+      if (active) setNativeRoomComponent(() => NativeLiveRoom);
+    });
+    return () => { active = false; };
+  }, [isExpoGo]);
+
+  if (isExpoGo) {
+    return <View style={styles.notice}><Text style={styles.noticeTitle}>Preview Expo Go</Text><Text style={styles.noticeBody}>Audio LIVE MUTHOWIF tersedia pada build aplikasi native. Tampilan dan alur lainnya tetap dapat diuji.</Text></View>;
+  }
+  if (!NativeRoomComponent) return <View style={styles.status}><View style={styles.waitingDot} /><Text style={styles.label}>Menyiapkan audio...</Text></View>;
+  return <NativeRoomComponent {...props} />;
 }
 
 const styles = StyleSheet.create({
   status: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
-  liveDot: { width: 9, height: 9, borderRadius: 5, backgroundColor: "#22C55E" },
-  waitingDot: { backgroundColor: colors.gold },
+  waitingDot: { width: 9, height: 9, borderRadius: 5, backgroundColor: colors.gold },
   label: { color: colors.white, fontFamily: typography.semibold, fontSize: 13 },
+  notice: { borderWidth: 1, borderColor: "rgba(255,255,255,0.24)", borderRadius: 14, paddingHorizontal: 16, paddingVertical: 14, gap: 4 },
+  noticeTitle: { color: colors.gold, fontFamily: typography.bold, fontSize: 14, textAlign: "center" },
+  noticeBody: { color: colors.white, fontFamily: typography.body, fontSize: 12, lineHeight: 18, textAlign: "center" },
 });
