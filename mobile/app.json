@@ -19,6 +19,7 @@
       "bundleIdentifier": "com.jamwisata.mobile",
       "infoPlist": {
         "UIBackgroundModes": ["audio"],
+        "ITSAppUsesNonExemptEncryption": false,
         "NSMicrophoneUsageDescription": "Mikrofon digunakan oleh muthowif untuk menyiarkan panduan ibadah secara langsung."
       }
     },
