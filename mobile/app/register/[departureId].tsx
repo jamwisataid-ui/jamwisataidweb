@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,6 +25,7 @@ const phoneValid = (value: string) => /^(?:\+?62|0)?8\d{7,12}$/.test(value.repla
 export default function RegistrationScreen() {
   const { departureId } = useLocalSearchParams<{ departureId: string }>();
   const tokens = useAuthStore((state) => state.tokens);
+  const draftOwnerId = useAuthStore((state) => state.user?.id ?? "guest");
   const signIn = useAuthStore((state) => state.signIn);
   const setUser = useAuthStore((state) => state.setUser);
   const [step, setStep] = useState(1);
@@ -35,20 +36,41 @@ export default function RegistrationScreen() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const previousDraftOwnerId = useRef(draftOwnerId);
+  const readyDraftOwnerId = useRef<string | null>(null);
   const packages = useQuery({ queryKey: ["packages", "registration"], queryFn: () => api<Package[]>("/packages") });
   const profile = useQuery({ queryKey: ["me"], queryFn: () => api<Profile>("/me"), enabled: Boolean(tokens) });
   const selection = useMemo(() => findPackageDeparture(packages.data, departureId), [packages.data, departureId]);
   const packageItem = selection?.packageItem;
   const selectedDeparture = selection?.departure;
 
-  useEffect(() => { if (!departureId) return; void loadRegistrationDraft(departureId).then((saved) => { if (saved) setDraft((current) => ({ ...current, ...saved })); setDraftReady(true); }); }, [departureId]);
+  useEffect(() => {
+    if (!departureId) return;
+    const previousOwnerId = previousDraftOwnerId.current;
+    const preserveGuestRegistration = previousOwnerId === "guest" && draftOwnerId !== "guest";
+    previousDraftOwnerId.current = draftOwnerId;
+    readyDraftOwnerId.current = null;
+    let active = true;
+    // The persisted draft is an external store synchronized into form state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDraftReady(false);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (!preserveGuestRegistration && previousOwnerId !== draftOwnerId) setDraft(initialDraft);
+    void loadRegistrationDraft(departureId, draftOwnerId).then((saved) => {
+      if (!active) return;
+      if (saved) setDraft((current) => ({ ...current, ...saved }));
+      readyDraftOwnerId.current = draftOwnerId;
+      setDraftReady(true);
+    });
+    return () => { active = false; };
+  }, [departureId, draftOwnerId]);
   useEffect(() => {
     if (!profile.data) return;
     // React Query is the external source being synchronized into the editable draft.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDraft((current) => ({ ...current, fullName: profile.data.fullName, whatsapp: profile.data.whatsapp, email: profile.data.email ?? "", gender: profile.data.gender ?? "", birthDate: profile.data.birthDate ?? "", nationality: profile.data.nationality || "Indonesia", passportNumber: profile.data.passportNumber ?? "", passportExpiry: profile.data.passportExpiry ?? "" }));
   }, [draftReady, profile.data]);
-  useEffect(() => { if (draftReady && departureId) void saveRegistrationDraft(departureId, draft); }, [departureId, draft, draftReady]);
+  useEffect(() => { if (draftReady && departureId && readyDraftOwnerId.current === draftOwnerId) void saveRegistrationDraft(departureId, draftOwnerId, draft); }, [departureId, draft, draftOwnerId, draftReady]);
 
   const update = (value: Partial<RegistrationDraft>) => { setDraft((current) => ({ ...current, ...value })); setErrors((current) => { const next = { ...current }; Object.keys(value).forEach((key) => delete next[key]); return next; }); };
   const profilePayload = { fullName: draft.fullName, whatsapp: draft.whatsapp, email: draft.email, gender: draft.gender || undefined, birthDate: draft.birthDate || undefined, nationality: draft.nationality, passportNumber: draft.passportNumber || undefined, passportExpiry: draft.passportExpiry || undefined, notes: draft.notes || undefined };
@@ -94,7 +116,7 @@ export default function RegistrationScreen() {
     const payerName = draft.payerSameAsPilgrim ? draft.fullName : draft.payerName;
     const payerWhatsapp = draft.payerSameAsPilgrim ? draft.whatsapp : draft.payerWhatsapp;
     const payerEmail = draft.payerSameAsPilgrim ? draft.email : draft.payerEmail;
-    try { const result = await api<{ registrationId: string }>("/registrations", { method: "POST", body: JSON.stringify({ departureId, roomType: draft.roomType, payerName, payerWhatsapp, payerEmail, note: draft.notes }) }); await clearRegistrationDraft(departureId); router.replace(`/payment/${result.registrationId}` as never); }
+    try { const result = await api<{ registrationId: string }>("/registrations", { method: "POST", body: JSON.stringify({ departureId, roomType: draft.roomType, payerName, payerWhatsapp, payerEmail, note: draft.notes }) }); await clearRegistrationDraft(departureId, draftOwnerId); router.replace(`/payment/${result.registrationId}` as never); }
     catch (error) { setMessage(error instanceof ApiError ? error.message : "Pendaftaran gagal dikirim. Silakan coba lagi."); }
     finally { setBusy(false); }
   };

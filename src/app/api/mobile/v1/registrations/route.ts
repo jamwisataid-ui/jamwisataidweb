@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { requireDatabase } from "@/db";
 import { agents, bookings, departures, managementSettings, mobileNotifications, packages, referralLeads, registrations } from "@/db/schema";
 import { withManagementTransaction } from "@/db/transaction";
@@ -17,8 +17,6 @@ export async function POST(request: Request) {
     const [selected] = await database.select({ departure: departures, package: packages }).from(departures).innerJoin(packages, eq(departures.packageId, packages.id)).where(and(eq(departures.id, parsed.data.departureId), eq(packages.status, "published"))).limit(1);
     const todayJakarta = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     if (!selected || selected.departure.departureDate < todayJakarta || !isDepartureSelectable(selected.departure)) throw new MobileApiError(400, "DEPARTURE_UNAVAILABLE", "Keberangkatan ini belum tersedia untuk pendaftaran.");
-    const existingRegistrations = await database.select({ registration: registrations, booking: bookings }).from(registrations).innerJoin(bookings, eq(registrations.bookingId, bookings.id)).where(and(eq(registrations.pilgrimId, pilgrim.id), eq(bookings.departureId, selected.departure.id), inArray(registrations.status, ["pending", "active"])));
-    if (existingRegistrations.length) throw new MobileApiError(409, "REGISTRATION_EXISTS", "Anda sudah memiliki pendaftaran untuk keberangkatan ini.");
     const settings = await database.query.managementSettings.findFirst({ where: eq(managementSettings.id, "default") });
     const referral = await database.select({ lead: referralLeads, agent: agents }).from(referralLeads)
       .innerJoin(agents, eq(referralLeads.agentId, agents.id))
@@ -30,6 +28,23 @@ export async function POST(request: Request) {
     const bookingNumber = `APP-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-${bookingId.slice(0, 6).toUpperCase()}`;
     const price = Number(selected.departure.price);
     await withManagementTransaction(async (tx) => {
+      // Serialize the logical (pilgrim, departure) invariant. bookingId is
+      // generated per request, so the existing registration unique index
+      // cannot prevent two concurrent requests from creating duplicates.
+      const registrationLockKey = `${pilgrim.id}:${selected.departure.id}`;
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${registrationLockKey}))`);
+      const existingRegistrations = await tx.select({ id: registrations.id })
+        .from(registrations)
+        .innerJoin(bookings, eq(registrations.bookingId, bookings.id))
+        .where(and(
+          eq(registrations.pilgrimId, pilgrim.id),
+          eq(bookings.departureId, selected.departure.id),
+          inArray(registrations.status, ["pending", "active"]),
+        ))
+        .limit(1);
+      if (existingRegistrations.length) {
+        throw new MobileApiError(409, "REGISTRATION_EXISTS", "Anda sudah memiliki pendaftaran untuk keberangkatan ini.");
+      }
       await tx.insert(bookings).values({
         id: bookingId,
         bookingNumber,

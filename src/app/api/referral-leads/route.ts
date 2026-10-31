@@ -3,8 +3,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { requireDatabase } from "@/db";
-import { agents, packages, pilgrims, referralLeads } from "@/db/schema";
-import { findMatchingContact } from "@/lib/management/referral-attribution";
+import { agents, packages, referralLeads } from "@/db/schema";
 import { indonesianWhatsappSchema } from "@/lib/management/validation";
 
 const schema = z.object({
@@ -27,16 +26,17 @@ export async function POST(request: Request) {
     const agent = await db.query.agents.findFirst({ where: eq(agents.referralCode, parsed.data.referralCode.toLowerCase()) });
     if (!agent || agent.status !== "active") return NextResponse.json({ error: "Link agen tidak aktif." }, { status: 404 });
     const pkg = parsed.data.packageId ? await db.query.packages.findFirst({ where: eq(packages.id, parsed.data.packageId) }) : null;
-    const pilgrimRows = await db.select().from(pilgrims);
-    const matchingPilgrim = findMatchingContact(pilgrimRows, parsed.data);
     const [lead] = await db.insert(referralLeads).values({
       agentId: agent.id,
       packageId: pkg?.id ?? null,
       name: parsed.data.name,
       whatsapp: parsed.data.whatsapp,
       email: parsed.data.email || null,
-      status: matchingPilgrim ? "converted" : "new",
-      convertedPilgrimId: matchingPilgrim?.id ?? null,
+      // A public contact form is not proof that the submitter controls an
+      // existing pilgrim's WhatsApp/email. Attribution is linked later by an
+      // authenticated registration flow or explicit admin review.
+      status: "new",
+      convertedPilgrimId: null,
       sourcePath: parsed.data.sourcePath || `/ref/${agent.referralCode}`,
       utmSource: parsed.data.utmSource || null,
       utmCampaign: parsed.data.utmCampaign || null,

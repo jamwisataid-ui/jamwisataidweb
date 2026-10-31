@@ -3,8 +3,13 @@ import { describe, expect, it } from "vitest";
 import { MobileApiError } from "../src/lib/mobile/api";
 import { assertLiveSessionJoinable } from "../src/lib/mobile/live-session-policy";
 import { countJamaahParticipants, liveKitHttpUrl } from "../src/lib/mobile/livekit-room";
+import { eligibleLiveRegistrationStatuses } from "../src/lib/mobile/live-muthowif";
 
 describe("assertLiveSessionJoinable", () => {
+  it("allows only admin-approved registrations to access live sessions", () => {
+    expect(eligibleLiveRegistrationStatuses).toEqual(["active"]);
+  });
+
   it("allows an active room with remaining capacity", () => {
     expect(() => assertLiveSessionJoinable({ status: "live", listenerCount: 38, capacity: 45 })).not.toThrow();
   });

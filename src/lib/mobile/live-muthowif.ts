@@ -4,7 +4,7 @@ import { requireDatabase } from "@/db";
 import { bookings, departures, liveMuthowifSessions, packages, registrations } from "@/db/schema";
 import { MobileApiError } from "./api";
 
-const ELIGIBLE_REGISTRATION_STATUSES = ["pending", "active"] as const;
+const ELIGIBLE_REGISTRATION_STATUSES = ["active"] as const;
 
 export async function findAuthorizedLiveSession(pilgrimId: string, sessionId: string) {
   const database = requireDatabase();

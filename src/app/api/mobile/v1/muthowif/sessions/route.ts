@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     const result = await Promise.all(rows.filter(({ session }) => session.status !== "cancelled").map(async ({ session, departure, packageName }) => {
       const [registered] = await database.select({ value: count() }).from(registrations)
         .innerJoin(bookings, eq(registrations.bookingId, bookings.id))
-        .where(and(eq(bookings.departureId, departure.id), inArray(registrations.status, ["pending", "active"])));
+        .where(and(eq(bookings.departureId, departure.id), inArray(registrations.status, ["active"])));
       return {
         id: session.id,
         title: session.title,

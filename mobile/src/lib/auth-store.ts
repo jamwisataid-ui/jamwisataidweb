@@ -3,6 +3,8 @@ import { Platform } from "react-native";
 import { create } from "zustand";
 import { clearJourneyCache } from "./journey-cache";
 import { clearLiveMuthowifCache } from "./live-muthowif-cache";
+import { clearAllRegistrationDrafts } from "./registration-draft";
+import { clearAccountQueries } from "./query-client";
 
 export type Tokens = { accessToken: string; refreshToken: string; accessExpiresAt: string; refreshExpiresAt: string };
 type User = { id: string; fullName: string; whatsapp?: string; email?: string | null; role?: "jamaah" | "muthowif" };
@@ -40,8 +42,20 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ tokens: stored && "tokens" in stored ? stored.tokens : stored, user: stored && "tokens" in stored ? stored.user : null, seenOnboarding: onboarding === "done", ready: true });
   },
   completeOnboarding: async () => { await setStoredValue(ONBOARDING_KEY, "done", true); set({ seenOnboarding: true }); },
-  signIn: async (tokens, user = null) => { await setStoredValue(KEY, JSON.stringify({ tokens, user })); set({ tokens, user }); },
+  signIn: async (tokens, user = null) => {
+    await clearAccountQueries();
+    await clearAllRegistrationDrafts();
+    await setStoredValue(KEY, JSON.stringify({ tokens, user }));
+    set({ tokens, user });
+  },
   setTokens: async (tokens) => { const user = useAuthStore.getState().user; await setStoredValue(KEY, JSON.stringify({ tokens, user })); set({ tokens }); },
-  signOut: async () => { await Promise.all([deleteStoredValue(KEY), clearJourneyCache(), clearLiveMuthowifCache()]); set({ tokens: null, user: null }); },
+  signOut: async () => {
+    // Disable authenticated observers before cancelling/removing their data.
+    set({ tokens: null, user: null });
+    await clearAccountQueries();
+    await Promise.all([deleteStoredValue(KEY), clearJourneyCache(), clearLiveMuthowifCache(), clearAllRegistrationDrafts()]);
+    // A request that was already resolving must not repopulate a private key.
+    await clearAccountQueries();
+  },
   setUser: (user) => set({ user }),
 }));
