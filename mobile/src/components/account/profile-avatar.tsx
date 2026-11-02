@@ -8,6 +8,6 @@ export function ProfileAvatar({ name }: { name: string }) {
 }
 
 const styles = StyleSheet.create({
-  avatar: { width: 62, height: 62, borderRadius: 31, borderWidth: 2, borderColor: "#D4AF37", backgroundColor: "#F8F1DC", alignItems: "center", justifyContent: "center" },
-  initials: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 20 },
+  avatar: { width: 60, height: 60, borderRadius: 30, borderWidth: 1.5, borderColor: colors.gold, backgroundColor: colors.royal, alignItems: "center", justifyContent: "center" },
+  initials: { color: colors.softGold, fontFamily: "Cinzel_700Bold", fontSize: 19 },
 });

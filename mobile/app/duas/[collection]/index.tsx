@@ -5,12 +5,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { DuaContentListItem } from "@/components/dua/dua-list-item";
 import { getDuaCollection } from "@/lib/dua-dhikr";
 import { colors, typography } from "@/theme";
+import { AppBar as LuxuryAppBar } from "@/components/ui";
 
 export default function DuaCollectionScreen() {
   const { collection: id } = useLocalSearchParams<{ collection: string }>();
   const collection = getDuaCollection(id);
   if (!collection) return <SafeAreaView style={styles.safe}><Text style={styles.missing}>Kumpulan bacaan tidak ditemukan.</Text></SafeAreaView>;
-  const header = <><View style={styles.appBar}><Pressable accessibilityLabel="Kembali" onPress={() => router.back()} style={styles.back}><Ionicons name="arrow-back" size={23} color={colors.navy} /></Pressable><Text numberOfLines={1} style={styles.title}>{collection.title}</Text><View style={styles.back} /></View><View style={styles.intro}><Text style={styles.introTitle}>{collection.title}</Text><Text style={styles.introBody}>{collection.subtitle} · {collection.items.length} bacaan</Text></View></>;
+  const header = <><LuxuryAppBar title={collection.title} /><View style={styles.intro}><Text style={styles.introTitle}>{collection.title}</Text><Text style={styles.introBody}>{collection.subtitle} · {collection.items.length} bacaan</Text></View></>;
   return <SafeAreaView edges={["top", "bottom"]} style={styles.safe}><FlatList contentContainerStyle={styles.bottom} data={collection.items} initialNumToRender={12} keyExtractor={(item) => item.id} ListHeaderComponent={header} renderItem={({ item }) => <DuaContentListItem item={item} onPress={() => router.push({ pathname: "/duas/[collection]/[item]", params: { collection: collection.id, item: item.id } })} />} showsVerticalScrollIndicator={false} /></SafeAreaView>;
 }
 

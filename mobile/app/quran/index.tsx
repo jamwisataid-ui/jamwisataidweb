@@ -13,10 +13,11 @@ import { SurahNumberBadge } from "@/components/quran/surah-number-badge";
 import { filterSurahs, getSurah, juz, type QuranSurah } from "@/lib/quran";
 import { loadQuranProgress, type QuranProgress } from "@/lib/quran-progress";
 import { colors, typography } from "@/theme";
+import { AppBar as LuxuryAppBar } from "@/components/ui";
 
 const initialProgress: QuranProgress = { bookmarks: [], lastRead: null };
 
-function AppBar() { return <View style={styles.appBar}><Pressable accessibilityLabel="Kembali" onPress={() => router.canGoBack() ? router.back() : router.replace("/(tabs)")} style={styles.back}><Ionicons name="arrow-back" size={23} color={colors.navy} /></Pressable><Text style={styles.title}>Mushaf Qur&apos;an</Text><View style={styles.back} /></View>; }
+function AppBar() { return <LuxuryAppBar title="Mushaf Qur'an" />; }
 
 export default function QuranScreen() {
   const [tab, setTab] = useState<QuranTab>("surah");

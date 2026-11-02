@@ -1,54 +1,59 @@
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-type IconName = keyof typeof Ionicons.glyphMap;
+import { MetallicGold } from "@/components/metallic-gold";
+import { colors, shadow } from "@/theme";
 
-const items: Array<{ label: string; icon: IconName; href: string }> = [
+type IconName = keyof typeof Ionicons.glyphMap;
+type Item = { label: string; icon: IconName; href: string; requiresLogin?: boolean; live?: boolean };
+
+const items: Item[] = [
   { label: "Paket Umroh", icon: "airplane-outline", href: "/(tabs)/packages" },
-  { label: "Jadwal Keberangkatan", icon: "calendar-outline", href: "/schedule" },
-  { label: "Panduan Ibadah", icon: "compass-outline", href: "/(tabs)/worship" },
-  { label: "Jadwal Sholat", icon: "time-outline", href: "/prayer-times" },
-  { label: "Mushaf Qur'an", icon: "book-outline", href: "/quran" },
+  { label: "Jadwal", icon: "calendar-outline", href: "/schedule" },
+  { label: "Al-Qur'an", icon: "book-outline", href: "/quran" },
   { label: "Doa & Dzikir", icon: "sparkles-outline", href: "/duas" },
-  { label: "Dokumen Jamaah", icon: "document-text-outline", href: "/documents" },
-  { label: "LIVE MUTHOWIF", icon: "radio-outline", href: "/live-muthowif" },
+  { label: "Waktu Sholat", icon: "time-outline", href: "/prayer-times" },
+  { label: "Panduan Ibadah", icon: "compass-outline", href: "/(tabs)/worship" },
+  { label: "Dokumen", icon: "document-text-outline", href: "/documents", requiresLogin: true },
+  { label: "Muthowif", icon: "headset-outline", href: "/live-muthowif", live: true },
 ];
 
-function QuickMenuItem({ label, icon, href }: (typeof items)[number]) {
+function QuickMenuItem({ item, guest }: { item: Item; guest: boolean }) {
+  const locked = guest && item.requiresLogin;
   return (
     <Pressable
       accessibilityRole="button"
-      onPress={() => router.push(href as never)}
+      accessibilityLabel={locked ? `${item.label}, perlu masuk` : item.label}
+      onPress={() => router.push(item.href as never)}
       style={({ pressed }) => [styles.item, pressed && styles.pressed]}
     >
-      <View style={styles.iconWrap}>
-        <Ionicons name={icon} size={24} color="#0A1D3A" />
-        <View style={styles.accent} />
+      <View style={[styles.ring, item.live && styles.ringLive]}>
+        {item.live ? <View style={styles.liveFill}><LinearGradient colors={["#1E3A5F", "#06152B"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} /></View> : null}
+        <Ionicons name={item.icon} size={23} color={item.live ? colors.softGold : colors.goldDark} />
+        {item.live ? <MetallicGold style={styles.liveTag}><Text style={styles.liveText}>LIVE</Text></MetallicGold> : null}
+        {locked ? <View style={styles.lock}><Ionicons name="lock-closed" size={9} color={colors.softGold} /></View> : null}
       </View>
-      <Text numberOfLines={2} style={styles.label}>{label}</Text>
+      <Text numberOfLines={2} style={[styles.label, item.live && styles.labelStrong]}>{item.label}</Text>
     </Pressable>
   );
 }
 
-export function QuickMenuGrid() {
-  return <View style={styles.grid}>{items.map((item) => <QuickMenuItem key={item.label} {...item} />)}</View>;
+export function QuickMenuGrid({ guest }: { guest: boolean }) {
+  return <View style={styles.grid}>{items.map((item) => <QuickMenuItem key={item.label} item={item} guest={guest} />)}</View>;
 }
 
 const styles = StyleSheet.create({
-  grid: { flexDirection: "row", flexWrap: "wrap", rowGap: 18 },
+  grid: { flexDirection: "row", flexWrap: "wrap", rowGap: 16 },
   item: { width: "25%", alignItems: "center", gap: 8, paddingHorizontal: 3 },
   pressed: { opacity: 0.66, transform: [{ scale: 0.97 }] },
-  iconWrap: {
-    width: 54,
-    height: 54,
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#F8F1DC",
-    borderWidth: 1,
-    borderColor: "#F4DFC0",
-  },
-  accent: { position: "absolute", right: 8, top: 8, width: 6, height: 6, borderRadius: 3, backgroundColor: "#D4AF37" },
-  label: { minHeight: 31, color: "#1E3A5F", fontFamily: "Montserrat_500Medium", fontSize: 10.5, lineHeight: 14, textAlign: "center" },
+  ring: { width: 56, height: 56, borderRadius: 28, alignItems: "center", justifyContent: "center", backgroundColor: colors.white, borderWidth: 1, borderColor: "rgba(184,134,11,0.35)", ...shadow },
+  ringLive: { borderColor: colors.gold, backgroundColor: colors.navy },
+  liveFill: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, borderRadius: 28, overflow: "hidden" },
+  liveTag: { position: "absolute", top: -5, right: -8, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 999 },
+  liveText: { color: colors.navyDeep, fontFamily: "Montserrat_700Bold", fontSize: 8, letterSpacing: 1 },
+  lock: { position: "absolute", right: -2, bottom: -2, width: 20, height: 20, borderRadius: 10, alignItems: "center", justifyContent: "center", backgroundColor: colors.navy, borderWidth: 2, borderColor: colors.ivory },
+  label: { minHeight: 30, color: colors.royal, fontFamily: "Montserrat_500Medium", fontSize: 11, lineHeight: 15, textAlign: "center" },
+  labelStrong: { color: colors.navy, fontFamily: "Montserrat_600SemiBold" },
 });

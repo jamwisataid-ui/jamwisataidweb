@@ -10,4 +10,4 @@ export function PrayerDateHeader({ data }: { data: PrayerTimes }) {
   return <View style={styles.root}><Text style={styles.gregorian}>{gregorian}</Text><Text style={styles.hijri}>{hijri}</Text></View>;
 }
 
-const styles = StyleSheet.create({ root: { paddingTop: 20, paddingBottom: 13, alignItems: "center", gap: 4 }, gregorian: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 14.5 }, hijri: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 12.5 } });
+const styles = StyleSheet.create({ root: { paddingTop: 18, paddingBottom: 14, alignItems: "center", gap: 2 }, gregorian: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 14.5 }, hijri: { color: colors.goldText, fontFamily: "CormorantGaramond_500Medium_Italic", fontSize: 16 } });

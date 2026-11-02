@@ -1,14 +1,26 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { Image, StyleSheet, Text, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import heroImage from "../../../assets/home/hero-makkah-cinematic.jpg";
 import { colors } from "@/theme";
 
+/** Dark header for the account tab; the profile/guest card overlaps its bottom edge by 51px. */
 export function AccountHeader() {
-  return <View style={styles.header}><Pressable accessibilityLabel="Kembali" hitSlop={10} onPress={() => router.canGoBack() ? router.back() : router.replace("/(tabs)")} style={styles.back}><Ionicons name="arrow-back" size={24} color={colors.white} /></Pressable><Text style={styles.title}>Area Jamaah</Text><View style={styles.back} /></View>;
+  const insets = useSafeAreaInsets();
+  return (
+    <View style={[styles.header, { paddingTop: insets.top + 22, height: insets.top + 170 }]}>
+      <Image alt="" source={heroImage} resizeMode="cover" style={styles.image} />
+      <LinearGradient colors={["rgba(6,21,43,0.6)", "rgba(6,21,43,0.95)"]} style={StyleSheet.absoluteFill} />
+      <Text style={styles.eyebrow}>AREA JAMAAH</Text>
+      <Text accessibilityRole="header" style={styles.title}>Akun Saya</Text>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  header: { height: 112, backgroundColor: "#0A1D3A", flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", paddingHorizontal: 18, paddingTop: 20 },
-  back: { width: 42, height: 42, alignItems: "center", justifyContent: "center" },
-  title: { color: colors.white, fontFamily: "Montserrat_700Bold", fontSize: 21, paddingTop: 8 },
+  header: { paddingHorizontal: 22, gap: 4, overflow: "hidden", backgroundColor: colors.navyDeep },
+  image: { position: "absolute", top: 0, right: -200, bottom: 0, width: 780, opacity: 0.4 },
+  eyebrow: { color: colors.gold, fontFamily: "Cinzel_600SemiBold", fontSize: 10, letterSpacing: 3 },
+  title: { color: colors.white, fontFamily: "Cinzel_700Bold", fontSize: 26, lineHeight: 32 },
 });

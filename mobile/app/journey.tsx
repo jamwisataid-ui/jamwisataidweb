@@ -9,7 +9,7 @@ import { ImportantInfoList } from "@/components/itinerary/important-info-list";
 import { ItineraryState } from "@/components/itinerary/itinerary-state";
 import { ItineraryTabs, type ItineraryTab } from "@/components/itinerary/itinerary-tabs";
 import { TimelineList } from "@/components/itinerary/timeline-list";
-import { GuestGate } from "@/components/ui";
+import { GuestGate, AppBar as LuxuryAppBar } from "@/components/ui";
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
 import { loadJourneyCache, saveJourneyCache, type JourneyCache } from "@/lib/journey-cache";
@@ -18,7 +18,7 @@ import type { Journey } from "@/types";
 
 function AppBar() {
   const goBack = () => router.canGoBack() ? router.back() : router.replace("/(tabs)");
-  return <View style={styles.appBar}><Pressable accessibilityLabel="Kembali" accessibilityRole="button" onPress={goBack} style={styles.back}><Ionicons name="arrow-back" size={23} color={colors.navy} /></Pressable><Text style={styles.title}>Itinerary Perjalanan</Text><View style={styles.back} /></View>;
+  return <LuxuryAppBar title="Itinerary Perjalanan" />;
 }
 
 function JourneyPicker({ items, selected, onChange }: { items: Journey[]; selected: string; onChange: (id: string) => void }) {

@@ -21,3 +21,13 @@ describe("Jam Wisata mobile brand theme", () => {
     expect(typography.quranArabic).toBe("QPCUthmaniHafs");
   });
 });
+
+describe("Jam Wisata luxury tokens", () => {
+  it("keeps readable gold text and soft radii", async () => {
+    const { colors: c, radius } = await import("../src/theme");
+    expect(c.goldText).toBe("#8C6708");
+    expect(c.ivory).toBe("#FBFAF6");
+    expect(radius.button).toBe(12);
+    expect(radius.card).toBe(20);
+  });
+});

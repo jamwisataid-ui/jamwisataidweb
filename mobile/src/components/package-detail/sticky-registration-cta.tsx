@@ -17,17 +17,17 @@ export function StickyRegistrationCTA({ status, enabled, onPress }: { status: st
   return (
     <View style={[styles.frame, { paddingBottom: Math.max(insets.bottom, 10) }]}>
       <Pressable accessibilityRole="button" disabled={!enabled} onPress={onPress} style={({ pressed }) => [styles.button, !enabled && styles.disabled, pressed && enabled && styles.pressed]}>
-        {enabled ? <MetallicGold style={styles.buttonFill}><Text style={styles.label}>{labels[status] || "Pendaftaran Belum Tersedia"}</Text><Ionicons name="arrow-forward" size={19} color={colors.navy} /></MetallicGold> : <Text style={styles.label}>{labels[status] || "Pendaftaran Belum Tersedia"}</Text>}
+        {enabled ? <MetallicGold style={styles.buttonFill}><Text style={styles.label}>{labels[status] || "Pendaftaran Belum Tersedia"}</Text><Ionicons name="arrow-forward" size={18} color={colors.navyDeep} /></MetallicGold> : <Text style={styles.label}>{labels[status] || "Pendaftaran Belum Tersedia"}</Text>}
       </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  frame: { paddingTop: 11, paddingHorizontal: 18, backgroundColor: "rgba(255,253,248,0.98)", borderTopWidth: 1, borderTopColor: "#EDE7DC" },
-  button: { minHeight: 56, borderRadius: 18, overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  buttonFill: { position: "absolute", inset: 0, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9 },
+  frame: { paddingTop: 12, paddingHorizontal: 20, backgroundColor: "rgba(255,255,255,0.97)", borderTopWidth: 1, borderTopColor: "rgba(184,134,11,0.25)" },
+  button: { minHeight: 56, borderRadius: 12, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+  buttonFill: { position: "absolute", inset: 0, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9, borderRadius: 12, borderWidth: 1, borderColor: "rgba(255,236,170,0.55)" },
   disabled: { backgroundColor: "#DED9D0" },
   pressed: { opacity: 0.82, transform: [{ scale: 0.99 }] },
-  label: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 16 },
+  label: { color: colors.navyDeep, fontFamily: "Montserrat_700Bold", fontSize: 15, letterSpacing: 0.6 },
 });

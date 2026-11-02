@@ -10,8 +10,9 @@ import { DuaContentListItem, DuaListItem } from "@/components/dua/dua-list-item"
 import { dhikrTabCollections, doaTabCollections, getDuaItemById, selectedItems, type DuaCollection, type DuaItem } from "@/lib/dua-dhikr";
 import { loadDuaFavorites, type DuaFavorite } from "@/lib/dua-favorites";
 import { colors, typography } from "@/theme";
+import { AppBar as LuxuryAppBar } from "@/components/ui";
 
-function AppBar() { return <View style={styles.appBar}><Pressable accessibilityLabel="Kembali" onPress={() => router.canGoBack() ? router.back() : router.replace("/(tabs)")} style={styles.back}><Ionicons name="arrow-back" size={23} color={colors.navy} /></Pressable><Text style={styles.title}>Doa &amp; Dzikir</Text><View style={styles.back} /></View>; }
+function AppBar() { return <LuxuryAppBar title="Doa & Dzikir" />; }
 const openCollection = (collection: DuaCollection) => router.push({ pathname: "/duas/[collection]", params: { collection: collection.id } });
 const openItem = (item: DuaItem) => router.push({ pathname: "/duas/[collection]/[item]", params: { collection: item.collectionId, item: item.id } });
 

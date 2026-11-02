@@ -9,8 +9,8 @@ export function LocationSelector({ value, open, onOpen, onClose, onChange }: { v
 }
 
 const styles = StyleSheet.create({
-  selector: { marginHorizontal: 18, minHeight: 50, paddingHorizontal: 13, borderRadius: 16, flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "#F0EDE6" },
-  pressed: { opacity: .75 }, pin: { width: 28, height: 28, borderRadius: 10, alignItems: "center", justifyContent: "center", backgroundColor: "#F8F1DC" },
+  selector: { marginHorizontal: 18, minHeight: 50, paddingHorizontal: 13, borderRadius: 999, flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: colors.white, borderWidth: 1, borderColor: "rgba(184,134,11,0.3)" },
+  pressed: { opacity: .75 }, pin: { width: 28, height: 28, borderRadius: 14, alignItems: "center", justifyContent: "center", backgroundColor: colors.navy },
   selected: { flex: 1, color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 14 },
   backdrop: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(2,23,48,.34)" },
   sheet: { maxHeight: "78%", paddingTop: 10, paddingBottom: 26, borderTopLeftRadius: 25, borderTopRightRadius: 25, backgroundColor: colors.ivory },
@@ -19,6 +19,6 @@ const styles = StyleSheet.create({
   sheetTitle: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 22 }, sheetBody: { marginTop: 3, color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 12.5 },
   close: { width: 42, height: 42, borderRadius: 14, alignItems: "center", justifyContent: "center", backgroundColor: colors.white },
   options: { paddingHorizontal: 18, gap: 8 }, option: { minHeight: 62, paddingHorizontal: 13, flexDirection: "row", alignItems: "center", gap: 12, borderRadius: 15, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white },
-  optionActive: { borderColor: colors.gold, backgroundColor: "#F8F1DC" }, optionIcon: { width: 38, height: 38, borderRadius: 13, alignItems: "center", justifyContent: "center", backgroundColor: "#F1EDE5" }, optionIconActive: { backgroundColor: colors.navy },
+  optionActive: { borderColor: colors.gold, backgroundColor: "rgba(212,175,55,0.08)" }, optionIcon: { width: 38, height: 38, borderRadius: 13, alignItems: "center", justifyContent: "center", backgroundColor: "#F1EDE5" }, optionIconActive: { backgroundColor: colors.navy },
   optionCopy: { flex: 1 }, optionCity: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 14 }, optionCountry: { marginTop: 2, color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 11.5 },
 });

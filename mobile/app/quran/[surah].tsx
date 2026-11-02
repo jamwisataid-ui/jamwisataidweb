@@ -8,6 +8,7 @@ import { AyahItem } from "@/components/quran/ayah-item";
 import { getSurah, revelationLabel } from "@/lib/quran";
 import { loadQuranProgress, saveLastRead, toggleQuranBookmark, type QuranProgress } from "@/lib/quran-progress";
 import { colors, typography } from "@/theme";
+import { AppBar as LuxuryAppBar } from "@/components/ui";
 
 const empty: QuranProgress = { bookmarks: [], lastRead: null };
 
@@ -21,7 +22,7 @@ export default function SurahDetailScreen() {
   useEffect(() => { if (surah) void saveLastRead(surah.id, initialAyah).then(setProgress); }, [initialAyah, surah]);
   useEffect(() => { if (surah && initialAyah > 1) setTimeout(() => list.current?.scrollToIndex({ index: Math.min(initialAyah - 1, surah.verses.length - 1), animated: false, viewPosition: 0 }), 100); }, [initialAyah, surah]);
   const bookmarked = useMemo(() => new Set(progress.bookmarks.filter((item) => item.surahNumber === surah?.id).map((item) => item.ayahNumber)), [progress.bookmarks, surah?.id]);
-  if (!surah) return <SafeAreaView style={styles.safe}><View style={styles.appBar}><Pressable onPress={() => router.back()} style={styles.back}><Ionicons name="arrow-back" size={23} color={colors.navy} /></Pressable><Text style={styles.title}>Mushaf Qur&apos;an</Text><View style={styles.back} /></View><View style={styles.missing}><Text style={styles.missingTitle}>Surah tidak ditemukan</Text><Pressable onPress={() => router.replace("/quran")}><Text style={styles.link}>Kembali ke daftar surah</Text></Pressable></View></SafeAreaView>;
+  if (!surah) return <SafeAreaView style={styles.safe}><LuxuryAppBar title="Mushaf Qur'an" /><View style={styles.missing}><Text style={styles.missingTitle}>Surah tidak ditemukan</Text><Pressable onPress={() => router.replace("/quran")}><Text style={styles.link}>Kembali ke daftar surah</Text></Pressable></View></SafeAreaView>;
   return <SafeAreaView edges={["top", "bottom"]} style={styles.safe}><View style={styles.appBar}><Pressable accessibilityLabel="Kembali" onPress={() => router.back()} style={styles.back}><Ionicons name="arrow-back" size={23} color={colors.navy} /></Pressable><View style={styles.heading}><Text numberOfLines={1} style={styles.title}>{surah.transliteration}</Text><Text style={styles.subtitle}>{surah.total_verses} ayat · {revelationLabel(surah.type)}</Text></View><View style={styles.back} /></View><FlatList ref={list} data={surah.verses} initialNumToRender={10} keyExtractor={(item) => String(item.id)} ListHeaderComponent={<View style={styles.hero}><Text style={styles.arabicName}>{surah.name}</Text><Text style={styles.meaning}>{surah.translation}</Text>{surah.id !== 1 && surah.id !== 9 ? <Text style={styles.basmalah}>بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</Text> : null}</View>} onScrollToIndexFailed={({ index }) => setTimeout(() => list.current?.scrollToIndex({ index, animated: false }), 300)} renderItem={({ item }) => <AyahItem bookmarked={bookmarked.has(item.id)} lastRead={progress.lastRead?.surahNumber === surah.id && progress.lastRead.ayahNumber === item.id} onBookmark={() => void toggleQuranBookmark(surah.id, item.id).then(setProgress)} onLastRead={() => void saveLastRead(surah.id, item.id).then(setProgress)} verse={item} />} showsVerticalScrollIndicator={false} windowSize={7} /></SafeAreaView>;
 }
 

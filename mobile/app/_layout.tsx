@@ -4,7 +4,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_500Medium, Montserrat_600SemiBold, Montserrat_700Bold } from "@expo-google-fonts/montserrat";
 import { useFonts as useCinzel, Cinzel_600SemiBold, Cinzel_700Bold } from "@expo-google-fonts/cinzel";
-import { useFonts as useCormorant, CormorantGaramond_500Medium, CormorantGaramond_600SemiBold } from "@expo-google-fonts/cormorant-garamond";
+import { useFonts as useCormorant, CormorantGaramond_500Medium, CormorantGaramond_600SemiBold, CormorantGaramond_500Medium_Italic, CormorantGaramond_600SemiBold_Italic } from "@expo-google-fonts/cormorant-garamond";
 import { useFonts as useQuranFont } from "expo-font";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
@@ -24,7 +24,7 @@ export default function RootLayout() {
   const [bootstrapReady, setBootstrapReady] = useState(false);
   const [montserratLoaded, montserratError] = useMontserrat({ Montserrat_400Regular, Montserrat_500Medium, Montserrat_600SemiBold, Montserrat_700Bold });
   const [cinzelLoaded, cinzelError] = useCinzel({ Cinzel_600SemiBold, Cinzel_700Bold });
-  const [cormorantLoaded, cormorantError] = useCormorant({ CormorantGaramond_500Medium, CormorantGaramond_600SemiBold });
+  const [cormorantLoaded, cormorantError] = useCormorant({ CormorantGaramond_500Medium, CormorantGaramond_600SemiBold, CormorantGaramond_500Medium_Italic, CormorantGaramond_600SemiBold_Italic });
   // Expo requires a static CommonJS asset reference so Metro can bundle the local font.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const [quranFontLoaded, quranFontError] = useQuranFont({ QPCUthmaniHafs: require("../assets/fonts/UthmanicHafs_V22.ttf") });

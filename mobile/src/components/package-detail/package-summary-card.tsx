@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import { colors, shadow } from "@/theme";
-import { MetallicGold } from "@/components/metallic-gold";
+import { colors } from "@/theme";
+import { NavyCard } from "@/components/ui";
 import type { Package } from "@/types";
 
 const money = new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 });
@@ -21,22 +21,22 @@ export function PackageSummaryCard({ item, price = item.priceFrom }: { item: Pac
           <Text style={styles.destination}>{destinationLabel(item)}</Text>
         </View>
       </View>
-      <MetallicGold style={styles.pricePill}>
+      <NavyCard style={styles.pricePill}>
+        <Text style={styles.person}>{price ? "mulai dari / jamaah" : "Harga paket"}</Text>
         <Text adjustsFontSizeToFit numberOfLines={1} style={styles.price}>{price ? `Rp ${money.format(price)}` : "Hubungi kami"}</Text>
-        {price ? <Text style={styles.person}>/jamaah</Text> : null}
-      </MetallicGold>
+      </NavyCard>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { marginTop: -30, marginHorizontal: 18, padding: 19, gap: 16, borderRadius: 23, backgroundColor: colors.white, borderWidth: 1, borderColor: "#EEE8DE", ...shadow },
+  card: { marginTop: -30, paddingHorizontal: 20, paddingTop: 24, paddingBottom: 6, gap: 16, borderTopLeftRadius: 30, borderTopRightRadius: 30, backgroundColor: colors.ivory },
   headingRow: { flexDirection: "row", gap: 12 },
   headingCopy: { flex: 1, gap: 5 },
-  eyebrow: { color: colors.gold, fontFamily: "Montserrat_700Bold", fontSize: 10, letterSpacing: 1.5 },
-  title: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 24, lineHeight: 29 },
-  destination: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 14, lineHeight: 20 },
-  pricePill: { alignSelf: "flex-start", minHeight: 50, maxWidth: "100%", paddingHorizontal: 15, borderRadius: 15, flexDirection: "row", alignItems: "baseline", gap: 5, overflow: "hidden" },
-  price: { flexShrink: 1, color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 24, lineHeight: 31 },
-  person: { color: colors.royal, fontFamily: "Montserrat_500Medium", fontSize: 12 },
+  eyebrow: { color: colors.goldText, fontFamily: "Cinzel_600SemiBold", fontSize: 10, letterSpacing: 2.6 },
+  title: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 23, lineHeight: 29 },
+  destination: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 13, lineHeight: 19 },
+  pricePill: { paddingVertical: 14, paddingHorizontal: 16, gap: 2 },
+  price: { color: colors.softGold, fontFamily: "Montserrat_700Bold", fontSize: 22, lineHeight: 28 },
+  person: { color: "rgba(255,255,255,0.72)", fontFamily: "Montserrat_400Regular", fontSize: 11 },
 });

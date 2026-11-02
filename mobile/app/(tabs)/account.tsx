@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import emblem from "../../assets/splash/logo-emblem.png";
+import { NavyCard } from "@/components/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -12,7 +13,7 @@ import { ProfileSummaryCard } from "@/components/account/profile-summary-card";
 import { MetallicGold } from "@/components/metallic-gold";
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
-import { colors } from "@/theme";
+import { colors, shadowDark } from "@/theme";
 import type { AccountProfile } from "@/types";
 
 type Notification = { id: string; readAt?: string | null };
@@ -37,20 +38,24 @@ export default function AccountScreen() {
     router.replace("/(tabs)");
   }
 
-  return <SafeAreaView edges={["top"]} style={styles.safe}><ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}><AccountHeader />{!tokens ? <View style={styles.guestContent}><View style={styles.guestCard}><View style={styles.guestIcon}><Ionicons name="person-outline" size={30} color={colors.navy} /></View><Text style={styles.guestTitle}>Masuk ke Area Jamaah</Text><Text style={styles.guestBody}>Akses profil, dokumen, pembayaran, itinerary, dan notifikasi perjalanan Anda.</Text><Pressable onPress={() => router.push("/login?next=%2F(tabs)%2Faccount" as never)} style={styles.login}><MetallicGold style={styles.loginFill}><Text style={styles.loginText}>Masuk / Daftar</Text><Ionicons name="arrow-forward" size={19} color={colors.navy} /></MetallicGold></Pressable><Text style={styles.guestNote}>Anda tetap dapat melihat paket dan memakai panduan ibadah tanpa masuk.</Text></View></View> : profile.isLoading ? <AccountSkeleton /> : profile.isError || !profile.data ? <AccountError onRetry={() => profile.refetch()} onLogout={() => setConfirmLogout(true)} /> : <><ProfileSummaryCard profile={profile.data} /><View style={styles.menu}><AccountMenuItem icon="person-outline" title="Profil Saya" subtitle="Data personal jamaah" onPress={() => router.push("/account/profile")} /><AccountMenuItem icon="document-text-outline" title="Dokumen Saya" subtitle="Paspor, KTP, visa, dan dokumen lainnya" onPress={() => router.push("/documents")} /><AccountMenuItem icon="wallet-outline" title="Pembayaran" subtitle="Status dan riwayat pembayaran" onPress={() => router.push("/payments")} /><AccountMenuItem icon="map-outline" title="Itinerary Saya" subtitle="Jadwal keberangkatan dan perjalanan" onPress={() => router.push("/journey")} /><AccountMenuItem icon="notifications-outline" title="Notifikasi" subtitle="Informasi terbaru" badge={unread} onPress={() => router.push("/(tabs)/notifications")} /><AccountMenuItem icon="help-circle-outline" title="Pertanyaan & Bantuan" subtitle="FAQ dan hubungi admin" onPress={() => router.push("/help")} /><AccountMenuItem icon="log-out-outline" title="Keluar" danger last onPress={() => setConfirmLogout(true)} /></View></>}</ScrollView><LogoutConfirmationModal visible={confirmLogout} busy={loggingOut} onCancel={() => setConfirmLogout(false)} onConfirm={logout} /></SafeAreaView>;
+  return <View style={styles.safe}><ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}><AccountHeader />{!tokens ? <View style={styles.guestContent}><View style={styles.guestWrap}><NavyCard style={styles.guestCard}><View style={styles.guestRow}><Image alt="" source={emblem} resizeMode="contain" style={styles.guestEmblem} /><View style={styles.guestCopy}><Text style={styles.guestTitle}>Masuk ke Area Jamaah</Text><Text style={styles.guestBody}>Akses profil, dokumen, pembayaran, itinerary, dan notifikasi perjalanan Anda.</Text></View></View><Pressable accessibilityRole="button" onPress={() => router.push("/login?next=%2F(tabs)%2Faccount" as never)} style={styles.login}><MetallicGold style={styles.loginFill}><Text style={styles.loginText}>MASUK / DAFTAR</Text><Ionicons name="arrow-forward" size={17} color={colors.navyDeep} /></MetallicGold></Pressable></NavyCard></View><Text style={styles.guestNote}>Anda tetap dapat melihat paket dan memakai panduan ibadah tanpa masuk.</Text><View style={[styles.menu, styles.guestMenu]}><AccountMenuItem icon="help-circle-outline" title="Pertanyaan & Bantuan" subtitle="FAQ dan hubungi admin" last onPress={() => router.push("/help")} /></View></View> : profile.isLoading ? <AccountSkeleton /> : profile.isError || !profile.data ? <AccountError onRetry={() => profile.refetch()} onLogout={() => setConfirmLogout(true)} /> : <><ProfileSummaryCard profile={profile.data} /><View style={styles.menu}><AccountMenuItem icon="person-outline" title="Profil Saya" subtitle="Data personal jamaah" onPress={() => router.push("/account/profile")} /><AccountMenuItem icon="document-text-outline" title="Dokumen Saya" subtitle="Paspor, KTP, visa, dan dokumen lainnya" onPress={() => router.push("/documents")} /><AccountMenuItem icon="wallet-outline" title="Pembayaran" subtitle="Status dan riwayat pembayaran" onPress={() => router.push("/payments")} /><AccountMenuItem icon="map-outline" title="Itinerary Saya" subtitle="Jadwal keberangkatan dan perjalanan" onPress={() => router.push("/journey")} /><AccountMenuItem icon="notifications-outline" title="Notifikasi" subtitle="Informasi terbaru" badge={unread} onPress={() => router.push("/(tabs)/notifications")} /><AccountMenuItem icon="help-circle-outline" title="Pertanyaan & Bantuan" subtitle="FAQ dan hubungi admin" onPress={() => router.push("/help")} /><AccountMenuItem icon="log-out-outline" title="Keluar" danger last onPress={() => setConfirmLogout(true)} /></View></>}</ScrollView><LogoutConfirmationModal visible={confirmLogout} busy={loggingOut} onCancel={() => setConfirmLogout(false)} onConfirm={logout} /></View>;
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: colors.ivory },
   content: { paddingBottom: 32, gap: 20 },
-  menu: { marginHorizontal: 18, overflow: "hidden", borderWidth: 1, borderColor: colors.line, borderRadius: 18, backgroundColor: colors.white },
-  guestContent: { marginTop: -51, paddingHorizontal: 18, paddingBottom: 40 },
-  guestCard: { padding: 22, alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.line, borderRadius: 21, backgroundColor: colors.white },
-  guestIcon: { width: 62, height: 62, borderRadius: 31, alignItems: "center", justifyContent: "center", backgroundColor: "#F8F1DC", borderWidth: 2, borderColor: "#D4AF37" },
-  guestTitle: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 21, textAlign: "center" },
-  guestBody: { maxWidth: 330, color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 14, lineHeight: 21, textAlign: "center" },
-  login: { alignSelf: "stretch", height: 54, marginTop: 5, borderRadius: 16, overflow: "hidden" },
-  loginFill: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9 },
-  loginText: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 16 },
-  guestNote: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 11.5, lineHeight: 17, textAlign: "center" },
+  menu: { marginHorizontal: 18, overflow: "hidden", borderWidth: 1, borderColor: colors.goldLine, borderRadius: 20, backgroundColor: colors.white },
+  guestContent: { gap: 14 },
+  guestWrap: { marginTop: -51, marginHorizontal: 18, borderRadius: 20, ...shadowDark },
+  guestCard: { padding: 18, gap: 16 },
+  guestRow: { flexDirection: "row", alignItems: "center", gap: 14 },
+  guestEmblem: { width: 52, height: 52 },
+  guestCopy: { flex: 1, gap: 4 },
+  guestTitle: { color: colors.white, fontFamily: "Cinzel_700Bold", fontSize: 16, lineHeight: 21 },
+  guestBody: { color: "rgba(255,255,255,0.74)", fontFamily: "Montserrat_400Regular", fontSize: 12, lineHeight: 17 },
+  login: { height: 48, borderRadius: 12, overflow: "hidden" },
+  loginFill: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 12, borderWidth: 1, borderColor: "rgba(255,236,170,0.55)" },
+  loginText: { color: colors.navyDeep, fontFamily: "Montserrat_700Bold", fontSize: 13, letterSpacing: 0.8 },
+  guestNote: { marginHorizontal: 28, color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 11.5, lineHeight: 17, textAlign: "center" },
+  guestMenu: { marginTop: 2 },
 });

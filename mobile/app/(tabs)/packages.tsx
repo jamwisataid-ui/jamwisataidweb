@@ -1,13 +1,13 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { PackageCard, PackageCardSkeleton } from "@/components/packages/package-card";
 import { PackageFilterTabs, type PackageFilter } from "@/components/packages/package-filter-tabs";
 import { EmptyPackageState, PackageErrorState } from "@/components/packages/package-list-state";
+import { CircleButton, Eyebrow } from "@/components/ui";
 import { api } from "@/lib/api";
 import { colors } from "@/theme";
 import type { Package } from "@/types";
@@ -25,21 +25,14 @@ export default function PackageListScreen() {
   const query = useQuery({ queryKey: ["packages", "umrah"], queryFn: () => api<Package[]>("/packages?category=umrah") });
   const packages = useMemo(() => (query.data ?? []).filter((item) => matchesFilter(item, filter)), [filter, query.data]);
 
-  const goBack = () => {
-    if (router.canGoBack()) router.back();
-    else router.replace("/(tabs)");
-  };
-
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
-      <View style={styles.appBar}>
-        <Pressable accessibilityLabel="Kembali" accessibilityRole="button" onPress={goBack} style={styles.iconButton}>
-          <Ionicons name="arrow-back" size={23} color={colors.navy} />
-        </Pressable>
-        <Text style={styles.title}>Paket Umroh</Text>
-        <Pressable accessibilityLabel="Cari paket" accessibilityRole="button" onPress={() => router.push("/search")} style={styles.iconButton}>
-          <Ionicons name="search" size={23} color={colors.navy} />
-        </Pressable>
+      <View style={styles.header}>
+        <View style={styles.headerCopy}>
+          <Eyebrow>KOLEKSI PERJALANAN</Eyebrow>
+          <Text accessibilityRole="header" style={styles.title}>Paket Umroh</Text>
+        </View>
+        <CircleButton icon="search-outline" label="Cari paket" onPress={() => router.push("/search")} />
       </View>
 
       <View style={styles.filterFrame}><PackageFilterTabs value={filter} onChange={setFilter} /></View>
@@ -64,12 +57,12 @@ export default function PackageListScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: colors.ivory },
-  appBar: { minHeight: 58, paddingHorizontal: 12, flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: colors.ivory },
-  iconButton: { width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  title: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 22 },
-  filterFrame: { borderBottomWidth: 1, borderBottomColor: "#EEE8DE" },
+  header: { paddingHorizontal: 20, paddingTop: 14, paddingBottom: 6, flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: 12 },
+  headerCopy: { flex: 1, gap: 4 },
+  title: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 28, lineHeight: 34 },
+  filterFrame: { paddingTop: 4 },
   list: { paddingHorizontal: 18, paddingTop: 17, paddingBottom: 34 },
   emptyList: { flexGrow: 1 },
-  separator: { height: 17 },
+  separator: { height: 16 },
   skeletons: { gap: 17 },
 });
