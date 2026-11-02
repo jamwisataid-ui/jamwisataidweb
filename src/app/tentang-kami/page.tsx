@@ -270,7 +270,7 @@ export default function TentangKamiPage() {
                 {/* Logo Jam 09.09 */}
                 <div className="relative mx-auto size-28 sm:size-32 flex items-center justify-center p-2 rounded-2xl border border-[#D5A12B]/35 bg-[#021224]/90 shadow-[0_10px_28px_rgba(212,175,55,0.25)]">
                   <Image
-                    src="/sites/jamwisata-com-2868cc8a/root-8a5edab2/jam-0909-logo.png"
+                    src="/images/logo-emblem.png"
                     alt="Logo Jam Wisata Pukul 09.09"
                     fill
                     sizes="(min-width: 640px) 128px, 112px"
