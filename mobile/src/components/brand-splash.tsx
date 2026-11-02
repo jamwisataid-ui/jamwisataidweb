@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Animated, Easing, Image, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Animated, Easing, Image, Platform, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -20,27 +20,58 @@ const IMAGE_RATIO = 1844 / 853;
 export function BrandSplash({ ready, onFinished }: { ready: boolean; onFinished: () => void }) {
   const { width, height } = useWindowDimensions();
   const compact = height < 720;
+  const supportsNativeDriver = Platform.OS !== "web";
+  const onFinishedRef = useRef(onFinished);
+  const hasFinishedRef = useRef(false);
   const [progress] = useState(() => new Animated.Value(0.08));
   const [opacity] = useState(() => new Animated.Value(1));
   const [reveal] = useState(() => new Animated.Value(0));
   const [zoom] = useState(() => new Animated.Value(1.08));
 
   useEffect(() => {
-    Animated.parallel([
+    onFinishedRef.current = onFinished;
+  }, [onFinished]);
+
+  const finishSplash = useCallback(() => {
+    if (hasFinishedRef.current) return;
+    hasFinishedRef.current = true;
+    onFinishedRef.current();
+  }, []);
+
+  useEffect(() => {
+    const revealAnimation = Animated.parallel([
       Animated.timing(progress, { toValue: 0.86, duration: 1800, useNativeDriver: false }),
-      Animated.timing(reveal, { toValue: 1, duration: 900, delay: 120, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-      Animated.timing(zoom, { toValue: 1, duration: 2600, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-    ]).start();
-  }, [progress, reveal, zoom]);
+      Animated.timing(reveal, { toValue: 1, duration: 900, delay: 120, easing: Easing.out(Easing.cubic), useNativeDriver: supportsNativeDriver }),
+      Animated.timing(zoom, { toValue: 1, duration: 2600, easing: Easing.out(Easing.quad), useNativeDriver: supportsNativeDriver }),
+    ]);
+
+    revealAnimation.start();
+    return () => revealAnimation.stop();
+  }, [progress, reveal, supportsNativeDriver, zoom]);
+
+  useEffect(() => {
+    // Loading data or fonts must never be able to lock users on the splash screen.
+    const hardTimeout = setTimeout(finishSplash, 8000);
+    return () => clearTimeout(hardTimeout);
+  }, [finishSplash]);
 
   useEffect(() => {
     if (!ready) return;
-    Animated.sequence([
+
+    const exitFallback = setTimeout(finishSplash, 1400);
+    const exitAnimation = Animated.sequence([
       Animated.timing(progress, { toValue: 1, duration: 280, useNativeDriver: false }),
       Animated.delay(200),
-      Animated.timing(opacity, { toValue: 0, duration: 360, useNativeDriver: true }),
-    ]).start(({ finished }) => { if (finished) onFinished(); });
-  }, [onFinished, opacity, progress, ready]);
+      Animated.timing(opacity, { toValue: 0, duration: 360, useNativeDriver: supportsNativeDriver }),
+    ]);
+
+    // Finish even when React Native reports an interrupted animation.
+    exitAnimation.start(finishSplash);
+    return () => {
+      clearTimeout(exitFallback);
+      exitAnimation.stop();
+    };
+  }, [finishSplash, opacity, progress, ready, supportsNativeDriver]);
 
   const imageWidth = Math.max(width, height / IMAGE_RATIO);
   const imageHeight = imageWidth * IMAGE_RATIO;
