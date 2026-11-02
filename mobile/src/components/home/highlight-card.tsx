@@ -1,12 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import { Linking, StyleSheet, Text, View } from "react-native";
 
 import { MetallicGold } from "@/components/metallic-gold";
 import { NavyCard } from "@/components/ui";
 import { flattenPackageDepartures } from "@/lib/package-departures";
 import { colors, shadowDark } from "@/theme";
 import type { AccountProfile, Package } from "@/types";
+import { PressableScale } from "@/components/motion";
 
 const consultUrl = "https://wa.me/6281809627499?text=Assalamu%27alaikum%2C%20saya%20ingin%20konsultasi%20paket%20umroh%20JAM%20WISATA.";
 
@@ -21,18 +22,18 @@ function formatDate(isoDate: string) {
 
 function GoldAction({ label, icon, onPress }: { label: string; icon: keyof typeof Ionicons.glyphMap; onPress: () => void }) {
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.goldAction, pressed && { opacity: 0.85 }]}>
+    <PressableScale accessibilityRole="button" onPress={onPress} containerStyle={styles.goldActionWrap} style={styles.goldAction}>
       <MetallicGold style={styles.goldFill}><Text style={styles.goldText}>{label}</Text><Ionicons name={icon} size={15} color={colors.navyDeep} /></MetallicGold>
-    </Pressable>
+    </PressableScale>
   );
 }
 
 function OutlineAction({ label, icon, onPress }: { label: string; icon: keyof typeof Ionicons.glyphMap; onPress: () => void }) {
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.outlineAction, pressed && { opacity: 0.75 }]}>
+    <PressableScale accessibilityRole="button" onPress={onPress} style={styles.outlineAction}>
       <Ionicons name={icon} size={15} color={colors.softGold} />
       <Text style={styles.outlineText}>{label}</Text>
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -100,7 +101,8 @@ const styles = StyleSheet.create({
   countdownValue: { color: colors.softGold, fontFamily: "Cinzel_700Bold", fontSize: 22, lineHeight: 26 },
   countdownLabel: { color: "rgba(255,255,255,0.75)", fontFamily: "Montserrat_600SemiBold", fontSize: 9, letterSpacing: 1.5 },
   actions: { flexDirection: "row", gap: 10 },
-  goldAction: { flex: 1, height: 44, borderRadius: 12, overflow: "hidden" },
+  goldAction: { height: 44, borderRadius: 12, overflow: "hidden" },
+  goldActionWrap: { flex: 1 },
   goldFill: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 12, borderColor: "rgba(255,236,170,0.55)", borderWidth: 1 },
   goldText: { color: colors.navyDeep, fontFamily: "Montserrat_700Bold", fontSize: 12.5, letterSpacing: 0.6 },
   outlineAction: { height: 44, paddingHorizontal: 14, borderRadius: 12, flexDirection: "row", alignItems: "center", gap: 7, borderWidth: 1, borderColor: "rgba(212,175,55,0.45)" },

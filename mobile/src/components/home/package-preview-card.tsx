@@ -1,9 +1,10 @@
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 
 import type { Package } from "@/types";
 import { colors } from "@/theme";
+import { PressableScale } from "@/components/motion";
 
 const shortRupiah = (value?: number) => {
   if (!value) return "Hubungi kami";
@@ -16,11 +17,11 @@ export const PACKAGE_PREVIEW_WIDTH = 296;
 export function PackagePreviewCard({ item }: { item: Package }) {
   const eyebrow = [item.packageType === "plus" ? "UMROH PLUS" : item.badge?.toLocaleUpperCase("id-ID") || "REGULER", item.durationDays ? `${item.durationDays} HARI` : null].filter(Boolean).join(" · ");
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       accessibilityLabel={`Lihat detail ${item.name}`}
       onPress={() => router.push({ pathname: "/package/[slug]", params: { slug: item.id } })}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      style={styles.card}
     >
       <Image source={{ uri: item.image }} resizeMode="cover" style={StyleSheet.absoluteFill} alt={item.name} />
       <LinearGradient colors={["rgba(6,21,43,0.92)", "rgba(6,21,43,0.55)", "rgba(6,21,43,0.08)"]} locations={[0, 0.55, 1]} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={StyleSheet.absoluteFill} />
@@ -31,7 +32,7 @@ export function PackagePreviewCard({ item }: { item: Package }) {
         </View>
         <Text style={styles.from}>mulai <Text style={styles.price}>{shortRupiah(item.priceFrom)}</Text></Text>
       </View>
-    </Pressable>
+    </PressableScale>
   );
 }
 

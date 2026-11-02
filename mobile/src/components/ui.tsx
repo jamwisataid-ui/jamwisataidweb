@@ -6,6 +6,7 @@ import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, gradients, radius, shadow } from "@/theme";
 import { MetallicGold } from "@/components/metallic-gold";
+import { PressableScale } from "@/components/motion";
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -32,7 +33,7 @@ export function NavyCard({ children, style }: PropsWithChildren<{ style?: StyleP
 
 export function Button({ label, onPress, loading, secondary, disabled, icon }: { label: string; onPress: () => void; loading?: boolean; secondary?: boolean; disabled?: boolean; icon?: IconName }) {
   const content = loading ? <ActivityIndicator color={colors.navy} /> : <View style={styles.buttonRow}>{icon ? <Ionicons name={icon} size={18} color={colors.navyDeep} /> : null}<Text style={[styles.buttonText, secondary && styles.buttonTextSecondary]}>{label}</Text></View>;
-  return <Pressable accessibilityRole="button" disabled={disabled || loading} onPress={onPress} style={({ pressed }) => [styles.button, secondary && styles.buttonSecondary, (pressed || disabled) && { opacity: .7 }]}>{secondary ? content : <MetallicGold style={styles.buttonFill}>{content}</MetallicGold>}</Pressable>;
+  return <PressableScale accessibilityRole="button" disabled={disabled || loading} onPress={onPress} style={[styles.button, secondary && styles.buttonSecondary]}>{secondary ? content : <MetallicGold style={styles.buttonFill}>{content}</MetallicGold>}</PressableScale>;
 }
 
 export function Field({ label, error, optional, ...props }: TextInputProps & { label: string; error?: string; optional?: boolean }) {
@@ -62,7 +63,7 @@ export function AppBar({ title, eyebrow, right, dark, onBack }: { title: string;
 }
 
 export function CircleButton({ icon, label, onPress, dark, children }: PropsWithChildren<{ icon: IconName; label: string; onPress: () => void; dark?: boolean }>) {
-  return <Pressable accessibilityLabel={label} accessibilityRole="button" hitSlop={4} onPress={onPress} style={({ pressed }) => [styles.circle, dark ? styles.circleDark : styles.circleLight, pressed && { opacity: .7 }]}><Ionicons name={icon} size={20} color={dark ? colors.softGold : colors.navy} />{children}</Pressable>;
+  return <PressableScale accessibilityLabel={label} accessibilityRole="button" hitSlop={4} onPress={onPress} pressedScale={0.92} hoverLift={0} style={[styles.circle, dark ? styles.circleDark : styles.circleLight]}><Ionicons name={icon} size={20} color={dark ? colors.softGold : colors.navy} />{children}</PressableScale>;
 }
 
 export function Chip({ label, active, onPress, dark }: { label: string; active?: boolean; onPress: () => void; dark?: boolean }) {

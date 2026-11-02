@@ -11,6 +11,7 @@ import { CircleButton, Eyebrow } from "@/components/ui";
 import { api } from "@/lib/api";
 import { colors } from "@/theme";
 import type { Package } from "@/types";
+import { FadeInView } from "@/components/motion";
 
 function matchesFilter(item: Package, filter: PackageFilter) {
   if (filter === "all") return true;
@@ -43,7 +44,7 @@ export default function PackageListScreen() {
         <FlatList
           data={packages}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <PackageCard item={item} />}
+          renderItem={({ item, index }) => <FadeInView delay={Math.min(index, 5) * 70}><PackageCard item={item} /></FadeInView>}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           ListEmptyComponent={query.isPending ? <View style={styles.skeletons}><PackageCardSkeleton /><PackageCardSkeleton /></View> : <EmptyPackageState filtered={filter !== "all"} />}
           contentContainerStyle={[styles.list, !query.isPending && packages.length === 0 && styles.emptyList]}

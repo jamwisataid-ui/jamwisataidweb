@@ -11,6 +11,7 @@ import { api } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
 import { colors } from "@/theme";
 import type { AccountProfile, Package } from "@/types";
+import { FadeInView } from "@/components/motion";
 
 type HomeNotification = { id: string; readAt?: string | null };
 
@@ -36,7 +37,7 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <HomeHeader name={guest ? null : profile.data?.fullName ?? user?.fullName} unreadCount={unreadCount} guest={guest} />
         <View style={styles.overlap}>
-          <HighlightCard profile={guest ? undefined : profile.data} packages={packages.data} />
+          <FadeInView distance={20}><HighlightCard profile={guest ? undefined : profile.data} packages={packages.data} /></FadeInView>
         </View>
 
         <View style={styles.content}>
@@ -45,7 +46,7 @@ export default function HomeScreen() {
             <QuickMenuGrid guest={guest} />
           </View>
 
-          <View style={styles.section}>
+          <FadeInView delay={380} style={styles.section}>
             <HomeSectionHeader title="Paket Pilihan" actionLabel="Lihat koleksi" onAction={() => router.push("/(tabs)/packages")} />
             {!packages.isPending && featuredPackages.length === 0 ? (
               <View style={styles.empty}>
@@ -63,7 +64,7 @@ export default function HomeScreen() {
                 {packages.isPending ? <><PackagePreviewSkeleton /><PackagePreviewSkeleton /></> : featuredPackages.map((item) => <PackagePreviewCard key={item.id} item={item} />)}
               </ScrollView>
             )}
-          </View>
+          </FadeInView>
         </View>
       </ScrollView>
     </View>

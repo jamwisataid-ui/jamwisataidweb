@@ -1,11 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 
 import { colors, shadow } from "@/theme";
 import { MetallicGold } from "@/components/metallic-gold";
 import type { Package } from "@/types";
+import { PressableScale } from "@/components/motion";
 
 const money = new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 });
 
@@ -41,11 +42,12 @@ export function PackageCard({ item }: { item: Package }) {
   const disabled = item.status === "sold-out";
 
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       accessibilityLabel={`Lihat detail ${item.name}`}
       onPress={() => router.push({ pathname: "/package/[slug]", params: { slug: item.id } })}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      pressedScale={0.985}
+      style={styles.card}
     >
       <View style={styles.imageFrame}>
         <Image source={{ uri: item.image }} resizeMode="cover" style={styles.image} alt={item.name} />
@@ -72,7 +74,7 @@ export function PackageCard({ item }: { item: Package }) {
           {disabled ? <View style={[styles.arrow, styles.disabledButton]}><Ionicons name="arrow-forward" size={18} color={colors.muted} /></View> : <MetallicGold style={styles.arrow}><Ionicons name="arrow-forward" size={18} color={colors.navyDeep} /></MetallicGold>}
         </View>
       </View>
-    </Pressable>
+    </PressableScale>
   );
 }
 

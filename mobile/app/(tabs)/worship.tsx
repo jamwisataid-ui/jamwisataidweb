@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Linking, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import kaaba from "../../assets/splash/kaaba-masjidil-haram.jpg";
@@ -9,20 +9,23 @@ import { MetallicGold } from "@/components/metallic-gold";
 import { IconRing, NavyCard } from "@/components/ui";
 import { useNextPrayer } from "@/lib/use-next-prayer";
 import { colors, shadow, shadowDark } from "@/theme";
+import { FadeInView, PressableScale } from "@/components/motion";
 
 type WorshipItem = { title: string; description: string; icon: keyof typeof Ionicons.glyphMap; href?: string; external?: string; live?: boolean };
 
 const items: WorshipItem[] = [
   { title: "Mushaf Qur'an", description: "Baca 114 surah, simpan bookmark, dan lanjutkan bacaan terakhir secara offline.", icon: "book-outline", href: "/quran" },
   { title: "Doa & Dzikir", description: "Doa perjalanan, tanah suci, dzikir pagi-petang, dan bacaan favorit.", icon: "sparkles-outline", href: "/duas" },
+  { title: "Asmaul Husna", description: "99 nama Allah lengkap dengan teks Arab, latin, dan artinya.", icon: "star-outline", href: "/asmaul-husna" },
   { title: "Live Muthowif", description: "Dengarkan panduan ibadah langsung sesuai rombongan jamaah.", icon: "headset-outline", href: "/live-muthowif", live: true },
   { title: "Panduan Umroh", description: "Buka panduan manasik resmi Jam Wisata dari website.", icon: "compass-outline", external: "https://jamwisata.id/panduan-umroh" },
 ];
 
-function WorshipCard({ item }: { item: WorshipItem }) {
+function WorshipCard({ item, index }: { item: WorshipItem; index: number }) {
   const open = () => item.href ? router.push(item.href as never) : item.external ? void Linking.openURL(item.external) : undefined;
   return (
-    <Pressable accessibilityRole="button" onPress={open} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
+    <FadeInView delay={100 + index * 60}>
+    <PressableScale accessibilityRole="button" onPress={open} style={styles.card}>
       <IconRing name={item.icon} size={50} />
       <View style={styles.copy}>
         <View style={styles.titleRow}>
@@ -32,14 +35,15 @@ function WorshipCard({ item }: { item: WorshipItem }) {
         <Text style={styles.description}>{item.description}</Text>
       </View>
       <Ionicons name={item.external ? "open-outline" : "chevron-forward"} size={18} color={colors.goldDark} />
-    </Pressable>
+    </PressableScale>
+    </FadeInView>
   );
 }
 
 function NextPrayerCard() {
   const next = useNextPrayer();
   return (
-    <Pressable accessibilityRole="button" onPress={() => router.push("/prayer-times")} style={styles.prayerWrap}>
+    <FadeInView><PressableScale accessibilityRole="button" onPress={() => router.push("/prayer-times")} style={styles.prayerWrap}>
       <NavyCard style={styles.prayerCard}>
         <IconRing dark name="moon" size={46} />
         <View style={styles.copy}>
@@ -49,7 +53,7 @@ function NextPrayerCard() {
         </View>
         <Ionicons name="chevron-forward" size={18} color={colors.gold} />
       </NavyCard>
-    </Pressable>
+    </PressableScale></FadeInView>
   );
 }
 
@@ -67,7 +71,7 @@ export default function WorshipScreen() {
         </View>
         <View style={styles.body}>
           <NextPrayerCard />
-          {items.map((item) => <WorshipCard item={item} key={item.title} />)}
+          {items.map((item, index) => <WorshipCard item={item} index={index} key={item.title} />)}
           <Text style={styles.note}>Semua fitur ibadah dapat dibuka sebagai tamu. Live Muthowif mengikuti akses rombongan saat Anda sudah masuk.</Text>
         </View>
       </ScrollView>

@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { MetallicGold } from "@/components/metallic-gold";
 import { colors, shadowDark } from "@/theme";
+import { FadeInView } from "@/components/motion";
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -42,10 +43,12 @@ export function LuxuryTabBar({ state, descriptors, emitter, navigateToTab, inset
               style={({ pressed }) => [focused ? styles.itemFocused : styles.item, pressed && !focused && { opacity: 0.7 }]}
             >
               {focused ? (
-                <MetallicGold style={styles.activePill}>
-                  <Ionicons name={icon} size={18} color={colors.navyDeep} />
-                  <Text numberOfLines={1} style={styles.activeLabel}>{label}</Text>
-                </MetallicGold>
+                <FadeInView key={route.key} distance={0} duration={260}>
+                  <MetallicGold style={styles.activePill}>
+                    <Ionicons name={icon} size={18} color={colors.navyDeep} />
+                    <Text numberOfLines={1} style={styles.activeLabel}>{label}</Text>
+                  </MetallicGold>
+                </FadeInView>
               ) : (
                 <View>
                   <Ionicons name={`${icon}-outline` as IconName} size={21} color="rgba(255,255,255,0.72)" />
