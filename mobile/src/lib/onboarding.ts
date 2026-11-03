@@ -24,6 +24,7 @@ export const defaultOnboardingSlides: OnboardingSlide[] = [
 export async function fetchOnboardingSlides() {
   const remote = await api<RemoteSlide[]>("/onboarding");
   if (!remote.length) return defaultOnboardingSlides;
-  await Promise.allSettled(remote.map((slide) => Image.prefetch(slide.imageUrl)));
+  // Images are warmed opportunistically; they must not block app bootstrap.
+  void Promise.allSettled(remote.map((slide) => Image.prefetch(slide.imageUrl)));
   return remote.map((slide) => ({ ...slide, image: { uri: slide.imageUrl } }));
 }

@@ -33,11 +33,13 @@ export default function RootLayout() {
   useEffect(() => { void SplashScreen.hideAsync(); }, []);
   useEffect(() => {
     let active = true;
+    // Warm public data in the background. A slow network must never keep the
+    // user on the splash screen; each destination already owns its loading UI.
+    void queryClient.prefetchQuery({ queryKey: ["packages", "umrah"], queryFn: () => api<Package[]>("/packages?category=umrah") });
+    void queryClient.prefetchQuery({ queryKey: ["onboarding"], queryFn: fetchOnboardingSlides });
     void Promise.allSettled([
       hydrate(),
-      queryClient.prefetchQuery({ queryKey: ["packages", "umrah"], queryFn: () => api<Package[]>("/packages?category=umrah") }),
-      queryClient.prefetchQuery({ queryKey: ["onboarding"], queryFn: fetchOnboardingSlides }),
-      new Promise((resolve) => setTimeout(resolve, 1500)),
+      new Promise((resolve) => setTimeout(resolve, 500)),
     ]).then(() => { if (active) setBootstrapReady(true); });
     return () => { active = false; };
   }, [hydrate]);

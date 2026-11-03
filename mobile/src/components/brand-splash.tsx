@@ -51,7 +51,7 @@ export function BrandSplash({ ready, onFinished }: { ready: boolean; onFinished:
 
   useEffect(() => {
     // Loading data or fonts must never be able to lock users on the splash screen.
-    const hardTimeout = setTimeout(finishSplash, 8000);
+    const hardTimeout = setTimeout(finishSplash, 5000);
     return () => clearTimeout(hardTimeout);
   }, [finishSplash]);
 
