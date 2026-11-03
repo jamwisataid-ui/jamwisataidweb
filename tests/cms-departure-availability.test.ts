@@ -17,6 +17,13 @@ describe("departure availability", () => {
     expect(calculateRemainingSeats(45, active)).toBe(remaining);
   });
 
+  it("keeps capacity 45 selectable when there are no active registrations", () => {
+    const remainingSeats = calculateRemainingSeats(45, 0);
+
+    expect(remainingSeats).toBe(45);
+    expect(isDepartureSelectable({ status: "open", remainingSeats })).toBe(true);
+  });
+
   it("does not count cancelled registrations", () => {
     const active = countSeatConsumingRegistrations(["pending", "active", "cancelled", "completed"]);
     expect(active).toBe(3);
