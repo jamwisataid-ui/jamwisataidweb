@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, count, eq, inArray, ne, sql } from "drizzle-orm";
 import { requireDatabase } from "@/db";
 import { agents, bookings, departures, managementSettings, mobileNotifications, packages, referralLeads, registrations } from "@/db/schema";
 import { withManagementTransaction } from "@/db/transaction";
 import { requireMobileSession } from "@/lib/mobile/auth";
 import { mobileData, mobileError, MobileApiError, zodFieldErrors } from "@/lib/mobile/api";
 import { mobileRegistrationSchema } from "@/lib/mobile/validation";
-import { isDepartureSelectable } from "@/lib/cms/departure-availability";
+import { calculateRemainingSeats, isDepartureSelectable } from "@/lib/cms/departure-availability";
 
 export async function POST(request: Request) {
   try {
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     const database = requireDatabase();
     const [selected] = await database.select({ departure: departures, package: packages }).from(departures).innerJoin(packages, eq(departures.packageId, packages.id)).where(and(eq(departures.id, parsed.data.departureId), eq(packages.status, "published"))).limit(1);
     const todayJakarta = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
-    if (!selected || selected.departure.departureDate < todayJakarta || !isDepartureSelectable(selected.departure)) throw new MobileApiError(400, "DEPARTURE_UNAVAILABLE", "Keberangkatan ini belum tersedia untuk pendaftaran.");
+    if (!selected || selected.departure.departureDate < todayJakarta || !isDepartureSelectable({ status: selected.departure.status, remainingSeats: null })) throw new MobileApiError(400, "DEPARTURE_UNAVAILABLE", "Keberangkatan ini belum tersedia untuk pendaftaran.");
     const settings = await database.query.managementSettings.findFirst({ where: eq(managementSettings.id, "default") });
     const referral = await database.select({ lead: referralLeads, agent: agents }).from(referralLeads)
       .innerJoin(agents, eq(referralLeads.agentId, agents.id))
@@ -28,6 +28,27 @@ export async function POST(request: Request) {
     const bookingNumber = `APP-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-${bookingId.slice(0, 6).toUpperCase()}`;
     const price = Number(selected.departure.price);
     await withManagementTransaction(async (tx) => {
+      // Serialize every capacity check for the same departure so two requests
+      // cannot both claim the final seat.
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`departure-capacity:${selected.departure.id}`}))`);
+      const [currentDeparture] = await tx.select({
+        capacity: departures.capacity,
+        departureDate: departures.departureDate,
+        status: departures.status,
+      }).from(departures).where(eq(departures.id, selected.departure.id)).limit(1);
+      const [activeRegistrationRow] = await tx.select({ value: count(registrations.id) })
+        .from(registrations)
+        .innerJoin(bookings, eq(registrations.bookingId, bookings.id))
+        .where(and(
+          eq(bookings.departureId, selected.departure.id),
+          ne(registrations.status, "cancelled"),
+          ne(bookings.status, "cancelled"),
+        ));
+      const remainingSeats = calculateRemainingSeats(currentDeparture?.capacity, Number(activeRegistrationRow?.value ?? 0));
+      if (!currentDeparture || currentDeparture.departureDate < todayJakarta || !isDepartureSelectable({ status: currentDeparture.status, remainingSeats })) {
+        if (remainingSeats === 0) throw new MobileApiError(409, "DEPARTURE_FULL", "Sisa pax sudah 0. Silakan pilih keberangkatan lain.");
+        throw new MobileApiError(400, "DEPARTURE_UNAVAILABLE", "Keberangkatan ini belum tersedia untuk pendaftaran.");
+      }
       // Serialize the logical (pilgrim, departure) invariant. bookingId is
       // generated per request, so the existing registration unique index
       // cannot prevent two concurrent requests from creating duplicates.

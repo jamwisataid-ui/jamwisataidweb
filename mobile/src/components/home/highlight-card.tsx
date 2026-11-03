@@ -74,7 +74,7 @@ function NearestDepartureCard({ packages }: { packages?: Package[] }) {
         <Text style={styles.eyebrow}>{nearest ? "KEBERANGKATAN TERDEKAT" : "UMROH BERSAMA JAM WISATA"}</Text>
         <Text style={styles.title}>{nearest ? (/^\d{4}-\d{2}-\d{2}$/.test(nearest.departure.departureDate) ? formatDate(nearest.departure.departureDate) : nearest.departure.dateLabel) : "Setiap Waktu Bernilai Ibadah"}</Text>
         <Text numberOfLines={1} style={styles.meta}>
-          {nearest ? `${nearest.packageItem.name}${typeof nearest.departure.remainingQuota === "number" ? ` · sisa ${nearest.departure.remainingQuota} kursi` : ""}` : "Jadwal keberangkatan sedang diperbarui."}
+          {nearest ? `${nearest.packageItem.name}${typeof nearest.departure.remainingQuota === "number" ? ` · sisa ${nearest.departure.remainingQuota} pax` : ""}` : "Jadwal keberangkatan sedang diperbarui."}
         </Text>
       </View>
       <View style={styles.actions}>

@@ -47,6 +47,7 @@ const monthLabel = (value: string) => {
 };
 
 function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
+  const displayedDeparture = travelPackage.departures?.find((departure) => departure.selectable) ?? travelPackage.departures?.[0];
   const whatsappText =
     travelPackage.whatsappMessage ||
     `Assalamu’alaikum Jam Wisata, saya ingin konsultasi mengenai ${travelPackage.name}${travelPackage.departureDate ? ` (Keberangkatan ${travelPackage.departureDate})` : ""}. Mohon info seat dan rincian lengkapnya.`;
@@ -138,7 +139,7 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
           {travelPackage.departureDate ? (
             <div className="mt-3.5 flex items-center gap-2 px-1 text-xs text-slate-300">
               <CalendarDays className="size-3.5 text-[#E8C967] shrink-0" />
-              <span>Jadwal: <strong className="font-semibold text-white">{travelPackage.departureDate}</strong></span>
+              <span>Jadwal: <strong className="font-semibold text-white">{travelPackage.departureDate}</strong>{displayedDeparture?.remainingQuota != null ? ` · Sisa ${displayedDeparture.remainingQuota}${displayedDeparture.quota != null ? ` dari ${displayedDeparture.quota}` : ""} pax` : ""}</span>
             </div>
           ) : null}
         </div>

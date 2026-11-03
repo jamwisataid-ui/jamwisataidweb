@@ -31,7 +31,6 @@ type DepartureInput = {
   returnDate: string;
   price: string;
   capacity: string;
-  availableSeats: string;
   status: "open" | "limited" | "full" | "closed" | "coming-soon";
 };
 const initialState: ActionState = { ok: false, message: "" };
@@ -130,8 +129,7 @@ const parseDepartures = (values: Values): DepartureInput[] => {
         returnDate: String(departure?.returnDate ?? ""),
         price: formatRupiahInput(departure?.price ?? ""),
         capacity: String(departure?.capacity ?? ""),
-        availableSeats: String(departure?.availableSeats ?? ""),
-        status: departure?.status ?? "open",
+        status: departure?.status === "full" ? "open" : departure?.status ?? "open",
       }));
     }
   } catch {}
@@ -141,7 +139,6 @@ const parseDepartures = (values: Values): DepartureInput[] => {
     returnDate: field(values, "returnDate"),
     price: formatRupiahInput(field(values, "price")),
     capacity: field(values, "capacity"),
-    availableSeats: field(values, "availableSeats"),
     status: field(values, "departureStatus", "open") as DepartureInput["status"],
   }];
 };
@@ -277,7 +274,6 @@ export function PackageForm({ values = {} }: { values?: Values }) {
       <input type="hidden" name="returnDate" value={departures[0]?.returnDate ?? ""} />
       <input type="hidden" name="price" value={cleanRupiahInput(departures[0]?.price ?? "")} />
       <input type="hidden" name="capacity" value={departures[0]?.capacity ?? ""} />
-      <input type="hidden" name="availableSeats" value={departures[0]?.availableSeats ?? ""} />
       <input type="hidden" name="departureStatus" value={departures[0]?.status ?? "open"} />
       <input type="hidden" name="plusHotels" value={JSON.stringify(plusHotels)} />
       <input type="hidden" name="includes" value={includes.map((s) => s.trim()).filter(Boolean).join("\n")} />
@@ -376,7 +372,7 @@ export function PackageForm({ values = {} }: { values?: Values }) {
           <div className="admin-span-2 admin-departure-editor">
             <div className="admin-departure-editor__heading">
               <div><strong>Keberangkatan</strong><small>Urutan di website otomatis dari tanggal terdekat.</small></div>
-              <button type="button" className="admin-secondary-button" onClick={() => setDepartures((current) => [...current, { departureDate: "", returnDate: "", price: current.at(-1)?.price ?? "", capacity: "", availableSeats: "", status: "open" }])}>
+              <button type="button" className="admin-secondary-button" onClick={() => setDepartures((current) => [...current, { departureDate: "", returnDate: "", price: current.at(-1)?.price ?? "", capacity: "", status: "open" }])}>
                 <Plus className="size-4" /> Tambah Keberangkatan
               </button>
             </div>
@@ -387,8 +383,8 @@ export function PackageForm({ values = {} }: { values?: Values }) {
                 <label><span>Tanggal pulang <em>opsional</em></span><input type="date" value={departure.returnDate} onChange={(event) => updateDeparture(index, { returnDate: event.target.value })} /></label>
                 <label><span>Harga per jamaah</span><div className="admin-input-prefix"><span>Rp</span><input inputMode="numeric" value={departure.price} onChange={(event) => updateDeparture(index, { price: formatRupiahInput(event.target.value) })} placeholder="33.900.000" required /></div></label>
                 <label><span>Kuota <em>opsional</em></span><input type="number" min="1" value={departure.capacity} onChange={(event) => updateDeparture(index, { capacity: event.target.value })} placeholder="45" /></label>
-                <label><span>Sisa kuota <em>opsional</em></span><input type="number" min="0" value={departure.availableSeats} onChange={(event) => updateDeparture(index, { availableSeats: event.target.value })} placeholder="45" /></label>
-                <label><span>Status</span><select value={departure.status} onChange={(event) => updateDeparture(index, { status: event.target.value as DepartureInput["status"] })}><option value="open">Tersedia</option><option value="limited">Hampir penuh</option><option value="full">Kuota penuh</option><option value="coming-soon">Segera dibuka</option><option value="closed">Ditutup</option></select></label>
+                <label><span>Status</span><select value={departure.status === "full" ? "open" : departure.status} onChange={(event) => updateDeparture(index, { status: event.target.value as DepartureInput["status"] })}><option value="open">Tersedia</option><option value="limited">Hampir penuh</option><option value="coming-soon">Segera dibuka</option><option value="closed">Ditutup</option></select></label>
+                <small className="admin-span-2">Sisa pax dihitung otomatis dari kuota dikurangi pendaftaran aktif. Pendaftaran yang dibatalkan tidak dihitung.</small>
                 {departure.price ? <small className="admin-departure-row__amount">Rp {departure.price} · {terbilangRupiah(cleanRupiahInput(departure.price))}</small> : null}
               </div>
             ))}

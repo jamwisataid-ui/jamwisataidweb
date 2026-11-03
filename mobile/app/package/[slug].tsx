@@ -47,7 +47,7 @@ export default function PackageDetailScreen() {
         <PackageDetailTabs value={tab} onChange={setTab} />
         <PackageDetailContent item={item} tab={tab} />
       </ScrollView>
-      <StickyRegistrationCTA status={selectedDeparture?.status ?? item.status} enabled={canRegister} onPress={() => effectiveDepartureId && router.push(`/register/${effectiveDepartureId}`)} />
+      <StickyRegistrationCTA status={selectedDeparture?.status ?? item.status} enabled={canRegister} remainingQuota={selectedDeparture?.remainingQuota} onPress={() => effectiveDepartureId && router.push(`/register/${effectiveDepartureId}`)} />
     </SafeAreaView>
   );
 }

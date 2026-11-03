@@ -111,7 +111,6 @@ export async function getPackageAdmin(id: string) {
     arrivalAirport: departure?.arrivalAirport ?? "",
     price: departure ? Number(departure.price) : 0,
     capacity: departure?.capacity ?? "",
-    availableSeats: departure?.availableSeats ?? "",
     departureStatus: departure?.status ?? "open",
     departures: JSON.stringify(packageDepartures.map((entry) => ({
       id: entry.id,
@@ -119,7 +118,6 @@ export async function getPackageAdmin(id: string) {
       returnDate: entry.returnDate ?? "",
       price: Number(entry.price),
       capacity: entry.capacity ?? "",
-      availableSeats: entry.availableSeats ?? "",
       status: entry.status,
     }))),
     makkahHotel: makkah?.hotelName ?? "",

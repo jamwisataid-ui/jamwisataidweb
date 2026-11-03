@@ -19,7 +19,8 @@ const statusContent: Record<string, { label: string; tone: "navy" | "gold" | "re
 
 function PackageBadge({ item }: { item: Package }) {
   const status = statusContent[item.status];
-  const label = item.badge || (item.packageType === "plus" ? "Plus" : status?.label || "Umroh");
+  const hasNoSeats = item.departures?.some((departure) => departure.remainingQuota === 0);
+  const label = item.badge || (item.packageType === "plus" ? "Plus" : hasNoSeats && item.status === "sold-out" ? "Sisa 0 pax" : status?.label || "Umroh");
   const tone = item.badge ? "gold" : item.packageType === "plus" ? "navy" : status?.tone || "navy";
   return <View style={[styles.badge, tone === "red" && styles.redBadge]}><Text style={[styles.badgeText, tone === "red" && styles.redBadgeText]}>{label.toLocaleUpperCase("id-ID")}</Text></View>;
 }

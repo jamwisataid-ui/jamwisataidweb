@@ -5,19 +5,20 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/theme";
 import { MetallicGold } from "@/components/metallic-gold";
 
-const labels: Record<string, string> = {
-  available: "Daftar Sekarang",
-  limited: "Daftar · Kursi Terbatas",
-  "sold-out": "Kuota Penuh",
-  "coming-soon": "Segera Dibuka",
-};
+function buttonLabel(status: string, remainingQuota?: number) {
+  if (remainingQuota === 0) return "Sisa 0 pax";
+  if (status === "coming-soon") return "Segera Dibuka";
+  if (status === "sold-out") return "Pendaftaran Ditutup";
+  return remainingQuota == null ? "Daftar Sekarang" : `Daftar Sekarang · Sisa ${remainingQuota} pax`;
+}
 
-export function StickyRegistrationCTA({ status, enabled, onPress }: { status: string; enabled: boolean; onPress: () => void }) {
+export function StickyRegistrationCTA({ status, enabled, remainingQuota, onPress }: { status: string; enabled: boolean; remainingQuota?: number; onPress: () => void }) {
   const insets = useSafeAreaInsets();
+  const label = buttonLabel(status, remainingQuota);
   return (
     <View style={[styles.frame, { paddingBottom: Math.max(insets.bottom, 10) }]}>
       <Pressable accessibilityRole="button" disabled={!enabled} onPress={onPress} style={({ pressed }) => [styles.button, !enabled && styles.disabled, pressed && enabled && styles.pressed]}>
-        {enabled ? <MetallicGold style={styles.buttonFill}><Text style={styles.label}>{labels[status] || "Pendaftaran Belum Tersedia"}</Text><Ionicons name="arrow-forward" size={18} color={colors.navyDeep} /></MetallicGold> : <Text style={styles.label}>{labels[status] || "Pendaftaran Belum Tersedia"}</Text>}
+        {enabled ? <MetallicGold style={styles.buttonFill}><Text style={styles.label}>{label}</Text><Ionicons name="arrow-forward" size={18} color={colors.navyDeep} /></MetallicGold> : <Text style={styles.label}>{label}</Text>}
       </Pressable>
     </View>
   );

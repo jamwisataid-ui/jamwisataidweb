@@ -31,7 +31,6 @@ const departureSchema = z.object({
     z.number().int().positive("Harga harus lebih dari 0."),
   ),
   capacity: z.union([z.coerce.number().int().positive(), z.literal(""), z.null()]).optional(),
-  availableSeats: z.union([z.coerce.number().int().min(0), z.literal(""), z.null()]).optional(),
   status: z.enum(["open", "limited", "full", "closed", "coming-soon"]).default("open"),
 });
 
@@ -71,7 +70,6 @@ export const packageFormSchema = z.object({
     z.number().int().positive("Harga harus lebih dari 0.")
   ),
   capacity: z.union([z.coerce.number().int().positive(), z.literal(""), z.null()]).optional(),
-  availableSeats: z.union([z.coerce.number().int().min(0), z.literal(""), z.null()]).optional(),
   departureStatus: z.enum(["open", "limited", "full", "closed", "coming-soon"]).default("open"),
   departures: packageDepartures.optional().default([]),
   makkahHotel: z.string().trim().min(2, "Hotel Makkah wajib diisi."),
@@ -99,11 +97,6 @@ export const packageFormSchema = z.object({
   if (new Set(dates).size !== dates.length) {
     context.addIssue({ code: "custom", path: ["departures"], message: "Tanggal keberangkatan dalam satu paket tidak boleh duplikat." });
   }
-  data.departures.forEach((departure, index) => {
-    if (typeof departure.capacity === "number" && typeof departure.availableSeats === "number" && departure.availableSeats > departure.capacity) {
-      context.addIssue({ code: "custom", path: ["departures", index, "availableSeats"], message: "Sisa kuota tidak boleh melebihi kuota." });
-    }
-  });
 }).transform((data) => ({
   ...(data.packageType === "plus" ? data : { ...data, plusHotels: [] }),
   departures: data.departures.length ? data.departures : [{
@@ -112,7 +105,6 @@ export const packageFormSchema = z.object({
     returnDate: data.returnDate,
     price: data.price,
     capacity: data.capacity,
-    availableSeats: data.availableSeats,
     status: data.departureStatus,
   }],
 }));

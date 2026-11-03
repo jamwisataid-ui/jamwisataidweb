@@ -9,7 +9,7 @@ const money = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR
 const statusLabel = {
   available: "Tersedia",
   limited: "Kursi Terbatas",
-  "sold-out": "Kuota Penuh",
+  "sold-out": "Pendaftaran Ditutup",
   "coming-soon": "Segera Dibuka",
 } as const;
 const dateLabel = (value: string) => {
@@ -19,7 +19,8 @@ const dateLabel = (value: string) => {
 
 export function ScheduleDepartureCard({ item }: { item: PackageDepartureSelection }) {
   const { packageItem, departure } = item;
-  const seats = departure.remainingQuota && departure.remainingQuota > 0 ? `${departure.remainingQuota}${departure.quota ? ` / ${departure.quota}` : ""} kursi tersisa` : null;
+  const seats = departure.remainingQuota == null ? null : departure.quota != null ? `Sisa ${departure.remainingQuota} dari ${departure.quota} pax` : `Sisa ${departure.remainingQuota} pax`;
+  const badge = departure.remainingQuota === 0 ? "Sisa 0 pax" : statusLabel[departure.status];
 
   return <Pressable
     accessibilityLabel={`Lihat ${packageItem.name}, keberangkatan ${departure.dateLabel}`}
@@ -32,7 +33,7 @@ export function ScheduleDepartureCard({ item }: { item: PackageDepartureSelectio
       <View style={styles.topRow}>
         <Text style={styles.date}>{departure.dateLabel}</Text>
         <View style={[styles.badge, departure.status === "limited" && styles.badgeLimited, departure.status === "sold-out" && styles.badgeClosed]}>
-          <Text style={styles.badgeText}>{statusLabel[departure.status]}</Text>
+          <Text style={styles.badgeText}>{badge}</Text>
         </View>
       </View>
       <Text numberOfLines={2} style={styles.title}>{packageItem.name}</Text>

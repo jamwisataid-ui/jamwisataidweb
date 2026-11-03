@@ -243,7 +243,9 @@ export async function savePackageAction(_state: ActionState, formData: FormData)
         arrivalAirport: data.arrivalAirport || null,
         price: String(input.price),
         capacity: input.capacity === "" || input.capacity == null ? null : Number(input.capacity),
-        availableSeats: input.availableSeats === "" || input.availableSeats == null ? null : Number(input.availableSeats),
+        // Remaining seats are derived from capacity minus active registrations.
+        // Clear legacy manual values so they can never become a source of truth.
+        availableSeats: null,
         status: input.status,
         sortOrder: index,
         updatedAt: new Date(),

@@ -1,6 +1,22 @@
 [
   {
-    "title": "Ayat al-Kursi",
+    "title": "Al-Fatihah (Ayat 1–7)",
+    "arabic": "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ ﴿١﴾ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَٰلَمِينَ ﴿٢﴾ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ ﴿٣﴾ مَٰلِكِ يَوۡمِ ٱلدِّينِ ﴿٤﴾ إِيَّاكَ نَعۡبُدُ وَإِيَّاكَ نَسۡتَعِينُ ﴿٥﴾ ٱهۡدِنَا ٱلصِّرَٰطَ ٱلۡمُسۡتَقِيمَ ﴿٦﴾ صِرَٰطَ ٱلَّذِينَ أَنۡعَمۡتَ عَلَيۡهِمۡ غَيۡرِ ٱلۡمَغۡضُوبِ عَلَيۡهِمۡ وَلَا ٱلضَّآلِّينَ ﴿٧﴾",
+    "latin": "",
+    "translation": "Dengan nama Allah Yang Maha Pengasih, Maha Penyayang ﴿١﴾ Segala puji bagi Allah, Tuhan seluruh alam ﴿٢﴾ Yang Maha Pengasih, Maha Penyayang ﴿٣﴾ Pemilik hari pembalasan ﴿٤﴾ Hanya kepada Engkaulah kami menyembah dan hanya kepada Engkaulah kami mohon pertolongan ﴿٥﴾ Tunjukilah kami jalan yang lurus ﴿٦﴾ (yaitu) jalan orang-orang yang telah Engkau beri nikmat kepadanya; bukan (jalan) mereka yang dimurkai, dan bukan (pula jalan) mereka yang sesat ﴿٧﴾",
+    "notes": "Dibaca 1x",
+    "source": "QS. Al-Fatihah: 1–7"
+  },
+  {
+    "title": "Al-Baqarah (Ayat 1–5)",
+    "arabic": "الٓمٓ ﴿١﴾ ذَٰلِكَ ٱلۡكِتَٰبُ لَا رَيۡبَۛ فِيهِۛ هُدٗى لِّلۡمُتَّقِينَ ﴿٢﴾ ٱلَّذِينَ يُؤۡمِنُونَ بِٱلۡغَيۡبِ وَيُقِيمُونَ ٱلصَّلَوٰةَ وَمِمَّا رَزَقۡنَٰهُمۡ يُنفِقُونَ ﴿٣﴾ وَٱلَّذِينَ يُؤۡمِنُونَ بِمَآ أُنزِلَ إِلَيۡكَ وَمَآ أُنزِلَ مِن قَبۡلِكَ وَبِٱلۡأٓخِرَةِ هُمۡ يُوقِنُونَ ﴿٤﴾ أُوْلَـٰٓئِكَ عَلَىٰ هُدٗى مِّن رَّبِّهِمۡۖ وَأُوْلَـٰٓئِكَ هُمُ ٱلۡمُفۡلِحُونَ ﴿٥﴾",
+    "latin": "",
+    "translation": "Alif Lām Mīm ﴿١﴾ Kitab (Alquran) ini tidak ada keraguan padanya; petunjuk bagi mereka yang bertakwa ﴿٢﴾ (Yaitu) mereka yang beriman kepada yang gaib, melaksanakan salat, dan menginfakkan6) sebagian rezeki yang Kami berikan kepada mereka ﴿٣﴾ dan mereka beriman kepada (Alquran) yang diturunkan kepadamu (Muhammad) dan (kitab-kitab) yang telah diturunkan sebelum engkau,7) dan mereka yakin akan adanya akhirat ﴿٤﴾ Merekalah yang mendapat petunjuk dari Tuhannya, dan mereka itulah orang-orang yang beruntung ﴿٥﴾",
+    "notes": "Dibaca 1x",
+    "source": "QS. Al-Baqarah: 1–5"
+  },
+  {
+    "title": "Ayat Kursi",
     "arabic": "ٱللَّهُ لَآ إِلَٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ ۚ لَا تَأْخُذُهُۥ سِنَةٌ وَلَا نَوْمٌ ۚ لَّهُۥ مَا فِى ٱلسَّمَٰوَٰتِ وَمَا فِى ٱلْأَرْضِ ۗ مَن ذَا ٱلَّذِى يَشْفَعُ عِندَهُۥٓ إِلَّا بِإِذْنِهِۦ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَىْءٍ مِّنْ عِلْمِهِۦٓ إِلَّا بِمَا شَآءَ ۚ وَسِعَ كُرْسِيُّهُ ٱلسَّمَٰوَٰتِ وَٱلْأَرْضَ ۖ وَلَا يَـُٔودُهُۥ حِفْظُهُمَا ۚ وَهُوَ ٱلْعَلِىُّ ٱلْعَظِيمُ",
     "latin": "Allāhu lā ilāha illā huwalḥayyul qayyụm, lā ta`khużuhụ sinatuw wa lā na`ụm, lahụ mā fis samāwāti wa mā fil arḍ, man żallażī yasyfa'u 'indahū illā bi`iżnih, ya'lamu mā baina aidīhim wa mā khalfahum, wa lā yuḥīṭụna bisyai`im min 'ilmihī illā bimā syā`, wasi'a kursiyyuhus samāwāti wal arḍ, wa lā ya`ụduhụ ḥifẓuhumā, wa huwal 'aliyyul 'aẓīm",
     "translation": "Allah, tidak ada Tuhan (yang berhak disembah) melainkan Dia Yang Hidup kekal lagi terus menerus mengurus (makhluk-Nya); tidak mengantuk dan tidak tidur. Kepunyaan-Nya apa yang di langit dan di bumi. Tiada yang dapat memberi syafa'at di sisi Allah tanpa izin-Nya? Allah mengetahui apa-apa yang di hadapan mereka dan di belakang mereka, dan mereka tidak mengetahui apa-apa dari ilmu Allah melainkan apa yang dikehendaki-Nya. Kursi Allah meliputi langit dan bumi. Dan Allah tidak merasa berat memelihara keduanya, dan Allah Maha Tinggi lagi Maha Besar.",
@@ -9,28 +25,36 @@
     "source": "HR. at-Tirmidzi: 2879"
   },
   {
+    "title": "Al-Baqarah (Ayat 285–286)",
+    "arabic": "ءَامَنَ ٱلرَّسُولُ بِمَآ أُنزِلَ إِلَيۡهِ مِن رَّبِّهِۦ وَٱلۡمُؤۡمِنُونَۚ كُلٌّ ءَامَنَ بِٱللَّهِ وَمَلَـٰٓئِكَتِهِۦ وَكُتُبِهِۦ وَرُسُلِهِۦ لَا نُفَرِّقُ بَيۡنَ أَحَدٖ مِّن رُّسُلِهِۦۚ وَقَالُواْ سَمِعۡنَا وَأَطَعۡنَاۖ غُفۡرَانَكَ رَبَّنَا وَإِلَيۡكَ ٱلۡمَصِيرُ ﴿٢٨٥﴾ لَا يُكَلِّفُ ٱللَّهُ نَفۡسًا إِلَّا وُسۡعَهَاۚ لَهَا مَا كَسَبَتۡ وَعَلَيۡهَا مَا ٱكۡتَسَبَتۡۗ رَبَّنَا لَا تُؤَاخِذۡنَآ إِن نَّسِينَآ أَوۡ أَخۡطَأۡنَاۚ رَبَّنَا وَلَا تَحۡمِلۡ عَلَيۡنَآ إِصۡرٗا كَمَا حَمَلۡتَهُۥ عَلَى ٱلَّذِينَ مِن قَبۡلِنَاۚ رَبَّنَا وَلَا تُحَمِّلۡنَا مَا لَا طَاقَةَ لَنَا بِهِۦۖ وَٱعۡفُ عَنَّا وَٱغۡفِرۡ لَنَا وَٱرۡحَمۡنَآۚ أَنتَ مَوۡلَىٰنَا فَٱنصُرۡنَا عَلَى ٱلۡقَوۡمِ ٱلۡكَٰفِرِينَ ﴿٢٨٦﴾",
+    "latin": "",
+    "translation": "Rasul (Muhammad) beriman kepada apa yang diturunkan kepadanya (Alquran) dari Tuhannya, demikian pula orang-orang yang beriman. Semua beriman kepada Allah, malaikat-malaikat-Nya, kitab-kitab-Nya, dan rasul-rasul-Nya. (Mereka berkata), \"Kami tidak membeda-bedakan seorang pun dari rasul-rasul-Nya.\" Dan mereka berkata, \"Kami dengar dan kami taat. Ampunilah kami Ya Tuhan kami, dan kepada-Mu tempat (kami) kembali ﴿٢٨٥﴾ Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya. Dia mendapat (pahala) dari kebajikan yang dikerjakannya dan dia mendapat (siksa) dari (kejahatan) yang diperbuatnya. (Mereka berdoa), \"Ya Tuhan kami, janganlah Engkau hukum kami jika kami lupa atau kami melakukan kesalahan. Ya Tuhan kami, janganlah Engkau bebani kami dengan beban yang berat sebagaimana Engkau bebankan kepada orang-orang sebelum kami. Ya Tuhan kami, janganlah Engkau pikulkan kepada kami apa yang tidak sanggup kami memikulnya. Maafkanlah kami, ampunilah kami, dan rahmatilah kami. Engkaulah pelindung kami, maka tolonglah kami menghadapi orang-orang kafir ﴿٢٨٦﴾",
+    "notes": "Dibaca 1x",
+    "source": "QS. Al-Baqarah: 285–286"
+  },
+  {
     "title": "Al-Ikhlas",
-    "arabic": "قُلْ هُوَ ٱللَّهُ أَحَدٌ (1) ٱللَّهُ ٱلصَّمَدُ (2) لَمْ يَلِدْ وَلَمْ يُولَدْ (3) وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ (4)",
+    "arabic": "قُلۡ هُوَ ٱللَّهُ أَحَدٌ ﴿١﴾ ٱللَّهُ ٱلصَّمَدُ ﴿٢﴾ لَمۡ يَلِدۡ وَلَمۡ يُولَدۡ ﴿٣﴾ وَلَمۡ يَكُن لَّهُۥ كُفُوًا أَحَدُۢ ﴿٤﴾",
     "latin": "Qul huwallāhu aḥad (1) Allāhuṣ ṣamad (2) lam yalid wa lam yụlad (3) wa lam yakul lahụ kufuwan aḥad (4)",
-    "translation": "Katakanlah: \"Dialah Allah, Yang Maha Esa. Allah adalah Tuhan yang bergantung kepada-Nya segala sesuatu. Dia tiada beranak dan tidak pula diperanakkan, dan tidak ada seorangpun yang setara dengan Dia\".",
+    "translation": "Katakanlah (Muhammad), \"Dialah Allah, Yang Maha Esa ﴿١﴾ Allah tempat meminta segala sesuatu ﴿٢﴾ (Allah) tidak beranak dan tidak pula diperanakkan ﴿٣﴾ Dan tidak ada sesuatu yang setara dengan Dia ﴿٤﴾",
     "notes": "Dibaca 3x",
     "fawaid": "Rasulullah shallallahu 'alaihi wa sallam bersabda: Katakanlah (bacalah surat), Qulhuwallahu ahad, dan Al-Muawwidzatain (Al-Falaq dan An-Naas) ketika petang dan pagi tiga kali, maka dengan ayat ini akan mencukupkanmu (menjagamu) dari segala sesuatu.",
     "source": "HR. Abu Dawud No. 4241"
   },
   {
     "title": "Al-Falaq",
-    "arabic": "قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ (1) مِن شَرِّ مَا خَلَقَ (2) وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ (3) وَمِن شَرِّ ٱلنَّفَّٰثَٰتِ فِى ٱلْعُقَدِ (4) وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ (5)",
+    "arabic": "قُلۡ أَعُوذُ بِرَبِّ ٱلۡفَلَقِ ﴿١﴾ مِن شَرِّ مَا خَلَقَ ﴿٢﴾ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ﴿٣﴾ وَمِن شَرِّ ٱلنَّفَّـٰثَٰتِ فِي ٱلۡعُقَدِ ﴿٤﴾ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ ﴿٥﴾",
     "latin": "Qul a'ụżu birabbil falaq (1) min syarri mā khalaq (2) wa min syarri gāsiqin iżā waqab (3) wa min syarrin naffāṡāti fil 'uqad (4) wa min syarri ḥāsidin iżā ḥasad (5)",
-    "translation": "Katakanlah: \"Aku berlindung kepada Tuhan Yang Menguasai subuh, dari kejahatan makhluk-Nya, dan dari kejahatan malam apabila telah gelap gulita, dan dari kejahatan wanita-wanita tukang sihir yang menghembus pada buhul-buhul, dan dari kejahatan pendengki bila ia dengki\".",
+    "translation": "Katakanlah, \"Aku berlindung kepada Tuhan yang menguasai subuh (fajar) ﴿١﴾ dari kejahatan (makhluk yang) Dia ciptakan ﴿٢﴾ dan dari kejahatan malam apabila telah gelap gulita ﴿٣﴾ dan dari kejahatan (perempuan-perempuan) penyihir yang meniup pada buhul-buhul (talinya) ﴿٤﴾ dan dari kejahatan orang yang dengki apabila dia dengki ﴿٥﴾",
     "notes": "Dibaca 3x",
     "fawaid": "Rasulullah shallallahu 'alaihi wa sallam bersabda: Katakanlah (bacalah surat), Qulhuwallahu ahad, dan Al-Muawwidzatain (Al-Falaq dan An-Naas) ketika petang dan pagi tiga kali, maka dengan ayat ini akan mencukupkanmu (menjagamu) dari segala sesuatu.",
     "source": "HR. Abu Dawud No. 4241"
   },
   {
     "title": "An-Naas",
-    "arabic": "قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ (1) مَلِكِ ٱلنَّاسِ (2) إِلَٰهِ ٱلنَّاسِ (3) مِن شَرِّ ٱلْوَسْوَاسِ ٱلْخَنَّاسِ (4) ٱلَّذِى يُوَسْوِسُ فِى صُدُورِ ٱلنَّاسِ (5) مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ (6)",
+    "arabic": "قُلۡ أَعُوذُ بِرَبِّ ٱلنَّاسِ ﴿١﴾ مَلِكِ ٱلنَّاسِ ﴿٢﴾ إِلَٰهِ ٱلنَّاسِ ﴿٣﴾ مِن شَرِّ ٱلۡوَسۡوَاسِ ٱلۡخَنَّاسِ ﴿٤﴾ ٱلَّذِي يُوَسۡوِسُ فِي صُدُورِ ٱلنَّاسِ ﴿٥﴾ مِنَ ٱلۡجِنَّةِ وَٱلنَّاسِ ﴿٦﴾",
     "latin": "Qul a'ụżu birabbin nās (1) malikin nās (2) ilāhin nās (3) min syarril waswāsil khannās (4) allażī yuwaswisu fī ṣudụrin nās (5) minal jinnati wan nās (6)",
-    "translation": "Katakanlah: “Aku berlindung kepada Tuhan (yang memelihara dan menguasai) manusia. (1) Raja manusia. (2) Sembahan manusia. (3) Dari kejahatan (bisikan) syaitan yang biasa bersembunyi, (4) yang membisikkan (kejahatan) ke dalam dada manusia, (5) dari (golongan) jin dan manusia. (6)",
+    "translation": "Katakanlah, \"Aku berlindung kepada Tuhannya manusia ﴿١﴾ Raja manusia ﴿٢﴾ sembahan manusia ﴿٣﴾ dari kejahatan (bisikan) setan yang bersembunyi ﴿٤﴾ yang membisikkan (kejahatan) ke dalam dada manusia ﴿٥﴾ dari (golongan) jin dan manusia ﴿٦﴾",
     "notes": "Dibaca 3x",
     "fawaid": "Rasulullah shallallahu 'alaihi wa sallam bersabda: Katakanlah (bacalah surat), Qulhuwallahu ahad, dan Al-Muawwidzatain (Al-Falaq dan An-Naas) ketika petang dan pagi tiga kali, maka dengan ayat ini akan mencukupkanmu (menjagamu) dari segala sesuatu.",
     "source": "HR. Abu Dawud No. 4241"

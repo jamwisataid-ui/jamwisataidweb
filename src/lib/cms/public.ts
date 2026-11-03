@@ -1,21 +1,23 @@
 import { cache } from "react";
 import { unstable_cache } from "next/cache";
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, ne } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
   accommodations,
   articles,
+  bookings,
   contentEntries,
   departures,
   itineraryDays,
   packageItems,
   packages,
+  registrations,
 } from "@/db/schema";
 import { umrahPackages } from "@/data/jamwisata";
 import type { TravelPackage } from "@/types/jamwisata";
 import { filterPackagesByCategory, type ManagedPackageCategory } from "./package-category";
-import { isDepartureSelectable } from "./departure-availability";
+import { calculateRemainingSeats, isDepartureSelectable } from "./departure-availability";
 
 export { packagePublicPath } from "./package-category";
 
@@ -68,13 +70,31 @@ async function queryPackages(): Promise<TravelPackage[]> {
     ]);
 
     const departureIds = departureRows.map((item) => item.id);
-    const hotelRows = departureIds.length
-      ? await db.select().from(accommodations).where(inArray(accommodations.departureId, departureIds)).orderBy(asc(accommodations.sortOrder))
-      : [];
+    const [hotelRows, activeRegistrationRows] = await Promise.all([
+      departureIds.length
+        ? db.select().from(accommodations).where(inArray(accommodations.departureId, departureIds)).orderBy(asc(accommodations.sortOrder))
+        : [],
+      departureIds.length
+        ? db.select({ departureId: bookings.departureId, value: count(registrations.id) })
+          .from(registrations)
+          .innerJoin(bookings, eq(registrations.bookingId, bookings.id))
+          .where(and(
+            inArray(bookings.departureId, departureIds),
+            ne(registrations.status, "cancelled"),
+            ne(bookings.status, "cancelled"),
+          ))
+          .groupBy(bookings.departureId)
+        : [],
+    ]);
+    const activeRegistrationCount = new Map(activeRegistrationRows.map((row) => [row.departureId, Number(row.value)]));
+    const departuresWithAvailability = departureRows.map((departure) => ({
+      ...departure,
+      remainingSeats: calculateRemainingSeats(departure.capacity, activeRegistrationCount.get(departure.id) ?? 0),
+    }));
 
     const todayJakarta = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     return packageRows.map((item) => {
-      const packageDepartures = departureRows.filter((candidate) => candidate.packageId === item.id);
+      const packageDepartures = departuresWithAvailability.filter((candidate) => candidate.packageId === item.id);
       const futureDepartures = packageDepartures.filter((candidate) => candidate.departureDate >= todayJakarta && candidate.status !== "closed");
       const selectableDepartures = futureDepartures.filter(isDepartureSelectable);
       const departure = selectableDepartures[0] ?? futureDepartures[0] ?? packageDepartures.at(-1);
@@ -93,12 +113,12 @@ async function queryPackages(): Promise<TravelPackage[]> {
         returnDate: candidate.returnDate ?? undefined,
         price: Number(candidate.price),
         quota: candidate.capacity ?? undefined,
-        remainingQuota: candidate.availableSeats ?? undefined,
-        status: !isDepartureSelectable(candidate) && candidate.status !== "coming-soon" ? "sold-out" as const : candidate.status === "limited" ? "limited" as const : candidate.status === "coming-soon" ? "coming-soon" as const : "available" as const,
+        remainingQuota: candidate.remainingSeats ?? undefined,
+        status: candidate.status === "coming-soon" ? "coming-soon" as const : !isDepartureSelectable(candidate) ? "sold-out" as const : candidate.status === "limited" ? "limited" as const : "available" as const,
         selectable: isDepartureSelectable(candidate),
       }));
       const activePrices = selectableDepartures.map((candidate) => Number(candidate.price)).filter(Number.isFinite);
-      const packageStatus = selectableDepartures.some((candidate) => candidate.status === "open")
+      const packageStatus = selectableDepartures.some((candidate) => candidate.status !== "limited")
         ? "available" as const
         : selectableDepartures.some((candidate) => candidate.status === "limited")
           ? "limited" as const
