@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 import {
   createAccountAction,
+  createExpenseCategoryAction,
   assignRoomAction,
   createAgentAction,
   createBookingAction,
@@ -24,9 +25,11 @@ import {
   saveInventoryItemAction,
   seedManagementDefaultsAction,
   setManagementRecordStatusAction,
+  setExpenseCategoryStatusAction,
   toggleReportInclusionAction,
   updateAccountAction,
   updateAgentAction,
+  updateExpenseCategoryAction,
   updatePilgrimAction,
 } from "@/lib/management/actions";
 import { DOCUMENT_NUMBER_PATTERN, formatDocumentNumber, generateDefaultRoomNumber, rupiah } from "@/lib/management/domain";
@@ -315,17 +318,47 @@ export function BookingCancellationForm({ bookingId }: { bookingId: string }) {
 
 export function CashForm({ accounts, packages, categories }: { accounts: Array<{ id: string; name: string }>; packages: Array<{ id: string; name: string }>; categories: Array<{ id: string; name: string }> }) {
   const [state, action, pending] = useActionState(recordCashAction, managementInitialState);
+  const [categoryState, categoryAction, categoryPending] = useActionState(createExpenseCategoryAction, managementInitialState);
   const [localNow] = useState(() => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16));
-  return <form action={action} className="management-form"><Feedback state={state} /><div className="management-form-grid two">
-    <label><span>Jenis transaksi</span><select name="direction"><option value="in">Kas masuk</option><option value="out">Kas keluar</option><option value="transfer">Transfer internal</option></select></label>
+  const [direction, setDirection] = useState<"in" | "out" | "transfer">("in");
+  const [categoryOptions, setCategoryOptions] = useState(categories);
+  const [categoryId, setCategoryId] = useState("");
+  const [newCategoryName, setNewCategoryName] = useState("");
+  useEffect(() => {
+    if (!categoryState.ok || !categoryState.createdCategory) return;
+    setCategoryOptions((current) => current.some((item) => item.id === categoryState.createdCategory!.id) ? current : [...current, categoryState.createdCategory!].sort((a, b) => a.name.localeCompare(b.name, "id-ID")));
+    setCategoryId(categoryState.createdCategory.id);
+    setNewCategoryName("");
+  }, [categoryState]);
+  return <form action={action} encType="multipart/form-data" className="management-form"><Feedback state={state} /><Feedback state={categoryState} /><div className="management-form-grid two">
+    <label><span>Jenis transaksi</span><select name="direction" value={direction} onChange={(event) => setDirection(event.target.value as typeof direction)}><option value="in">Kas masuk</option><option value="out">Kas keluar (bayar ke pihak luar)</option><option value="transfer">Pindah dana antar rekening Jam Wisata</option></select></label>
     <label><span>Rekening/kas asal *</span><select name="accountId" required><option value="">Pilih akun</option>{accounts.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-    <label><span>Rekening tujuan <i>untuk transfer</i></span><select name="destinationAccountId"><option value="">Tidak ada</option>{accounts.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+    {direction === "transfer" ? <label><span>Rekening tujuan (internal Jam Wisata) *</span><select name="destinationAccountId" required><option value="">Pilih rekening tujuan</option>{accounts.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label> : null}
     <label><span>Nominal *</span><input name="amount" inputMode="numeric" required /></label>
     <label><span>Tanggal *</span><input name="transactionAt" type="datetime-local" defaultValue={localNow} required /></label>
     <label><span>Paket <i>opsional</i></span><select name="packageId"><option value="">Umum</option>{packages.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-    <label><span>Kategori biaya</span><select name="categoryId"><option value="">Tanpa kategori</option>{categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+    {direction === "out" ? <>
+      <label><span>Kategori biaya *</span><select name="categoryId" value={categoryId} onChange={(event) => setCategoryId(event.target.value)} required><option value="">Pilih kategori</option>{categoryOptions.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}<option value="__new__">+ Tambah kategori baru</option></select></label>
+      {categoryId === "__new__" ? <label><span>Nama kategori baru *</span><span className="management-inline-action"><input name="name" value={newCategoryName} onChange={(event) => setNewCategoryName(event.target.value)} placeholder="Contoh: Handling bandara" /><button type="submit" formAction={categoryAction} formNoValidate disabled={categoryPending || newCategoryName.trim().length < 2}>{categoryPending ? "Menyimpan…" : "Tambah"}</button></span></label> : null}
+      <label><span>Nama penerima <i>opsional</i></span><input name="recipientName" placeholder="Hotel, maskapai, vendor, agen, atau jamaah" /></label>
+      <label><span>Bank penerima <i>opsional</i></span><input name="recipientBank" placeholder="Nama bank" /></label>
+      <label><span>No. rekening penerima <i>opsional</i></span><input name="recipientAccountNumber" inputMode="numeric" /></label>
+      <label><span>Atas nama <i>opsional</i></span><input name="recipientAccountHolder" /></label>
+      <label className="span-two"><span>Bukti transfer <i>opsional, maks. 10 MB</i></span><input name="transferProof" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" /></label>
+    </> : null}
     <label><span>Keterangan *</span><input name="description" required /></label>
   </div><SubmitButton>{pending ? "Mencatat…" : "Simpan transaksi"}</SubmitButton></form>;
+}
+
+function ExpenseCategoryRow({ category }: { category: { id: string; name: string; status: "active" | "archived" } }) {
+  const [updateState, updateAction, updatePending] = useActionState(updateExpenseCategoryAction, managementInitialState);
+  const [statusState, statusAction, statusPending] = useActionState(setExpenseCategoryStatusAction, managementInitialState);
+  return <div className="management-category-row"><Feedback state={updateState} /><Feedback state={statusState} /><form action={updateAction}><input type="hidden" name="id" value={category.id} /><input name="name" defaultValue={category.name} aria-label={`Nama kategori ${category.name}`} required /><button disabled={updatePending}>{updatePending ? "Menyimpan…" : "Simpan nama"}</button></form><form action={statusAction}><input type="hidden" name="id" value={category.id} /><input type="hidden" name="status" value={category.status === "active" ? "archived" : "active"} /><button className={category.status === "active" ? "danger" : undefined} disabled={statusPending}>{statusPending ? "Memproses…" : category.status === "active" ? "Nonaktifkan" : "Aktifkan"}</button></form></div>;
+}
+
+export function ExpenseCategoryManager({ categories }: { categories: Array<{ id: string; name: string; status: "active" | "archived" }> }) {
+  const [state, action, pending] = useActionState(createExpenseCategoryAction, managementInitialState);
+  return <div className="management-category-manager"><form action={action} className="management-form"><Feedback state={state} /><div className="management-inline-action"><input name="name" placeholder="Nama kategori biaya baru" required /><button disabled={pending}>{pending ? "Menambahkan…" : "Tambah kategori"}</button></div></form><div>{categories.map((category) => <ExpenseCategoryRow key={category.id} category={category} />)}</div></div>;
 }
 
 export function StockForm({ items }: { items: Array<{ id: string; name: string; currentStock: number }> }) {

@@ -33,8 +33,8 @@ import { withManagementTransaction } from "@/db/transaction";
 import { requireAdminSession } from "@/lib/admin-session";
 import { issueTransactionDocument } from "./issue-document";
 import { parseDocumentSequenceInput, paymentStatus, rupiah } from "./domain";
-import { deletePrivateObject } from "./storage";
-import { agentSchema, bookingSchema, cashSchema, fields, type ManagementActionState, paymentSchema, pilgrimSchema, stockMovementSchema } from "./validation";
+import { deletePrivateObject, privateObjectKey, putPrivateObject, validatePrivateFile } from "./storage";
+import { agentSchema, bookingSchema, cashSchema, expenseCategorySchema, fields, type ManagementActionState, paymentSchema, pilgrimSchema, stockMovementSchema } from "./validation";
 import { findMatchingReferralLead, latestLeadPerPilgrim } from "./referral-attribution";
 
 function raw(formData: FormData) {
@@ -514,18 +514,130 @@ export async function recordPaymentAction(_state: ManagementActionState, formDat
 export async function recordCashAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
   const parsed = cashSchema.safeParse(raw(formData));
   if (!parsed.success) return { ok: false, message: "Periksa data transaksi.", errors: fields(parsed.error) };
-  if (parsed.data.direction === "transfer" && (!parsed.data.destinationAccountId || parsed.data.destinationAccountId === parsed.data.accountId)) {
-    return { ok: false, message: "Rekening tujuan transfer harus berbeda." };
-  }
+  const proof = formData.get("transferProof");
+  let uploadedObjectKey = "";
   try {
     const session = await requireAdminSession();
     const id = randomUUID();
+    let proofMetadata: {
+      transferProofObjectKey: string;
+      transferProofOriginalName: string;
+      transferProofMimeType: string;
+      transferProofSizeBytes: number;
+    } | undefined;
+    if (parsed.data.direction === "out" && proof instanceof File && proof.size > 0) {
+      const bytes = new Uint8Array(await proof.arrayBuffer());
+      validatePrivateFile(bytes, proof.type, proof.size);
+      const extension = proof.name.split(".").pop() ?? "bin";
+      uploadedObjectKey = privateObjectKey("cash-transactions", id, extension);
+      await putPrivateObject(uploadedObjectKey, bytes, proof.type);
+      proofMetadata = {
+        transferProofObjectKey: uploadedObjectKey,
+        transferProofOriginalName: proof.name,
+        transferProofMimeType: proof.type,
+        transferProofSizeBytes: proof.size,
+      };
+    }
     await withManagementTransaction(async (tx) => {
-      await tx.insert(cashTransactions).values({ id, accountId: parsed.data.accountId, destinationAccountId: parsed.data.destinationAccountId || null, packageId: parsed.data.packageId || null, categoryId: parsed.data.categoryId || null, direction: parsed.data.direction, kind: "manual", amount: parsed.data.amount, transactionAt: new Date(parsed.data.transactionAt), description: parsed.data.description, createdBy: session.user.id });
+      if (parsed.data.direction === "out") {
+        const category = await tx.query.expenseCategories.findFirst({ where: and(eq(expenseCategories.id, parsed.data.categoryId!), eq(expenseCategories.status, "active")) });
+        if (!category) throw new Error("Kategori biaya tidak tersedia. Pilih kategori aktif lainnya.");
+      }
+      await tx.insert(cashTransactions).values({
+        id,
+        accountId: parsed.data.accountId,
+        destinationAccountId: parsed.data.direction === "transfer" ? parsed.data.destinationAccountId || null : null,
+        packageId: parsed.data.packageId || null,
+        categoryId: parsed.data.direction === "out" ? parsed.data.categoryId || null : null,
+        direction: parsed.data.direction,
+        kind: "manual",
+        amount: parsed.data.amount,
+        transactionAt: new Date(parsed.data.transactionAt),
+        description: parsed.data.description,
+        recipientName: parsed.data.direction === "out" ? parsed.data.recipientName || null : null,
+        recipientBank: parsed.data.direction === "out" ? parsed.data.recipientBank || null : null,
+        recipientAccountNumber: parsed.data.direction === "out" ? parsed.data.recipientAccountNumber || null : null,
+        recipientAccountHolder: parsed.data.direction === "out" ? parsed.data.recipientAccountHolder || null : null,
+        ...proofMetadata,
+        createdBy: session.user.id,
+      });
       await tx.insert(auditLogs).values({ actorId: session.user.id, action: "create", entityType: "cash_transaction", entityId: id, summary: `${parsed.data.direction === "in" ? "Kas masuk" : parsed.data.direction === "out" ? "Kas keluar" : "Transfer"} dicatat` });
     });
     refresh();
     return { ok: true, message: "Transaksi kas berhasil dicatat.", redirectTo: `/admin/manajemen/keuangan/${id}` };
+  } catch (error) {
+    if (uploadedObjectKey) await deletePrivateObject(uploadedObjectKey).catch((storageError) => console.error("Cash transfer proof cleanup failed:", storageError));
+    return failure(error);
+  }
+}
+
+class ExpenseCategoryConflictError extends Error {}
+
+function expenseCategoryConflict(error: unknown): boolean {
+  if (error instanceof ExpenseCategoryConflictError) return true;
+  if (!error || typeof error !== "object") return false;
+  if ("code" in error && error.code === "23505") return true;
+  return "cause" in error ? expenseCategoryConflict(error.cause) : false;
+}
+
+function expenseCategoryFailure(error: unknown): ManagementActionState {
+  if (expenseCategoryConflict(error)) return { ok: false, message: "Kategori biaya dengan nama tersebut sudah ada.", errors: { name: ["Gunakan nama kategori lain."] } };
+  return failure(error);
+}
+
+export async function createExpenseCategoryAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
+  const parsed = expenseCategorySchema.safeParse(raw(formData));
+  if (!parsed.success) return { ok: false, message: "Periksa nama kategori.", errors: fields(parsed.error) };
+  try {
+    const session = await requireAdminSession();
+    const created = await withManagementTransaction(async (tx) => {
+      const existing = await tx.select({ id: expenseCategories.id }).from(expenseCategories)
+        .where(sql`lower(${expenseCategories.name}) = lower(${parsed.data.name})`).limit(1);
+      if (existing.length) throw new ExpenseCategoryConflictError("Kategori biaya dengan nama tersebut sudah ada.");
+      const [category] = await tx.insert(expenseCategories).values({ name: parsed.data.name }).returning({ id: expenseCategories.id, name: expenseCategories.name });
+      await tx.insert(auditLogs).values({ actorId: session.user.id, action: "create", entityType: "expense_category", entityId: category.id, summary: `Kategori biaya ${category.name} ditambahkan` });
+      return category;
+    });
+    refresh();
+    return { ok: true, message: "Kategori biaya berhasil ditambahkan.", createdCategory: created };
+  } catch (error) {
+    return expenseCategoryFailure(error);
+  }
+}
+
+export async function updateExpenseCategoryAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
+  const parsed = expenseCategorySchema.safeParse(raw(formData));
+  if (!parsed.success || !parsed.data.id) return { ok: false, message: "Periksa nama kategori.", errors: parsed.success ? { id: ["Kategori tidak valid."] } : fields(parsed.error) };
+  try {
+    const session = await requireAdminSession();
+    await withManagementTransaction(async (tx) => {
+      const existing = await tx.select({ id: expenseCategories.id }).from(expenseCategories)
+        .where(and(sql`lower(${expenseCategories.name}) = lower(${parsed.data.name})`, ne(expenseCategories.id, parsed.data.id!))).limit(1);
+      if (existing.length) throw new ExpenseCategoryConflictError("Kategori biaya dengan nama tersebut sudah ada.");
+      const [updated] = await tx.update(expenseCategories).set({ name: parsed.data.name, updatedAt: new Date() }).where(eq(expenseCategories.id, parsed.data.id!)).returning({ id: expenseCategories.id });
+      if (!updated) throw new Error("Kategori biaya tidak ditemukan.");
+      await tx.insert(auditLogs).values({ actorId: session.user.id, action: "update", entityType: "expense_category", entityId: parsed.data.id!, summary: `Kategori biaya diubah menjadi ${parsed.data.name}` });
+    });
+    refresh();
+    return { ok: true, message: "Nama kategori biaya berhasil diperbarui." };
+  } catch (error) {
+    return expenseCategoryFailure(error);
+  }
+}
+
+export async function setExpenseCategoryStatusAction(_state: ManagementActionState, formData: FormData): Promise<ManagementActionState> {
+  const id = String(formData.get("id") ?? "");
+  const status = String(formData.get("status") ?? "");
+  if (!/^[0-9a-f-]{36}$/i.test(id) || !["active", "archived"].includes(status)) return { ok: false, message: "Data kategori tidak valid." };
+  try {
+    const session = await requireAdminSession();
+    await withManagementTransaction(async (tx) => {
+      const [updated] = await tx.update(expenseCategories).set({ status: status as "active" | "archived", updatedAt: new Date() }).where(eq(expenseCategories.id, id)).returning({ id: expenseCategories.id });
+      if (!updated) throw new Error("Kategori biaya tidak ditemukan.");
+      await tx.insert(auditLogs).values({ actorId: session.user.id, action: "status", entityType: "expense_category", entityId: id, summary: `Kategori biaya ${status === "active" ? "diaktifkan" : "dinonaktifkan"}` });
+    });
+    refresh();
+    return { ok: true, message: status === "active" ? "Kategori biaya diaktifkan." : "Kategori biaya dinonaktifkan." };
   } catch (error) { return failure(error); }
 }
 

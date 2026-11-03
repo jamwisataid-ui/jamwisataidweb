@@ -50,6 +50,15 @@ describe("laporan laba/rugi", () => {
     expect(report.netProfit).toBe(0);
   });
 
+  it("menampilkan kategori biaya pada kas keluar manual", () => {
+    const report = computeProfitLoss([
+      transaction({ kind: "manual", direction: "out", categoryName: "Hotel", amount: 7_500_000 }),
+    ]);
+
+    expect(report.rows[0].categoryLabel).toBe("Hotel");
+    expect(report.operatingExpenses).toBe(7_500_000);
+  });
+
   it("memfilter periode dan paket sambil tetap menyertakan overhead pada laporan keseluruhan", () => {
     const rows = [
       transaction({ id: "a", transactionAt: "2026-08-31T23:00:00+07:00", direction: "in", kind: "payment", amount: 10_000_000 }),

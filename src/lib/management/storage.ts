@@ -52,7 +52,7 @@ export function validatePrivateFile(bytes: Uint8Array, mimeType: string, sizeByt
   if (!isValid) throw new Error("Isi file tidak sesuai dengan tipe JPG, PNG, WebP, atau PDF yang dipilih.");
 }
 
-export function privateObjectKey(scope: "pilgrims" | "payments" | "documents" | "settings", entityId: string, extension = "bin") {
+export function privateObjectKey(scope: "pilgrims" | "payments" | "documents" | "settings" | "cash-transactions", entityId: string, extension = "bin") {
   const safeExtension = extension.toLowerCase().replace(/[^a-z0-9]/g, "") || "bin";
   return `private/${scope}/${entityId}/${randomUUID()}.${safeExtension}`;
 }

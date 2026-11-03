@@ -85,6 +85,22 @@ export const cashSchema = z.object({
   amount: money.positive(),
   transactionAt: z.string().min(8),
   description: requiredText("Keterangan"),
+  recipientName: z.string().trim().max(160).optional(),
+  recipientBank: z.string().trim().max(120).optional(),
+  recipientAccountNumber: z.string().trim().max(80).optional(),
+  recipientAccountHolder: z.string().trim().max(160).optional(),
+}).superRefine((data, context) => {
+  if (data.direction === "transfer" && (!data.destinationAccountId || data.destinationAccountId === data.accountId)) {
+    context.addIssue({ code: "custom", path: ["destinationAccountId"], message: "Pilih rekening tujuan internal yang berbeda." });
+  }
+  if (data.direction === "out" && !data.categoryId) {
+    context.addIssue({ code: "custom", path: ["categoryId"], message: "Kategori biaya wajib dipilih untuk kas keluar." });
+  }
+});
+
+export const expenseCategorySchema = z.object({
+  id: z.string().uuid().optional(),
+  name: requiredText("Nama kategori").pipe(z.string().max(120, "Nama kategori maksimal 120 karakter.")),
 });
 
 export const stockMovementSchema = z.object({
@@ -95,7 +111,7 @@ export const stockMovementSchema = z.object({
   note: z.string().trim().optional(),
 });
 
-export type ManagementActionState = { ok: boolean; message: string; errors?: Record<string, string[]>; redirectTo?: string };
+export type ManagementActionState = { ok: boolean; message: string; errors?: Record<string, string[]>; redirectTo?: string; createdCategory?: { id: string; name: string } };
 
 export function fields(error: z.ZodError) {
   return error.flatten().fieldErrors as Record<string, string[]>;

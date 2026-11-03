@@ -51,7 +51,7 @@ function categoryLabel(transaction: ProfitLossTransaction) {
   if (transaction.kind === "refund") return "Refund jamaah";
   if (transaction.kind === "commission") return "Komisi agen";
   if (transaction.kind === "expense") return transaction.categoryName || "Biaya operasional";
-  if (transaction.kind === "manual") return transaction.direction === "in" ? "Pendapatan lain" : "Biaya lain";
+  if (transaction.kind === "manual") return transaction.direction === "in" ? "Pendapatan lain" : transaction.categoryName || "Biaya lain";
   return transaction.categoryName || transaction.kind;
 }
 

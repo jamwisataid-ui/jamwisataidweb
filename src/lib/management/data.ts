@@ -27,6 +27,7 @@ import {
   registrations,
 } from "@/db/schema";
 import { computeDepartureReports, dueDate, paymentStatus, upcomingBirthday } from "./domain";
+import { calculateAccountBalance } from "./cash-ledger";
 import { hasMinimumRequiredPilgrimDocuments } from "./pilgrim-documents";
 
 export async function getManagementContext() {
@@ -96,15 +97,10 @@ export async function getManagementContext() {
     agent: booking.agentId ? agentsById.get(booking.agentId) : undefined,
   }));
 
-  const accountBalances = accountRows.map((account) => {
-    let balance = 0;
-    for (const transaction of cashRows) {
-      if (transaction.isIncludedInReports === false) continue;
-      if (transaction.accountId === account.id) balance += transaction.direction === "in" ? transaction.amount : -transaction.amount;
-      if (transaction.direction === "transfer" && transaction.destinationAccountId === account.id) balance += transaction.amount;
-    }
-    return { ...account, balance };
-  });
+  const accountBalances = accountRows.map((account) => ({
+    ...account,
+    balance: calculateAccountBalance(account.id, cashRows),
+  }));
 
   const packageFinancials = packageRows.map((pkg) => {
     const packageRegistrationIds = new Set(registrationSummaries.filter((item) => item.status === "active" && item.package?.id === pkg.id).map((item) => item.id));
