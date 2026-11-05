@@ -203,7 +203,7 @@ export default async function PaketUmrohHubPage() {
                     <div className="mt-4 space-y-2.5 text-xs text-[#59616D]">
                       <div className="flex items-center gap-2">
                         <Calendar className="size-4 text-[#D5A12B] shrink-0" />
-                        <span>{pkg.departures && pkg.departures.length > 1 ? <><strong>{pkg.departures.length} jadwal keberangkatan</strong><br /><small>Mulai {pkg.departures[0].dateLabel}{pkg.departures[0].remainingQuota != null ? ` · Sisa ${pkg.departures[0].remainingQuota}${pkg.departures[0].quota != null ? ` dari ${pkg.departures[0].quota}` : ""} pax` : ""}</small></> : <>Jadwal: <strong>{pkg.departureDate}</strong>{pkg.departures?.[0]?.remainingQuota != null ? <small className="ml-1">· Sisa {pkg.departures[0].remainingQuota}{pkg.departures[0].quota != null ? ` dari ${pkg.departures[0].quota}` : ""} pax</small> : null}</>}</span>
+                        <span>{pkg.departures && pkg.departures.length > 1 ? <><strong>{pkg.departures.length} jadwal keberangkatan</strong><br /><small>Mulai {pkg.departures[0].dateLabel}{pkg.departures[0].remainingQuota != null ? ` · Sisa ${pkg.departures[0].remainingQuota} pax` : ""}</small></> : <>Jadwal: <strong>{pkg.departureDate}</strong>{pkg.departures?.[0]?.remainingQuota != null ? <small className="ml-1">· Sisa {pkg.departures[0].remainingQuota} pax</small> : null}</>}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Plane className="size-4 text-[#D5A12B] shrink-0" />

@@ -14,9 +14,31 @@ const optionalEmail = z.preprocess(
   z.string().email("Format email tidak valid.").optional(),
 );
 
-const optionalDate = z.preprocess(
-  (value) => typeof value === "string" ? value.trim() || undefined : value,
-  z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Format tanggal tidak valid.").optional(),
+function normalizeDateInput(value: unknown) {
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+  const local = /^(\d{2})[-/]?(\d{2})[-/]?(\d{4})$/.exec(trimmed);
+  return local ? `${local[3]}-${local[2]}-${local[1]}` : trimmed;
+}
+
+function isRealIsoDate(value: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+}
+
+const todayIso = () => new Date().toISOString().slice(0, 10);
+const optionalDate = (formatMessage: string, temporalMessage: string, temporalCheck: (value: string) => boolean) => z.preprocess(
+  normalizeDateInput,
+  z.string()
+    .refine(isRealIsoDate, formatMessage)
+    .refine((value) => !isRealIsoDate(value) || temporalCheck(value), temporalMessage)
+    .optional(),
 );
 
 export const mobilePilgrimProfileSchema = z.object({
@@ -24,13 +46,21 @@ export const mobilePilgrimProfileSchema = z.object({
   whatsapp: whatsappSchema,
   email: optionalEmail,
   gender: z.enum(["Laki-laki", "Perempuan"]).optional(),
-  birthDate: optionalDate,
+  birthDate: optionalDate(
+    "Format tanggal lahir tidak valid (contoh: 10-02-1977).",
+    "Tanggal lahir tidak boleh di masa depan.",
+    (value) => value <= todayIso(),
+  ),
   nationality: z.string().trim().min(2, "Kewarganegaraan wajib diisi.").max(80).default("Indonesia"),
   passportNumber: z.preprocess(
     (value) => typeof value === "string" ? value.trim().toUpperCase() || undefined : value,
     z.string().max(40).optional(),
   ),
-  passportExpiry: optionalDate,
+  passportExpiry: optionalDate(
+    "Format masa berlaku paspor tidak valid (contoh: 10-02-2030).",
+    "Masa berlaku paspor harus setelah hari ini.",
+    (value) => value > todayIso(),
+  ),
   notes: z.preprocess(
     (value) => typeof value === "string" ? value.trim() || undefined : value,
     z.string().max(500).optional(),

@@ -30,7 +30,8 @@ describe("mobile core contracts", () => {
     expect(result.whatsapp).toBe("6281234567890");
     expect(result.email).toBeUndefined();
     expect(result.passportNumber).toBe("A12345");
-    expect(mobilePilgrimProfileSchema.safeParse({ ...result, birthDate: "21/04/1990" }).success).toBe(false);
+    expect(mobilePilgrimProfileSchema.safeParse({ ...result, birthDate: "21/04/1990" }).success).toBe(true);
+    expect(mobilePilgrimProfileSchema.safeParse({ ...result, birthDate: "31/02/1990" }).success).toBe(false);
   });
 
   it("requires valid payer data for a mobile booking", () => {

@@ -19,7 +19,7 @@ const dateLabel = (value: string) => {
 
 export function ScheduleDepartureCard({ item }: { item: PackageDepartureSelection }) {
   const { packageItem, departure } = item;
-  const seats = departure.remainingQuota == null ? null : departure.quota != null ? `Sisa ${departure.remainingQuota} dari ${departure.quota} pax` : `Sisa ${departure.remainingQuota} pax`;
+  const seats = departure.remainingQuota == null ? null : `Sisa ${departure.remainingQuota} pax`;
   const badge = departure.remainingQuota === 0 ? "Sisa 0 pax" : statusLabel[departure.status];
 
   return <Pressable

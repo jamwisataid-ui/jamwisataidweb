@@ -3,6 +3,7 @@ import { Platform, Pressable, StyleSheet, Text, TextInput, type TextInputProps, 
 import DateTimePicker, { type DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/theme";
+import { formatIsoDateForInput, maskIndonesianDateInput } from "@/lib/date-input";
 
 export function RegistrationField({ label, error, optional, ...props }: TextInputProps & { label: string; error?: string; optional?: boolean }) {
   return <View style={styles.group}><Text style={styles.label}>{label}{optional ? <Text style={styles.optional}>  Opsional</Text> : null}</Text><TextInput placeholderTextColor="#9298A2" {...props} style={[styles.input, props.multiline && styles.multiline, error && styles.inputError, props.style]} />{error ? <Text style={styles.error}>{error}</Text> : null}</View>;
@@ -17,7 +18,7 @@ export function DateField({ label, value, onChange, error, optional }: { label: 
   const [open, setOpen] = useState(false);
   const selected = toDate(value);
   const changed = (_event: DateTimePickerEvent, date?: Date) => { setOpen(Platform.OS === "ios"); if (date) onChange(date.toISOString().slice(0, 10)); };
-  if (Platform.OS === "web") return <RegistrationField label={label} optional={optional} value={value} onChangeText={onChange} placeholder="YYYY-MM-DD" error={error} inputMode="numeric" />;
+  if (Platform.OS === "web") return <RegistrationField label={label} optional={optional} value={formatIsoDateForInput(value)} onChangeText={(next) => onChange(maskIndonesianDateInput(next))} placeholder="DD-MM-YYYY" error={error} inputMode="numeric" maxLength={10} />;
   return <View style={styles.group}><Text style={styles.label}>{label}{optional ? <Text style={styles.optional}>  Opsional</Text> : null}</Text><Pressable onPress={() => setOpen(true)} style={[styles.input, styles.dateButton, error && styles.inputError]}><Text style={[styles.dateText, !value && { color: "#9298A2" }]}>{value ? new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "long", year: "numeric" }).format(selected) : `Pilih ${label.toLowerCase()}`}</Text><Ionicons name="calendar-outline" size={20} color={colors.navy} /></Pressable>{open ? <DateTimePicker value={selected} mode="date" maximumDate={label === "Tanggal Lahir" ? new Date() : undefined} onChange={changed} /> : null}{error ? <Text style={styles.error}>{error}</Text> : null}</View>;
 }
 

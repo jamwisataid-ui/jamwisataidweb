@@ -139,7 +139,7 @@ function PackageCard({ travelPackage }: { travelPackage: TravelPackage }) {
           {travelPackage.departureDate ? (
             <div className="mt-3.5 flex items-center gap-2 px-1 text-xs text-slate-300">
               <CalendarDays className="size-3.5 text-[#E8C967] shrink-0" />
-              <span>Jadwal: <strong className="font-semibold text-white">{travelPackage.departureDate}</strong>{displayedDeparture?.remainingQuota != null ? ` · Sisa ${displayedDeparture.remainingQuota}${displayedDeparture.quota != null ? ` dari ${displayedDeparture.quota}` : ""} pax` : ""}</span>
+              <span>Jadwal: <strong className="font-semibold text-white">{travelPackage.departureDate}</strong>{displayedDeparture?.remainingQuota != null ? ` · Sisa ${displayedDeparture.remainingQuota} pax` : ""}</span>
             </div>
           ) : null}
         </div>

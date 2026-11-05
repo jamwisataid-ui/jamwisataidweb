@@ -10,7 +10,7 @@ export function PackageDeparturePicker({ departures, value, onChange }: { depart
   if (!departures.length) return null;
   return <View style={styles.section}><Text style={styles.title}>Pilih Keberangkatan</Text><Text style={styles.hint}>Pilih tanggal sebelum melanjutkan pendaftaran.</Text><View style={styles.list}>{departures.map((item) => {
     const selected = value === item.id;
-    const remaining = item.remainingQuota == null ? "" : item.quota != null ? ` · Sisa ${item.remainingQuota} dari ${item.quota} pax` : ` · Sisa ${item.remainingQuota} pax`;
+    const remaining = item.remainingQuota == null ? "" : ` · Sisa ${item.remainingQuota} pax`;
     const status = item.remainingQuota === 0 ? "Sisa 0 pax" : item.status === "available" ? "Tersedia" : item.status === "limited" ? "Terbatas" : item.status === "coming-soon" ? "Segera" : "Ditutup";
     return <Pressable key={item.id} disabled={!item.selectable} onPress={() => onChange(item.id)} style={[styles.row, selected && styles.selected, !item.selectable && styles.disabled]}>
       <Ionicons name={selected ? "radio-button-on" : "radio-button-off"} size={22} color={selected ? colors.gold : colors.muted} />

@@ -24,7 +24,7 @@ export function PackageDepartureSelector({ packageName, departures }: { packageN
             <span className="min-w-0 flex-1">
               <strong className="block text-sm text-white">{departure.dateLabel}</strong>
               <span className="mt-1 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-300">
-                <span>{departure.price ? `Rp ${formatIDR(departure.price)}` : "Harga menyusul"}{departure.remainingQuota != null ? ` · Sisa ${departure.remainingQuota}${departure.quota != null ? ` dari ${departure.quota}` : ""} pax` : ""}</span>
+                <span>{departure.price ? `Rp ${formatIDR(departure.price)}` : "Harga menyusul"}{departure.remainingQuota != null ? ` · Sisa ${departure.remainingQuota} pax` : ""}</span>
                 <span className={departure.status === "limited" ? "text-amber-300" : departure.selectable ? "text-emerald-300" : "text-rose-300"}>{departure.remainingQuota === 0 ? "Sisa 0 pax" : departure.status === "available" ? "Tersedia" : departure.status === "limited" ? "Hampir penuh" : departure.status === "coming-soon" ? "Segera dibuka" : "Ditutup"}</span>
               </span>
             </span>

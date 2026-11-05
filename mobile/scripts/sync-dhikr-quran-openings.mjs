@@ -52,14 +52,6 @@ const openingEntries = [
   }),
 ];
 
-const closingBaqarahEntry = quranEntry({
-  title: "Al-Baqarah (Ayat 285–286)",
-  surahNumber: 2,
-  startVerse: 285,
-  endVerse: 286,
-  source: "QS. Al-Baqarah: 285–286",
-});
-
 const shortSurahs = new Map([
   ["Al-Ikhlas", { surahNumber: 112, startVerse: 1, endVerse: 4 }],
   ["Al-Falaq", { surahNumber: 113, startVerse: 1, endVerse: 5 }],
@@ -80,9 +72,30 @@ function refreshShortSurah(entry) {
 for (const period of ["morning", "evening"]) {
   const filePath = path.join(dhikrDirectory, `${period}-dhikr.json`);
   const current = JSON.parse(await readFile(filePath, "utf8"));
-  const currentAyatKursi = current.find((entry) => entry.title === "Ayat al-Kursi" || entry.title === "Ayat Kursi");
+  const currentAyatKursi = current.find((entry) => entry.title === "Ayat al-Kursi" || entry.title.startsWith("Ayat Kursi"));
   if (!currentAyatKursi) throw new Error(`Ayat Kursi tidak ditemukan di ${period}-dhikr.json`);
-  const ayatKursi = { ...currentAyatKursi, title: "Ayat Kursi" };
+  const ayatKursi = period === "morning"
+    ? {
+        ...currentAyatKursi,
+        ...quranEntry({
+          title: "Ayat Kursi (Al-Baqarah 255–257)",
+          surahNumber: 2,
+          startVerse: 255,
+          endVerse: 257,
+          source: currentAyatKursi.source,
+        }),
+        fawaid: currentAyatKursi.fawaid,
+        source: currentAyatKursi.source,
+      }
+    : { ...currentAyatKursi, title: "Ayat Kursi" };
+  const closingStartVerse = period === "morning" ? 284 : 285;
+  const closingBaqarahEntry = quranEntry({
+    title: `Al-Baqarah (Ayat ${closingStartVerse}–286)`,
+    surahNumber: 2,
+    startVerse: closingStartVerse,
+    endVerse: 286,
+    source: `QS. Al-Baqarah: ${closingStartVerse}–286`,
+  });
 
   const shortSurahEntries = ["Al-Ikhlas", "Al-Falaq", "An-Naas"].map((title) => {
     const entry = current.find((candidate) => candidate.title === title);
@@ -92,9 +105,11 @@ for (const period of ["morning", "evening"]) {
 
   const replacedTitles = new Set([
     ...openingEntries.map((entry) => entry.title),
-    closingBaqarahEntry.title,
+    "Al-Baqarah (Ayat 284–286)",
+    "Al-Baqarah (Ayat 285–286)",
     "Ayat al-Kursi",
     "Ayat Kursi",
+    "Ayat Kursi (Al-Baqarah 255–257)",
     ...shortSurahEntries.map((entry) => entry.title),
   ]);
   const remainingEntries = current.filter((entry) => !replacedTitles.has(entry.title));
