@@ -41,6 +41,13 @@ export function PackageCard({ item }: { item: Package }) {
     item.plusHotels?.[0] ? hotelLabel(item.plusHotels[0].name, item.plusHotels[0].star) : undefined,
   ].filter((value): value is string => Boolean(value)).slice(0, 2);
   const disabled = item.status === "sold-out";
+  const displayedDeparture = item.departures?.find((departure) => departure.selectable) ?? item.departures?.[0];
+  const scheduleLabel = item.departures && item.departures.length > 1
+    ? `${item.departures.length} jadwal · mulai ${item.departures[0].dateLabel}`
+    : item.departureDate || "Jadwal segera tersedia";
+  const scheduleWithSeats = displayedDeparture?.remainingQuota == null
+    ? scheduleLabel
+    : `${scheduleLabel} · Sisa ${displayedDeparture.remainingQuota} pax`;
 
   return (
     <PressableScale
@@ -62,7 +69,7 @@ export function PackageCard({ item }: { item: Package }) {
         <Text numberOfLines={2} style={styles.name}>{item.name}</Text>
 
         <View style={styles.metaList}>
-          <PackageMetaRow icon="calendar-outline" text={item.departures && item.departures.length > 1 ? `${item.departures.length} jadwal · mulai ${item.departures[0].dateLabel}` : item.departureDate || "Jadwal segera tersedia"} />
+          <PackageMetaRow icon="calendar-outline" text={scheduleWithSeats} />
           {item.airline ? <PackageMetaRow icon="airplane-outline" text={item.airline} /> : null}
           {hotels.map((hotel, index) => <PackageMetaRow key={`${hotel}-${index}`} icon="business-outline" text={hotel} />)}
         </View>

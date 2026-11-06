@@ -60,4 +60,10 @@ describe("mobile core contracts", () => {
     expect(migration).not.toContain("INSERT INTO \"payments\"");
     expect(migration).not.toContain("DROP ");
   });
+
+  it("shows remaining pax on mobile package catalogue cards when capacity is known", () => {
+    const card = readFileSync("mobile/src/components/packages/package-card.tsx", "utf8");
+    expect(card).toContain("Sisa ${displayedDeparture.remainingQuota} pax");
+    expect(card).not.toContain("dari ${displayedDeparture.quota} pax");
+  });
 });
