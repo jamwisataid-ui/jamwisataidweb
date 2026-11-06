@@ -1,0 +1,71 @@
+name: Mobile OTA preview
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mobile/**"
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      # Native configuration and dependencies need a new APK. Never send their
+      # JavaScript bundle to a binary that may not contain the required module.
+      - name: Check native compatibility
+        id: compatibility
+        shell: bash
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          if git diff --name-only "$BEFORE_SHA" "$GITHUB_SHA" -- mobile | grep -Eq '^mobile/(app\.json|eas\.json|package(-lock)?\.json|android/|ios/)'; then
+            echo "Native configuration changed; build and install a new preview APK before publishing another OTA update."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v6
+        if: steps.compatibility.outputs.publish == 'true'
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Check Expo token
+        if: steps.compatibility.outputs.publish == 'true'
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: test -n "$EXPO_TOKEN"
+
+      - uses: expo/expo-github-action@v8
+        if: steps.compatibility.outputs.publish == 'true'
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        if: steps.compatibility.outputs.publish == 'true'
+        working-directory: mobile
+        run: npm ci
+
+      - name: Check types
+        if: steps.compatibility.outputs.publish == 'true'
+        working-directory: mobile
+        run: npm run typecheck
+
+      - name: Run tests
+        if: steps.compatibility.outputs.publish == 'true'
+        working-directory: mobile
+        run: npm test
+
+      - name: Publish Android preview update
+        if: steps.compatibility.outputs.publish == 'true'
+        working-directory: mobile
+        run: eas update --channel preview --platform android --environment preview --message "$GITHUB_SHA" --non-interactive
