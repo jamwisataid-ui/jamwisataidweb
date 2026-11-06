@@ -4,7 +4,9 @@
     "slug": "matt",
     "scheme": "jamwisata",
     "version": "1.0.0",
-    "runtimeVersion": { "policy": "appVersion" },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "updates": {
       "url": "https://u.expo.dev/d18e9906-12f6-4cd1-96c5-9804d510a282",
       "checkAutomatically": "NEVER",
@@ -17,27 +19,65 @@
       "expo-secure-store",
       "@livekit/react-native-expo-plugin",
       "@config-plugins/react-native-webrtc",
-      ["expo-splash-screen", { "backgroundColor": "#06152B", "image": "./assets/splash/logo-emblem.png", "imageWidth": 132, "resizeMode": "contain" }],
-      ["expo-notifications", { "defaultChannel": "informasi-perjalanan" }]
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "extraProguardRules": "-keep class livekit.org.webrtc.** { *; }\n-keep class livekit.org.jni_zero.** { *; }\n-keep class org.jni_zero.** { *; }\n-keep class com.livekit.** { *; }\n-keep class com.oney.WebRTCModule.** { *; }\n-keepclasseswithmembernames class * { native <methods>; }"
+          }
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#06152B",
+          "image": "./assets/splash/logo-emblem.png",
+          "imageWidth": 132,
+          "resizeMode": "contain"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "defaultChannel": "informasi-perjalanan"
+        }
+      ]
     ],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.jamwisata.mobile",
       "infoPlist": {
-        "UIBackgroundModes": ["audio"],
+        "UIBackgroundModes": [
+          "audio"
+        ],
         "ITSAppUsesNonExemptEncryption": false,
         "NSMicrophoneUsageDescription": "Mikrofon digunakan oleh muthowif untuk menyiarkan panduan ibadah secara langsung."
       }
     },
     "android": {
       "package": "com.jamwisata.mobile",
-      "permissions": ["RECORD_AUDIO", "MODIFY_AUDIO_SETTINGS", "FOREGROUND_SERVICE", "FOREGROUND_SERVICE_MICROPHONE", "WAKE_LOCK"],
-      "adaptiveIcon": { "backgroundColor": "#06152B" }
+      "permissions": [
+        "RECORD_AUDIO",
+        "MODIFY_AUDIO_SETTINGS",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_MICROPHONE",
+        "WAKE_LOCK"
+      ],
+      "adaptiveIcon": {
+        "backgroundColor": "#06152B"
+      }
     },
-    "web": { "bundler": "metro", "output": "single" },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
     "extra": {
-      "router": { "origin": false },
-      "eas": { "projectId": "d18e9906-12f6-4cd1-96c5-9804d510a282" }
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d18e9906-12f6-4cd1-96c5-9804d510a282"
+      }
     },
     "owner": "matthmd28s-team"
   }
