@@ -4,6 +4,12 @@
     "slug": "matt",
     "scheme": "jamwisata",
     "version": "1.0.0",
+    "runtimeVersion": { "policy": "appVersion" },
+    "updates": {
+      "url": "https://u.expo.dev/d18e9906-12f6-4cd1-96c5-9804d510a282",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "plugins": [
