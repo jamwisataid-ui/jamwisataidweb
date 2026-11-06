@@ -8,6 +8,9 @@ import { useFonts as useCormorant, CormorantGaramond_500Medium, CormorantGaramon
 import { useFonts as useQuranFont } from "expo-font";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import * as Updates from "expo-updates";
+import * as Application from "expo-application";
+import { Alert, Linking, Platform } from "react-native";
 import { useAuthStore } from "@/lib/auth-store";
 import { api } from "@/lib/api";
 import type { Package } from "@/types";
@@ -16,6 +19,7 @@ import { fetchOnboardingSlides } from "@/lib/onboarding";
 import { colors } from "@/theme";
 import { useDeviceNotifications } from "@/lib/notifications";
 import { queryClient } from "@/lib/query-client";
+import { apkVersionUrl, isNewerAppVersion } from "@/lib/apk-updates";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -31,6 +35,45 @@ export default function RootLayout() {
   const hydrate = useAuthStore((state) => state.hydrate);
   useDeviceNotifications();
   useEffect(() => { void SplashScreen.hideAsync(); }, []);
+  useEffect(() => {
+    if (!Updates.isEnabled) return;
+    // This runs once on a cold launch, before a live audio session can start.
+    void (async () => {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+        }
+      } catch (error) {
+        console.warn("Unable to check for an OTA update", error);
+      }
+    })();
+  }, []);
+  useEffect(() => {
+    const downloadUrl = process.env.EXPO_PUBLIC_ANDROID_APK_URL;
+    const installedVersion = Application.nativeApplicationVersion;
+    if (Platform.OS !== "android" || !downloadUrl || !installedVersion) return;
+    const versionUrl = apkVersionUrl(downloadUrl);
+    if (!versionUrl) return;
+    let active = true;
+    void (async () => {
+      try {
+        const response = await fetch(versionUrl, { cache: "no-store" });
+        if (!response.ok) return;
+        const { version } = await response.json() as { version?: string };
+        if (active && version && isNewerAppVersion(version, installedVersion)) {
+          Alert.alert("Update APK tersedia", `Versi ${version} tersedia. Unduh APK terbaru untuk mendapatkan fitur baru.`, [
+            { text: "Nanti", style: "cancel" },
+            { text: "Unduh APK", onPress: () => { void Linking.openURL(downloadUrl); } },
+          ]);
+        }
+      } catch (error) {
+        console.warn("Unable to check for a newer APK", error);
+      }
+    })();
+    return () => { active = false; };
+  }, []);
   useEffect(() => {
     let active = true;
     // Warm public data in the background. A slow network must never keep the

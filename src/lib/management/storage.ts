@@ -1,6 +1,6 @@
 import "server-only";
 
-import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "node:crypto";
 
@@ -64,6 +64,12 @@ export async function createPrivateDownloadUrl(objectKey: string, fileName?: str
     Key: objectKey,
     ResponseContentDisposition: fileName ? `attachment; filename="${fileName.replace(/["\r\n]/g, "")}"` : undefined,
   }), { expiresIn: 600 });
+}
+
+export async function getPrivateObjectMetadata(objectKey: string) {
+  const { s3, bucket } = client();
+  const result = await s3.send(new HeadObjectCommand({ Bucket: bucket, Key: objectKey }));
+  return result.Metadata ?? {};
 }
 
 export async function putPrivateObject(objectKey: string, body: Uint8Array, contentType: string) {
