@@ -2,6 +2,7 @@
   "expo": {
     "name": "Jam Wisata",
     "slug": "matt",
+    "icon": "./assets/icon/icon.png",
     "scheme": "jamwisata",
     "version": "1.0.0",
     "runtimeVersion": {
@@ -56,6 +57,7 @@
     },
     "android": {
       "package": "com.jamwisata.mobile",
+      "versionCode": 3,
       "permissions": [
         "RECORD_AUDIO",
         "MODIFY_AUDIO_SETTINGS",
@@ -64,6 +66,7 @@
         "WAKE_LOCK"
       ],
       "adaptiveIcon": {
+        "foregroundImage": "./assets/icon/adaptive-icon.png",
         "backgroundColor": "#06152B"
       }
     },
