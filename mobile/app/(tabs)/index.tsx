@@ -42,12 +42,12 @@ export default function HomeScreen() {
 
         <View style={styles.content}>
           <View style={styles.section}>
-            <HomeSectionHeader title="Layanan" actionLabel="Ibadah" onAction={() => router.push("/(tabs)/worship")} />
+            <HomeSectionHeader title="Layanan Utama" actionLabel="Ibadah" onAction={() => router.push("/(tabs)/worship")} />
             <QuickMenuGrid guest={guest} />
           </View>
 
-          <FadeInView delay={380} style={styles.section}>
-            <HomeSectionHeader title="Paket Pilihan" actionLabel="Lihat koleksi" onAction={() => router.push("/(tabs)/packages")} />
+          <FadeInView delay={320} style={styles.section}>
+            <HomeSectionHeader title="Paket Pilihan" actionLabel="Lihat Semua" onAction={() => router.push("/(tabs)/packages")} />
             {!packages.isPending && featuredPackages.length === 0 ? (
               <View style={styles.empty}>
                 <Text style={styles.emptyText}>Paket pilihan sedang diperbarui. Silakan cek kembali beberapa saat lagi.</Text>
@@ -56,12 +56,19 @@ export default function HomeScreen() {
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                snapToInterval={PACKAGE_PREVIEW_WIDTH + 12}
+                snapToInterval={PACKAGE_PREVIEW_WIDTH + 14}
                 decelerationRate="fast"
                 contentContainerStyle={styles.carousel}
                 style={styles.carouselFrame}
               >
-                {packages.isPending ? <><PackagePreviewSkeleton /><PackagePreviewSkeleton /></> : featuredPackages.map((item) => <PackagePreviewCard key={item.id} item={item} />)}
+                {packages.isPending ? (
+                  <>
+                    <PackagePreviewSkeleton />
+                    <PackagePreviewSkeleton />
+                  </>
+                ) : (
+                  featuredPackages.map((item) => <PackagePreviewCard key={item.id} item={item} />)
+                )}
               </ScrollView>
             )}
           </FadeInView>
@@ -73,12 +80,12 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", backgroundColor: colors.ivory },
-  scroll: { paddingBottom: 28 },
+  scroll: { paddingBottom: 32 },
   overlap: { marginTop: -84, paddingHorizontal: 18 },
-  content: { paddingHorizontal: 18, paddingTop: 26, gap: 28 },
+  content: { paddingHorizontal: 18, paddingTop: 26, gap: 30 },
   section: { gap: 14 },
   carouselFrame: { marginHorizontal: -18 },
-  carousel: { paddingHorizontal: 18, gap: 12 },
+  carousel: { paddingHorizontal: 18, gap: 14 },
   empty: { padding: 18, borderRadius: 20, borderWidth: 1, borderColor: colors.goldLine, backgroundColor: colors.white },
   emptyText: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 14, lineHeight: 21, textAlign: "center" },
 });

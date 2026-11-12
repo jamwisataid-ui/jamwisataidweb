@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import heroImage from "../../../assets/home/hero-makkah-cinematic.jpg";
 import emblem from "../../../assets/splash/logo-emblem.png";
 import { CircleButton } from "@/components/ui";
+import { GlassSurface } from "@/components/glass";
 import { useNextPrayer } from "@/lib/use-next-prayer";
 import { colors } from "@/theme";
 
@@ -17,9 +18,13 @@ function NextPrayerChip() {
   const next = useNextPrayer();
   if (!next) return null;
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={`Sholat berikutnya ${next.name} pukul ${next.time} di ${next.city}`} onPress={() => router.push("/prayer-times")} style={styles.chip}>
-      <Ionicons name="moon" size={13} color={colors.gold} />
-      <Text numberOfLines={1} style={styles.chipText}>{next.name} <Text style={styles.chipStrong}>{next.time}</Text> · {next.city} · {next.remaining}</Text>
+    <Pressable accessibilityRole="button" accessibilityLabel={`Sholat berikutnya ${next.name} pukul ${next.time} di ${next.city}`} onPress={() => router.push("/prayer-times")} style={styles.chipWrap}>
+      <GlassSurface variant="dark" radius={999} style={styles.chip}>
+        <View style={styles.chipInner}>
+          <Ionicons name="moon" size={13} color={colors.gold} />
+          <Text numberOfLines={1} style={styles.chipText}>{next.name} <Text style={styles.chipStrong}>{next.time}</Text> · {next.city} · {next.remaining}</Text>
+        </View>
+      </GlassSurface>
     </Pressable>
   );
 }
@@ -38,9 +43,13 @@ export function HomeHeader({ name, unreadCount, guest }: { name?: string | null;
         </View>
         <CircleButton dark icon="search-outline" label="Cari paket" onPress={() => router.push("/search")} />
         {guest ? (
-          <Pressable accessibilityRole="button" onPress={() => router.push("/login")} style={({ pressed }) => [styles.login, pressed && { opacity: 0.75 }]}>
-            <Ionicons name="person-outline" size={15} color={colors.softGold} />
-            <Text style={styles.loginText}>Masuk</Text>
+          <Pressable accessibilityRole="button" onPress={() => router.push("/login")} style={({ pressed }) => [pressed && { opacity: 0.75 }]}>
+            <GlassSurface variant="dark" baseGoldTint radius={999} style={styles.login}>
+              <View style={styles.loginInner}>
+                <Ionicons name="person-outline" size={15} color={colors.softGold} />
+                <Text style={styles.loginText}>Masuk</Text>
+              </View>
+            </GlassSurface>
           </Pressable>
         ) : (
           <CircleButton dark icon="notifications-outline" label={unreadCount ? `Notifikasi, ${unreadCount} belum dibaca` : "Notifikasi"} onPress={() => router.push("/(tabs)/notifications")}>
@@ -61,10 +70,13 @@ const styles = StyleSheet.create({
   greeting: { flex: 1, minWidth: 0 },
   salam: { color: colors.softGold, fontFamily: "CormorantGaramond_500Medium_Italic", fontSize: 16 },
   name: { color: colors.white, fontFamily: "Cinzel_600SemiBold", fontSize: 15 },
-  login: { height: 40, paddingHorizontal: 11, borderRadius: 999, flexDirection: "row", alignItems: "center", gap: 6, borderWidth: 1, borderColor: "rgba(212,175,55,0.55)", backgroundColor: "rgba(212,175,55,0.1)" },
+  login: { height: 40, borderRadius: 999 },
+  loginInner: { height: 40, paddingHorizontal: 14, flexDirection: "row", alignItems: "center", gap: 6 },
   loginText: { color: colors.softGold, fontFamily: "Montserrat_600SemiBold", fontSize: 12.5 },
   dot: { position: "absolute", top: 10, right: 11, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.gold, borderWidth: 2, borderColor: colors.navy },
-  chip: { alignSelf: "flex-start", maxWidth: "100%", height: 32, paddingLeft: 10, paddingRight: 14, borderRadius: 999, flexDirection: "row", alignItems: "center", gap: 7, backgroundColor: "rgba(6,21,43,0.55)", borderWidth: 1, borderColor: "rgba(212,175,55,0.3)" },
+  chipWrap: { alignSelf: "flex-start", maxWidth: "100%" },
+  chip: { height: 34, borderRadius: 999 },
+  chipInner: { height: 34, paddingLeft: 12, paddingRight: 16, flexDirection: "row", alignItems: "center", gap: 7 },
   chipText: { flexShrink: 1, color: "rgba(255,255,255,0.86)", fontFamily: "Montserrat_400Regular", fontSize: 12 },
   chipStrong: { color: colors.softGold, fontFamily: "Montserrat_600SemiBold" },
 });
