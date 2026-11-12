@@ -1,11 +1,11 @@
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import { colors } from "@/theme";
 import { AppBar as LuxuryAppBar } from "@/components/ui";
 
 const whatsappUrl = "https://wa.me/6281809627499?text=Assalamu%27alaikum%2C%20saya%20membutuhkan%20bantuan%20terkait%20aplikasi%20JAM%20WISATA.";
+const privacyUrl = "https://jamwisata.id/privacy";
 
 function HelpRow({ icon, title, subtitle, onPress }: { icon: keyof typeof Ionicons.glyphMap; title: string; subtitle: string; onPress?: () => void }) {
   const body = <><View style={styles.icon}><Ionicons name={icon} size={22} color={colors.navy} /></View><View style={styles.copy}><Text style={styles.rowTitle}>{title}</Text><Text style={styles.subtitle}>{subtitle}</Text></View>{onPress ? <Ionicons name="open-outline" size={18} color={colors.muted} /> : null}</>;
@@ -13,7 +13,7 @@ function HelpRow({ icon, title, subtitle, onPress }: { icon: keyof typeof Ionico
 }
 
 export default function HelpScreen() {
-  return <SafeAreaView style={styles.safe}><LuxuryAppBar title="Pertanyaan & Bantuan" /><ScrollView contentContainerStyle={styles.content}><View style={styles.hero}><View style={styles.heroIcon}><Ionicons name="headset-outline" size={30} color={colors.navy} /></View><Text style={styles.heroTitle}>Kami siap membantu</Text><Text style={styles.heroText}>Hubungi tim Jam Wisata jika Anda memerlukan bantuan pendaftaran, dokumen, pembayaran, atau perjalanan.</Text></View><View style={styles.list}><HelpRow icon="logo-whatsapp" title="WhatsApp Admin" subtitle="+62 818-0962-7499" onPress={() => Linking.openURL(whatsappUrl)} /><HelpRow icon="location-outline" title="Kantor Jam Wisata" subtitle="Jl. Cibangkong No. 28A Gatot Subroto, Bandung 40273" /></View><View style={styles.faq}><Text style={styles.faqTitle}>Pertanyaan umum</Text><Text style={styles.question}>Apakah melihat paket harus masuk akun?</Text><Text style={styles.answer}>Tidak. Anda dapat melihat paket dan memakai panduan ibadah sebagai tamu. Akun diperlukan saat mendaftar paket dan membuka data pribadi.</Text><Text style={styles.question}>Bagaimana memperbarui dokumen?</Text><Text style={styles.answer}>Buka Area Jamaah → Dokumen Saya, lalu pilih dokumen yang ingin diunggah atau diganti.</Text></View></ScrollView></SafeAreaView>;
+  return <SafeAreaView style={styles.safe}><LuxuryAppBar title="Pertanyaan & Bantuan" /><ScrollView contentContainerStyle={styles.content}><View style={styles.hero}><View style={styles.heroIcon}><Ionicons name="headset-outline" size={30} color={colors.navy} /></View><Text style={styles.heroTitle}>Kami siap membantu</Text><Text style={styles.heroText}>Hubungi tim Jam Wisata jika Anda memerlukan bantuan pendaftaran, dokumen, pembayaran, atau perjalanan.</Text></View><View style={styles.list}><HelpRow icon="logo-whatsapp" title="WhatsApp Admin" subtitle="+62 818-0962-7499" onPress={() => Linking.openURL(whatsappUrl)} /><HelpRow icon="location-outline" title="Kantor Jam Wisata" subtitle="Jl. Cibangkong No. 28A Gatot Subroto, Bandung 40273" /><HelpRow icon="shield-checkmark-outline" title="Kebijakan Privasi" subtitle="Cara Jam Wisata mengelola data Anda" onPress={() => Linking.openURL(privacyUrl)} /></View><View style={styles.faq}><Text style={styles.faqTitle}>Pertanyaan umum</Text><Text style={styles.question}>Apakah melihat paket harus masuk akun?</Text><Text style={styles.answer}>Tidak. Anda dapat melihat paket dan memakai panduan ibadah sebagai tamu. Akun diperlukan saat mendaftar paket dan membuka data pribadi.</Text><Text style={styles.question}>Bagaimana memperbarui dokumen?</Text><Text style={styles.answer}>Buka Area Jamaah → Dokumen Saya, lalu pilih dokumen yang ingin diunggah atau diganti.</Text></View></ScrollView></SafeAreaView>;
 }
 
 const styles = StyleSheet.create({
