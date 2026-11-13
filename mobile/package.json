@@ -53,6 +53,8 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
+    "@emnapi/core": "2.0.0-beta.2",
+    "@emnapi/runtime": "2.0.0-beta.2",
     "@react-native/metro-config": "0.88.0",
     "@types/react": "~19.3.0",
     "typescript": "~6.0.3",
