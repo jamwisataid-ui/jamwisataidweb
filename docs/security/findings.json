@@ -1,0 +1,235 @@
+[
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "mobile-auth.muthowif-login-no-throttle",
+    "title": "Login muthowif tidak memiliki rate limit yang terlihat di source",
+    "description": "Endpoint login muthowif menerima percobaan password berulang tanpa bucket rate limit atau lockout yang setara dengan login jamaah/admin.",
+    "claimed_root_cause": "Handler langsung melakukan lookup user dan verifikasi password tanpa memakai tabel auth_rate_limits atau kontrol per caller/account.",
+    "trace": [
+      {"kind":"entrypoint","file":"src/app/api/mobile/v1/auth/muthowif/login/route.ts","line":13,"scope":"POST muthowif login","description":"Caller anonim mengirim email dan password."},
+      {"kind":"propagation","file":"src/app/api/mobile/v1/auth/muthowif/login/route.ts","line":19,"scope":"credential lookup","description":"Handler mengambil user berdasarkan email dan memverifikasi password."},
+      {"kind":"sink","file":"src/app/api/mobile/v1/auth/muthowif/login/route.ts","line":21,"scope":"authentication decision","description":"Kegagalan langsung dikembalikan tanpa rate counter atau backoff source-visible."}
+    ],
+    "evidence": [
+      {"file":"src/app/api/mobile/v1/auth/login/route.ts","line":12,"description":"Login jamaah memiliki WINDOW_MS dan MAX_ATTEMPTS sebagai kontrol pembanding."},
+      {"file":"src/db/schema/auth.ts","line":30,"description":"Repository sudah memiliki tabel auth_rate_limits tetapi route muthowif tidak memakainya."}
+    ],
+    "blockers": ["Rate limiting di ingress/WAF production dan perilaku runtime belum dapat diamati tanpa sandbox/deployment access."],
+    "validation_plan": {"local":"Jalankan handler dengan database dummy dan IP/email sintetis di sandbox; pastikan percobaan keenam ditolak tanpa menyentuh akun nyata.","deployment":"Periksa rule rate limit edge yang efektif untuk route muthowif secara read-only."}
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "mobile-auth.activation-non-atomic-and-session-retention",
+    "title": "Aktivasi/PIN reset tidak atomik dan sesi lama tidak dicabut",
+    "description": "Token aktivasi dicek, akun di-upsert, token ditandai used, dan sesi baru dibuat sebagai operasi terpisah. Ketika PIN diganti melalui aktivasi, sesi lama akun tidak terlihat dicabut.",
+    "claimed_root_cause": "Konsumsi capability dan perubahan credential tidak dibungkus satu transaksi conditional serta tidak melakukan revocation seluruh sesi akun.",
+    "trace": [
+      {"kind":"entrypoint","file":"src/app/api/mobile/v1/auth/activate/route.ts","line":10,"scope":"POST activation","description":"Caller mengirim bearer activation token dan PIN baru."},
+      {"kind":"propagation","file":"src/app/api/mobile/v1/auth/activate/route.ts","line":15,"scope":"token lookup","description":"Token unused/unrevoked/unexpired dipilih tanpa row lock atau consume atomik."},
+      {"kind":"propagation","file":"src/app/api/mobile/v1/auth/activate/route.ts","line":28,"scope":"account upsert","description":"PIN dan status akun diganti sebelum token usedAt diperbarui."},
+      {"kind":"sink","file":"src/app/api/mobile/v1/auth/activate/route.ts","line":38,"scope":"session issuance","description":"Sesi baru dibuat tanpa revocation sesi akun yang sudah ada."}
+    ],
+    "evidence": [
+      {"file":"src/app/api/admin/mobile/activation/[pilgrimId]/route.ts","line":27,"description":"Token memiliki entropi 32 byte dan expiry 24 jam; kelemahan yang diklaim adalah atomicity/lifecycle, bukan predictability."},
+      {"file":"src/app/api/admin/mobile/activation/[pilgrimId]/route.ts","line":44,"description":"Jalur admin DELETE menunjukkan revocation semua sesi memang tersedia, tetapi tidak dipanggil oleh activation."}
+    ],
+    "blockers": ["Butuh PostgreSQL disposable untuk membuktikan race dua request dan efek sesi lama; eksekusi target tidak diizinkan pada host ini."],
+    "validation_plan": {"local":"Gunakan barrier dua request activation pada database disposable lalu uji token lama dan sesi lama setelah PIN reset.","deployment":"Tidak perlu menyentuh production; konfirmasi hanya bahwa tidak ada serialisasi eksternal yang tak terlihat."}
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "mobile-auth.refresh-rotation-race",
+    "title": "Refresh token rotation tidak atomik",
+    "description": "Dua request refresh bersamaan dapat sama-sama membaca session yang belum revoked sebelum masing-masing membuat replacement session.",
+    "claimed_root_cause": "Select, update revokedAt, dan createMobileSession tidak memakai transaksi, row lock, atau conditional update yang memastikan hanya satu pemenang.",
+    "trace": [
+      {"kind":"entrypoint","file":"src/app/api/mobile/v1/auth/refresh/route.ts","line":5,"scope":"POST refresh","description":"Caller mengirim refresh token."},
+      {"kind":"propagation","file":"src/lib/mobile/auth.ts","line":85,"scope":"rotateMobileSession","description":"Session valid dipilih dengan revokedAt null."},
+      {"kind":"sink","file":"src/lib/mobile/auth.ts","line":99,"scope":"replacement session","description":"Session lama di-update lalu session baru dibuat pada operasi terpisah."}
+    ],
+    "evidence": [{"file":"src/lib/mobile/auth.ts","line":94,"description":"Predicate revokedAt null ada pada SELECT tetapi tidak menjadi compare-and-set pada UPDATE."}],
+    "blockers": ["Perlu concurrency fixture PostgreSQL untuk membuktikan dua replacement token diterbitkan."],
+    "validation_plan": {"local":"Sinkronkan dua rotateMobileSession pada database disposable dan hitung replacement session yang berhasil.","deployment":"Tidak diperlukan."}
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "auth.forwarded-ip-rate-limit-trust",
+    "title": "Rate limit bergantung pada forwarding header yang belum terbukti tepercaya",
+    "description": "Mobile/admin authentication memakai alamat pertama X-Forwarded-For atau X-Real-IP untuk bucket rate limit. Jika proxy aktif tidak membersihkan header dari caller, bucket dapat diganti per request.",
+    "claimed_root_cause": "Application menerima metadata proxy tanpa source-visible trusted-proxy enforcement.",
+    "trace": [
+      {"kind":"entrypoint","file":"src/lib/mobile/api.ts","line":27,"scope":"requestMetadata","description":"Header forwarding dibaca langsung dari request."},
+      {"kind":"propagation","file":"src/app/api/mobile/v1/auth/login/route.ts","line":23,"scope":"rate key","description":"IP hasil header digabung dengan WhatsApp."},
+      {"kind":"sink","file":"src/app/api/mobile/v1/auth/login/route.ts","line":27,"scope":"throttle decision","description":"Bucket menentukan apakah request ditolak setelah lima percobaan."}
+    ],
+    "evidence": [{"file":"deploy/jamwisata/mobile-nginx.conf","line":15,"description":"Nginx mengappend X-Forwarded-For; final edge sanitization tidak ditetapkan oleh repository."}],
+    "blockers": ["Konfigurasi Caddy/edge production efektif dan sanitasi header tidak dapat dibuktikan dari source."],
+    "validation_plan": {"local":"Jalankan exact proxy config dalam loopback sandbox dan kirim header sintetis.","deployment":"Verifikasi edge membuang header caller dan meneruskan hanya client IP authoritative."}
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "mobile.activation-custom-scheme-interception",
+    "title": "Bearer token aktivasi memakai custom URL scheme yang tidak terverifikasi",
+    "description": "Default link aktivasi membawa token 24 jam di query jamwisata://; aplikasi lain di perangkat dapat mencoba mengklaim scheme yang sama.",
+    "claimed_root_cause": "Capability sensitif dikirim melalui custom scheme tanpa source-visible Android App Link/iOS Universal Link terverifikasi.",
+    "trace": [
+      {"kind":"entrypoint","file":"src/app/api/admin/mobile/activation/[pilgrimId]/route.ts","line":31,"scope":"activation invitation","description":"Default activation base adalah jamwisata://activate."},
+      {"kind":"propagation","file":"mobile/app/activate.tsx","line":16,"scope":"deep-link parsing","description":"Token dibaca dari parameter URL."},
+      {"kind":"sink","file":"src/app/api/mobile/v1/auth/activate/route.ts","line":38,"scope":"session issuance","description":"Pemegang token dapat menetapkan PIN dan menerima session."}
+    ],
+    "evidence": [{"file":"mobile/app.json","line":6,"description":"Aplikasi mendaftarkan scheme jamwisata tanpa associated-domain source-visible."}],
+    "blockers": ["Final native manifests, production activation URL override, dan dispatch OS belum diperiksa."],
+    "validation_plan": {"local":"Pasang dua aplikasi disposable yang mengklaim scheme sama dan buka token dummy.","deployment":"Pastikan production memakai verified HTTPS App/Universal Link dengan association file benar."}
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "mobile.guest-draft-shared-device",
+    "title": "Semua guest berbagi namespace draft pendaftaran yang sama",
+    "description": "Guest memakai owner ID literal guest; pada perangkat bersama, guest berikutnya yang membuka departure sama berpotensi memuat PII draft sebelumnya.",
+    "claimed_root_cause": "Draft sensitif dipersistenkan berdasarkan ownerId dan departureId, sementara seluruh user anonim memakai ownerId yang sama.",
+    "trace": [
+      {"kind":"entrypoint","file":"mobile/app/register/[departureId].tsx","line":94,"scope":"draft owner","description":"User tanpa akun diberi draftOwnerId guest."},
+      {"kind":"propagation","file":"mobile/src/lib/registration-draft.ts","line":24,"scope":"storage key","description":"Key dibentuk dari ownerId dan departureId."},
+      {"kind":"sink","file":"mobile/app/register/[departureId].tsx","line":138,"scope":"draft load","description":"Draft tersimpan digabung ke form yang terlihat."}
+    ],
+    "evidence": [{"file":"mobile/src/lib/registration-draft.ts","line":4,"description":"Payload mencakup identitas, paspor, catatan, dan data pembayar."}],
+    "blockers": ["Belum diuji pada perangkat disposable dan kebijakan retensi guest tidak didokumentasikan."],
+    "validation_plan": {"local":"Isi data sintetis sebagai guest A, tutup app, lalu buka departure sama sebagai guest B pada perangkat uji.","deployment":"Tidak diperlukan."}
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "mobile.signin-private-cache-switch",
+    "title": "Sign-in akun baru tidak membersihkan cache journey dan Live akun lama",
+    "description": "Jalur signIn membersihkan query dan draft tetapi tidak journey/live cache global; login akun B tanpa explicit signOut dapat memakai fallback cache akun A saat offline/error.",
+    "claimed_root_cause": "Cache private tidak dinamespace per account dan cleanup hanya lengkap pada signOut.",
+    "trace": [
+      {"kind":"entrypoint","file":"mobile/src/lib/auth-store.ts","line":45,"scope":"signIn","description":"Account baru mengganti token/user."},
+      {"kind":"propagation","file":"mobile/src/lib/journey-cache.ts","line":6,"scope":"journey cache","description":"Cache memakai key global."},
+      {"kind":"propagation","file":"mobile/src/lib/live-muthowif-cache.ts","line":6,"scope":"live cache","description":"Cache sesi memakai key global."},
+      {"kind":"sink","file":"mobile/app/journey.tsx","line":33,"scope":"offline fallback","description":"Cache lama dapat digunakan sebelum/tanpa data API baru."}
+    ],
+    "evidence": [{"file":"mobile/src/lib/auth-store.ts","line":52,"description":"signOut membersihkan journey/live cache, menunjukkan cleanup tidak ada pada signIn."}],
+    "blockers": ["Butuh uji dua akun dummy pada perangkat/storage terisolasi."],
+    "validation_plan": {"local":"Isi cache akun A, login akun B lewat route login tanpa logout, gagalkan API, lalu amati fallback.","deployment":"Tidak diperlukan."}
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "documents.prelimit-full-buffer",
+    "title": "Upload dokumen dibuffer penuh sebelum batas 10 MB diterapkan",
+    "description": "Route memanggil formData dan arrayBuffer sebelum validatePrivateFile memeriksa ukuran, sehingga body besar dapat menggunakan memori lebih dulu.",
+    "claimed_root_cause": "Batas file berada setelah materialisasi multipart/file dan tidak ada source-visible hard body cap untuk Route Handler.",
+    "trace": [
+      {"kind":"entrypoint","file":"src/app/api/mobile/v1/documents/route.ts","line":26,"scope":"multipart upload","description":"Request multipart diterima dari jamaah terautentikasi."},
+      {"kind":"propagation","file":"src/app/api/mobile/v1/documents/route.ts","line":30,"scope":"full buffering","description":"File.arrayBuffer mematerialisasi bytes."},
+      {"kind":"sink","file":"src/lib/management/storage.ts","line":33,"scope":"size validation","description":"Batas 10 MB baru diterapkan setelah buffering."}
+    ],
+    "evidence": [{"file":"next.config.ts","line":5,"description":"Batas 10 MB yang terlihat ditujukan ke Server Actions, bukan Route Handler upload mobile."}],
+    "blockers": ["Ingress/CDN mungkin memiliki body limit yang tidak terlihat; stress test dilarang dan sandbox tidak tersedia."],
+    "validation_plan": {"local":"Dengan memory cap ketat dan dummy multipart sedikit di atas limit, pastikan penolakan terjadi sebelum buffering.","deployment":"Periksa effective request-body limit edge/runtime."}
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "documents.r2-private-policy-unobserved",
+    "title": "Privasi bucket dokumen tidak dapat dibuktikan dari repository",
+    "description": "Application mengeluarkan signed URL setelah owner check dan memakai prefix private, tetapi policy bucket/CDN yang menentukan apakah object key bisa diakses langsung tidak ada di repo.",
+    "claimed_root_cause": "Kontrol object-store merupakan deployment attachment yang belum diamati, bukan defect source yang terkonfirmasi.",
+    "trace": [
+      {"kind":"entrypoint","file":"src/app/api/mobile/v1/documents/[id]/route.ts","line":12,"scope":"document download","description":"Owner-scoped route menemukan object key."},
+      {"kind":"propagation","file":"src/lib/management/storage.ts","line":60,"scope":"signed URL","description":"Server membuat presigned GetObject selama 600 detik."},
+      {"kind":"sink","file":"src/lib/management/storage.ts","line":21,"scope":"R2 bucket","description":"Object dilayani oleh bucket eksternal dengan policy yang tidak didefinisikan di repo."}
+    ],
+    "evidence": [{"file":"src/lib/management/storage.ts","line":55,"description":"Object key memakai prefix private dan UUID, tetapi nama bukan access control."}],
+    "blockers": ["R2 bucket policy, public access setting, custom domain/CDN route, dan signed URL log tidak tersedia secara lokal."],
+    "validation_plan": {"local":"Tidak ada local check yang menggantikan policy provider.","deployment":"Owner memeriksa bucket public access/custom domain dan mencoba HEAD/GET object dummy tanpa signature."}
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "livekit.publisher-capability-survives-end",
+    "title": "Token publisher 8 jam mungkin tetap berlaku setelah sesi diakhiri",
+    "description": "Ending session hanya mengubah database; source tidak menunjukkan room close, participant removal, atau provider token revocation untuk capability yang sudah diterbitkan.",
+    "claimed_root_cause": "Status database dianggap mencabut capability LiveKit yang sudah ditandatangani.",
+    "trace": [
+      {"kind":"entrypoint","file":"src/app/api/mobile/v1/muthowif/sessions/[sessionId]/token/route.ts","line":17,"scope":"publisher token","description":"Muthowif menerima token dengan TTL delapan jam."},
+      {"kind":"propagation","file":"src/app/api/mobile/v1/muthowif/sessions/[sessionId]/route.ts","line":25,"scope":"end action","description":"End mengubah status/livedEndedAt di database."},
+      {"kind":"sink","file":"src/app/api/mobile/v1/muthowif/sessions/[sessionId]/token/route.ts","line":23,"scope":"LiveKit publish grant","description":"Token yang sudah diterbitkan memiliki canPublish dan canPublishData."}
+    ],
+    "evidence": [{"file":"src/lib/mobile/livekit-room.ts","line":11,"description":"RoomServiceClient source-visible hanya dipakai membaca participant count."}],
+    "blockers": ["Perilaku LiveKit existing connection dan automation production tidak terlihat; runtime test memerlukan LiveKit sandbox."],
+    "validation_plan": {"local":"Dengan LiveKit lokal dummy, end session lalu coba lanjut/reconnect publish memakai token lama.","deployment":"Periksa webhook/automation yang mungkin menutup room atau menghapus participant."}
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "livekit.invalid-terminal-state-transition",
+    "title": "Muthowif dapat mencoba menghidupkan kembali sesi terminal",
+    "description": "PATCH action=start menulis status live tanpa memeriksa current status, termasuk ketika sesi ended/cancelled; policy terminal hanya dipakai saat token issuance.",
+    "claimed_root_cause": "Tidak ada transition table atau conditional update pada state machine sesi.",
+    "trace": [
+      {"kind":"entrypoint","file":"src/app/api/mobile/v1/muthowif/sessions/[sessionId]/route.ts","line":18,"scope":"PATCH assigned session","description":"Muthowif assigned mengirim action start."},
+      {"kind":"propagation","file":"src/app/api/mobile/v1/muthowif/sessions/[sessionId]/route.ts","line":23,"scope":"state computation","description":"Start selalu membentuk values status live."},
+      {"kind":"sink","file":"src/app/api/mobile/v1/muthowif/sessions/[sessionId]/route.ts","line":30,"scope":"database update","description":"Update hanya memfilter session ID, bukan prior state."}
+    ],
+    "evidence": [{"file":"src/lib/mobile/muthowif-live-policy.ts","line":5,"description":"Policy broadcast menolak ended/cancelled tetapi tidak dipanggil sebelum PATCH start."}],
+    "blockers": ["Belum divalidasi dengan DB dummy; kebutuhan produk untuk reopen tidak didokumentasikan."],
+    "validation_plan": {"local":"Buat sesi ended/cancelled dummy, panggil start sebagai assigned muthowif, dan cek state.","deployment":"Konfirmasi transition yang dimaksud owner."}
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "release.job-wide-secrets-and-mutable-tools",
+    "title": "Release job mengekspos secret luas sambil menjalankan input/tool mutable",
+    "description": "Expo dan R2 credentials tersedia di seluruh job, termasuk npm lifecycle scripts dan runtime install AWS CLI; actions/tooling juga tidak dipin ke immutable digest/versi penuh.",
+    "claimed_root_cause": "Secret scope terlalu luas dan handoff build-to-release tidak mengikat seluruh executable input secara immutable.",
+    "trace": [
+      {"kind":"entrypoint","file":".github/workflows/mobile-apk.yml","line":17,"scope":"job environment","description":"EXPO_TOKEN dan R2 credentials dipasang job-wide."},
+      {"kind":"propagation","file":".github/workflows/mobile-apk.yml","line":50,"scope":"build tooling","description":"Expo action memakai eas-version latest dan npm ci menjalankan dependency scripts."},
+      {"kind":"sink","file":".github/workflows/mobile-apk.yml","line":75,"scope":"release upload","description":"Unversioned awscli dipasang lalu credential menulis stable APK object."}
+    ],
+    "evidence": [{"file":".github/workflows/mobile-apk.yml","line":25,"description":"GitHub actions menggunakan tag mayor, bukan commit SHA immutable."}],
+    "blockers": ["Branch/tag protection, environment approval, runner egress, dan effective credential policy tidak terlihat."],
+    "validation_plan": {"local":"Gunakan disposable workflow/canary secret untuk memetakan step yang menerima env.","deployment":"Review GitHub environment, tag protection, R2 IAM scope, token rotation, dan runner policy."}
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "release.apk-identity-not-verified",
+    "title": "APK dipromosikan tanpa verifikasi identitas dan signing certificate",
+    "description": "Workflow hanya memeriksa HTTPS URL, file non-empty, dan ZIP integrity sebelum menimpa object latest; package ID, versionCode, signature/certificate, dan digest tidak diverifikasi.",
+    "claimed_root_cause": "Promotion mengikat mutable artifact URL/file, bukan identitas APK yang diharapkan.",
+    "trace": [
+      {"kind":"entrypoint","file":".github/workflows/mobile-apk.yml","line":60,"scope":"EAS build","description":"Workflow meminta preview artifact."},
+      {"kind":"propagation","file":".github/workflows/mobile-apk.yml","line":69,"scope":"artifact download","description":"Artifact URL diunduh dan hanya diuji sebagai ZIP."},
+      {"kind":"sink","file":".github/workflows/mobile-apk.yml","line":76,"scope":"stable R2 object","description":"Bytes menimpa jam-wisata-latest.apk."}
+    ],
+    "evidence": [{"file":"scripts/upload-mobile-release.ts","line":14,"description":"Jalur manual juga hanya memeriksa ZIP magic sebelum upload."}],
+    "blockers": ["EAS signing guarantees, key custody, bucket versioning, dan tag authorization tidak terlihat."],
+    "validation_plan": {"local":"Pada artifact dummy, jalankan apksigner/aapt dan cocokkan package, version, certificate fingerprint, serta SHA-256 sebelum promotion.","deployment":"Periksa signing key custody dan release/tag approvals."}
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "demo.google-review-account-data-isolation",
+    "title": "Isolasi data akun demo review tidak dapat diverifikasi dari source",
+    "description": "Nomor 081290002026 tidak ditemukan pada source tracked. Karena akun/data berada di database deployment, audit source tidak dapat memastikan akun demo bebas dari data jamaah asli.",
+    "claimed_root_cause": "Ini adalah fakta data deployment yang tidak direpresentasikan di repository.",
+    "trace": [
+      {"kind":"entrypoint","file":"src/app/api/mobile/v1/auth/login/route.ts","line":31,"scope":"account lookup","description":"Login mencari account/pilgrim dari database runtime."},
+      {"kind":"propagation","file":"src/lib/mobile/auth.ts","line":41,"scope":"session principal","description":"Session mengikat account ke pilgrim runtime."},
+      {"kind":"sink","file":"src/app/api/mobile/v1/me/route.ts","line":9,"scope":"personal data","description":"Data yang terlihat ditentukan oleh pilgrim row yang terikat pada akun tersebut."}
+    ],
+    "evidence": [{"file":"tests/mobile-core.test.ts","line":8,"description":"PIN 123456 hanya muncul sebagai fixture test; nomor demo spesifik tidak ditemukan di tracked source."}],
+    "blockers": ["Database production/staging tidak boleh diprobed oleh audit dan dump sanitasi tidak disediakan."],
+    "validation_plan": {"local":"Tidak ada local source check yang cukup.","deployment":"Owner menjalankan query read-only untuk account demo dan memastikan pilgrim/registrations/documents/payments semuanya synthetic serta diberi label demo."}
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "public-ingestion.persistent-db-growth",
+    "title": "Endpoint anonim dapat menambah state database tanpa quota aplikasi",
+    "description": "Traffic pageview dan referral lead dapat menambah row persisten tanpa source-visible rate limit, dedup, atau retention control.",
+    "claimed_root_cause": "Anonymous ingestion diteruskan ke insert/upsert database tanpa bounded per-caller quota.",
+    "trace": [
+      {"kind":"entrypoint","file":"src/app/api/traffic/route.ts","line":8,"scope":"anonymous traffic POST","description":"Caller anonim mengirim event valid berulang."},
+      {"kind":"propagation","file":"src/lib/analytics.ts","line":65,"scope":"analytics persistence","description":"Session di-upsert dan pageview ditambahkan."},
+      {"kind":"sink","file":"src/app/api/referral-leads/route.ts","line":29,"scope":"referral persistence","description":"Submission valid membuat lead baru."}
+    ],
+    "evidence": [{"file":"src/app/api/referral-leads/route.ts","line":21,"description":"Route tidak memanggil limiter application-level sebelum insert."}],
+    "blockers": ["WAF/rate limit edge, retention job, volume, dan kapasitas database production tidak terlihat."],
+    "validation_plan": {"local":"Dengan DB dummy, kirim sedikit request identik dan ukur pertumbuhan row tanpa stress test.","deployment":"Review rule edge, retention, row count, dan alerting secara read-only."}
+  }
+]
