@@ -42,7 +42,8 @@
         {
           "defaultChannel": "informasi-perjalanan"
         }
-      ]
+      ],
+      "expo-status-bar"
     ],
     "ios": {
       "supportsTablet": false,
