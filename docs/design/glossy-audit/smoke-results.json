@@ -1,0 +1,62 @@
+[
+  {
+    "platform": "android",
+    "name": "home",
+    "path": "/",
+    "errors": []
+  },
+  {
+    "platform": "android",
+    "name": "packages",
+    "path": "/packages",
+    "errors": []
+  },
+  {
+    "platform": "android",
+    "name": "account",
+    "path": "/account",
+    "errors": []
+  },
+  {
+    "platform": "android",
+    "name": "register",
+    "path": "/register/dep-demo",
+    "errors": []
+  },
+  {
+    "platform": "android",
+    "name": "payment",
+    "path": "/payment/reg-demo",
+    "errors": []
+  },
+  {
+    "platform": "android",
+    "name": "quran",
+    "path": "/quran",
+    "errors": []
+  },
+  {
+    "platform": "android",
+    "name": "duas",
+    "path": "/duas",
+    "errors": []
+  },
+  {
+    "platform": "android",
+    "name": "live-muthowif",
+    "path": "/live-muthowif",
+    "errors": []
+  },
+  {
+    "platform": "android",
+    "name": "journey",
+    "path": "/journey",
+    "errors": []
+  },
+  {
+    "platform": "android",
+    "name": "onboarding",
+    "path": "/onboarding",
+    "errors": []
+  }
+]

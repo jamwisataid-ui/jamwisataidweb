@@ -1,17 +1,16 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { colors, typography } from "@/theme";
+import { GlassSurface } from "@/components/glass";
 
 export type LiveTab = "active" | "schedule";
 export function LiveTabs({ value, onChange }: { value: LiveTab; onChange: (value: LiveTab) => void }) {
-  return <View style={styles.tabs}>{([["active", "Siaran Aktif"], ["schedule", "Jadwal Siaran"]] as const).map(([id, label]) => <Pressable key={id} accessibilityRole="tab" accessibilityState={{ selected: value === id }} onPress={() => onChange(id)} style={styles.tab}><Text style={[styles.text, value === id && styles.textActive]}>{label}</Text><View style={[styles.indicator, value === id && styles.indicatorActive]} /></Pressable>)}</View>;
+  return <View style={styles.tabs}>{([["active", "Siaran Aktif"], ["schedule", "Jadwal Siaran"]] as const).map(([id, label]) => { const active = value === id; return <Pressable key={id} accessibilityRole="tab" accessibilityState={{ selected: active }} onPress={() => onChange(id)} style={styles.tab}><GlassSurface variant={active ? "gold" : "pearl"} radius={18} glow={active} style={styles.surface}><Text style={[styles.text, active && styles.textActive]}>{label}</Text></GlassSurface></Pressable>; })}</View>;
 }
 
 const styles = StyleSheet.create({
-  tabs: { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: colors.line },
-  tab: { flex: 1, minHeight: 48, justifyContent: "flex-end", alignItems: "center", gap: 11 },
+  tabs: { paddingHorizontal: 18, gap: 8, flexDirection: "row" },
+  tab: { flex: 1 }, surface: { minHeight: 40, alignItems: "center", justifyContent: "center" },
   text: { color: colors.muted, fontFamily: typography.semibold, fontSize: 14 },
-  textActive: { color: colors.navy, fontFamily: typography.bold },
-  indicator: { width: "66%", height: 3, borderRadius: 3, backgroundColor: "transparent" },
-  indicatorActive: { backgroundColor: colors.navy },
+  textActive: { color: colors.navyDeep, fontFamily: typography.bold },
 });

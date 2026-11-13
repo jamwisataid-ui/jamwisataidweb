@@ -1,6 +1,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { colors } from "@/theme";
+import { GlassSurface } from "@/components/glass";
 
 export type DetailTab = "detail" | "itinerary" | "facilities" | "requirements";
 
@@ -18,8 +19,7 @@ export function PackageDetailTabs({ value, onChange }: { value: DetailTab; onCha
         const active = tab.key === value;
         return (
           <Pressable accessibilityRole="tab" accessibilityState={{ selected: active }} key={tab.key} onPress={() => onChange(tab.key)} style={styles.tab}>
-            <Text style={[styles.label, active && styles.activeLabel]}>{tab.label}</Text>
-            <View style={[styles.line, active && styles.activeLine]} />
+            <GlassSurface variant={active ? "gold" : "pearl"} radius={18} glow={active} style={styles.surface}><Text style={[styles.label, active && styles.activeLabel]}>{tab.label}</Text></GlassSurface>
           </Pressable>
         );
       })}
@@ -28,10 +28,8 @@ export function PackageDetailTabs({ value, onChange }: { value: DetailTab; onCha
 }
 
 const styles = StyleSheet.create({
-  tabs: { minWidth: "100%", paddingHorizontal: 18, borderBottomWidth: 1, borderBottomColor: "#EDE7DC" },
-  tab: { minWidth: 88, flex: 1, paddingTop: 18, alignItems: "center" },
-  label: { paddingBottom: 11, color: colors.muted, fontFamily: "Montserrat_500Medium", fontSize: 13.5 },
-  activeLabel: { color: colors.navy, fontFamily: "Montserrat_700Bold" },
-  line: { width: "100%", height: 3, borderRadius: 3, backgroundColor: "transparent" },
-  activeLine: { backgroundColor: colors.navy },
+  tabs: { minWidth: "100%", paddingHorizontal: 18, paddingVertical: 12, gap: 8 },
+  tab: { minWidth: 88, flex: 1 }, surface: { minHeight: 40, paddingHorizontal: 14, alignItems: "center", justifyContent: "center" },
+  label: { color: colors.muted, fontFamily: "Montserrat_500Medium", fontSize: 13.5 },
+  activeLabel: { color: colors.navyDeep, fontFamily: "Montserrat_700Bold" },
 });

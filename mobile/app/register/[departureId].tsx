@@ -32,6 +32,7 @@ import { RegistrationFooter } from "@/components/registration/registration-foote
 import { DocumentStep } from "@/components/registration/document-step";
 import { PaymentStep } from "@/components/registration/payment-step";
 import { ConfirmationStep } from "@/components/registration/confirmation-step";
+import { AppBar } from "@/components/ui";
 import {
   compareIsoDateToToday,
   parseIndonesianDateInput,
@@ -371,13 +372,7 @@ export default function RegistrationScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View style={styles.safe}>
-        <View style={styles.appBar}>
-          <Pressable onPress={back} hitSlop={12} style={styles.iconButton}>
-            <Ionicons name="arrow-back" size={23} color={colors.navy} />
-          </Pressable>
-          <Text style={styles.appTitle}>Pendaftaran</Text>
-          <View style={styles.iconButton} />
-        </View>
+        <AppBar title="Pendaftaran" onBack={back} />
         <RegistrationStepper current={step} />
         {message ? (
           <View style={styles.errorBox}>

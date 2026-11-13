@@ -1,0 +1,14 @@
+[
+  {
+    "platform": "android",
+    "name": "login",
+    "path": "/login",
+    "errors": []
+  },
+  {
+    "platform": "ios",
+    "name": "login",
+    "path": "/login",
+    "errors": []
+  }
+]

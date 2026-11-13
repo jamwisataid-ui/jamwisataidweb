@@ -1,4 +1,4 @@
-import { useEffect, useRef, type PropsWithChildren } from "react";
+import { useEffect, useRef, useState, type PropsWithChildren } from "react";
 import { Animated, Easing, Platform, Pressable, type PressableProps, type StyleProp, type ViewStyle } from "react-native";
 
 /**
@@ -18,8 +18,8 @@ type PressableScaleProps = Omit<PressableProps, "style" | "children"> & PropsWit
 
 /** Pressable that springs down on press and lifts slightly on hover (web). */
 export function PressableScale({ style, containerStyle, children, pressedScale = 0.97, hoverLift = 3, onPressIn, onPressOut, onHoverIn, onHoverOut, disabled, ...props }: PressableScaleProps) {
-  const scale = useRef(new Animated.Value(1)).current;
-  const lift = useRef(new Animated.Value(0)).current;
+  const [scale] = useState(() => new Animated.Value(1));
+  const [lift] = useState(() => new Animated.Value(0));
   const spring = (value: Animated.Value, toValue: number) => Animated.spring(value, { toValue, useNativeDriver: true, speed: 40, bounciness: 6 }).start();
 
   return (
@@ -39,7 +39,7 @@ export function PressableScale({ style, containerStyle, children, pressedScale =
 
 /** Fades and rises content into place once mounted; stagger siblings with `delay`. */
 export function FadeInView({ children, delay = 0, distance = 14, duration = 460, style }: PropsWithChildren<{ delay?: number; distance?: number; duration?: number; style?: StyleProp<ViewStyle> }>) {
-  const progress = useRef(new Animated.Value(0)).current;
+  const [progress] = useState(() => new Animated.Value(0));
   useEffect(() => {
     const animation = Animated.timing(progress, { toValue: 1, duration, delay, easing: Easing.out(Easing.cubic), useNativeDriver: true });
     animation.start();
@@ -51,7 +51,7 @@ export function FadeInView({ children, delay = 0, distance = 14, duration = 460,
 
 /** Briefly pops its child when `trigger` changes (e.g. a counter tick). */
 export function PopOnChange({ trigger, children, style }: PropsWithChildren<{ trigger: unknown; style?: StyleProp<ViewStyle> }>) {
-  const scale = useRef(new Animated.Value(1)).current;
+  const [scale] = useState(() => new Animated.Value(1));
   const first = useRef(true);
   useEffect(() => {
     if (first.current) { first.current = false; return; }

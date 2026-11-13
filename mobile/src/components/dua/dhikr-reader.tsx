@@ -10,6 +10,7 @@ import type { DuaCollection, DuaItem } from "@/lib/dua-dhikr";
 import { dhikrFontSizes, dhikrModes, repeatCount, type DhikrMode } from "@/lib/dhikr-reader";
 import { qpcHafsText } from "@/lib/qpc-hafs-text";
 import { colors, typography } from "@/theme";
+import { GlassSurface } from "@/components/glass";
 
 /** Eight-point star with the item number inside — the reader's verse marker. */
 function StarNumber({ value, done }: { value: number; done: boolean }) {
@@ -97,12 +98,12 @@ export function DhikrReader({ collection }: { collection: DuaCollection }) {
           <View role="tablist" style={styles.modes}>
             {dhikrModes.map((option) => {
               const active = option.key === mode;
-              return <Pressable key={option.key} role="tab" accessibilityRole="tab" accessibilityState={{ selected: active }} onPress={() => setMode(option.key)} style={[styles.mode, active && styles.modeActive]}><Text style={[styles.modeText, active && styles.modeTextActive]}>{option.label}</Text></Pressable>;
+              return <Pressable key={option.key} role="tab" accessibilityRole="tab" accessibilityState={{ selected: active }} onPress={() => setMode(option.key)} style={styles.mode}><GlassSurface variant={active ? "gold" : "pearl"} radius={10} glow={active} style={styles.modeSurface}><Text style={[styles.modeText, active && styles.modeTextActive]}>{option.label}</Text></GlassSurface></Pressable>;
             })}
           </View>
           <View style={styles.sizes}>
-            <Pressable accessibilityRole="button" accessibilityLabel="Perkecil teks Arab" disabled={sizeIndex === 0} onPress={() => setSizeIndex((value) => Math.max(0, value - 1))} style={[styles.sizeButton, sizeIndex === 0 && styles.sizeDisabled]}><Text style={styles.sizeSmall}>A</Text></Pressable>
-            <Pressable accessibilityRole="button" accessibilityLabel="Perbesar teks Arab" disabled={sizeIndex === dhikrFontSizes.length - 1} onPress={() => setSizeIndex((value) => Math.min(dhikrFontSizes.length - 1, value + 1))} style={[styles.sizeButton, sizeIndex === dhikrFontSizes.length - 1 && styles.sizeDisabled]}><Text style={styles.sizeLarge}>A</Text></Pressable>
+            <Pressable accessibilityRole="button" accessibilityLabel="Perkecil teks Arab" disabled={sizeIndex === 0} onPress={() => setSizeIndex((value) => Math.max(0, value - 1))} style={sizeIndex === 0 && styles.sizeDisabled}><GlassSurface variant="pearl" radius={22} glow={false} style={styles.sizeButton}><Text style={styles.sizeSmall}>A</Text></GlassSurface></Pressable>
+            <Pressable accessibilityRole="button" accessibilityLabel="Perbesar teks Arab" disabled={sizeIndex === dhikrFontSizes.length - 1} onPress={() => setSizeIndex((value) => Math.min(dhikrFontSizes.length - 1, value + 1))} style={sizeIndex === dhikrFontSizes.length - 1 && styles.sizeDisabled}><GlassSurface variant="pearl" radius={22} glow={false} style={styles.sizeButton}><Text style={styles.sizeLarge}>A</Text></GlassSurface></Pressable>
           </View>
         </FadeInView>
 
@@ -138,13 +139,12 @@ const styles = StyleSheet.create({
   progressFill: { height: 6, borderRadius: 999, overflow: "hidden" },
   heroMeta: { color: "rgba(255,255,255,0.72)", fontFamily: "Montserrat_400Regular", fontSize: 11.5, lineHeight: 16 },
   toolbar: { flexDirection: "row", alignItems: "center", gap: 10 },
-  modes: { flex: 1, flexDirection: "row", padding: 4, gap: 4, borderRadius: 14, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.goldLine },
-  mode: { flex: 1, height: 36, borderRadius: 10, alignItems: "center", justifyContent: "center" },
-  modeActive: { backgroundColor: colors.navy },
+  modes: { flex: 1, flexDirection: "row", gap: 4 },
+  mode: { flex: 1, height: 36, borderRadius: 10 }, modeSurface: { height: 36, alignItems: "center", justifyContent: "center" },
   modeText: { color: colors.muted, fontFamily: "Montserrat_500Medium", fontSize: 12 },
-  modeTextActive: { color: colors.softGold, fontFamily: "Montserrat_600SemiBold" },
+  modeTextActive: { color: colors.navyDeep, fontFamily: "Montserrat_700Bold" },
   sizes: { flexDirection: "row", gap: 6 },
-  sizeButton: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center", backgroundColor: colors.white, borderWidth: 1, borderColor: "rgba(184,134,11,0.32)" },
+  sizeButton: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" },
   sizeDisabled: { opacity: 0.4 },
   sizeSmall: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 13 },
   sizeLarge: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 19 },

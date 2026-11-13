@@ -7,6 +7,7 @@ import { Button, Card, Empty, GuestGate, Screen, Section, Title } from "@/compon
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
 import { colors } from "@/theme";
+import { GlassSurface } from "@/components/glass";
 
 type Bill = {
   registrationId: string;
@@ -27,7 +28,7 @@ const rp = (value: number) => new Intl.NumberFormat("id-ID", { style: "currency"
 const statusLabel = { unpaid: "Belum dibayar", partial: "Dibayar sebagian", paid: "Lunas" };
 
 function BillCard({ bill }: { bill: Bill }) {
-  return <Card><View style={styles.billHeader}><View style={styles.billCopy}><Text style={styles.packageName}>{bill.packageName}</Text><Text style={styles.meta}>{bill.bookingNumber}</Text></View><View style={[styles.badge, bill.status === "paid" && styles.badgePaid]}><Text style={[styles.badgeText, bill.status === "paid" && styles.badgeTextPaid]}>{statusLabel[bill.status]}</Text></View></View><View style={styles.billAmounts}><View><Text style={styles.label}>Sisa tagihan</Text><Text style={[styles.billAmount, bill.outstanding > 0 && styles.outstanding]}>{rp(bill.outstanding)}</Text></View>{bill.paid > 0 ? <View style={styles.paidBlock}><Text style={styles.label}>Terbayar</Text><Text style={styles.paid}>{rp(bill.paid)}</Text></View> : null}</View><Pressable accessibilityRole="button" onPress={() => router.push(`/payment/${bill.registrationId}` as never)} style={styles.payButton}><Text style={styles.payButtonText}>{bill.status === "paid" ? "Lihat Pembayaran" : bill.selectedMethod ? "Lihat Instruksi Pembayaran" : "Pilih Cara Pembayaran"}</Text><Ionicons name="arrow-forward" size={18} color={colors.white} /></Pressable></Card>;
+  return <Card><View style={styles.billHeader}><View style={styles.billCopy}><Text style={styles.packageName}>{bill.packageName}</Text><Text style={styles.meta}>{bill.bookingNumber}</Text></View><View style={[styles.badge, bill.status === "paid" && styles.badgePaid]}><Text style={[styles.badgeText, bill.status === "paid" && styles.badgeTextPaid]}>{statusLabel[bill.status]}</Text></View></View><View style={styles.billAmounts}><View><Text style={styles.label}>Sisa tagihan</Text><Text style={[styles.billAmount, bill.outstanding > 0 && styles.outstanding]}>{rp(bill.outstanding)}</Text></View>{bill.paid > 0 ? <View style={styles.paidBlock}><Text style={styles.label}>Terbayar</Text><Text style={styles.paid}>{rp(bill.paid)}</Text></View> : null}</View><Pressable accessibilityRole="button" onPress={() => router.push(`/payment/${bill.registrationId}` as never)}><GlassSurface variant="dark" radius={13} style={styles.payButton}><Text style={styles.payButtonText}>{bill.status === "paid" ? "Lihat Pembayaran" : bill.selectedMethod ? "Lihat Instruksi Pembayaran" : "Pilih Cara Pembayaran"}</Text><Ionicons name="arrow-forward" size={18} color={colors.softGold} /></GlassSurface></Pressable></Card>;
 }
 
 export default function PaymentsScreen() {
@@ -60,6 +61,6 @@ const styles = StyleSheet.create({
   notice: { flexDirection: "row", alignItems: "flex-start", gap: 9, padding: 13, borderRadius: 14, backgroundColor: colors.goldPale },
   noticeText: { flex: 1, color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 12, lineHeight: 18 },
   errorTitle: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 17 },
-  payButton: { marginTop: 14, minHeight: 44, paddingHorizontal: 15, borderRadius: 13, backgroundColor: colors.navy, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
+  payButton: { marginTop: 14, minHeight: 44, paddingHorizontal: 15, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
   payButtonText: { color: colors.white, fontFamily: "Montserrat_700Bold", fontSize: 13 },
 } as const);

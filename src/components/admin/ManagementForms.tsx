@@ -324,12 +324,16 @@ export function CashForm({ accounts, packages, categories }: { accounts: Array<{
   const [categoryOptions, setCategoryOptions] = useState(categories);
   const [categoryId, setCategoryId] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
+  /* The server-action result must be reflected in this in-progress form without
+     resetting the other cash-transaction fields. */
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!categoryState.ok || !categoryState.createdCategory) return;
     setCategoryOptions((current) => current.some((item) => item.id === categoryState.createdCategory!.id) ? current : [...current, categoryState.createdCategory!].sort((a, b) => a.name.localeCompare(b.name, "id-ID")));
     setCategoryId(categoryState.createdCategory.id);
     setNewCategoryName("");
   }, [categoryState]);
+  /* eslint-enable react-hooks/set-state-in-effect */
   return <form action={action} encType="multipart/form-data" className="management-form"><Feedback state={state} /><Feedback state={categoryState} /><div className="management-form-grid two">
     <label><span>Jenis transaksi</span><select name="direction" value={direction} onChange={(event) => setDirection(event.target.value as typeof direction)}><option value="in">Kas masuk</option><option value="out">Kas keluar (bayar ke pihak luar)</option><option value="transfer">Pindah dana antar rekening Jam Wisata</option></select></label>
     <label><span>Rekening/kas asal *</span><select name="accountId" required><option value="">Pilih akun</option>{accounts.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>

@@ -1,5 +1,5 @@
 import type { PropsWithChildren, ReactNode } from "react";
-import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
+import { StyleSheet, View, type DimensionValue, type StyleProp, type ViewStyle } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { gradients } from "@/theme";
 
@@ -27,9 +27,9 @@ const variantConfig: Record<
     baseEnd?: { x: number; y: number };
     specularColors: readonly [string, string, ...string[]];
     specularLocations?: readonly [number, number, ...number[]];
-    specularHeight: string;
+    specularHeight: DimensionValue;
     reflectionColors: readonly [string, string, ...string[]];
-    reflectionHeight: string;
+    reflectionHeight: DimensionValue;
     insetHighlightColor: string;
     borderColor: string;
     borderWidth: number;
@@ -197,11 +197,9 @@ export function GlassSurface({
   return (
     <View
       style={[
-        styles.surface,
+        styles.shadowShell,
         {
           borderRadius: finalRadius,
-          borderWidth: finalBorderWidth,
-          borderColor: finalBorderColor,
           backgroundColor: cfg.fallbackBg,
         },
         glow && {
@@ -214,72 +212,78 @@ export function GlassSurface({
         style,
       ]}
     >
-      {/* 1. Base LinearGradient */}
-      <LinearGradient
-        colors={baseColors}
-        locations={cfg.baseLocations}
-        start={cfg.baseStart}
-        end={cfg.baseEnd}
-        style={StyleSheet.absoluteFill}
-      />
-
-      {/* Diagonal shine strip for cards */}
-      {showDiagonal ? (
+      <View
+        pointerEvents="none"
+        style={[
+          styles.surface,
+          StyleSheet.absoluteFill,
+          {
+            borderRadius: finalRadius,
+            borderWidth: finalBorderWidth,
+            borderColor: finalBorderColor,
+          },
+        ]}
+      >
+        {/* 1. Base LinearGradient */}
         <LinearGradient
-          colors={["transparent", "rgba(255,255,255,0.20)", "transparent"]}
-          locations={[0.42, 0.5, 0.58]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          pointerEvents="none"
+          colors={baseColors}
+          locations={cfg.baseLocations}
+          start={cfg.baseStart}
+          end={cfg.baseEnd}
           style={StyleSheet.absoluteFill}
         />
-      ) : null}
+
+      {/* Diagonal shine strip for cards */}
+        {showDiagonal ? (
+          <LinearGradient
+            colors={["transparent", "rgba(255,255,255,0.20)", "transparent"]}
+            locations={[0.42, 0.5, 0.58]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+        ) : null}
 
       {/* Top-right corner gold glow for navy card */}
-      {variant === "navyCard" ? (
-        <LinearGradient
-          colors={["rgba(245,217,122,0.22)", "transparent"]}
-          start={{ x: 1, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          pointerEvents="none"
-          style={styles.cardCornerGlow}
-        />
-      ) : null}
+        {variant === "navyCard" ? (
+          <LinearGradient
+            colors={["rgba(245,217,122,0.22)", "transparent"]}
+            start={{ x: 1, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={styles.cardCornerGlow}
+          />
+        ) : null}
 
       {/* Extra pearlescent spot highlight for pearl orb */}
-      {variant === "pearl" ? (
-        <View pointerEvents="none" style={styles.pearlGleam} />
-      ) : null}
+        {variant === "pearl" ? <View style={styles.pearlGleam} /> : null}
 
       {/* 2. Specular atas: kilap putih elips/gradasi di bagian atas */}
-      <LinearGradient
-        colors={cfg.specularColors}
-        locations={cfg.specularLocations}
-        pointerEvents="none"
-        style={[styles.specular, { height: cfg.specularHeight as any }]}
-      />
+        <LinearGradient
+          colors={cfg.specularColors}
+          locations={cfg.specularLocations}
+          style={[styles.specular, { height: cfg.specularHeight }]}
+        />
 
       {/* 3. Refleksi bawah: pendar lembut di bawah */}
-      <LinearGradient
-        colors={cfg.reflectionColors}
-        pointerEvents="none"
-        style={[styles.reflection, { height: cfg.reflectionHeight as any }]}
-      />
+        <LinearGradient
+          colors={cfg.reflectionColors}
+          style={[styles.reflection, { height: cfg.reflectionHeight }]}
+        />
 
       {/* 4. Rim: garis putih tipis 1–2px di tepi atas (inset highlight) */}
-      {insetHighlight ? (
-        <View
-          pointerEvents="none"
-          style={[
-            styles.insetRim,
-            {
-              backgroundColor: cfg.insetHighlightColor,
-              borderTopLeftRadius: finalRadius,
-              borderTopRightRadius: finalRadius,
-            },
-          ]}
-        />
-      ) : null}
+        {insetHighlight ? (
+          <View
+            style={[
+              styles.insetRim,
+              {
+                backgroundColor: cfg.insetHighlightColor,
+                borderTopLeftRadius: finalRadius,
+                borderTopRightRadius: finalRadius,
+              },
+            ]}
+          />
+        ) : null}
+      </View>
 
       {/* Children */}
       {children}
@@ -288,9 +292,11 @@ export function GlassSurface({
 }
 
 const styles = StyleSheet.create({
+  shadowShell: {
+    position: "relative",
+  },
   surface: {
     overflow: "hidden",
-    position: "relative",
   },
   specular: {
     position: "absolute",
