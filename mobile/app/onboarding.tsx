@@ -12,7 +12,7 @@ import { colors, gradients, shadow } from "@/theme";
 function Slide({ item, width, height }: { item: OnboardingSlide; width: number; height: number }) {
   const compact = height < 720;
   const heroHeight = Math.min(Math.max(height * (compact ? 0.43 : 0.48), 300), 460);
-  return <View style={[styles.slide, { width }]}><View style={[styles.hero, { height: heroHeight }]}><Image alt="" source={item.image} resizeMode="cover" style={StyleSheet.absoluteFill} /><LinearGradient colors={["transparent", "rgba(255,249,240,0.28)", "#FBFAF6"]} locations={[0.62, 0.82, 1]} style={StyleSheet.absoluteFill} /></View><View style={[styles.copy, compact && styles.copyCompact]}><Text style={[styles.title, compact && styles.titleCompact]}>{item.title}</Text><Text style={[styles.description, compact && styles.descriptionCompact]}>{item.description}</Text></View></View>;
+  return <View style={[styles.slide, { width }]}><View style={[styles.hero, { height: heroHeight }]}><Image alt="" source={item.image} resizeMode="cover" style={StyleSheet.absoluteFill} /><LinearGradient colors={["transparent", "rgba(255,255,255,0.28)", "#FFFFFF"]} locations={[0.62, 0.82, 1]} style={StyleSheet.absoluteFill} /></View><View style={[styles.copy, compact && styles.copyCompact]}><Text style={[styles.title, compact && styles.titleCompact]}>{item.title}</Text><Text style={[styles.description, compact && styles.descriptionCompact]}>{item.description}</Text></View></View>;
 }
 
 export default function OnboardingScreen() {
@@ -34,8 +34,8 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, alignItems: "center", backgroundColor: "#FBFAF6" },
-  container: { flex: 1, position: "relative", overflow: "hidden", backgroundColor: "#FBFAF6" },
+  safe: { flex: 1, alignItems: "center", backgroundColor: "#FFFFFF" },
+  container: { flex: 1, position: "relative", overflow: "hidden", backgroundColor: "#FFFFFF" },
   slide: { flex: 1 }, hero: { width: "100%", overflow: "hidden" },
   copy: { paddingHorizontal: 24, paddingTop: 12, gap: 13 }, copyCompact: { paddingTop: 7, gap: 8 },
   title: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 32, lineHeight: 38 }, titleCompact: { fontSize: 27, lineHeight: 32 },
@@ -43,6 +43,6 @@ const styles = StyleSheet.create({
   skip: { position: "absolute", top: 12, right: 20, zIndex: 3, paddingHorizontal: 16, paddingVertical: 9, borderRadius: 18, backgroundColor: "rgba(6,21,43,0.45)", borderWidth: 1, borderColor: "rgba(255,255,255,0.25)" }, skipText: { color: colors.white, fontFamily: "Montserrat_600SemiBold", fontSize: 13 },
   controls: { position: "absolute", left: 22, right: 22, bottom: 16, gap: 14 }, dots: { height: 10, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9 },
   dot: { width: 8, height: 3, borderRadius: 2, backgroundColor: "rgba(10,29,58,0.18)" }, dotActive: { width: 24, backgroundColor: colors.gold },
-  button: { width: "100%", borderRadius: 12, overflow: "hidden", ...shadow }, buttonGradient: { minHeight: 56, alignItems: "center", justifyContent: "center", paddingHorizontal: 20 }, buttonText: { color: colors.navyDeep, fontFamily: "Montserrat_700Bold", fontSize: 14.5, letterSpacing: 1 },
+  button: { width: "100%", borderRadius: 12, ...shadow }, buttonGradient: { minHeight: 56, borderRadius: 12, alignItems: "center", justifyContent: "center", paddingHorizontal: 20 }, buttonText: { color: colors.navyDeep, fontFamily: "Montserrat_700Bold", fontSize: 14.5, letterSpacing: 1 },
   loginLink: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 13, textAlign: "center" }, loginStrong: { color: colors.goldText, fontFamily: "Montserrat_700Bold" },
 });

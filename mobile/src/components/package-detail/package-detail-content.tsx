@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   dayNumber: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 13 },
   rail: { width: 2, flex: 1, minHeight: 54, backgroundColor: "#E5D9BD" },
   dayCopy: { flex: 1, paddingBottom: 19, gap: 3 },
-  dayLabel: { color: colors.gold, fontFamily: "Montserrat_700Bold", fontSize: 10, letterSpacing: 1 },
+  dayLabel: { color: colors.goldText, fontFamily: "Montserrat_700Bold", fontSize: 10, letterSpacing: 1 },
   dayTitle: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 15, lineHeight: 20 },
   dayDescription: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 13, lineHeight: 20 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },

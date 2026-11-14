@@ -26,10 +26,11 @@ export function ScheduleDepartureCard({ item }: { item: PackageDepartureSelectio
     accessibilityLabel={`Lihat ${packageItem.name}, keberangkatan ${departure.dateLabel}`}
     accessibilityRole="button"
     onPress={() => router.push({ pathname: "/package/[slug]", params: { slug: packageItem.slug || packageItem.id, departureId: departure.id } })}
-    style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+    style={({ pressed }) => [styles.shadowShell, pressed && styles.pressed]}
   >
-    <Image alt={packageItem.name} resizeMode="cover" source={{ uri: packageItem.image }} style={styles.image} />
-    <View style={styles.content}>
+    <View style={styles.card}>
+      <Image alt={packageItem.name} resizeMode="cover" source={{ uri: packageItem.image }} style={styles.image} />
+      <View style={styles.content}>
       <View style={styles.topRow}>
         <Text style={styles.date}>{departure.dateLabel}</Text>
         <View style={[styles.badge, departure.status === "limited" && styles.badgeLimited, departure.status === "sold-out" && styles.badgeClosed]}>
@@ -40,12 +41,14 @@ export function ScheduleDepartureCard({ item }: { item: PackageDepartureSelectio
       <View style={styles.meta}><Ionicons color={colors.goldDark} name="airplane-outline" size={15} /><Text numberOfLines={1} style={styles.metaText}>{packageItem.airline || packageItem.departureAirport || "Informasi penerbangan menyusul"}</Text></View>
       {departure.returnDate ? <View style={styles.meta}><Ionicons color={colors.goldDark} name="return-down-back-outline" size={15} /><Text style={styles.metaText}>Pulang {dateLabel(departure.returnDate)}</Text></View> : null}
       <View style={styles.footer}><View><Text style={styles.price}>{departure.price ? money.format(departure.price) : "Hubungi kami"}</Text>{seats ? <Text style={styles.seats}>{seats}</Text> : null}</View><Ionicons color={colors.navy} name="arrow-forward" size={20} /></View>
+      </View>
     </View>
   </Pressable>;
 }
 
 const styles = StyleSheet.create({
-  card: { flexDirection: "row", minHeight: 174, overflow: "hidden", borderRadius: 19, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, ...shadow },
+  shadowShell: { borderRadius: 19, ...shadow },
+  card: { flexDirection: "row", minHeight: 174, overflow: "hidden", borderRadius: 19, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white },
   pressed: { opacity: .8 },
   image: { width: "34%", minHeight: 174, backgroundColor: "#D9E1E7" },
   content: { flex: 1, minWidth: 0, padding: 14, gap: 7 },

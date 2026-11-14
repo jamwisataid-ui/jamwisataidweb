@@ -55,31 +55,33 @@ export function PackageCard({ item }: { item: Package }) {
       accessibilityLabel={`Lihat detail ${item.name}`}
       onPress={() => router.push({ pathname: "/package/[slug]", params: { slug: item.id } })}
       pressedScale={0.985}
-      style={styles.card}
+      style={styles.shadowShell}
     >
-      <View style={styles.imageFrame}>
-        <Image source={{ uri: item.image }} resizeMode="cover" style={styles.image} alt={item.name} />
-        <LinearGradient colors={["transparent", "rgba(6,21,43,0.55)"]} locations={[0.5, 1]} style={StyleSheet.absoluteFill} />
-        <PackageBadge item={item} />
-        {item.durationDays ? <Text style={styles.imageCaption}>{item.durationDays} hari{item.departures?.[0]?.dateLabel ? ` · mulai ${item.departures[0].dateLabel}` : ""}</Text> : null}
-      </View>
-
-      <View style={styles.content}>
-        <Text numberOfLines={1} style={styles.eyebrow}>{destinations.toLocaleUpperCase("id-ID")}</Text>
-        <Text numberOfLines={2} style={styles.name}>{item.name}</Text>
-
-        <View style={styles.metaList}>
-          <PackageMetaRow icon="calendar-outline" text={scheduleWithSeats} />
-          {item.airline ? <PackageMetaRow icon="airplane-outline" text={item.airline} /> : null}
-          {hotels.map((hotel, index) => <PackageMetaRow key={`${hotel}-${index}`} icon="business-outline" text={hotel} />)}
+      <View style={styles.card}>
+        <View style={styles.imageFrame}>
+          <Image source={{ uri: item.image }} resizeMode="cover" style={styles.image} alt={item.name} />
+          <LinearGradient colors={["transparent", "rgba(6,21,43,0.55)"]} locations={[0.5, 1]} style={StyleSheet.absoluteFill} />
+          <PackageBadge item={item} />
+          {item.durationDays ? <Text style={styles.imageCaption}>{item.durationDays} hari{item.departures?.[0]?.dateLabel ? ` · mulai ${item.departures[0].dateLabel}` : ""}</Text> : null}
         </View>
 
-        <View style={styles.footer}>
-          <View style={styles.priceBlock}>
-            <Text style={styles.perPerson}>{item.priceFrom ? "mulai dari / jamaah" : "Harga paket"}</Text>
-            <Text style={styles.price}>{item.priceFrom ? `Rp ${money.format(item.priceFrom)}` : "Hubungi kami"}</Text>
+        <View style={styles.content}>
+          <Text numberOfLines={1} style={styles.eyebrow}>{destinations.toLocaleUpperCase("id-ID")}</Text>
+          <Text numberOfLines={2} style={styles.name}>{item.name}</Text>
+
+          <View style={styles.metaList}>
+            <PackageMetaRow icon="calendar-outline" text={scheduleWithSeats} />
+            {item.airline ? <PackageMetaRow icon="airplane-outline" text={item.airline} /> : null}
+            {hotels.map((hotel, index) => <PackageMetaRow key={`${hotel}-${index}`} icon="business-outline" text={hotel} />)}
           </View>
-          {disabled ? <View style={[styles.arrow, styles.disabledButton]}><Ionicons name="arrow-forward" size={18} color={colors.muted} /></View> : <MetallicGold style={styles.arrow}><Ionicons name="arrow-forward" size={18} color={colors.navyDeep} /></MetallicGold>}
+
+          <View style={styles.footer}>
+            <View style={styles.priceBlock}>
+              <Text style={styles.perPerson}>{item.priceFrom ? "mulai dari / jamaah" : "Harga paket"}</Text>
+              <Text style={styles.price}>{item.priceFrom ? `Rp ${money.format(item.priceFrom)}` : "Hubungi kami"}</Text>
+            </View>
+            {disabled ? <View style={[styles.arrow, styles.disabledButton]}><Ionicons name="arrow-forward" size={18} color={colors.muted} /></View> : <MetallicGold style={styles.arrow}><Ionicons name="arrow-forward" size={18} color={colors.navyDeep} /></MetallicGold>}
+          </View>
         </View>
       </View>
     </PressableScale>
@@ -101,7 +103,8 @@ export function PackageCardSkeleton() {
 }
 
 const styles = StyleSheet.create({
-  card: { width: "100%", borderRadius: 20, overflow: "hidden", backgroundColor: colors.white, borderWidth: 1, borderColor: colors.goldLine, ...shadow },
+  shadowShell: { width: "100%", borderRadius: 20, ...shadow },
+  card: { width: "100%", borderRadius: 20, overflow: "hidden", backgroundColor: colors.white, borderWidth: 1, borderColor: colors.goldLine },
   pressed: { opacity: 0.86 },
   imageFrame: { width: "100%", aspectRatio: 16 / 8.5, backgroundColor: colors.navyDeep },
   image: { width: "100%", height: "100%" },

@@ -6,9 +6,9 @@ export const colors = {
   goldDark: "#B8860B",
   softGold: "#E8C967",
   goldPale: "#F8F1DC",
-  /** Gold for small text on light surfaces (≈5:1 on ivory; #B8860B is only ≈3:1). */
+  /** Gold for small text on white surfaces; keep this darker than decorative gold. */
   goldText: "#8C6708",
-  ivory: "#FBFAF6",
+  ivory: "#FFFFFF",
   white: "#FFFFFF",
   ink: "#333333",
   muted: "#68707A",

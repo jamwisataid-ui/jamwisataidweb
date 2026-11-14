@@ -47,7 +47,7 @@ export function LiveSessionCard({ item, joining, onJoin }: { item: LiveMuthowifS
 const styles = StyleSheet.create({
   card: { padding: 13, borderRadius: radius.card, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, gap: 12, ...shadow },
   main: { flexDirection: "row", gap: 13 },
-  image: { width: 104, minHeight: 128, borderRadius: 13, backgroundColor: colors.goldPale },
+  image: { width: 104, height: 128, borderRadius: 13, backgroundColor: colors.goldPale },
   info: { flex: 1, alignItems: "flex-start", minWidth: 0 },
   badge: { height: 23, flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 8, borderRadius: 8, backgroundColor: "#22C55E", marginBottom: 6 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.white },

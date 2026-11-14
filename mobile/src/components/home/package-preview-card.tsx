@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.88 },
   body: { flex: 1, padding: 16, justifyContent: "space-between", maxWidth: "78%" },
   top: { gap: 4 },
-  eyebrow: { color: colors.gold, fontFamily: "Cinzel_600SemiBold", fontSize: 9.5, letterSpacing: 2.2 },
+  eyebrow: { color: colors.goldText, fontFamily: "Cinzel_600SemiBold", fontSize: 9.5, letterSpacing: 2.2 },
   title: { color: colors.white, fontFamily: "Cinzel_600SemiBold", fontSize: 17, lineHeight: 22 },
   from: { color: "rgba(255,255,255,0.75)", fontFamily: "Montserrat_400Regular", fontSize: 11 },
   price: { color: colors.softGold, fontFamily: "Montserrat_700Bold", fontSize: 16 },

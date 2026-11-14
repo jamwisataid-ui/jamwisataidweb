@@ -5,11 +5,12 @@ import { MetallicGold } from "@/components/metallic-gold";
 import { colors, shadow, typography } from "@/theme";
 
 export function LiveInfoBanner() {
-  return <MetallicGold style={styles.banner}><View style={styles.icon}><Ionicons name="radio" size={27} color={colors.gold} /></View><View style={styles.copy}><Text style={styles.eyebrow}>PANDUAN IBADAH</Text><Text style={styles.title}>Secara Langsung dari Ustadz Pembimbing</Text></View><Ionicons name="radio-outline" size={58} color="rgba(6,21,43,0.13)" style={styles.watermark} /></MetallicGold>;
+  return <View style={styles.shadowShell}><MetallicGold style={styles.banner}><View style={styles.icon}><Ionicons name="radio" size={27} color={colors.gold} /></View><View style={styles.copy}><Text style={styles.eyebrow}>PANDUAN IBADAH</Text><Text style={styles.title}>Secara Langsung dari Ustadz Pembimbing</Text></View><Ionicons name="radio-outline" size={58} color="rgba(6,21,43,0.13)" style={styles.watermark} /></MetallicGold></View>;
 }
 
 const styles = StyleSheet.create({
-  banner: { minHeight: 94, borderRadius: 18, padding: 16, flexDirection: "row", alignItems: "center", gap: 13, overflow: "hidden", ...shadow },
+  shadowShell: { borderRadius: 18, ...shadow },
+  banner: { minHeight: 94, borderRadius: 18, padding: 16, flexDirection: "row", alignItems: "center", gap: 13 },
   icon: { width: 48, height: 48, borderRadius: 16, backgroundColor: colors.navyDeep, alignItems: "center", justifyContent: "center" },
   copy: { flex: 1, gap: 3, zIndex: 1 },
   eyebrow: { color: colors.navyDeep, fontFamily: typography.bold, fontSize: 10, letterSpacing: 1.2 },
