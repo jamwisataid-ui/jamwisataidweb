@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { PackagePreviewCard, PackagePreviewSkeleton } from "@/components/home/package-preview-card";
-import { AppBar, Screen } from "@/components/ui";
+import { Screen } from "@/components/ui";
 import { api } from "@/lib/api";
 import { colors } from "@/theme";
 import type { Package } from "@/types";
@@ -33,8 +33,11 @@ export default function SearchScreen() {
   return (
     <Screen>
       <View style={styles.header}>
-        <AppBar title="Cari perjalanan" />
+        <Pressable accessibilityLabel="Kembali" accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={23} color={colors.navy} />
+        </Pressable>
         <View style={styles.heading}>
+          <Text style={styles.title}>Cari perjalanan</Text>
           <Text style={styles.subtitle}>Temukan paket, tujuan, maskapai, atau hotel.</Text>
         </View>
       </View>
@@ -57,7 +60,7 @@ export default function SearchScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { gap: 2 },
+  header: { flexDirection: "row", alignItems: "center", gap: 10 },
   backButton: { width: 42, height: 42, borderRadius: 14, alignItems: "center", justifyContent: "center", backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
   heading: { flex: 1, gap: 2 },
   title: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 24, lineHeight: 29 },

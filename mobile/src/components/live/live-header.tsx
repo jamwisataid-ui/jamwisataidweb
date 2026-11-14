@@ -1,13 +1,12 @@
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { colors, typography } from "@/theme";
-import { CircleButton } from "@/components/ui";
-import { GlassSurface } from "@/components/glass";
 
 export function LiveHeader() {
   const goBack = () => router.canGoBack() ? router.back() : router.replace("/(tabs)");
-  return <GlassSurface variant="dark" radius={0} glow={false} style={styles.header}><CircleButton dark icon="arrow-back" label="Kembali" onPress={goBack} /><Text style={styles.title}>LIVE MUTHOWIF</Text><View style={styles.action} /></GlassSurface>;
+  return <View style={styles.header}><Pressable accessibilityLabel="Kembali" accessibilityRole="button" onPress={goBack} style={styles.action}><Ionicons name="arrow-back" size={23} color={colors.white} /></Pressable><Text style={styles.title}>LIVE MUTHOWIF</Text><View style={styles.action} /></View>;
 }
 
 const styles = StyleSheet.create({

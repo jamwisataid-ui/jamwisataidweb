@@ -1,20 +1,21 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { ProfileAvatar } from "@/components/account/profile-avatar";
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
 import { colors } from "@/theme";
 import type { AccountProfile } from "@/types";
+import { Pressable } from "react-native";
 import { AppBar as LuxuryAppBar } from "@/components/ui";
-import { GlassSurface } from "@/components/glass";
 
 const gender: Record<string, string> = { male: "Laki-laki", female: "Perempuan", laki_laki: "Laki-laki", perempuan: "Perempuan" };
 function date(value?: string | null) { return value ? new Intl.DateTimeFormat("id-ID", { dateStyle: "long" }).format(new Date(`${value}T00:00:00`)) : "Belum diisi"; }
 
 function ProfileRow({ icon, label, value }: { icon: keyof typeof Ionicons.glyphMap; label: string; value?: string | null }) {
-  return <View style={styles.row}><GlassSurface variant="pearl" radius={13} style={styles.icon}><Ionicons name={icon} size={20} color={colors.navy} /></GlassSurface><View style={styles.rowCopy}><Text style={styles.label}>{label}</Text><Text selectable style={styles.value}>{value || "Belum diisi"}</Text></View></View>;
+  return <View style={styles.row}><View style={styles.icon}><Ionicons name={icon} size={20} color={colors.navy} /></View><View style={styles.rowCopy}><Text style={styles.label}>{label}</Text><Text selectable style={styles.value}>{value || "Belum diisi"}</Text></View></View>;
 }
 
 export default function ProfileScreen() {
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
   number: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 12 },
   list: { overflow: "hidden", borderRadius: 18, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white },
   row: { minHeight: 67, marginLeft: 15, paddingRight: 15, flexDirection: "row", alignItems: "center", gap: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
-  icon: { width: 38, height: 38, alignItems: "center", justifyContent: "center" },
+  icon: { width: 38, height: 38, borderRadius: 13, backgroundColor: "#F8F1DC", alignItems: "center", justifyContent: "center" },
   rowCopy: { flex: 1, gap: 2 },
   label: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 11.5 },
   value: { color: colors.navy, fontFamily: "Montserrat_500Medium", fontSize: 14.5 },

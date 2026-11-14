@@ -4,7 +4,6 @@ import { Animated, Image, Pressable, StyleSheet, Text, View } from "react-native
 
 import { colors, radius, shadow, typography } from "@/theme";
 import type { LiveMuthowifSession } from "@/types";
-import { GlassSurface } from "@/components/glass";
 
 import fallbackImage from "../../../assets/onboarding/live-muthowif.jpg";
 
@@ -41,14 +40,14 @@ export function LiveSessionCard({ item, joining, onJoin }: { item: LiveMuthowifS
         <View style={styles.listeners}><Ionicons name="headset-outline" size={15} color={colors.navy} /><Text style={styles.listenerText}>{item.listenerCount} / {item.capacity} jamaah</Text></View>
       </View>
     </View>
-    <Pressable accessibilityRole="button" disabled={joining || (isLive && !item.canJoin) || isEnded} onPress={() => onJoin(item)} style={({ pressed }) => [(pressed || joining || (isLive && !item.canJoin) || isEnded) && styles.buttonDisabled]}><GlassSurface variant="dark" radius={11} style={styles.button}><Ionicons name={isLive ? "headset" : "calendar-outline"} size={18} color={colors.softGold} /><Text style={styles.buttonText}>{joining ? "Menghubungkan..." : buttonLabel}</Text></GlassSurface></Pressable>
+    <Pressable accessibilityRole="button" disabled={joining || (isLive && !item.canJoin) || isEnded} onPress={() => onJoin(item)} style={({ pressed }) => [styles.button, (pressed || joining || (isLive && !item.canJoin) || isEnded) && styles.buttonDisabled]}><Ionicons name={isLive ? "headset" : "calendar-outline"} size={18} color={colors.white} /><Text style={styles.buttonText}>{joining ? "Menghubungkan..." : buttonLabel}</Text></Pressable>
   </View>;
 }
 
 const styles = StyleSheet.create({
   card: { padding: 13, borderRadius: radius.card, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, gap: 12, ...shadow },
   main: { flexDirection: "row", gap: 13 },
-  image: { width: 104, height: 128, borderRadius: 13, backgroundColor: colors.goldPale },
+  image: { width: 104, minHeight: 128, borderRadius: 13, backgroundColor: colors.goldPale },
   info: { flex: 1, alignItems: "flex-start", minWidth: 0 },
   badge: { height: 23, flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 8, borderRadius: 8, backgroundColor: "#22C55E", marginBottom: 6 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.white },
@@ -60,7 +59,7 @@ const styles = StyleSheet.create({
   meta: { color: colors.muted, fontFamily: typography.body, fontSize: 10.5, lineHeight: 16 },
   listeners: { marginTop: 5, flexDirection: "row", alignItems: "center", gap: 5 },
   listenerText: { color: colors.navy, fontFamily: typography.semibold, fontSize: 11 },
-  button: { minHeight: 44, borderRadius: 11, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
+  button: { minHeight: 44, borderRadius: 11, backgroundColor: colors.navy, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
   buttonDisabled: { opacity: 0.52 },
   buttonText: { color: colors.white, fontFamily: typography.bold, fontSize: 14 },
 });

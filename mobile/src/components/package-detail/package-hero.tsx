@@ -5,12 +5,11 @@ import { router } from "expo-router";
 
 import { colors } from "@/theme";
 import type { Package } from "@/types";
-import { GlassSurface } from "@/components/glass";
 
 function FloatingAction({ icon, label, onPress }: { icon: keyof typeof Ionicons.glyphMap; label: string; onPress: () => void }) {
   return (
-    <Pressable accessibilityLabel={label} accessibilityRole="button" onPress={onPress} style={({ pressed }) => [pressed && styles.pressed]}>
-      <GlassSurface variant="dark" radius={22} style={styles.action}><Ionicons name={icon} size={20} color={colors.white} /></GlassSurface>
+    <Pressable accessibilityLabel={label} accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.action, pressed && styles.pressed]}>
+      <Ionicons name={icon} size={20} color={colors.white} />
     </Pressable>
   );
 }
@@ -43,6 +42,6 @@ const styles = StyleSheet.create({
   image: { width: "100%", height: "100%" },
   controls: { position: "absolute", top: 12, left: 16, right: 16, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   rightControls: { flexDirection: "row", gap: 9 },
-  action: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" },
+  action: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(6,21,43,0.45)", borderWidth: 1, borderColor: "rgba(255,255,255,0.22)" },
   pressed: { opacity: 0.72, transform: [{ scale: 0.96 }] },
 });

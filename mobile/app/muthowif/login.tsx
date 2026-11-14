@@ -5,7 +5,7 @@ import { useState } from "react";
 import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { z } from "zod";
 
-import { Button, CircleButton, Field, NavyCard, Screen } from "@/components/ui";
+import { Button, Field, Screen } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
 import { type Tokens, useAuthStore } from "@/lib/auth-store";
 import { colors, typography } from "@/theme";
@@ -28,8 +28,8 @@ export default function MuthowifLoginScreen() {
     }
   });
   return <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === "ios" ? "padding" : undefined}><Screen>
-    <CircleButton icon="chevron-back" label="Kembali" onPress={() => router.back()} />
-    <NavyCard style={styles.hero}><Text style={styles.eyebrow}>AKSES PETUGAS</Text><Text style={styles.title}>Panel Muthowif</Text><Text style={styles.copy}>Masuk menggunakan akun muthowif resmi Jam Wisata.</Text></NavyCard>
+    <Pressable onPress={() => router.back()}><Text style={styles.back}>← Kembali</Text></Pressable>
+    <View style={styles.hero}><Text style={styles.eyebrow}>AKSES PETUGAS</Text><Text style={styles.title}>Panel Muthowif</Text><Text style={styles.copy}>Masuk menggunakan akun muthowif resmi Jam Wisata.</Text></View>
     <View style={styles.form}>
       <Controller control={control} name="email" render={({ field }) => <Field label="Email" keyboardType="email-address" autoCapitalize="none" value={field.value} onChangeText={field.onChange} error={errors.email?.message} placeholder="muthowif@jamwisata.com" />} />
       <Controller control={control} name="password" render={({ field }) => <Field label="Kata Sandi" secureTextEntry value={field.value} onChangeText={field.onChange} error={errors.password?.message} placeholder="••••••••••" />} />

@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,16 +14,16 @@ import { api } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
 import { loadJourneyCache, saveJourneyCache, type JourneyCache } from "@/lib/journey-cache";
 import { colors } from "@/theme";
-import { GlassSurface } from "@/components/glass";
 import type { Journey } from "@/types";
 
 function AppBar() {
+  const goBack = () => router.canGoBack() ? router.back() : router.replace("/(tabs)");
   return <LuxuryAppBar title="Itinerary Perjalanan" />;
 }
 
 function JourneyPicker({ items, selected, onChange }: { items: Journey[]; selected: string; onChange: (id: string) => void }) {
   if (items.length < 2) return null;
-  return <ScrollView horizontal contentContainerStyle={styles.pickerContent} showsHorizontalScrollIndicator={false}>{items.map((item) => <Pressable key={item.registrationId} onPress={() => onChange(item.registrationId)}><GlassSurface variant={selected === item.registrationId ? "gold" : "pearl"} radius={14} style={styles.picker}><Text numberOfLines={1} style={[styles.pickerText, selected === item.registrationId && styles.pickerTextActive]}>{item.package.name}</Text><Text style={[styles.pickerDate, selected === item.registrationId && styles.pickerTextActive]}>{item.departure.dateLabel}</Text></GlassSurface></Pressable>)}</ScrollView>;
+  return <ScrollView horizontal contentContainerStyle={styles.pickerContent} showsHorizontalScrollIndicator={false}>{items.map((item) => <Pressable key={item.registrationId} onPress={() => onChange(item.registrationId)} style={[styles.picker, selected === item.registrationId && styles.pickerActive]}><Text numberOfLines={1} style={[styles.pickerText, selected === item.registrationId && styles.pickerTextActive]}>{item.package.name}</Text><Text style={[styles.pickerDate, selected === item.registrationId && styles.pickerTextActive]}>{item.departure.dateLabel}</Text></Pressable>)}</ScrollView>;
 }
 
 export default function JourneyScreen() {
@@ -65,7 +66,8 @@ const styles = StyleSheet.create({
   title: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 21 },
   guest: { padding: 20, paddingTop: 28 },
   pickerContent: { paddingHorizontal: 18, paddingTop: 12, gap: 9 },
-  picker: { maxWidth: 220, minHeight: 54, paddingHorizontal: 14, paddingVertical: 9 },
+  picker: { maxWidth: 220, minHeight: 54, paddingHorizontal: 14, paddingVertical: 9, borderRadius: 14, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white },
+  pickerActive: { borderColor: colors.gold, backgroundColor: "#F8F1DC" },
   pickerText: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 12 },
   pickerDate: { marginTop: 2, color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 10.5 },
   pickerTextActive: { color: colors.navy },

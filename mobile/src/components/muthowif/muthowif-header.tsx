@@ -1,11 +1,10 @@
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { colors, typography } from "@/theme";
-import { CircleButton } from "@/components/ui";
-import { GlassSurface } from "@/components/glass";
 
 export function MuthowifHeader({ onSettings }: { onSettings?: () => void }) {
-  return <GlassSurface variant="dark" radius={0} glow={false} style={styles.root}><CircleButton dark icon="arrow-back" label="Kembali" onPress={() => router.back()} /><Text style={styles.title}>PANEL MUTHOWIF</Text><CircleButton dark icon="settings-outline" label="Pengaturan" onPress={onSettings ?? (() => router.push("/muthowif/settings" as never))} /></GlassSurface>;
+  return <View style={styles.root}><Pressable hitSlop={12} onPress={() => router.back()}><Ionicons name="arrow-back" size={24} color={colors.white} /></Pressable><Text style={styles.title}>PANEL MUTHOWIF</Text><Pressable hitSlop={12} onPress={onSettings ?? (() => router.push("/muthowif/settings" as never))}><Ionicons name="settings-outline" size={23} color={colors.white} /></Pressable></View>;
 }
-const styles = StyleSheet.create({ root: { minHeight: 64, paddingHorizontal: 12, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, title: { color: colors.white, fontFamily: typography.bold, fontSize: 18, letterSpacing: .5 } });
+const styles = StyleSheet.create({ root: { height: 58, paddingHorizontal: 18, flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: colors.navy }, title: { color: colors.white, fontFamily: typography.bold, fontSize: 18, letterSpacing: .5 } });
