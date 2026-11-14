@@ -6,7 +6,6 @@ import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, gradients, radius, shadow } from "@/theme";
 import { MetallicGold } from "@/components/metallic-gold";
-import { GlassSurface } from "@/components/glass";
 import { PressableScale } from "@/components/motion";
 
 type IconName = keyof typeof Ionicons.glyphMap;
@@ -29,21 +28,12 @@ export function Card({ children, style }: PropsWithChildren<{ style?: StyleProp<
 
 /** Dark navy card with a hairline gold border — the premium surface of the brand. */
 export function NavyCard({ children, style }: PropsWithChildren<{ style?: StyleProp<ViewStyle> }>) {
-  return (
-    <GlassSurface variant="navyCard" radius={radius.card} style={[styles.navyCard, style]}>
-      {children}
-    </GlassSurface>
-  );
+  return <View style={[styles.navyCard, style]}><LinearGradient colors={gradients.navyCard} locations={gradients.navyCardLocations} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />{children}</View>;
 }
 
-export function Button({ label, onPress, loading, secondary, disabled, icon, pill }: { label: string; onPress: () => void; loading?: boolean; secondary?: boolean; disabled?: boolean; icon?: IconName; pill?: boolean }) {
+export function Button({ label, onPress, loading, secondary, disabled, icon }: { label: string; onPress: () => void; loading?: boolean; secondary?: boolean; disabled?: boolean; icon?: IconName }) {
   const content = loading ? <ActivityIndicator color={colors.navy} /> : <View style={styles.buttonRow}>{icon ? <Ionicons name={icon} size={18} color={colors.navyDeep} /> : null}<Text style={[styles.buttonText, secondary && styles.buttonTextSecondary]}>{label}</Text></View>;
-  const btnRadius = pill ? radius.pill : radius.button;
-  return (
-    <PressableScale accessibilityRole="button" disabled={disabled || loading} onPress={onPress} style={[styles.button, secondary && styles.buttonSecondary, { borderRadius: btnRadius }]}>
-      {secondary ? content : <GlassSurface variant="gold" radius={btnRadius} style={styles.buttonGlass}>{content}</GlassSurface>}
-    </PressableScale>
-  );
+  return <PressableScale accessibilityRole="button" disabled={disabled || loading} onPress={onPress} style={[styles.button, secondary && styles.buttonSecondary]}>{secondary ? content : <MetallicGold style={styles.buttonFill}>{content}</MetallicGold>}</PressableScale>;
 }
 
 export function Field({ label, error, optional, ...props }: TextInputProps & { label: string; error?: string; optional?: boolean }) {
@@ -73,24 +63,7 @@ export function AppBar({ title, eyebrow, right, dark, onBack }: { title: string;
 }
 
 export function CircleButton({ icon, label, onPress, dark, children }: PropsWithChildren<{ icon: IconName; label: string; onPress: () => void; dark?: boolean }>) {
-  const content = (
-    <>
-      <Ionicons name={icon} size={20} color={dark ? colors.softGold : colors.navy} />
-      {children}
-    </>
-  );
-
-  return (
-    <PressableScale accessibilityLabel={label} accessibilityRole="button" hitSlop={4} onPress={onPress} pressedScale={0.92} hoverLift={0}>
-      {dark ? (
-        <GlassSurface variant="dark" radius={22} style={styles.circle}>
-          <View style={styles.circleInner}>{content}</View>
-        </GlassSurface>
-      ) : (
-        <View style={[styles.circle, styles.circleLight]}>{content}</View>
-      )}
-    </PressableScale>
-  );
+  return <PressableScale accessibilityLabel={label} accessibilityRole="button" hitSlop={4} onPress={onPress} pressedScale={0.92} hoverLift={0} style={[styles.circle, dark ? styles.circleDark : styles.circleLight]}><Ionicons name={icon} size={20} color={dark ? colors.softGold : colors.navy} />{children}</PressableScale>;
 }
 
 export function Chip({ label, active, onPress, dark }: { label: string; active?: boolean; onPress: () => void; dark?: boolean }) {
@@ -107,9 +80,8 @@ const styles = StyleSheet.create({
   eyebrow: { color: colors.goldText, fontFamily: "Cinzel_600SemiBold", fontSize: 10.5, letterSpacing: 3 }, eyebrowDark: { color: colors.gold },
   title: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 26, lineHeight: 32 }, subtitle: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 14, lineHeight: 21 },
   card: { backgroundColor: colors.white, borderRadius: radius.card, padding: 17, gap: 12, borderWidth: 1, borderColor: colors.goldLine, ...shadow },
-  navyCard: { padding: 17, gap: 12 },
+  navyCard: { borderRadius: radius.card, padding: 17, gap: 12, overflow: "hidden", borderWidth: 1, borderColor: colors.goldLineDark, backgroundColor: colors.navy },
   button: { minHeight: 54, borderRadius: radius.button, overflow: "hidden" }, buttonFill: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 18, borderColor: "rgba(255,236,170,0.55)", borderWidth: 1, borderRadius: radius.button },
-  buttonGlass: { flex: 1, minHeight: 54, alignItems: "center", justifyContent: "center" },
   buttonSecondary: { backgroundColor: "transparent", borderWidth: 1, borderColor: "rgba(10,29,58,0.22)", alignItems: "center", justifyContent: "center", paddingHorizontal: 18 },
   buttonRow: { flexDirection: "row", alignItems: "center", gap: 8 }, buttonText: { color: colors.navyDeep, fontFamily: "Montserrat_700Bold", fontSize: 14.5, letterSpacing: .4 }, buttonTextSecondary: { color: colors.navy, fontFamily: "Montserrat_600SemiBold", letterSpacing: 0 },
   label: { color: colors.ink, fontFamily: "Montserrat_600SemiBold", fontSize: 13 }, optional: { color: colors.muted, fontFamily: "Montserrat_500Medium" },
@@ -120,7 +92,7 @@ const styles = StyleSheet.create({
   star: { width: 12, height: 12, alignItems: "center", justifyContent: "center" }, starSquare: { position: "absolute", width: 8.5, height: 8.5, borderWidth: 1.2, borderColor: colors.gold }, starRotated: { transform: [{ rotate: "45deg" }] },
   appBar: { minHeight: 64, paddingHorizontal: 18, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10 },
   appBarTitleWrap: { flex: 1, alignItems: "center", gap: 2 }, appBarEyebrow: { color: colors.goldText, fontFamily: "Cinzel_600SemiBold", fontSize: 9, letterSpacing: 2.6 }, appBarTitle: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 17, letterSpacing: 1.2 },
-  circle: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" }, circleInner: { width: "100%", height: "100%", alignItems: "center", justifyContent: "center" }, circleLight: { backgroundColor: colors.white, borderWidth: 1, borderColor: "rgba(184,134,11,0.32)" }, circleDark: { backgroundColor: "rgba(255,255,255,0.06)", borderWidth: 1, borderColor: colors.goldLineDark },
+  circle: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" }, circleLight: { backgroundColor: colors.white, borderWidth: 1, borderColor: "rgba(184,134,11,0.32)" }, circleDark: { backgroundColor: "rgba(255,255,255,0.06)", borderWidth: 1, borderColor: colors.goldLineDark },
   chip: { minHeight: 38, paddingHorizontal: 16, borderRadius: radius.pill, borderWidth: 1, borderColor: "rgba(10,29,58,0.16)", alignItems: "center", justifyContent: "center" }, chipDark: { borderColor: "rgba(255,255,255,0.18)" },
   chipActive: { backgroundColor: colors.navy, borderColor: colors.navy }, chipActiveDark: { backgroundColor: "rgba(212,175,55,0.14)", borderColor: colors.gold },
   chipText: { color: colors.royal, fontFamily: "Montserrat_500Medium", fontSize: 12.5 }, chipTextDark: { color: "rgba(255,255,255,0.78)" }, chipTextActive: { color: colors.softGold, fontFamily: "Montserrat_600SemiBold" },
