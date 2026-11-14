@@ -940,7 +940,10 @@ export function ModernProofFooter({ testimonials = defaultTestimonialVideos, gal
             <p>
               © {new Date().getFullYear()} Jam Wisata. Seluruh hak dilindungi.
             </p>
-            <Link href="/privacy" className="silver-underline transition-colors duration-300 hover:text-white">Kebijakan Privasi</Link>
+            <div className="flex flex-wrap gap-x-4 gap-y-2">
+              <Link href="/privacy" className="silver-underline transition-colors duration-300 hover:text-white">Kebijakan Privasi</Link>
+              <Link href="/hapus-akun" className="silver-underline transition-colors duration-300 hover:text-white">Hapus Akun</Link>
+            </div>
             <a
               href="https://jamwisata.com"
               target="_blank"
