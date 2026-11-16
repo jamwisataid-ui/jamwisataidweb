@@ -47,7 +47,7 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.jamwisata.mobile",
+      "bundleIdentifier": "id.jamwisata.mobile",
       "infoPlist": {
         "UIBackgroundModes": [
           "audio"
@@ -57,8 +57,8 @@
       }
     },
     "android": {
-      "package": "com.jamwisata.mobile",
-      "versionCode": 7,
+      "package": "id.jamwisata.mobile",
+      "versionCode": 8,
       "permissions": [
         "RECORD_AUDIO",
         "MODIFY_AUDIO_SETTINGS",
