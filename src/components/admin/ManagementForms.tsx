@@ -267,9 +267,9 @@ function allocatePayment(registrations: PaymentBooking["registrations"], amount:
   return allocations;
 }
 
-export function PaymentForm({ bookings, accounts, initialBookingId }: { bookings: PaymentBooking[]; accounts: Array<{ id: string; name: string }>; initialBookingId?: string }) {
+export function PaymentForm({ bookings, accounts, initialBookingId, initialInvoiceId }: { bookings: PaymentBooking[]; accounts: Array<{ id: string; name: string }>; initialBookingId?: string; initialInvoiceId?: string }) {
   const [state, action, pending] = useActionState(recordPaymentAction, managementInitialState);
-  const initialBooking = bookings.find((booking) => booking.id === initialBookingId) ?? bookings[0];
+  const initialBooking = bookings.find((booking) => booking.invoiceId === initialInvoiceId) ?? bookings.find((booking) => booking.id === initialBookingId) ?? bookings[0];
   const [invoiceId, setInvoiceId] = useState(initialBooking?.invoiceId ?? "");
   const [amount, setAmount] = useState(() => initialBooking?.invoiceRemaining ? String(initialBooking.invoiceRemaining) : "");
   const [allocations, setAllocations] = useState<Record<string, string>>(() => allocatePayment(initialBooking?.registrations ?? [], initialBooking?.invoiceRemaining ?? 0));

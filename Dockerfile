@@ -77,6 +77,20 @@ RUN if [ -f package-lock.json ]; then \
   fi
 
 # ============================================
+# Database migration image (run as a one-off on the private DB network)
+# ============================================
+
+FROM dependencies AS migrator
+
+WORKDIR /app
+
+COPY drizzle.config.ts ./
+COPY drizzle ./drizzle
+COPY src/db/schema ./src/db/schema
+
+CMD ["npm", "run", "db:migrate"]
+
+# ============================================
 # Stage 3: Run Next.js application
 # ============================================
 

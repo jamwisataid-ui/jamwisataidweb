@@ -9,6 +9,8 @@ import { TransactionDocumentBuilder } from "./TransactionDocumentBuilder";
 import { EnsureReceiptButton } from "./EnsureReceiptButton";
 import { IssuedDocumentPreview } from "./IssuedDocumentPreview";
 import { ManualReceiptBuilder } from "./ManualReceiptBuilder";
+import { SettlementInvoiceButton } from "./SettlementInvoiceButton";
+import { invoiceOutstanding, netPaidForInvoiceIds } from "@/lib/management/invoice-ledger";
 import {
   AccountForm,
   AgentForm,
@@ -76,7 +78,7 @@ function PilgrimDocumentChecklist({ pilgrimId, documents }: { pilgrimId: string;
   </div>;
 }
 
-export function ManagementCreatePage({ module, data, kind, initialBookingId }: { module: string; data: Context; kind?: string; initialBookingId?: string }) {
+export function ManagementCreatePage({ module, data, kind, initialBookingId, initialInvoiceId }: { module: string; data: Context; kind?: string; initialBookingId?: string; initialInvoiceId?: string }) {
   const backHref = `/admin/manajemen/${module}`;
   const description = module === "invoice-kwitansi" ? "Terbitkan invoice terlebih dahulu. Kwitansi dibuat otomatis setelah pembayaran dicatat." : module === "pembayaran" ? "Pilih invoice, catat uang yang diterima, lalu sistem otomatis membuat kwitansi." : module === "keberangkatan" ? "Pilih paket, atur harga dan DP, isi pembayar, lalu pilih jamaah yang berangkat." : "Isi data pada form di bawah lalu periksa kembali sebelum menyimpan.";
   const header = <AdminPageHeader eyebrow={module === "invoice-kwitansi" ? "DOKUMEN TRANSAKSI" : "TAMBAH DATA"} title={module === "invoice-kwitansi" ? "Buat invoice" : `Tambah ${labels[module] ?? "data"}`} description={description} backHref={backHref} />;
@@ -87,14 +89,16 @@ export function ManagementCreatePage({ module, data, kind, initialBookingId }: {
     const active = data.documents.filter((document) => document.kind === "invoice" && document.status === "issued").flatMap((invoice) => {
       const booking = data.bookings.find((candidate) => candidate.id === invoice.bookingId);
       if (!booking || booking.status !== "active") return [];
-      const linkedPayments = data.payments.filter((payment) => payment.invoiceId === invoice.id && payment.status === "confirmed");
-      const linkedPaymentIds = new Set(linkedPayments.map((payment) => payment.id));
-      const netPaid = linkedPayments.reduce((sum, payment) => sum + payment.amount, 0) - data.refunds.filter((refund) => linkedPaymentIds.has(refund.paymentId) && refund.status === "confirmed").reduce((sum, refund) => sum + refund.amount, 0);
+      if (!invoice.parentInvoiceId) {
+        const hasOpenSettlement = data.documents.some((candidate) => candidate.parentInvoiceId === invoice.id && candidate.status === "issued" && invoiceOutstanding(Number(candidate.snapshot.total ?? 0), netPaidForInvoiceIds([candidate.id], data.payments, data.refunds)) > 0);
+        if (hasOpenSettlement) return [];
+      }
+      const netPaid = netPaidForInvoiceIds([invoice.id], data.payments, data.refunds);
       const invoiceAmount = Number(invoice.snapshot.total ?? 0);
-      const invoiceRemaining = Math.max(0, invoiceAmount - netPaid);
+      const invoiceRemaining = invoiceOutstanding(invoiceAmount, netPaid);
       return invoiceRemaining > 0 ? [{ ...booking, invoiceId: invoice.id, invoiceNumber: invoice.number, invoiceAmount, invoiceRemaining }] : [];
     });
-    return <>{header}{active.length ? <Panel title="Pembayaran invoice" description="Nominal pembayaran mengikuti invoice yang dipilih. Setiap kwitansi otomatis terhubung ke invoice tersebut."><PaymentForm initialBookingId={initialBookingId} bookings={active.map((booking) => ({ id: booking.id, invoiceId: booking.invoiceId, bookingNumber: booking.bookingNumber, invoiceNumber: booking.invoiceNumber, invoiceAmount: booking.invoiceAmount, invoiceRemaining: booking.invoiceRemaining, payerName: booking.payerName, registrations: booking.registrations.map((item) => ({ id: item.id, agreedPrice: item.agreedPrice, dpTarget: item.dpTarget, payment: item.payment, pilgrim: item.pilgrim ? { fullName: item.pilgrim.fullName } : undefined })) }))} accounts={data.accounts.filter((item) => item.status === "active").map(({ id, name }) => ({ id, name }))} /></Panel> : <div className="management-warning"><AlertTriangle /><span>Belum ada invoice aktif yang perlu dibayar. <Link href="/admin/manajemen/invoice-kwitansi/baru">Terbitkan invoice berikutnya.</Link></span></div>}</>;
+    return <>{header}{active.length ? <Panel title="Pembayaran invoice" description="Nominal pembayaran mengikuti invoice yang dipilih. Setiap kwitansi otomatis terhubung ke invoice tersebut."><PaymentForm initialBookingId={initialBookingId} initialInvoiceId={initialInvoiceId} bookings={active.map((booking) => ({ id: booking.id, invoiceId: booking.invoiceId, bookingNumber: booking.bookingNumber, invoiceNumber: booking.invoiceNumber, invoiceAmount: booking.invoiceAmount, invoiceRemaining: booking.invoiceRemaining, payerName: booking.payerName, registrations: booking.registrations.map((item) => ({ id: item.id, agreedPrice: item.agreedPrice, dpTarget: item.dpTarget, payment: item.payment, pilgrim: item.pilgrim ? { fullName: item.pilgrim.fullName } : undefined })) }))} accounts={data.accounts.filter((item) => item.status === "active").map(({ id, name }) => ({ id, name }))} /></Panel> : <div className="management-warning"><AlertTriangle /><span>Belum ada invoice aktif yang perlu dibayar. <Link href="/admin/manajemen/invoice-kwitansi/baru">Terbitkan invoice berikutnya.</Link></span></div>}</>;
   }
   if (module === "keuangan" && kind === "transaksi") return <>{header}<Panel title="Transaksi kas baru"><CashForm accounts={data.accounts.filter((item) => item.status === "active").map(({ id, name }) => ({ id, name }))} packages={data.packages.map(({ id, name }) => ({ id, name }))} categories={data.categories.filter((item) => item.status === "active").map(({ id, name }) => ({ id, name }))} /></Panel></>;
   if (module === "keuangan") return <>{header}<Panel title="Rekening atau kas baru"><AccountForm /></Panel></>;
@@ -106,13 +110,13 @@ export function ManagementCreatePage({ module, data, kind, initialBookingId }: {
     const invoiceSequence = data.sequences.find((sequence) => sequence.kind === "invoice" && sequence.active);
     const receiptSequence = data.sequences.find((sequence) => sequence.kind === "receipt" && sequence.active);
     const now = new Date();
-    const manualReceiptInvoices = data.documents.filter((document) => document.kind === "invoice" && document.status === "issued").filter((document, index, documents) => documents.findIndex((candidate) => candidate.bookingId === document.bookingId) === index).flatMap((invoice) => {
+    const manualReceiptInvoices = data.documents.filter((document) => document.kind === "invoice" && document.status === "issued").flatMap((invoice) => {
       const booking = data.bookings.find((candidate) => candidate.id === invoice.bookingId);
       const eligiblePayments = data.payments.filter((payment) => payment.invoiceId === invoice.id && payment.status === "confirmed" && !data.documents.some((document) => document.kind === "receipt" && document.paymentId === payment.id && document.status === "issued"));
       return booking && eligiblePayments.length ? [{ id: invoice.id, bookingId: invoice.bookingId, number: invoice.number, payerName: booking.payerName, payments: eligiblePayments.map((payment) => ({ id: payment.id, amountLabel: rupiah(payment.amount), paidAtLabel: new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeZone: "Asia/Jakarta" }).format(new Date(payment.paidAt)), method: payment.method })) }] : [];
     });
     return <>{header}<TransactionDocumentBuilder
-      bookings={data.bookings.filter((booking) => booking.status === "active").flatMap((booking) => { const totalPrice = booking.registrations.reduce((sum, registration) => sum + registration.agreedPrice, 0); const alreadyInvoiced = data.documents.filter((document) => document.kind === "invoice" && document.bookingId === booking.id && document.status === "issued").reduce((sum, document) => sum + Number(document.snapshot.total ?? 0), 0); const remainingPrice = Math.max(0, totalPrice - alreadyInvoiced); return remainingPrice > 0 ? [{ id: booking.id, bookingNumber: booking.bookingNumber, payerName: booking.payerName, packageName: String(booking.packageSnapshot.name ?? "Paket umroh"), pilgrims: booking.registrations.length, totalPrice, totalDp: booking.registrations.reduce((sum, registration) => sum + Math.min(registration.dpTarget, registration.agreedPrice), 0), alreadyInvoiced, remainingPrice }] : []; })}
+      bookings={data.bookings.filter((booking) => booking.status === "active").flatMap((booking) => { const totalPrice = booking.registrations.reduce((sum, registration) => sum + registration.agreedPrice, 0); const alreadyInvoiced = data.documents.filter((document) => document.kind === "invoice" && !document.parentInvoiceId && document.bookingId === booking.id && document.status === "issued").reduce((sum, document) => sum + Number(document.snapshot.total ?? 0), 0); const remainingPrice = Math.max(0, totalPrice - alreadyInvoiced); return remainingPrice > 0 ? [{ id: booking.id, bookingNumber: booking.bookingNumber, payerName: booking.payerName, packageName: String(booking.packageSnapshot.name ?? "Paket umroh"), pilgrims: booking.registrations.length, totalPrice, totalDp: booking.registrations.reduce((sum, registration) => sum + Math.min(registration.dpTarget, registration.agreedPrice), 0), alreadyInvoiced, remainingPrice }] : []; })}
       invoiceNumber={invoiceSequence ? formatDocumentNumber(invoiceSequence, now).number : "Belum diatur"}
     /><ManualReceiptBuilder invoices={manualReceiptInvoices} receiptNumber={receiptSequence ? formatDocumentNumber(receiptSequence, now).number : "Belum diatur"} /><details className="management-disclosure management-numbering-settings"><summary><span><strong>Atur nomor dokumen</strong><small>Opsional — ubah nomor berikutnya jika memang diperlukan.</small></span><i>+</i></summary><div><div className="management-settings-grid"><Panel title="Nomor invoice"><SequenceForm kind="invoice" values={invoiceSequence} /></Panel><Panel title="Nomor kwitansi"><SequenceForm kind="receipt" values={receiptSequence} /></Panel></div></div></details></>;
   }
@@ -170,14 +174,31 @@ export function ManagementDetailPage({ module, id, data }: { module: string; id:
   }
   if (module === "invoice-kwitansi") {
     const item = data.documents.find((row) => row.id === id); if (!item) return null;
-    const linkedPayments = item.kind === "invoice" ? data.payments.filter((payment) => payment.invoiceId === item.id && payment.status === "confirmed") : [];
-    const linkedPaymentIds = new Set(linkedPayments.map((payment) => payment.id));
-    const paid = linkedPayments.reduce((sum, payment) => sum + payment.amount, 0) - data.refunds.filter((refund) => linkedPaymentIds.has(refund.paymentId) && refund.status === "confirmed").reduce((sum, refund) => sum + refund.amount, 0);
-    const outstanding = item.kind === "invoice" ? Math.max(0, Number(item.snapshot.total ?? 0) - paid) : 0;
+    const settlementInvoices = item.kind === "invoice" && !item.parentInvoiceId
+      ? data.documents.filter((document) => document.parentInvoiceId === item.id && document.kind === "invoice" && document.status === "issued")
+      : [];
+    const ledgerInvoiceIds = item.kind === "invoice" ? [item.id, ...settlementInvoices.map((document) => document.id)] : [];
+    const paid = item.kind === "invoice" ? netPaidForInvoiceIds(ledgerInvoiceIds, data.payments, data.refunds) : 0;
+    const outstanding = item.kind === "invoice" ? invoiceOutstanding(Number(item.snapshot.total ?? 0), paid) : 0;
+    const openSettlement = settlementInvoices.find((document) => invoiceOutstanding(Number(document.snapshot.total ?? 0), netPaidForInvoiceIds([document.id], data.payments, data.refunds)) > 0);
     const paymentLabel = outstanding <= 0 ? "Lunas" : paid > 0 ? "Cicilan" : "Belum bayar";
-    const rows: Array<[string, React.ReactNode]> = [["Nomor", item.number], ["Jenis", item.kind === "invoice" ? "Invoice" : "Kwitansi"], ["Tanggal terbit", <DateText key="date" value={item.issuedAt} />], ["Status dokumen", item.status]];
+    const documentLabel = item.kind === "invoice" ? (item.parentInvoiceId ? "Invoice Pelunasan" : "Invoice") : "Kwitansi";
+    const rows: Array<[string, React.ReactNode]> = [["Nomor", item.number], ["Jenis", documentLabel], ["Tanggal terbit", <DateText key="date" value={item.issuedAt} />], ["Status dokumen", item.status]];
+    if (item.parentInvoiceId) {
+      const parent = data.documents.find((document) => document.id === item.parentInvoiceId);
+      rows.push(["Invoice awal", parent ? <Link key="parent-invoice" href={`/admin/manajemen/invoice-kwitansi/${parent.id}`}>{parent.number}</Link> : "—"]);
+    }
     if (item.kind === "invoice") rows.push(["Status pembayaran", paymentLabel], ["Sudah dibayar", rupiah(paid)], ["Sisa tagihan", rupiah(outstanding)]);
-    return <><AdminPageHeader eyebrow="DETAIL DOKUMEN" title={item.number} description={item.kind === "invoice" ? `Status pembayaran: ${paymentLabel}. Kwitansi dibuat otomatis setiap pembayaran diterima.` : "Kwitansi ini dibuat dari pembayaran yang sudah diterima."} backHref={backHref} action={item.kind === "invoice" && outstanding > 0 ? { href: `/admin/manajemen/pembayaran/baru?booking=${item.bookingId}`, label: "Catat pembayaran" } : undefined} /><section className="management-issued-document-layout"><div className="management-issued-document-preview"><header><span><small>PREVIEW DOKUMEN</small><strong>{item.kind === "invoice" ? "Invoice" : "Kwitansi"} · {item.number}</strong></span><span className="management-status good">Dokumen terbit</span></header><div className={item.kind === "invoice" ? "portrait" : "landscape"}><IssuedDocumentPreview id={item.id} label={`Preview ${item.kind === "invoice" ? "invoice" : "kwitansi"} ${item.number}`} /></div></div><Panel title="Informasi & tindakan"><DetailGrid rows={rows} /><div className="management-document-downloads"><a className="management-create-link" href={`/api/admin/management/issued-documents/${item.id}`}><Download /> Download PDF / Print</a><a className="management-create-link secondary" href={`/api/admin/management/issued-documents/${item.id}?format=png`}><Download /> Download PNG</a><DeleteButton id={item.id} name={item.number} type="document" documentKind={item.kind} variant="form" /></div></Panel></section></>;
+    const action = item.kind !== "invoice" || outstanding <= 0
+      ? undefined
+      : item.parentInvoiceId
+        ? { href: `/admin/manajemen/pembayaran/baru?booking=${item.bookingId}&invoice=${item.id}`, label: "Catat pembayaran" }
+        : openSettlement
+          ? { href: `/admin/manajemen/invoice-kwitansi/${openSettlement.id}`, label: "Buka invoice pelunasan" }
+          : paid <= 0
+            ? { href: `/admin/manajemen/pembayaran/baru?booking=${item.bookingId}&invoice=${item.id}`, label: "Catat pembayaran" }
+            : undefined;
+    return <><AdminPageHeader eyebrow="DETAIL DOKUMEN" title={item.number} description={item.kind === "invoice" ? `Status pembayaran: ${paymentLabel}. Kwitansi dibuat otomatis setiap pembayaran diterima.` : "Kwitansi ini dibuat dari pembayaran yang sudah diterima."} backHref={backHref} action={action} /><section className="management-issued-document-layout"><div className="management-issued-document-preview"><header><span><small>PREVIEW DOKUMEN</small><strong>{documentLabel} · {item.number}</strong></span><span className="management-status good">Dokumen terbit</span></header><div className={item.kind === "invoice" ? "portrait" : "landscape"}><IssuedDocumentPreview id={item.id} label={`Preview ${documentLabel.toLowerCase()} ${item.number}`} /></div></div><Panel title="Informasi & tindakan"><DetailGrid rows={rows} />{item.kind === "invoice" && !item.parentInvoiceId && paid > 0 && outstanding > 0 && !openSettlement ? <div className="management-payment-flow-note"><FileText /><span><small>SISA PEMBAYARAN</small><strong>{rupiah(outstanding)}</strong><p>Terbitkan invoice pelunasan khusus untuk sisa tagihan. Nilai paket tidak akan dihitung dua kali.</p></span><SettlementInvoiceButton bookingId={item.bookingId} parentInvoiceId={item.id} /></div> : null}<div className="management-document-downloads"><a className="management-create-link" href={`/api/admin/management/issued-documents/${item.id}`}><Download /> Download PDF / Print</a><a className="management-create-link secondary" href={`/api/admin/management/issued-documents/${item.id}?format=png`}><Download /> Download PNG</a><DeleteButton id={item.id} name={item.number} type="document" documentKind={item.kind} variant="form" /></div></Panel></section></>;
   }
   return null;
 }

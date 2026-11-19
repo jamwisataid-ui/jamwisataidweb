@@ -1,20 +1,22 @@
 import "server-only";
 
 import { createHash, randomUUID } from "node:crypto";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 
-import { accommodations, auditLogs, bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, registrations } from "@/db/schema";
+import { accommodations, auditLogs, bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, refunds, registrations } from "@/db/schema";
 import { withManagementTransaction } from "@/db/transaction";
 import { formatDocumentNumber } from "./domain";
 import { renderTransactionPdf, type TransactionPdfSnapshot } from "./document-renderer";
 import { buildInvoiceItems, invoiceTotals, resolveInvoiceAmount } from "./invoice";
+import { invoiceOutstanding, netPaidForInvoiceIds } from "./invoice-ledger";
 import { deletePrivateObject, privateObjectKey, putPrivateObject } from "./storage";
 
-export async function issueTransactionDocument({ kind, bookingId, paymentId, invoiceAmount, actorId }: {
+export async function issueTransactionDocument({ kind, bookingId, paymentId, invoiceAmount, parentInvoiceId, actorId }: {
   kind: "invoice" | "receipt";
   bookingId: string;
   paymentId?: string;
   invoiceAmount?: number;
+  parentInvoiceId?: string;
   actorId: string;
 }) {
   let uploadedObjectKey: string | undefined;
@@ -40,6 +42,7 @@ export async function issueTransactionDocument({ kind, bookingId, paymentId, inv
     let linkedInvoice: typeof issuedDocuments.$inferSelect | undefined;
     let total: number;
     let items: TransactionPdfSnapshot["items"];
+    let parentInvoice: typeof issuedDocuments.$inferSelect | undefined;
 
     if (kind === "receipt") {
       payment = await tx.query.payments.findFirst({ where: and(eq(payments.id, paymentId!), eq(payments.bookingId, booking.id)) });
@@ -53,9 +56,48 @@ export async function issueTransactionDocument({ kind, bookingId, paymentId, inv
       const qty = equalAllocations ? allocations.length : 1;
       items = [{ description: `Pembayaran ${String(booking.packageSnapshot.name ?? "paket umroh")}${allocations.length ? ` untuk ${allocations.length} jamaah` : ""}`, qty, unitPrice: equalAllocations ? allocations[0].amount : payment.amount, total: payment.amount }];
       total = payment.amount;
+    } else if (parentInvoiceId) {
+      await tx.execute(sql`select id from issued_documents where id = ${parentInvoiceId} for update`);
+      parentInvoice = await tx.query.issuedDocuments.findFirst({
+        where: and(
+          eq(issuedDocuments.id, parentInvoiceId),
+          eq(issuedDocuments.kind, "invoice"),
+          eq(issuedDocuments.bookingId, booking.id),
+          eq(issuedDocuments.status, "issued"),
+          isNull(issuedDocuments.parentInvoiceId),
+        ),
+      });
+      if (!parentInvoice) throw new Error("Invoice awal tidak ditemukan atau bukan invoice utama yang aktif.");
+      const settlementInvoices = await tx.select().from(issuedDocuments).where(and(
+        eq(issuedDocuments.parentInvoiceId, parentInvoice.id),
+        eq(issuedDocuments.kind, "invoice"),
+        eq(issuedDocuments.status, "issued"),
+      ));
+      const invoiceIds = [parentInvoice.id, ...settlementInvoices.map((document) => document.id)];
+      const invoicePayments = await tx.select().from(payments).where(and(inArray(payments.invoiceId, invoiceIds), eq(payments.status, "confirmed")));
+      const invoicePaymentIds = invoicePayments.map((item) => item.id);
+      const invoiceRefunds = invoicePaymentIds.length
+        ? await tx.select().from(refunds).where(and(inArray(refunds.paymentId, invoicePaymentIds), eq(refunds.status, "confirmed")))
+        : [];
+      for (const settlement of settlementInvoices) {
+        const settlementPaid = netPaidForInvoiceIds([settlement.id], invoicePayments, invoiceRefunds);
+        if (invoiceOutstanding(Number(settlement.snapshot.total ?? 0), settlementPaid) > 0) {
+          return { id: settlement.id, number: settlement.number, existing: true };
+        }
+      }
+      const parentTotal = Number(parentInvoice.snapshot.total ?? 0);
+      total = invoiceOutstanding(parentTotal, netPaidForInvoiceIds(invoiceIds, invoicePayments, invoiceRefunds));
+      if (total <= 0) throw new Error("Invoice ini sudah lunas dan tidak memerlukan invoice pelunasan.");
+      const suffix = String(booking.packageSnapshot.dateLabel ?? booking.packageSnapshot.departureDate ?? "");
+      items = [{
+        description: `Pelunasan ${String(booking.packageSnapshot.name ?? "Paket umroh")}${suffix ? ` — ${suffix}` : ""}`,
+        qty: 1,
+        unitPrice: total,
+        total,
+      }];
     } else {
       const totals = invoiceTotals(registrationRows);
-      const existingInvoices = await tx.select({ snapshot: issuedDocuments.snapshot }).from(issuedDocuments).where(and(eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.bookingId, booking.id), eq(issuedDocuments.status, "issued")));
+      const existingInvoices = await tx.select({ snapshot: issuedDocuments.snapshot }).from(issuedDocuments).where(and(eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.bookingId, booking.id), eq(issuedDocuments.status, "issued"), isNull(issuedDocuments.parentInvoiceId)));
       const alreadyInvoiced = existingInvoices.reduce((sum, document) => sum + Number(document.snapshot.total ?? 0), 0);
       const remaining = Math.max(0, totals.totalPrice - alreadyInvoiced);
       if (remaining <= 0) throw new Error("Seluruh harga pendaftaran sudah ditagihkan.");
@@ -70,6 +112,8 @@ export async function issueTransactionDocument({ kind, bookingId, paymentId, inv
 
     const snapshot: TransactionPdfSnapshot = {
       kind,
+      purpose: parentInvoice ? "settlement" : "standard",
+      parentInvoiceId: parentInvoice?.id,
       number: formatted.number,
       issuedAt: issuedAt.toISOString(),
       customer: { name: booking.payerName, whatsapp: booking.payerWhatsapp, email: booking.payerEmail },
@@ -94,7 +138,7 @@ export async function issueTransactionDocument({ kind, bookingId, paymentId, inv
     const pdf = await renderTransactionPdf(snapshot);
     await putPrivateObject(objectKey, new Uint8Array(pdf), "application/pdf");
     const checksum = createHash("sha256").update(pdf).digest("hex");
-    await tx.insert(issuedDocuments).values({ id, kind, number: formatted.number, bookingId: booking.id, paymentId: payment?.id ?? null, sequenceId: sequence.id, snapshot, objectKey, checksum, templateVersion: "jamwisata-client-image-v3", issuedAt, createdBy: actorId });
+    await tx.insert(issuedDocuments).values({ id, kind, number: formatted.number, bookingId: booking.id, paymentId: payment?.id ?? null, parentInvoiceId: parentInvoice?.id ?? null, sequenceId: sequence.id, snapshot, objectKey, checksum, templateVersion: "jamwisata-client-image-v3", issuedAt, createdBy: actorId });
     await tx.update(documentSequences).set({ nextNumber: formatted.nextNumber, currentPeriod: formatted.period, updatedAt: new Date() }).where(eq(documentSequences.id, sequence.id));
     await tx.insert(auditLogs).values({ actorId, action: "issue", entityType: kind, entityId: id, summary: `${kind === "invoice" ? "Invoice" : "Kwitansi"} ${formatted.number} diterbitkan` });
     return { id, number: formatted.number, existing: false };

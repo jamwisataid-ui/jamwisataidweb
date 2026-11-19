@@ -74,6 +74,10 @@ set -a
 set +a
 docker compose --env-file /opt/jamwisata/shared/deploy.env \
   -f deploy/jamwisata/compose.yml build web
+docker build --target migrator -t jamwisata-migrator:current .
+docker run --rm --network jamwisata-internal \
+  --env-file /opt/jamwisata/shared/app.env \
+  jamwisata-migrator:current
 docker compose --env-file /opt/jamwisata/shared/deploy.env \
   -f deploy/jamwisata/compose.yml up -d postgres web
 curl --fail http://127.0.0.1:3300/api/health

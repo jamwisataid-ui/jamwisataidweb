@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 import { requireDatabase } from "@/db";
 import { accommodations, bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, registrations } from "@/db/schema";
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
       total = payment.amount;
     } else {
       const totals = invoiceTotals(registrationRows);
-      const existingInvoices = await db.select({ snapshot: issuedDocuments.snapshot }).from(issuedDocuments).where(and(eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.bookingId, booking.id), eq(issuedDocuments.status, "issued")));
+      const existingInvoices = await db.select({ snapshot: issuedDocuments.snapshot }).from(issuedDocuments).where(and(eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.bookingId, booking.id), eq(issuedDocuments.status, "issued"), isNull(issuedDocuments.parentInvoiceId)));
       const alreadyInvoiced = existingInvoices.reduce((sum, document) => sum + Number(document.snapshot.total ?? 0), 0);
       const remaining = Math.max(0, totals.totalPrice - alreadyInvoiced);
       if (remaining <= 0) throw new Error("Seluruh harga pendaftaran sudah ditagihkan.");

@@ -10,6 +10,8 @@ import { terbilang } from "./domain";
 
 export type TransactionPdfSnapshot = {
   kind: "invoice" | "receipt";
+  purpose?: "standard" | "settlement";
+  parentInvoiceId?: string;
   number: string;
   issuedAt: string;
   customer: { name: string; whatsapp: string; email?: string | null };

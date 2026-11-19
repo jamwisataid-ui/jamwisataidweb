@@ -460,6 +460,12 @@ export async function recordPaymentAction(_state: ManagementActionState, formDat
       await tx.execute(sql`select id from issued_documents where id = ${parsed.data.invoiceId} for update`);
       const invoice = await tx.query.issuedDocuments.findFirst({ where: and(eq(issuedDocuments.id, parsed.data.invoiceId), eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.bookingId, parsed.data.bookingId), eq(issuedDocuments.status, "issued")) });
       if (!invoice) throw new Error("Invoice belum diterbitkan. Buat invoice terlebih dahulu sebelum mencatat pembayaran.");
+      if (!invoice.parentInvoiceId) {
+        const openSettlement = await tx.query.issuedDocuments.findFirst({
+          where: and(eq(issuedDocuments.parentInvoiceId, invoice.id), eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.status, "issued")),
+        });
+        if (openSettlement) throw new Error(`Pembayaran harus dicatat melalui invoice pelunasan ${openSettlement.number}.`);
+      }
       const invoicePayments = await tx.select({ id: payments.id, amount: payments.amount }).from(payments).where(and(eq(payments.invoiceId, invoice.id), eq(payments.status, "confirmed")));
       const invoicePaymentIds = invoicePayments.map((item) => item.id);
       const invoiceRefunds = invoicePaymentIds.length
@@ -1147,6 +1153,10 @@ export async function deleteIssuedDocumentAction(formData: FormData): Promise<Ma
       const document = await tx.query.issuedDocuments.findFirst({ where: eq(issuedDocuments.id, id) });
       if (!document) throw new Error("Invoice atau kwitansi tidak ditemukan.");
       if (document.kind === "invoice") {
+        const settlementInvoice = await tx.query.issuedDocuments.findFirst({
+          where: and(eq(issuedDocuments.parentInvoiceId, document.id), eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.status, "issued")),
+        });
+        if (settlementInvoice) throw new Error(`Hapus invoice pelunasan ${settlementInvoice.number} terlebih dahulu sebelum menghapus invoice awal ini.`);
         const linkedPayments = await tx.select({ id: payments.id }).from(payments).where(eq(payments.invoiceId, document.id));
         const linkedReceipt = linkedPayments.length ? await tx.query.issuedDocuments.findFirst({
           where: and(eq(issuedDocuments.kind, "receipt"), inArray(issuedDocuments.paymentId, linkedPayments.map((payment) => payment.id)), eq(issuedDocuments.status, "issued")),

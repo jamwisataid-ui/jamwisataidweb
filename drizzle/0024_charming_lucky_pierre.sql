@@ -1,0 +1,3 @@
+ALTER TABLE "issued_documents" ADD COLUMN "parent_invoice_id" uuid;--> statement-breakpoint
+ALTER TABLE "issued_documents" ADD CONSTRAINT "issued_documents_parent_invoice_id_issued_documents_id_fk" FOREIGN KEY ("parent_invoice_id") REFERENCES "public"."issued_documents"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "issued_documents_parent_invoice_idx" ON "issued_documents" USING btree ("parent_invoice_id");

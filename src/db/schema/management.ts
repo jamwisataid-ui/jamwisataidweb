@@ -327,6 +327,7 @@ export const issuedDocuments = pgTable("issued_documents", {
   number: text("number").notNull(),
   bookingId: uuid("booking_id").notNull().references(() => bookings.id, { onDelete: "restrict" }),
   paymentId: uuid("payment_id").references(() => payments.id, { onDelete: "restrict" }),
+  parentInvoiceId: uuid("parent_invoice_id").references((): AnyPgColumn => issuedDocuments.id, { onDelete: "restrict" }),
   sequenceId: uuid("sequence_id").notNull().references(() => documentSequences.id, { onDelete: "restrict" }),
   snapshot: jsonb("snapshot").$type<Record<string, unknown>>().notNull(),
   objectKey: text("object_key").notNull().unique(),
@@ -341,6 +342,7 @@ export const issuedDocuments = pgTable("issued_documents", {
 }, (table) => [
   uniqueIndex("issued_documents_kind_number_idx").on(table.kind, table.number),
   index("issued_documents_booking_idx").on(table.bookingId, table.issuedAt),
+  index("issued_documents_parent_invoice_idx").on(table.parentInvoiceId),
 ]);
 
 export const hppPriceMaster = pgTable("hpp_price_master", {
