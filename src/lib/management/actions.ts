@@ -464,7 +464,7 @@ export async function recordPaymentAction(_state: ManagementActionState, formDat
         const openSettlement = await tx.query.issuedDocuments.findFirst({
           where: and(eq(issuedDocuments.parentInvoiceId, invoice.id), eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.status, "issued")),
         });
-        if (openSettlement) throw new Error(`Pembayaran harus dicatat melalui invoice pelunasan ${openSettlement.number}.`);
+        if (openSettlement) throw new Error(`Invoice ini sudah dipecah menjadi termin. Catat pembayaran melalui invoice termin (mis. ${openSettlement.number}) atau buat invoice termin berikutnya.`);
       }
       const invoicePayments = await tx.select({ id: payments.id, amount: payments.amount }).from(payments).where(and(eq(payments.invoiceId, invoice.id), eq(payments.status, "confirmed")));
       const invoicePaymentIds = invoicePayments.map((item) => item.id);

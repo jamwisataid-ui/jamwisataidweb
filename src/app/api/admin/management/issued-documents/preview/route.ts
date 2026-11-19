@@ -7,13 +7,14 @@ import { requireAdminSession } from "@/lib/admin-session";
 import { formatDocumentNumber } from "@/lib/management/domain";
 import { renderTransactionPdf, renderTransactionPng, type TransactionPdfSnapshot } from "@/lib/management/document-renderer";
 import { buildInvoiceItems, invoiceTotals, resolveInvoiceAmount } from "@/lib/management/invoice";
+import { resolveSettlementInvoice } from "@/lib/management/settlement-invoice";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
     await requireAdminSession();
-    const body = await request.json() as { kind?: string; bookingId?: string; paymentId?: string; invoiceAmount?: number };
+    const body = await request.json() as { kind?: string; bookingId?: string; paymentId?: string; invoiceAmount?: number; parentInvoiceId?: string };
     const kind = body.kind === "receipt" ? "receipt" : body.kind === "invoice" ? "invoice" : null;
     if (!kind || !body.bookingId) return NextResponse.json({ error: "Jenis dokumen atau booking tidak valid." }, { status: 400 });
 
@@ -46,6 +47,11 @@ export async function POST(request: Request) {
       const qty = equalAllocations ? allocations.length : 1;
       items = [{ description: `Pembayaran ${String(booking.packageSnapshot.name ?? "paket umroh")}${allocations.length ? ` untuk ${allocations.length} jamaah` : ""}`, qty, unitPrice: equalAllocations ? allocations[0].amount : payment.amount, total: payment.amount }];
       total = payment.amount;
+    } else if (body.parentInvoiceId) {
+      const settlement = await resolveSettlementInvoice(db, booking, body.parentInvoiceId, body.invoiceAmount);
+      if (settlement.openSettlement) throw new Error(`Masih ada invoice termin ${settlement.openSettlement.number} yang belum lunas.`);
+      total = settlement.total;
+      items = settlement.items;
     } else {
       const totals = invoiceTotals(registrationRows);
       const existingInvoices = await db.select({ snapshot: issuedDocuments.snapshot }).from(issuedDocuments).where(and(eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.bookingId, booking.id), eq(issuedDocuments.status, "issued"), isNull(issuedDocuments.parentInvoiceId)));
@@ -63,6 +69,8 @@ export async function POST(request: Request) {
 
     const snapshot: TransactionPdfSnapshot = {
       kind,
+      purpose: body.parentInvoiceId ? "settlement" : "standard",
+      parentInvoiceId: body.parentInvoiceId,
       number: formatted.number,
       issuedAt: issuedAt.toISOString(),
       customer: { name: booking.payerName, whatsapp: booking.payerWhatsapp, email: booking.payerEmail },

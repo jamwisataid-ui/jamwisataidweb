@@ -1,14 +1,14 @@
 import "server-only";
 
 import { createHash, randomUUID } from "node:crypto";
-import { and, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 
-import { accommodations, auditLogs, bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, refunds, registrations } from "@/db/schema";
+import { accommodations, auditLogs, bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, registrations } from "@/db/schema";
 import { withManagementTransaction } from "@/db/transaction";
 import { formatDocumentNumber } from "./domain";
 import { renderTransactionPdf, type TransactionPdfSnapshot } from "./document-renderer";
 import { buildInvoiceItems, invoiceTotals, resolveInvoiceAmount } from "./invoice";
-import { invoiceOutstanding, netPaidForInvoiceIds } from "./invoice-ledger";
+import { resolveSettlementInvoice } from "./settlement-invoice";
 import { deletePrivateObject, privateObjectKey, putPrivateObject } from "./storage";
 
 export async function issueTransactionDocument({ kind, bookingId, paymentId, invoiceAmount, parentInvoiceId, actorId }: {
@@ -58,43 +58,11 @@ export async function issueTransactionDocument({ kind, bookingId, paymentId, inv
       total = payment.amount;
     } else if (parentInvoiceId) {
       await tx.execute(sql`select id from issued_documents where id = ${parentInvoiceId} for update`);
-      parentInvoice = await tx.query.issuedDocuments.findFirst({
-        where: and(
-          eq(issuedDocuments.id, parentInvoiceId),
-          eq(issuedDocuments.kind, "invoice"),
-          eq(issuedDocuments.bookingId, booking.id),
-          eq(issuedDocuments.status, "issued"),
-          isNull(issuedDocuments.parentInvoiceId),
-        ),
-      });
-      if (!parentInvoice) throw new Error("Invoice awal tidak ditemukan atau bukan invoice utama yang aktif.");
-      const settlementInvoices = await tx.select().from(issuedDocuments).where(and(
-        eq(issuedDocuments.parentInvoiceId, parentInvoice.id),
-        eq(issuedDocuments.kind, "invoice"),
-        eq(issuedDocuments.status, "issued"),
-      ));
-      const invoiceIds = [parentInvoice.id, ...settlementInvoices.map((document) => document.id)];
-      const invoicePayments = await tx.select().from(payments).where(and(inArray(payments.invoiceId, invoiceIds), eq(payments.status, "confirmed")));
-      const invoicePaymentIds = invoicePayments.map((item) => item.id);
-      const invoiceRefunds = invoicePaymentIds.length
-        ? await tx.select().from(refunds).where(and(inArray(refunds.paymentId, invoicePaymentIds), eq(refunds.status, "confirmed")))
-        : [];
-      for (const settlement of settlementInvoices) {
-        const settlementPaid = netPaidForInvoiceIds([settlement.id], invoicePayments, invoiceRefunds);
-        if (invoiceOutstanding(Number(settlement.snapshot.total ?? 0), settlementPaid) > 0) {
-          return { id: settlement.id, number: settlement.number, existing: true };
-        }
-      }
-      const parentTotal = Number(parentInvoice.snapshot.total ?? 0);
-      total = invoiceOutstanding(parentTotal, netPaidForInvoiceIds(invoiceIds, invoicePayments, invoiceRefunds));
-      if (total <= 0) throw new Error("Invoice ini sudah lunas dan tidak memerlukan invoice pelunasan.");
-      const suffix = String(booking.packageSnapshot.dateLabel ?? booking.packageSnapshot.departureDate ?? "");
-      items = [{
-        description: `Pelunasan ${String(booking.packageSnapshot.name ?? "Paket umroh")}${suffix ? ` — ${suffix}` : ""}`,
-        qty: 1,
-        unitPrice: total,
-        total,
-      }];
+      const settlement = await resolveSettlementInvoice(tx, booking, parentInvoiceId, invoiceAmount);
+      if (settlement.openSettlement) return { id: settlement.openSettlement.id, number: settlement.openSettlement.number, existing: true };
+      parentInvoice = settlement.parentInvoice;
+      total = settlement.total;
+      items = settlement.items;
     } else {
       const totals = invoiceTotals(registrationRows);
       const existingInvoices = await tx.select({ snapshot: issuedDocuments.snapshot }).from(issuedDocuments).where(and(eq(issuedDocuments.kind, "invoice"), eq(issuedDocuments.bookingId, booking.id), eq(issuedDocuments.status, "issued"), isNull(issuedDocuments.parentInvoiceId)));

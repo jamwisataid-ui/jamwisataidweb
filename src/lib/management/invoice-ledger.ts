@@ -15,3 +15,14 @@ export function netPaidForInvoiceIds(invoiceIds: Iterable<string>, payments: Pay
 export function invoiceOutstanding(total: number, netPaid: number) {
   return Math.max(0, total - netPaid);
 }
+
+/** A child invoice that clears the whole remainder is a "Pelunasan"; anything smaller is a numbered termin. */
+export function installmentLineDescription({ packageName, departureLabel, amount, remaining, installmentNumber }: { packageName: string; departureLabel?: string; amount: number; remaining: number; installmentNumber: number }) {
+  const suffix = departureLabel ? ` — ${departureLabel}` : "";
+  return amount >= remaining ? `Pelunasan ${packageName}${suffix}` : `Pembayaran termin ${installmentNumber} ${packageName}${suffix}`;
+}
+
+export function childInvoiceLabel(snapshot: unknown) {
+  const items = (snapshot as { items?: Array<{ description?: unknown }> } | null | undefined)?.items;
+  return String(items?.[0]?.description ?? "").startsWith("Pembayaran termin") ? "Invoice Termin" : "Invoice Pelunasan";
+}
