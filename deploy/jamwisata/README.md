@@ -94,6 +94,15 @@ Run the same script nightly from root cron or a systemd timer. The local default
 retention is 14 days. Synchronize the resulting encrypted backup to storage
 outside this VPS; a local-only backup does not protect against VPS loss.
 
+Install the included systemd timer:
+
+```bash
+sudo install -m 0644 deploy/jamwisata/systemd/jamwisata-postgres-backup.service /etc/systemd/system/
+sudo install -m 0644 deploy/jamwisata/systemd/jamwisata-postgres-backup.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now jamwisata-postgres-backup.timer
+```
+
 Start realtime only after the VPS firewall/security group exposes LiveKit's
 required ports and the server has enough free CPU, RAM, swap, and disk:
 
