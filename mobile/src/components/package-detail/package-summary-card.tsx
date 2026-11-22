@@ -22,7 +22,7 @@ export function PackageSummaryCard({ item, price = item.priceFrom }: { item: Pac
         </View>
       </View>
       <NavyCard style={styles.pricePill}>
-        <Text style={styles.person}>{price ? "mulai dari / jamaah" : "Harga paket"}</Text>
+        <Text style={styles.person}>{price ? "All In/jamaah (Quad)" : "Harga paket"}</Text>
         <Text adjustsFontSizeToFit numberOfLines={1} style={styles.price}>{price ? `Rp ${money.format(price)}` : "Hubungi kami"}</Text>
       </NavyCard>
     </View>

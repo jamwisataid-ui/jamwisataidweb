@@ -77,7 +77,7 @@ export function PackageCard({ item }: { item: Package }) {
 
           <View style={styles.footer}>
             <View style={styles.priceBlock}>
-              <Text style={styles.perPerson}>{item.priceFrom ? "mulai dari / jamaah" : "Harga paket"}</Text>
+              <Text style={styles.perPerson}>{item.priceFrom ? "All In/jamaah (Quad)" : "Harga paket"}</Text>
               <Text style={styles.price}>{item.priceFrom ? `Rp ${money.format(item.priceFrom)}` : "Hubungi kami"}</Text>
             </View>
             {disabled ? <View style={[styles.arrow, styles.disabledButton]}><Ionicons name="arrow-forward" size={18} color={colors.muted} /></View> : <MetallicGold style={styles.arrow}><Ionicons name="arrow-forward" size={18} color={colors.navyDeep} /></MetallicGold>}

@@ -30,7 +30,7 @@ export function PackagePreviewCard({ item }: { item: Package }) {
           <Text numberOfLines={1} style={styles.eyebrow}>{eyebrow}</Text>
           <Text numberOfLines={2} style={styles.title}>{item.name}</Text>
         </View>
-        <Text style={styles.from}>mulai <Text style={styles.price}>{shortRupiah(item.priceFrom)}</Text></Text>
+        <View><Text numberOfLines={1} style={styles.from}>All In/jamaah (Quad)</Text><Text style={styles.price}>{shortRupiah(item.priceFrom)}</Text></View>
       </View>
     </PressableScale>
   );

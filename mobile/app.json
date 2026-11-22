@@ -58,7 +58,7 @@
     },
     "android": {
       "package": "id.jamwisata.mobile",
-      "versionCode": 8,
+      "versionCode": 9,
       "permissions": [
         "RECORD_AUDIO",
         "MODIFY_AUDIO_SETTINGS",

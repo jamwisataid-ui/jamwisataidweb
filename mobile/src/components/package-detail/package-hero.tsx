@@ -19,7 +19,7 @@ export function PackageHero({ item, favorite, onToggleFavorite }: { item: Packag
   const height = Math.min(Math.max(width * 0.86, 300), 380);
   const share = () => void Share.share({
     title: item.name,
-    message: `${item.name}\nHarga mulai ${item.priceFrom ? `Rp${new Intl.NumberFormat("id-ID").format(item.priceFrom)}/jamaah` : "hubungi JAM WISATA"}\nJAM WISATA\nhttps://jamwisata.id/paket-umroh/${item.slug}`,
+    message: `${item.name}\n${item.priceFrom ? `Harga All In/jamaah (Quad) Rp${new Intl.NumberFormat("id-ID").format(item.priceFrom)}` : "Harga: hubungi JAM WISATA"}\nJAM WISATA\nhttps://jamwisata.id/paket-umroh/${item.slug}`,
   });
 
   return (
