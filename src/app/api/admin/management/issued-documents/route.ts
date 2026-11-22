@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { requireAdminSession } from "@/lib/admin-session";
+import { adminSessionExpiredResponse, requireAdminSession } from "@/lib/admin-session";
 import { issueTransactionDocument } from "@/lib/management/issue-document";
 
 export async function POST(request: Request) {
@@ -11,6 +11,8 @@ export async function POST(request: Request) {
     if (!kind || !body.bookingId) return NextResponse.json({ error: "Jenis dokumen atau booking tidak valid." }, { status: 400 });
     return NextResponse.json(await issueTransactionDocument({ kind, bookingId: body.bookingId, paymentId: body.paymentId, invoiceAmount: body.invoiceAmount, parentInvoiceId: body.parentInvoiceId, actorId: session.user.id }));
   } catch (error) {
+    const expired = adminSessionExpiredResponse(error);
+    if (expired) return expired;
     console.error("Document issue failed:", error);
     return NextResponse.json({ error: error instanceof Error ? error.message : "PDF gagal diterbitkan." }, { status: 500 });
   }

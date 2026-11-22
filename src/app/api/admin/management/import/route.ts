@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 
 import { agents, auditLogs, bookings, cashTransactions, financialAccounts, inventoryItems, inventoryMovements, managementSettings, packages, paymentAllocations, payments, pilgrims, registrations, departures } from "@/db/schema";
 import { withManagementTransaction } from "@/db/transaction";
-import { requireAdminSession } from "@/lib/admin-session";
+import { adminSessionExpiredResponse, requireAdminSession } from "@/lib/admin-session";
 
 type ImportRow = Record<string, string>;
 const allowedTypes = new Set(["jamaah", "agen", "rekening", "stok", "pendaftaran"]);
@@ -101,6 +101,8 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ ok: true, preview: false, rows: rows.length, summary });
   } catch (error) {
+    const expired = adminSessionExpiredResponse(error);
+    if (expired) return expired;
     console.error("Management import failed:", error);
     return NextResponse.json({ error: error instanceof Error ? error.message : "Import gagal." }, { status: 500 });
   }

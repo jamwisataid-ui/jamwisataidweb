@@ -3,7 +3,7 @@ import { and, eq, isNull } from "drizzle-orm";
 
 import { requireDatabase } from "@/db";
 import { accommodations, bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, registrations } from "@/db/schema";
-import { requireAdminSession } from "@/lib/admin-session";
+import { adminSessionExpiredResponse, requireAdminSession } from "@/lib/admin-session";
 import { formatDocumentNumber } from "@/lib/management/domain";
 import { renderTransactionPdf, renderTransactionPng, type TransactionPdfSnapshot } from "@/lib/management/document-renderer";
 import { buildInvoiceItems, invoiceTotals, resolveInvoiceAmount } from "@/lib/management/invoice";
@@ -106,6 +106,8 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
+    const expired = adminSessionExpiredResponse(error);
+    if (expired) return expired;
     console.error("Document preview failed:", error);
     return NextResponse.json({ error: error instanceof Error ? error.message : "Preview PDF gagal dibuat." }, { status: 500 });
   }

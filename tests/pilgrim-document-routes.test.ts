@@ -24,6 +24,7 @@ vi.mock("@/lib/management/pilgrim-documents", () => ({
 
 vi.mock("@/lib/admin-session", () => ({
   requireAdminSession: vi.fn().mockResolvedValue({ user: { id: "admin-1" } }),
+  adminSessionExpiredResponse: vi.fn().mockReturnValue(null),
 }));
 
 vi.mock("@/lib/management/storage", () => ({

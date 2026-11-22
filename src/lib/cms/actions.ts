@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { unstable_rethrow } from "next/navigation";
 import { and, eq, inArray } from "drizzle-orm";
 
 import { requireDatabase } from "@/db";
@@ -298,6 +299,7 @@ export async function savePackageAction(_state: ActionState, formData: FormData)
     invalidate("packages", `/${data.category === "halal-tour" ? "paket-wisata" : "paket-umroh"}/${data.slug}`);
     return { ok: true, message: "Paket berhasil diterbitkan ke website.", redirectTo: `/admin/paket/${data.id}` };
   } catch (error) {
+    unstable_rethrow(error);
     console.error("Gagal menyimpan paket:", error);
     return { ok: false, message: error instanceof Error ? error.message : "Terjadi kesalahan saat menyimpan paket ke database." };
   }
@@ -346,6 +348,7 @@ export async function saveEntryAction(_state: ActionState, formData: FormData): 
     try {
       data = entryData(input.type, input);
     } catch (error) {
+      unstable_rethrow(error);
       return { ok: false, message: error instanceof Error ? error.message : "Data konten tidak valid." };
     }
 
@@ -377,6 +380,7 @@ export async function saveEntryAction(_state: ActionState, formData: FormData): 
     invalidate("entries");
     return { ok: true, message: "Konten sudah tampil di website.", redirectTo: `/admin/konten/${input.type}/${entryId}` };
   } catch (error) {
+    unstable_rethrow(error);
     console.error("Gagal menyimpan konten:", error);
     return { ok: false, message: error instanceof Error ? error.message : "Gagal menyimpan konten ke database." };
   }
@@ -423,6 +427,7 @@ export async function saveArticleAction(_state: ActionState, formData: FormData)
     invalidate("articles", `/artikel/${input.slug}`);
     return { ok: true, message: "Artikel berhasil diterbitkan.", redirectTo: `/admin/artikel/${id}` };
   } catch (error) {
+    unstable_rethrow(error);
     console.error("Gagal menyimpan artikel:", error);
     return { ok: false, message: error instanceof Error ? error.message : "Gagal menyimpan artikel ke database." };
   }
@@ -447,6 +452,7 @@ export async function setPublicationStatusAction(formData: FormData) {
     }
     await writeAudit(session.user.id, status === "archived" ? "archive" : "unpublish", entityType, entityId, `Status diubah menjadi ${status}`);
   } catch (error) {
+    unstable_rethrow(error);
     console.error("Gagal mengubah status publikasi:", error);
   }
 }
@@ -492,6 +498,7 @@ export async function deletePackageAction(formData: FormData): Promise<ActionSta
 
     return { ok: true, message: `Paket "${pkg.name}" berhasil dihapus.`, redirectTo: "/admin/paket" };
   } catch (error) {
+    unstable_rethrow(error);
     console.error("Gagal menghapus paket:", error);
     return { ok: false, message: error instanceof Error ? error.message : "Gagal menghapus paket dari database." };
   }
@@ -519,6 +526,7 @@ export async function deleteArticleAction(formData: FormData): Promise<ActionSta
 
     return { ok: true, message: `Artikel "${article.title}" berhasil dihapus.`, redirectTo: "/admin/artikel" };
   } catch (error) {
+    unstable_rethrow(error);
     console.error("Gagal menghapus artikel:", error);
     return { ok: false, message: error instanceof Error ? error.message : "Gagal menghapus artikel." };
   }
@@ -547,6 +555,7 @@ export async function deleteEntryAction(formData: FormData): Promise<ActionState
 
     return { ok: true, message: `Konten "${entry.title}" berhasil dihapus.`, redirectTo: `/admin/konten/${type || entry.type}` };
   } catch (error) {
+    unstable_rethrow(error);
     console.error("Gagal menghapus konten:", error);
     return { ok: false, message: error instanceof Error ? error.message : "Gagal menghapus konten." };
   }

@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 
 import { requireDatabase } from "@/db";
 import { auditLogs, pilgrimDocuments, pilgrims } from "@/db/schema";
-import { requireAdminSession } from "@/lib/admin-session";
+import { adminSessionExpiredResponse, requireAdminSession } from "@/lib/admin-session";
 import { isPilgrimDocumentKind } from "@/lib/management/pilgrim-documents";
 import { deletePrivateObject, privateObjectKey, putPrivateObject, validatePrivateFile } from "@/lib/management/storage";
 
@@ -38,6 +38,8 @@ export async function POST(request: Request) {
     await db.insert(auditLogs).values({ actorId: session.user.id, action: "upload", entityType: "pilgrim_document", entityId: document.id, summary: `${kind} ${pilgrim.fullName} diunggah` });
     return NextResponse.json({ ok: true, documentId: document.id });
   } catch (error) {
+    const expired = adminSessionExpiredResponse(error);
+    if (expired) return expired;
     console.error("Pilgrim document upload failed:", error);
     return NextResponse.json({ error: "Dokumen gagal diunggah. Silakan coba lagi." }, { status: 500 });
   }
