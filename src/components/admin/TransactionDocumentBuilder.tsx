@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { CircleDollarSign, FileCheck2, FileText, LoaderCircle, ReceiptText, RotateCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import { INVOICE_DESCRIPTION_MAX_LENGTH } from "@/lib/management/invoice";
+
 type BuilderBooking = {
   optionId?: string;
   id: string;
@@ -46,6 +48,10 @@ export function TransactionDocumentBuilder({ bookings, invoiceNumber, initialPar
   const [previewBusy, setPreviewBusy] = useState(false);
   const [issueBusy, setIssueBusy] = useState(false);
   const [issueError, setIssueError] = useState("");
+  const [defaultDescriptions, setDefaultDescriptions] = useState<string[]>([]);
+  const [descriptionOverrides, setDescriptionOverrides] = useState<string[]>([]);
+  const descriptionKey = JSON.stringify(descriptionOverrides);
+  const descriptionTooLong = descriptionOverrides.some((value) => value.trim().length > INVOICE_DESCRIPTION_MAX_LENGTH);
   const selectedBooking = bookings.find((booking) => bookingOptionId(booking) === selectedOptionId);
   const numericInvoiceAmount = Number(invoiceAmount);
   const amountValid = Boolean(selectedBooking && Number.isSafeInteger(numericInvoiceAmount) && numericInvoiceAmount > 0 && numericInvoiceAmount <= selectedBooking.remainingPrice);
@@ -55,7 +61,7 @@ export function TransactionDocumentBuilder({ bookings, invoiceNumber, initialPar
   const selectedParentInvoiceId = selectedBooking?.parentInvoiceId;
 
   useEffect(() => {
-    if (!selectedBookingId || !amountValid) return;
+    if (!selectedBookingId || !amountValid || descriptionTooLong) return;
     const controller = new AbortController();
     let nextUrl = "";
     const timer = window.setTimeout(async () => {
@@ -65,12 +71,18 @@ export function TransactionDocumentBuilder({ bookings, invoiceNumber, initialPar
         const response = await fetch("/api/admin/management/issued-documents/preview", {
           method: "POST",
           headers: { "content-type": "application/json", accept: "image/png" },
-          body: JSON.stringify({ kind: "invoice", bookingId: selectedBookingId, parentInvoiceId: selectedParentInvoiceId, invoiceAmount: numericInvoiceAmount }),
+          body: JSON.stringify({ kind: "invoice", bookingId: selectedBookingId, parentInvoiceId: selectedParentInvoiceId, invoiceAmount: numericInvoiceAmount, itemDescriptions: JSON.parse(descriptionKey) }),
           signal: controller.signal,
         });
         if (!response.ok) {
           const result = await response.json();
           throw new Error(result.error || "Preview PDF gagal dibuat.");
+        }
+        try {
+          const header = response.headers.get("x-invoice-item-descriptions");
+          if (header) setDefaultDescriptions(JSON.parse(decodeURIComponent(header)));
+        } catch {
+          setDefaultDescriptions([]);
         }
         nextUrl = URL.createObjectURL(await response.blob());
         setPreviewUrl((current) => { if (current) URL.revokeObjectURL(current); return nextUrl; });
@@ -79,19 +91,19 @@ export function TransactionDocumentBuilder({ bookings, invoiceNumber, initialPar
       } finally {
         if (!controller.signal.aborted) setPreviewBusy(false);
       }
-    }, 250);
+    }, 350);
     return () => { window.clearTimeout(timer); controller.abort(); if (nextUrl) URL.revokeObjectURL(nextUrl); };
-  }, [amountValid, numericInvoiceAmount, selectedBookingId, selectedParentInvoiceId]);
+  }, [amountValid, descriptionKey, descriptionTooLong, numericInvoiceAmount, selectedBookingId, selectedParentInvoiceId]);
 
   async function issue() {
-    if (!selectedBooking || !amountValid) return;
+    if (!selectedBooking || !amountValid || descriptionTooLong) return;
     setIssueBusy(true);
     setIssueError("");
     try {
       const response = await fetch("/api/admin/management/issued-documents", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ kind: "invoice", bookingId: selectedBooking.id, parentInvoiceId: selectedBooking.parentInvoiceId, invoiceAmount: numericInvoiceAmount }),
+        body: JSON.stringify({ kind: "invoice", bookingId: selectedBooking.id, parentInvoiceId: selectedBooking.parentInvoiceId, invoiceAmount: numericInvoiceAmount, itemDescriptions: descriptionOverrides }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Invoice gagal diterbitkan.");
@@ -115,7 +127,7 @@ export function TransactionDocumentBuilder({ bookings, invoiceNumber, initialPar
     <section className="management-document-builder">
       <div className="management-document-controls">
         <header><small>BUAT TAGIHAN</small><h2>Terbitkan invoice</h2><p>Buat invoice awal atau invoice termin dengan nominal yang dapat ditentukan sendiri.</p></header>
-        <label className="management-document-select"><span>1. Pilih tagihan</span><select value={selectedOptionId} onChange={(event) => { const next = bookings.find((booking) => bookingOptionId(booking) === event.target.value); setSelectedOptionId(event.target.value); setInvoiceAmount(defaultInvoiceAmount(next)); setIssueError(""); }}>{bookings.map((booking) => <option value={bookingOptionId(booking)} key={bookingOptionId(booking)}>{booking.mode === "settlement" ? `${booking.sourceInvoiceNumber} · Termin · sisa ${currency.format(booking.remainingPrice)}` : `${booking.bookingNumber} · ${booking.payerName}`}</option>)}</select></label>
+        <label className="management-document-select"><span>1. Pilih tagihan</span><select value={selectedOptionId} onChange={(event) => { const next = bookings.find((booking) => bookingOptionId(booking) === event.target.value); setSelectedOptionId(event.target.value); setInvoiceAmount(defaultInvoiceAmount(next)); setDescriptionOverrides([]); setDefaultDescriptions([]); setIssueError(""); }}>{bookings.map((booking) => <option value={bookingOptionId(booking)} key={bookingOptionId(booking)}>{booking.mode === "settlement" ? `${booking.sourceInvoiceNumber} · Termin · sisa ${currency.format(booking.remainingPrice)}` : `${booking.bookingNumber} · ${booking.payerName}`}</option>)}</select></label>
         {selectedBooking ? <div className="management-document-summary"><span><small>Paket</small><strong>{selectedBooking.packageName}</strong></span><span><small>Jamaah</small><strong>{selectedBooking.pilgrims} orang</strong></span>{selectedBooking.mode === "settlement" ? <><span><small>Invoice awal</small><strong>{selectedBooking.sourceInvoiceNumber}</strong></span><span><small>Sudah dibayar</small><strong>{currency.format(selectedBooking.alreadyInvoiced)}</strong></span><span><small>Sisa tagihan</small><strong>{currency.format(selectedBooking.remainingPrice)}</strong></span></> : <><span><small>Total harga pendaftaran</small><strong>{currency.format(selectedBooking.totalPrice)}</strong></span><span><small>Sudah dibuatkan invoice</small><strong>{currency.format(selectedBooking.alreadyInvoiced)}</strong></span><span><small>Sisa belum ditagihkan</small><strong>{currency.format(selectedBooking.remainingPrice)}</strong></span></>}</div> : null}
         <div className="management-invoice-amount">
           <label><span>2. Tentukan nominal invoice *</span><input aria-label="Nominal invoice" inputMode="numeric" value={invoiceAmount} onChange={(event) => { setInvoiceAmount(event.target.value.replace(/\D/g, "")); setIssueError(""); }} /></label>
@@ -123,10 +135,19 @@ export function TransactionDocumentBuilder({ bookings, invoiceNumber, initialPar
           <div>{selectedBooking?.mode === "settlement" ? null : <button type="button" className={numericInvoiceAmount === Math.min(selectedBooking?.totalDp ?? 0, selectedBooking?.remainingPrice ?? 0) ? "active" : ""} onClick={() => setInvoiceAmount(String(Math.min(selectedBooking?.totalDp ?? 0, selectedBooking?.remainingPrice ?? 0)))}>Tagih DP {selectedBooking ? currency.format(Math.min(selectedBooking.totalDp, selectedBooking.remainingPrice)) : ""}</button>}<button type="button" className={numericInvoiceAmount === selectedBooking?.remainingPrice ? "active" : ""} onClick={() => setInvoiceAmount(String(selectedBooking?.remainingPrice ?? 0))}>{selectedBooking?.mode === "settlement" ? "Pelunasan seluruh sisa" : "Tagih seluruh sisa"}</button></div>
           <small>Nominal dapat diisi bebas sampai sebesar sisa tagihan. Harga paket jamaah tetap tersimpan dan tidak berubah.</small>
         </div>
+        {defaultDescriptions.length ? <div className="management-invoice-amount management-invoice-description">
+          <span>3. Keterangan invoice</span>
+          {defaultDescriptions.map((fallback, index) => {
+            const value = descriptionOverrides[index] ?? fallback;
+            return <label key={index}><textarea aria-label={`Keterangan baris ${index + 1}`} rows={2} maxLength={INVOICE_DESCRIPTION_MAX_LENGTH} value={value} onChange={(event) => { const nextValue = event.target.value; setDescriptionOverrides((current) => { const next = [...current]; while (next.length <= index) next.push(""); next[index] = nextValue; return next; }); setIssueError(""); }} /></label>;
+          })}
+          {descriptionOverrides.some((value, index) => value && value !== defaultDescriptions[index]) ? <div><button type="button" onClick={() => setDescriptionOverrides([])}>Kembalikan keterangan otomatis</button></div> : null}
+          <small>{descriptionTooLong ? `Keterangan maksimal ${INVOICE_DESCRIPTION_MAX_LENGTH} karakter.` : "Teks ini tercetak di kolom Keterangan. Kosongkan untuk memakai keterangan otomatis."}</small>
+        </div> : null}
         <div className="management-document-number"><span>Nomor invoice yang akan dipakai</span><strong>{invoiceNumber}</strong><small>Nomor baru dipakai dan dinaikkan setelah invoice diterbitkan.</small></div>
         <p className="management-form-note">Setelah invoice terbit, catat pembayarannya dari menu Pembayaran. Sistem langsung membuat kwitansi secara otomatis.</p>
         {issueError ? <p className="management-document-error">{issueError}</p> : null}
-        <button className="management-document-issue" type="button" disabled={!selectedBooking || !amountValid || issueBusy || previewBusy || Boolean(previewError)} onClick={issue}>{issueBusy ? <LoaderCircle className="spin" /> : <FileCheck2 />}{issueBusy ? "Menerbitkan invoice…" : `Terbitkan invoice ${currency.format(numericInvoiceAmount || 0)}`}</button>
+        <button className="management-document-issue" type="button" disabled={!selectedBooking || !amountValid || descriptionTooLong || issueBusy || previewBusy || Boolean(previewError)} onClick={issue}>{issueBusy ? <LoaderCircle className="spin" /> : <FileCheck2 />}{issueBusy ? "Menerbitkan invoice…" : `Terbitkan invoice ${currency.format(numericInvoiceAmount || 0)}`}</button>
       </div>
       <div className="management-document-preview">
         <header><span><small>PREVIEW LIVE</small><strong>Invoice · {selectedBooking?.payerName ?? "-"}</strong></span>{amountValid && previewBusy ? <i><LoaderCircle className="spin" /> Memuat</i> : amountValid && previewUrl ? <i className="ready"><FileCheck2 /> Siap diperiksa</i> : null}</header>

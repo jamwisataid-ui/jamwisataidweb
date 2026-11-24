@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildInvoiceItems, invoiceTotals, resolveInvoiceAmount } from "../src/lib/management/invoice";
+import { applyItemDescriptions, buildInvoiceItems, invoiceTotals, resolveInvoiceAmount } from "../src/lib/management/invoice";
 
 const registrations = [
   { agreedPrice: 33_900_000, dpTarget: 5_000_000 },
@@ -28,5 +28,28 @@ describe("invoice management", () => {
 
   it("supports a later settlement invoice using the remaining value", () => {
     expect(resolveInvoiceAmount(57_800_000, 57_800_000)).toBe(57_800_000);
+  });
+});
+
+describe("invoice line descriptions", () => {
+  const items = [
+    { description: "Paket A — Jan", qty: 2, unitPrice: 10, total: 20 },
+    { description: "Paket A — Jan", qty: 1, unitPrice: 15, total: 15 },
+  ];
+
+  it("replaces only non-blank overrides and keeps amounts", () => {
+    expect(applyItemDescriptions(items, ["  Pelunasan   umroh Januari ", ""])).toEqual([
+      { description: "Pelunasan umroh Januari", qty: 2, unitPrice: 10, total: 20 },
+      items[1],
+    ]);
+  });
+
+  it("ignores missing or malformed overrides", () => {
+    expect(applyItemDescriptions(items, undefined)).toBe(items);
+    expect(applyItemDescriptions(items, [42, null, "extra"])).toEqual(items);
+  });
+
+  it("rejects descriptions that would overflow the template", () => {
+    expect(() => applyItemDescriptions(items, ["x".repeat(141)])).toThrow("maksimal 140");
   });
 });

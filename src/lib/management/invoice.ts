@@ -59,3 +59,18 @@ export function buildInvoiceItems({
 
   return [{ description: `Tagihan ${packageName}${suffix}`, qty: 1, unitPrice: amount, total: amount }];
 }
+
+export const INVOICE_DESCRIPTION_MAX_LENGTH = 140;
+
+/** Applies admin-edited line descriptions by index; blank or missing entries keep the generated text. */
+export function applyItemDescriptions(items: TransactionPdfSnapshot["items"], overrides: unknown): TransactionPdfSnapshot["items"] {
+  if (!Array.isArray(overrides)) return items;
+  return items.map((item, index) => {
+    const value = overrides[index];
+    if (typeof value !== "string") return item;
+    const description = value.replace(/\s+/g, " ").trim();
+    if (!description) return item;
+    if (description.length > INVOICE_DESCRIPTION_MAX_LENGTH) throw new Error(`Keterangan invoice maksimal ${INVOICE_DESCRIPTION_MAX_LENGTH} karakter.`);
+    return { ...item, description };
+  });
+}

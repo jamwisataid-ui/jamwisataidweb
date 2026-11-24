@@ -6,7 +6,7 @@ import { accommodations, bookings, documentSequences, financialAccounts, issuedD
 import { adminSessionExpiredResponse, requireAdminSession } from "@/lib/admin-session";
 import { formatDocumentNumber } from "@/lib/management/domain";
 import { renderTransactionPdf, renderTransactionPng, type TransactionPdfSnapshot } from "@/lib/management/document-renderer";
-import { buildInvoiceItems, invoiceTotals, resolveInvoiceAmount } from "@/lib/management/invoice";
+import { applyItemDescriptions, buildInvoiceItems, invoiceTotals, resolveInvoiceAmount } from "@/lib/management/invoice";
 import { resolveSettlementInvoice } from "@/lib/management/settlement-invoice";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   try {
     await requireAdminSession();
-    const body = await request.json() as { kind?: string; bookingId?: string; paymentId?: string; invoiceAmount?: number; parentInvoiceId?: string };
+    const body = await request.json() as { kind?: string; bookingId?: string; paymentId?: string; invoiceAmount?: number; parentInvoiceId?: string; itemDescriptions?: unknown };
     const kind = body.kind === "receipt" ? "receipt" : body.kind === "invoice" ? "invoice" : null;
     if (!kind || !body.bookingId) return NextResponse.json({ error: "Jenis dokumen atau booking tidak valid." }, { status: 400 });
 
@@ -67,6 +67,9 @@ export async function POST(request: Request) {
       });
     }
 
+    const defaultDescriptions = items.map((item) => item.description);
+    if (kind === "invoice") items = applyItemDescriptions(items, body.itemDescriptions);
+
     const snapshot: TransactionPdfSnapshot = {
       kind,
       purpose: body.parentInvoiceId ? "settlement" : "standard",
@@ -103,6 +106,7 @@ export async function POST(request: Request) {
         "content-type": wantsPng ? "image/png" : "application/pdf",
         "content-disposition": `inline; filename="preview-${kind}.${wantsPng ? "png" : "pdf"}"`,
         "cache-control": "no-store",
+        "x-invoice-item-descriptions": encodeURIComponent(JSON.stringify(defaultDescriptions)),
       },
     });
   } catch (error) {

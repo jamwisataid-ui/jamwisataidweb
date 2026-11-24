@@ -2570,6 +2570,10 @@
 .management-invoice-amount button { min-height: 43px; padding: 9px 10px; border: 1px solid #173d68; border-radius: 8px; background: #fff; color: #102f53; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
 .management-invoice-amount button:hover,.management-invoice-amount button.active { background: #102f53; color: #fff; }
 .management-invoice-amount > small { color: #65758a; font-size: 11px; line-height: 1.55; }
+.management-invoice-description > span { display: block; color: #173251; font-size: 15px; font-weight: 800; }
+.management-invoice-description > div { grid-template-columns: 1fr; }
+.management-invoice-description textarea { width: 100%; min-height: 64px; padding: 10px 13px; border: 1px solid #aebed0; border-radius: 9px; outline: none; background: #fff; color: #102a4c; font: inherit; font-size: 14px; line-height: 1.45; resize: vertical; }
+.management-invoice-description textarea:focus { border-color: #a77b18; box-shadow: 0 0 0 3px rgba(183,139,34,.14); }
 .management-document-number { padding: 14px; border: 1px solid #dfcc91; border-radius: 10px; background: #fffbf0; }
 .management-document-number span,.management-document-number strong,.management-document-number small { display: block; }
 .management-document-number span { color: #78601f; font-size: 11px; font-weight: 700; }

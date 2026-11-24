@@ -7,16 +7,17 @@ import { accommodations, auditLogs, bookings, documentSequences, financialAccoun
 import { withManagementTransaction } from "@/db/transaction";
 import { formatDocumentNumber } from "./domain";
 import { renderTransactionPdf, type TransactionPdfSnapshot } from "./document-renderer";
-import { buildInvoiceItems, invoiceTotals, resolveInvoiceAmount } from "./invoice";
+import { applyItemDescriptions, buildInvoiceItems, invoiceTotals, resolveInvoiceAmount } from "./invoice";
 import { resolveSettlementInvoice } from "./settlement-invoice";
 import { deletePrivateObject, privateObjectKey, putPrivateObject } from "./storage";
 
-export async function issueTransactionDocument({ kind, bookingId, paymentId, invoiceAmount, parentInvoiceId, actorId }: {
+export async function issueTransactionDocument({ kind, bookingId, paymentId, invoiceAmount, parentInvoiceId, itemDescriptions, actorId }: {
   kind: "invoice" | "receipt";
   bookingId: string;
   paymentId?: string;
   invoiceAmount?: number;
   parentInvoiceId?: string;
+  itemDescriptions?: unknown;
   actorId: string;
 }) {
   let uploadedObjectKey: string | undefined;
@@ -77,6 +78,8 @@ export async function issueTransactionDocument({ kind, bookingId, paymentId, inv
         departureLabel: String(booking.packageSnapshot.dateLabel ?? booking.packageSnapshot.departureDate ?? ""),
       });
     }
+
+    if (kind === "invoice") items = applyItemDescriptions(items, itemDescriptions);
 
     const snapshot: TransactionPdfSnapshot = {
       kind,
