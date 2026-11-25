@@ -29,7 +29,7 @@ export function PackageErrorState({ onRetry }: { onRetry: () => void }) {
 
 const styles = StyleSheet.create({
   state: { marginTop: 36, paddingHorizontal: 28, alignItems: "center", gap: 9 },
-  icon: { width: 56, height: 56, borderRadius: 18, alignItems: "center", justifyContent: "center", backgroundColor: "#F8F1DC" },
+  icon: { width: 56, height: 56, borderRadius: 18, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(214,180,100,0.30)", backgroundColor: "#FDF7EA", shadowColor: "#785F28", shadowOpacity: 0.14, shadowRadius: 10, shadowOffset: { width: 0, height: 5 }, elevation: 3 },
   title: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 20, textAlign: "center" },
   body: { maxWidth: 300, color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 14, lineHeight: 21, textAlign: "center" },
   retry: { minHeight: 42, marginTop: 6, paddingHorizontal: 17, borderRadius: 12, flexDirection: "row", alignItems: "center", gap: 7, backgroundColor: colors.navy },

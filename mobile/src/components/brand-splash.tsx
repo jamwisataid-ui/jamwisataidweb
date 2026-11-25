@@ -90,7 +90,7 @@ export function BrandSplash({ ready, onFinished }: { ready: boolean; onFinished:
         style={[styles.image, { width: imageWidth, height: imageHeight, left: (width - imageWidth) / 2, transform: [{ scale: zoom }] }]}
       />
       <LinearGradient
-        colors={["rgba(6,21,43,0.62)", "rgba(6,21,43,0.08)", "rgba(6,21,43,0)", "rgba(6,21,43,0.7)", colors.navyDeep]}
+        colors={["rgba(6,27,56,0.62)", "rgba(6,27,56,0.08)", "rgba(6,27,56,0)", "rgba(6,27,56,0.7)", colors.navyDeep]}
         locations={[0, 0.36, 0.52, 0.82, 1]}
         style={StyleSheet.absoluteFill}
       />

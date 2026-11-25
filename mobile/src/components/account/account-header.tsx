@@ -11,7 +11,7 @@ export function AccountHeader() {
   return (
     <View style={[styles.header, { paddingTop: insets.top + 22, height: insets.top + 170 }]}>
       <Image alt="" source={heroImage} resizeMode="cover" style={styles.image} />
-      <LinearGradient colors={["rgba(6,21,43,0.6)", "rgba(6,21,43,0.95)"]} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={["rgba(6,27,56,0.6)", "rgba(6,27,56,0.95)"]} style={StyleSheet.absoluteFill} />
       <Text style={styles.eyebrow}>AREA JAMAAH</Text>
       <Text accessibilityRole="header" style={styles.title}>Akun Saya</Text>
     </View>

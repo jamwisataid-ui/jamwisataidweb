@@ -60,7 +60,7 @@ export function PackageCard({ item }: { item: Package }) {
       <View style={styles.card}>
         <View style={styles.imageFrame}>
           <Image source={{ uri: item.image }} resizeMode="cover" style={styles.image} alt={item.name} />
-          <LinearGradient colors={["transparent", "rgba(6,21,43,0.55)"]} locations={[0.5, 1]} style={StyleSheet.absoluteFill} />
+          <LinearGradient colors={["transparent", "rgba(6,27,56,0.55)"]} locations={[0.5, 1]} style={StyleSheet.absoluteFill} />
           <PackageBadge item={item} />
           {item.durationDays ? <Text style={styles.imageCaption}>{item.durationDays} hari{item.departures?.[0]?.dateLabel ? ` · mulai ${item.departures[0].dateLabel}` : ""}</Text> : null}
         </View>
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.86 },
   imageFrame: { width: "100%", aspectRatio: 16 / 8.5, backgroundColor: colors.navyDeep },
   image: { width: "100%", height: "100%" },
-  badge: { position: "absolute", top: 14, left: 14, minHeight: 26, paddingHorizontal: 12, borderRadius: 999, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(6,21,43,0.6)", borderWidth: 1, borderColor: "rgba(212,175,55,0.6)" },
+  badge: { position: "absolute", top: 14, left: 14, minHeight: 26, paddingHorizontal: 12, borderRadius: 999, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(6,27,56,0.6)", borderWidth: 1, borderColor: "rgba(212,175,55,0.6)" },
   redBadge: { backgroundColor: "rgba(255,240,238,0.95)", borderColor: "rgba(180,35,24,0.35)" },
   badgeText: { color: colors.softGold, fontFamily: "Cinzel_600SemiBold", fontSize: 9.5, letterSpacing: 1.8 },
   redBadgeText: { color: colors.danger, fontFamily: "Montserrat_700Bold", letterSpacing: 0.6 },
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   metaList: { gap: 6, paddingTop: 5 },
   metaRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   metaText: { flex: 1, color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 12.5, lineHeight: 18 },
-  footer: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10, marginTop: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: "rgba(184,134,11,0.2)" },
+  footer: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10, marginTop: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: "rgba(201,151,31,0.2)" },
   priceBlock: { flex: 1, gap: 1 },
   price: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 19, lineHeight: 24 },
   perPerson: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 10.5 },

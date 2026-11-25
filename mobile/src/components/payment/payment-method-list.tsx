@@ -4,7 +4,7 @@ import type { PaymentMethod } from "./payment-types";
 import { colors } from "@/theme";
 
 const icons: Record<PaymentMethod["id"], keyof typeof Ionicons.glyphMap> = { bank_transfer: "business", virtual_account: "qr-code", card: "card", ewallet: "wallet" };
-const tones: Record<PaymentMethod["id"], string> = { bank_transfer: colors.navy, virtual_account: "#1E3A5F", card: "#D06A34", ewallet: "#1E3A5F" };
+const tones: Record<PaymentMethod["id"], string> = { bank_transfer: colors.navy, virtual_account: "#134A80", card: "#D06A34", ewallet: "#134A80" };
 
 export function PaymentMethodList({ methods, selected, onSelect }: { methods: PaymentMethod[]; selected: string | null; onSelect: (method: PaymentMethod) => void }) {
   return <View style={styles.list}>{methods.map((method) => {

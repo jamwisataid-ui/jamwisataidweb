@@ -7,10 +7,10 @@ export function AccountMenuItem({ icon, title, subtitle, badge, danger, onPress,
 }
 
 const styles = StyleSheet.create({
-  row: { minHeight: 64, marginLeft: 16, paddingRight: 16, flexDirection: "row", alignItems: "center", gap: 12, borderBottomWidth: 1, borderBottomColor: "rgba(184,134,11,0.14)" },
+  row: { minHeight: 64, marginLeft: 16, paddingRight: 16, flexDirection: "row", alignItems: "center", gap: 12, borderBottomWidth: 1, borderBottomColor: "rgba(201,151,31,0.14)" },
   last: { borderBottomWidth: 0 },
   pressed: { opacity: .62 },
-  icon: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.white, borderWidth: 1, borderColor: "rgba(184,134,11,0.35)", alignItems: "center", justifyContent: "center" },
+  icon: { width: 40, height: 40, borderRadius: 12, borderWidth: 1, borderColor: "rgba(214,180,100,0.30)", backgroundColor: "#FDF7EA", shadowColor: "#785F28", shadowOpacity: 0.14, shadowRadius: 10, shadowOffset: { width: 0, height: 5 }, elevation: 3, alignItems: "center", justifyContent: "center" },
   dangerIcon: { borderColor: "rgba(180,35,24,0.3)" },
   copy: { flex: 1, gap: 2 },
   title: { color: colors.navy, fontFamily: "Montserrat_600SemiBold", fontSize: 14.5 },

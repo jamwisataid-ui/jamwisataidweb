@@ -25,9 +25,9 @@ export function StickyRegistrationCTA({ status, enabled, remainingQuota, onPress
 }
 
 const styles = StyleSheet.create({
-  frame: { paddingTop: 12, paddingHorizontal: 20, backgroundColor: "rgba(255,255,255,0.97)", borderTopWidth: 1, borderTopColor: "rgba(184,134,11,0.25)" },
+  frame: { paddingTop: 12, paddingHorizontal: 20, backgroundColor: "rgba(255,255,255,0.97)", borderTopWidth: 1, borderTopColor: "rgba(201,151,31,0.25)" },
   button: { minHeight: 56, borderRadius: 12, overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  buttonFill: { position: "absolute", inset: 0, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9, borderRadius: 12, borderWidth: 1, borderColor: "rgba(255,236,170,0.55)" },
+  buttonFill: { position: "absolute", inset: 0, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9, borderRadius: 12, borderWidth: 1, borderColor: "rgba(170,120,15,0.35)" },
   disabled: { backgroundColor: "#DED9D0" },
   pressed: { opacity: 0.82, transform: [{ scale: 0.99 }] },
   label: { color: colors.navyDeep, fontFamily: "Montserrat_700Bold", fontSize: 15, letterSpacing: 0.6 },

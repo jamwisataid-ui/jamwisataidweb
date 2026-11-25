@@ -25,7 +25,7 @@ export function PackageHero({ item, favorite, onToggleFavorite }: { item: Packag
   return (
     <View style={[styles.hero, { height }]}>
       <Image alt={item.name} source={{ uri: item.image }} resizeMode="cover" style={styles.image} />
-      <LinearGradient colors={["rgba(6,21,43,0.6)", "transparent", "transparent", "rgba(6,21,43,0.5)"]} locations={[0, 0.32, 0.65, 1]} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={["rgba(6,27,56,0.6)", "transparent", "transparent", "rgba(6,27,56,0.5)"]} locations={[0, 0.32, 0.65, 1]} style={StyleSheet.absoluteFill} />
       <View style={styles.controls}>
         <FloatingAction icon="chevron-back" label="Kembali" onPress={() => router.back()} />
         <View style={styles.rightControls}>
@@ -42,6 +42,6 @@ const styles = StyleSheet.create({
   image: { width: "100%", height: "100%" },
   controls: { position: "absolute", top: 12, left: 16, right: 16, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   rightControls: { flexDirection: "row", gap: 9 },
-  action: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(6,21,43,0.45)", borderWidth: 1, borderColor: "rgba(255,255,255,0.22)" },
+  action: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(6,27,56,0.45)", borderWidth: 1, borderColor: "rgba(255,255,255,0.22)" },
   pressed: { opacity: 0.72, transform: [{ scale: 0.96 }] },
 });

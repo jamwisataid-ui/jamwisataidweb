@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   timeline: { gap: 0 },
   timelineRow: { flexDirection: "row", gap: 13 },
   timelineRail: { width: 34, alignItems: "center" },
-  dayCircle: { width: 34, height: 34, borderRadius: 17, alignItems: "center", justifyContent: "center", backgroundColor: "#E8C967" },
+  dayCircle: { width: 34, height: 34, borderRadius: 17, alignItems: "center", justifyContent: "center", backgroundColor: "#EDCB66" },
   dayNumber: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 13 },
   rail: { width: 2, flex: 1, minHeight: 54, backgroundColor: "#E5D9BD" },
   dayCopy: { flex: 1, paddingBottom: 19, gap: 3 },

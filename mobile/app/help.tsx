@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   title: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 20 },
   content: { padding: 18, paddingBottom: 40, gap: 18 },
   hero: { padding: 22, alignItems: "center", gap: 9, borderRadius: 20, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
-  heroIcon: { width: 60, height: 60, borderRadius: 30, alignItems: "center", justifyContent: "center", backgroundColor: "#F8F1DC" },
+  heroIcon: { width: 60, height: 60, borderRadius: 18, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(214,180,100,0.30)", backgroundColor: "#FDF7EA", shadowColor: "#785F28", shadowOpacity: 0.14, shadowRadius: 10, shadowOffset: { width: 0, height: 5 }, elevation: 3 },
   heroTitle: { color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 20 },
   heroText: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 13.5, lineHeight: 21, textAlign: "center" },
   list: { overflow: "hidden", borderRadius: 18, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white },

@@ -64,7 +64,7 @@ export default function WorshipScreen() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={[styles.hero, { paddingTop: insets.top + 24 }]}>
           <Image alt="" source={kaaba} resizeMode="cover" style={styles.heroImage} />
-          <LinearGradient colors={["rgba(6,21,43,0.55)", "rgba(6,21,43,0.95)"]} style={StyleSheet.absoluteFill} />
+          <LinearGradient colors={["rgba(6,27,56,0.55)", "rgba(6,27,56,0.95)"]} style={StyleSheet.absoluteFill} />
           <Text style={styles.eyebrow}>PENDAMPING IBADAH JAMAAH</Text>
           <Text accessibilityRole="header" style={styles.title}>Ibadah</Text>
           <Text style={styles.subtitle}>Al-Qur&apos;an, jadwal sholat, doa, dan panduan perjalanan dalam satu tempat.</Text>

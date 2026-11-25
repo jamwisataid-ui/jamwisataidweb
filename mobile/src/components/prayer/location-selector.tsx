@@ -9,7 +9,7 @@ export function LocationSelector({ value, open, onOpen, onClose, onChange }: { v
 }
 
 const styles = StyleSheet.create({
-  selector: { marginHorizontal: 18, minHeight: 50, paddingHorizontal: 13, borderRadius: 999, flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: colors.white, borderWidth: 1, borderColor: "rgba(184,134,11,0.3)" },
+  selector: { marginHorizontal: 18, minHeight: 50, paddingHorizontal: 13, borderRadius: 999, flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: colors.white, borderWidth: 1, borderColor: "rgba(201,151,31,0.3)" },
   pressed: { opacity: .75 }, pin: { width: 28, height: 28, borderRadius: 14, alignItems: "center", justifyContent: "center", backgroundColor: colors.navy },
   selected: { flex: 1, color: colors.navy, fontFamily: "Montserrat_700Bold", fontSize: 14 },
   backdrop: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(2,23,48,.34)" },

@@ -2,15 +2,15 @@ import { describe, expect, it } from "vitest";
 import { colors, gradients, typography } from "../src/theme";
 
 describe("Jam Wisata mobile brand theme", () => {
-  it("uses the same primary palette as the public website", () => {
-    expect(colors.navy).toBe("#0A1D3A");
-    expect(colors.navyDeep).toBe("#06152B");
+  it("uses the client reference palette", () => {
+    expect(colors.navy).toBe("#0B2A55");
+    expect(colors.navyDeep).toBe("#061B38");
     expect(colors.gold).toBe("#D4AF37");
-    expect(colors.goldDark).toBe("#B8860B");
-    expect(colors.softGold).toBe("#E8C967");
-    expect(gradients.navy).toEqual(["#06152B", "#0A1D3A", "#1E3A5F"]);
-    expect(gradients.gold).toEqual(["#8C6708", "#B8860B", "#D4AF37", "#F5D97A", "#D4AF37", "#B8860B", "#8C6708"]);
-    expect(gradients.goldLocations).toEqual([0, 0.18, 0.4, 0.58, 0.76, 0.92, 1]);
+    expect(colors.goldDark).toBe("#C9971F");
+    expect(colors.softGold).toBe("#EDCB66");
+    expect(gradients.navy).toEqual(["#061B38", "#0B2A55", "#134A80"]);
+    expect(gradients.gold).toEqual(["#FCE9A8", "#F2D06B", "#E2B640", "#D1A12B"]);
+    expect(gradients.goldLocations).toEqual([0, 0.3, 0.62, 1]);
   });
 
   it("uses the website font families for every text role", () => {
@@ -26,8 +26,8 @@ describe("Jam Wisata luxury tokens", () => {
   it("keeps readable gold text and soft radii", async () => {
     const { colors: c, radius } = await import("../src/theme");
     expect(c.goldText).toBe("#8C6708");
-    expect(c.ivory).toBe("#FFFFFF");
+    expect(c.ivory).toBe("#E6E7EA");
     expect(radius.button).toBe(12);
-    expect(radius.card).toBe(20);
+    expect(radius.card).toBe(15);
   });
 });

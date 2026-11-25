@@ -41,7 +41,7 @@ export default function LoginScreen() {
       <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll} bounces={false}>
         <View style={[styles.hero, { paddingTop: insets.top + 28 }]}>
           <Image alt="" source={kaaba} resizeMode="cover" style={styles.heroImage} />
-          <LinearGradient colors={["rgba(6,21,43,0.78)", "rgba(6,21,43,0.45)", "rgba(6,21,43,0.92)"]} locations={[0, 0.55, 1]} style={StyleSheet.absoluteFill} />
+          <LinearGradient colors={["rgba(6,27,56,0.78)", "rgba(6,27,56,0.45)", "rgba(6,27,56,0.92)"]} locations={[0, 0.55, 1]} style={StyleSheet.absoluteFill} />
           <Pressable accessibilityRole="button" accessibilityLabel="Tutup, lanjut sebagai tamu" hitSlop={6} onPress={close} style={[styles.close, { top: insets.top + 12 }]}>
             <Ionicons name="close" size={20} color={colors.white} />
           </Pressable>
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   scroll: { flexGrow: 1, backgroundColor: colors.ivory },
   hero: { minHeight: 330, paddingBottom: 64, alignItems: "center", gap: 6, overflow: "hidden", backgroundColor: colors.navyDeep },
   heroImage: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, opacity: 0.55 },
-  close: { position: "absolute", right: 18, width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(6,21,43,0.45)", borderWidth: 1, borderColor: "rgba(255,255,255,0.25)" },
+  close: { position: "absolute", right: 18, width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(6,27,56,0.45)", borderWidth: 1, borderColor: "rgba(255,255,255,0.25)" },
   emblem: { width: 84, height: 84 },
   kicker: { marginTop: 4, color: colors.softGold, fontFamily: "Cinzel_600SemiBold", fontSize: 10, letterSpacing: 3.5 },
   brand: { color: colors.white, fontFamily: "Cinzel_700Bold", fontSize: 31, letterSpacing: 5 },

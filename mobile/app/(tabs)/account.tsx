@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   guestTitle: { color: colors.white, fontFamily: "Cinzel_700Bold", fontSize: 16, lineHeight: 21 },
   guestBody: { color: "rgba(255,255,255,0.74)", fontFamily: "Montserrat_400Regular", fontSize: 12, lineHeight: 17 },
   login: { height: 48, borderRadius: 12, overflow: "hidden" },
-  loginFill: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 12, borderWidth: 1, borderColor: "rgba(255,236,170,0.55)" },
+  loginFill: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 12, borderWidth: 1, borderColor: "rgba(170,120,15,0.35)" },
   loginText: { color: colors.navyDeep, fontFamily: "Montserrat_700Bold", fontSize: 13, letterSpacing: 0.8 },
   guestNote: { marginHorizontal: 28, color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 11.5, lineHeight: 17, textAlign: "center" },
   guestMenu: { marginTop: 2 },

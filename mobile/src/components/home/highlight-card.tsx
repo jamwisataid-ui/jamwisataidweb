@@ -1,110 +1,128 @@
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Linking, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { FlatList, Image, Linking, StyleSheet, Text, View, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
 
+import fallbackImage from "../../../assets/home/v3/kartu-paket-contoh.jpg";
+import overlay from "../../../assets/home/v3/kartu-overlay-gelombang.png";
 import { MetallicGold } from "@/components/metallic-gold";
-import { NavyCard } from "@/components/ui";
-import { flattenPackageDepartures } from "@/lib/package-departures";
-import { colors, shadowDark } from "@/theme";
-import type { AccountProfile, Package } from "@/types";
 import { PressableScale } from "@/components/motion";
+import { flattenPackageDepartures } from "@/lib/package-departures";
+import { colors, glowGold, gradients, shadowDark } from "@/theme";
+import type { Package } from "@/types";
 
 const consultUrl = "https://wa.me/6281809627499?text=Assalamu%27alaikum%2C%20saya%20ingin%20konsultasi%20paket%20umroh%20JAM%20WISATA.";
 
-function daysUntil(isoDate: string) {
-  const target = new Date(`${isoDate}T00:00:00+07:00`).getTime();
-  return Math.ceil((target - Date.now()) / 86_400_000);
-}
+export const HIGHLIGHT_HEIGHT = 199;
+
+type Slide = { key: string; label: string; title: string; subtitle: string; image?: string; slug?: string };
 
 function formatDate(isoDate: string) {
   return new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Jakarta" }).format(new Date(`${isoDate}T00:00:00+07:00`));
 }
 
-function GoldAction({ label, icon, onPress }: { label: string; icon: keyof typeof Ionicons.glyphMap; onPress: () => void }) {
-  return (
-    <PressableScale accessibilityRole="button" onPress={onPress} containerStyle={styles.goldActionWrap} style={styles.goldAction}>
-      <MetallicGold style={styles.goldFill}><Text style={styles.goldText}>{label}</Text><Ionicons name={icon} size={15} color={colors.navyDeep} /></MetallicGold>
-    </PressableScale>
-  );
-}
-
-function OutlineAction({ label, icon, onPress }: { label: string; icon: keyof typeof Ionicons.glyphMap; onPress: () => void }) {
-  return (
-    <PressableScale accessibilityRole="button" onPress={onPress} style={styles.outlineAction}>
-      <Ionicons name={icon} size={15} color={colors.softGold} />
-      <Text style={styles.outlineText}>{label}</Text>
-    </PressableScale>
-  );
-}
-
-/** Signed-in pilgrim with a registered journey: countdown to departure. */
-function JourneyCard({ profile }: { profile: AccountProfile }) {
-  const journey = profile.journey!;
-  const days = daysUntil(journey.departureDate);
-  return (
-    <NavyCard style={styles.card}>
-      <View style={styles.topRow}>
-        <View style={styles.copy}>
-          <Text style={styles.eyebrow}>PERJALANAN ANDA</Text>
-          <Text style={styles.title}>Berangkat {formatDate(journey.departureDate)}</Text>
-          <Text style={styles.meta}>{profile.jamaahNumber ? `No. Jamaah ${profile.jamaahNumber}` : journey.status}</Text>
-        </View>
-        {days >= 0 ? (
-          <View accessibilityLabel={`${days} hari lagi`} style={styles.countdown}>
-            <Text style={styles.countdownValue}>{days}</Text>
-            <Text style={styles.countdownLabel}>HARI</Text>
-          </View>
-        ) : null}
-      </View>
-      <View style={styles.actions}>
-        <GoldAction label="ITINERARY" icon="arrow-forward" onPress={() => router.push("/journey")} />
-        <OutlineAction label="Dokumen" icon="document-text-outline" onPress={() => router.push("/documents")} />
-      </View>
-    </NavyCard>
-  );
-}
-
-/** Guests (or pilgrims without a journey): nearest open departure. */
-function NearestDepartureCard({ packages }: { packages?: Package[] }) {
+/** One slide per featured package: its nearest open departure, in date order. */
+function buildSlides(packages?: Package[]): Slide[] {
   const today = new Date().toISOString().slice(0, 10);
-  const nearest = flattenPackageDepartures(packages).find(({ departure }) => departure.selectable && departure.departureDate >= today);
+  const seen = new Set<string>();
+  const slides: Slide[] = [];
+  for (const { packageItem, departure } of flattenPackageDepartures(packages)) {
+    if (!departure.selectable || seen.has(packageItem.id)) continue;
+    const iso = /^\d{4}-\d{2}-\d{2}$/.test(departure.departureDate) ? departure.departureDate : null;
+    if (iso && iso < today) continue;
+    seen.add(packageItem.id);
+    slides.push({
+      key: packageItem.id,
+      label: slides.length === 0 ? "KEBERANGKATAN TERDEKAT" : "PAKET PILIHAN",
+      title: (iso ? formatDate(iso) : departure.dateLabel).toLocaleUpperCase("id-ID"),
+      subtitle: packageItem.name,
+      image: packageItem.image || undefined,
+      slug: packageItem.id,
+    });
+    if (slides.length === 4) break;
+  }
+  return slides.length ? slides : [{ key: "consult", label: "UMROH BERSAMA JAM WISATA", title: "SETIAP WAKTU BERNILAI IBADAH", subtitle: "Jadwal keberangkatan sedang diperbarui." }];
+}
+
+function SlideView({ slide, width }: { slide: Slide; width: number }) {
   return (
-    <NavyCard style={styles.card}>
-      <View style={styles.copy}>
-        <Text style={styles.eyebrow}>{nearest ? "KEBERANGKATAN TERDEKAT" : "UMROH BERSAMA JAM WISATA"}</Text>
-        <Text style={styles.title}>{nearest ? (/^\d{4}-\d{2}-\d{2}$/.test(nearest.departure.departureDate) ? formatDate(nearest.departure.departureDate) : nearest.departure.dateLabel) : "Setiap Waktu Bernilai Ibadah"}</Text>
-        <Text numberOfLines={1} style={styles.meta}>
-          {nearest ? `${nearest.packageItem.name}${typeof nearest.departure.remainingQuota === "number" ? ` · sisa ${nearest.departure.remainingQuota} pax` : ""}` : "Jadwal keberangkatan sedang diperbarui."}
-        </Text>
-      </View>
-      <View style={styles.actions}>
-        <GoldAction label="LIHAT JADWAL" icon="arrow-forward" onPress={() => router.push("/schedule")} />
-        <OutlineAction label="Konsultasi" icon="logo-whatsapp" onPress={() => void Linking.openURL(consultUrl)} />
-      </View>
-    </NavyCard>
+    <View style={{ width, height: HIGHLIGHT_HEIGHT }}>
+      <PressableScale
+        accessibilityRole="button"
+        accessibilityLabel={slide.slug ? `Lihat detail ${slide.subtitle}` : slide.title}
+        disabled={!slide.slug}
+        pressedScale={1}
+        hoverLift={0}
+        onPress={() => slide.slug && router.push({ pathname: "/package/[slug]", params: { slug: slide.slug } })}
+        style={StyleSheet.absoluteFill}
+      >
+        <Image alt="" source={slide.image ? { uri: slide.image } : fallbackImage} resizeMode="cover" style={styles.photo} />
+        <Image alt="" source={overlay} resizeMode="stretch" style={StyleSheet.absoluteFill} />
+        <Ionicons name="calendar-outline" size={15} color="#EFCB66" style={styles.calendar} />
+        <Text numberOfLines={1} style={styles.label}>{slide.label}</Text>
+        <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75} style={styles.title}>{slide.title}</Text>
+        <Text numberOfLines={1} style={styles.subtitle}>{slide.subtitle}</Text>
+      </PressableScale>
+    </View>
   );
 }
 
-export function HighlightCard({ profile, packages }: { profile?: AccountProfile; packages?: Package[] }) {
-  return <View style={styles.wrap}>{profile?.journey?.departureDate ? <JourneyCard profile={profile} /> : <NearestDepartureCard packages={packages} />}</View>;
+export function HighlightCarousel({ packages, width }: { packages?: Package[]; width: number }) {
+  const slides = buildSlides(packages);
+  const [page, setPage] = useState(0);
+  const inner = width - 4; // 2pt gold border on each side
+  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => setPage(Math.round(event.nativeEvent.contentOffset.x / inner));
+  return (
+    <View style={[styles.frame, { width }]}>
+      <LinearGradient pointerEvents="none" colors={gradients.navyCard} locations={gradients.navyCardLocations} start={{ x: 0.3, y: 0 }} end={{ x: 0.7, y: 1 }} style={StyleSheet.absoluteFill} />
+      <FlatList
+        data={slides}
+        keyExtractor={(item) => item.key}
+        horizontal
+        pagingEnabled
+        bounces={false}
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={onScroll}
+        onScroll={onScroll}
+        scrollEventThrottle={64}
+        renderItem={({ item }) => <SlideView slide={item} width={inner} />}
+      />
+      {slides.length > 1 ? (
+        <View pointerEvents="none" style={styles.dots}>
+          {slides.map((slide, index) => <View key={slide.key} style={index === page ? styles.dotActive : styles.dot} />)}
+        </View>
+      ) : null}
+      <PressableScale accessibilityRole="button" onPress={() => router.push("/schedule")} containerStyle={styles.primaryWrap} style={styles.primary}>
+        <MetallicGold style={styles.primaryFill}>
+          <Ionicons name="calendar-outline" size={16} color="#0B1F3F" />
+          <Text style={styles.primaryText}>LIHAT JADWAL</Text>
+          <Ionicons name="arrow-forward" size={16} color="#0B1F3F" />
+        </MetallicGold>
+      </PressableScale>
+      <PressableScale accessibilityRole="button" onPress={() => void Linking.openURL(consultUrl)} containerStyle={styles.secondaryWrap} style={styles.secondary}>
+        <Ionicons name="logo-whatsapp" size={17} color={colors.white} />
+        <Text style={styles.secondaryText}>Konsultasi</Text>
+      </PressableScale>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  wrap: { borderRadius: 20, ...shadowDark },
-  card: { minHeight: 168, padding: 18, gap: 14, justifyContent: "space-between" },
-  topRow: { flexDirection: "row", alignItems: "flex-start", gap: 12 },
-  copy: { flex: 1, gap: 4 },
-  eyebrow: { color: colors.gold, fontFamily: "Cinzel_600SemiBold", fontSize: 10, letterSpacing: 2.8 },
-  title: { color: colors.white, fontFamily: "Cinzel_600SemiBold", fontSize: 18, lineHeight: 24 },
-  meta: { color: "rgba(255,255,255,0.74)", fontFamily: "Montserrat_400Regular", fontSize: 12 },
-  countdown: { width: 66, height: 66, borderRadius: 33, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(212,175,55,0.6)", backgroundColor: "rgba(212,175,55,0.08)" },
-  countdownValue: { color: colors.softGold, fontFamily: "Cinzel_700Bold", fontSize: 22, lineHeight: 26 },
-  countdownLabel: { color: "rgba(255,255,255,0.75)", fontFamily: "Montserrat_600SemiBold", fontSize: 9, letterSpacing: 1.5 },
-  actions: { flexDirection: "row", gap: 10 },
-  goldAction: { height: 44, borderRadius: 12, overflow: "hidden" },
-  goldActionWrap: { flex: 1 },
-  goldFill: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 12, borderColor: "rgba(255,236,170,0.55)", borderWidth: 1 },
-  goldText: { color: colors.navyDeep, fontFamily: "Montserrat_700Bold", fontSize: 12.5, letterSpacing: 0.6 },
-  outlineAction: { height: 44, paddingHorizontal: 14, borderRadius: 12, flexDirection: "row", alignItems: "center", gap: 7, borderWidth: 1, borderColor: "rgba(212,175,55,0.45)" },
-  outlineText: { color: colors.softGold, fontFamily: "Montserrat_600SemiBold", fontSize: 12.5 },
+  frame: { height: HIGHLIGHT_HEIGHT, borderRadius: 16, overflow: "hidden", borderWidth: 2, borderColor: colors.gold, backgroundColor: "#0A2850", ...shadowDark },
+  photo: { position: "absolute", left: 0, right: 0, top: 53, height: 95 },
+  calendar: { position: "absolute", left: 16, top: 10 },
+  label: { position: "absolute", left: 41, right: 12, top: 11, color: "#EFCB66", fontFamily: "Cinzel_600SemiBold", fontSize: 9.5, letterSpacing: 3 },
+  title: { position: "absolute", left: 15, right: 12, top: 25, color: colors.white, fontFamily: "Cinzel_700Bold", fontSize: 21.5, lineHeight: 27 },
+  subtitle: { position: "absolute", left: 16, right: 12, top: 50, color: colors.white, fontFamily: "Montserrat_500Medium", fontSize: 14.3, lineHeight: 18 },
+  dots: { position: "absolute", top: 136, left: 0, right: 0, flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 4 },
+  dot: { width: 5, height: 5, borderRadius: 3, backgroundColor: "rgba(255,255,255,0.75)" },
+  dotActive: { width: 13, height: 5, borderRadius: 3, backgroundColor: "#F2C744" },
+  primaryWrap: { position: "absolute", left: 11, top: 150, width: "52%" },
+  primary: { height: 35, borderRadius: 10, backgroundColor: "#E2B640", ...glowGold, shadowOpacity: 0.45, shadowRadius: 10, elevation: 0 },
+  primaryFill: { flex: 1, borderRadius: 10, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
+  primaryText: { color: "#0B1F3F", fontFamily: "Montserrat_700Bold", fontSize: 13, letterSpacing: 0.3 },
+  secondaryWrap: { position: "absolute", right: 10, top: 150, width: "37.6%" },
+  secondary: { height: 34, borderRadius: 10, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, borderWidth: 1.6, borderColor: colors.goldBorder, backgroundColor: "rgba(3,18,44,0.72)" },
+  secondaryText: { color: colors.white, fontFamily: "Montserrat_500Medium", fontSize: 13 },
 });

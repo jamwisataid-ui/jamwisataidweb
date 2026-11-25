@@ -34,7 +34,7 @@ export function PackageFilterTabs({ value, onChange }: { value: PackageFilter; o
 
 const styles = StyleSheet.create({
   row: { paddingHorizontal: 20, paddingVertical: 12, gap: 8 },
-  pill: { height: 38, paddingHorizontal: 17, borderRadius: 19, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(10,29,58,0.16)" },
+  pill: { height: 38, paddingHorizontal: 17, borderRadius: 19, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(11,42,85,0.16)" },
   activePill: { backgroundColor: colors.navy, borderColor: colors.navy },
   label: { color: colors.royal, fontFamily: "Montserrat_500Medium", fontSize: 12.5 },
   activeLabel: { color: colors.softGold, fontFamily: "Montserrat_600SemiBold" },

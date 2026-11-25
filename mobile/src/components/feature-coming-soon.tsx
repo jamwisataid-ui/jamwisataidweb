@@ -28,7 +28,7 @@ export function FeatureComingSoon({
 }
 
 const styles = StyleSheet.create({
-  icon: { width: 60, height: 60, borderRadius: 20, alignItems: "center", justifyContent: "center", backgroundColor: "#F8F1DC" },
+  icon: { width: 60, height: 60, borderRadius: 20, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(214,180,100,0.30)", backgroundColor: "#FDF7EA", shadowColor: "#785F28", shadowOpacity: 0.14, shadowRadius: 10, shadowOffset: { width: 0, height: 5 }, elevation: 3 },
   heading: { color: colors.navy, fontFamily: "Cinzel_700Bold", fontSize: 22 },
   copy: { color: colors.muted, fontFamily: "Montserrat_400Regular", fontSize: 15, lineHeight: 23 },
 });

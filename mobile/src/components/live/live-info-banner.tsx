@@ -5,7 +5,7 @@ import { MetallicGold } from "@/components/metallic-gold";
 import { colors, shadow, typography } from "@/theme";
 
 export function LiveInfoBanner() {
-  return <View style={styles.shadowShell}><MetallicGold style={styles.banner}><View style={styles.icon}><Ionicons name="radio" size={27} color={colors.gold} /></View><View style={styles.copy}><Text style={styles.eyebrow}>PANDUAN IBADAH</Text><Text style={styles.title}>Secara Langsung dari Ustadz Pembimbing</Text></View><Ionicons name="radio-outline" size={58} color="rgba(6,21,43,0.13)" style={styles.watermark} /></MetallicGold></View>;
+  return <View style={styles.shadowShell}><MetallicGold style={styles.banner}><View style={styles.icon}><Ionicons name="radio" size={27} color={colors.gold} /></View><View style={styles.copy}><Text style={styles.eyebrow}>PANDUAN IBADAH</Text><Text style={styles.title}>Secara Langsung dari Ustadz Pembimbing</Text></View><Ionicons name="radio-outline" size={58} color="rgba(6,27,56,0.13)" style={styles.watermark} /></MetallicGold></View>;
 }
 
 const styles = StyleSheet.create({

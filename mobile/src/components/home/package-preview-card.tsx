@@ -24,7 +24,7 @@ export function PackagePreviewCard({ item }: { item: Package }) {
       style={styles.card}
     >
       <Image source={{ uri: item.image }} resizeMode="cover" style={StyleSheet.absoluteFill} alt={item.name} />
-      <LinearGradient colors={["rgba(6,21,43,0.92)", "rgba(6,21,43,0.55)", "rgba(6,21,43,0.08)"]} locations={[0, 0.55, 1]} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={["rgba(6,27,56,0.92)", "rgba(6,27,56,0.55)", "rgba(6,27,56,0.08)"]} locations={[0, 0.55, 1]} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={StyleSheet.absoluteFill} />
       <View style={styles.body}>
         <View style={styles.top}>
           <Text numberOfLines={1} style={styles.eyebrow}>{eyebrow}</Text>
