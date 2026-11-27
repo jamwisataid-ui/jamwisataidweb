@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { notFound } from "next/navigation";
 import { AdminPageHeader } from "@/components/admin/AdminUi";
 import { PackageForm } from "@/components/admin/PackageForm";
@@ -22,7 +23,8 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
           label: "Lihat Halaman Detail Web ↗",
         }}
       />
-      <PackageForm values={values} />
+      {/* Remount after every save: React resets uncontrolled fields after a form action, and <select> would otherwise snap back to the values from first load. */}
+      <PackageForm key={createHash("sha1").update(JSON.stringify(values)).digest("hex")} values={values} />
     </>
   );
 }
