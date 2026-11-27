@@ -36,6 +36,7 @@ import { parseDocumentSequenceInput, paymentStatus, rupiah } from "./domain";
 import { deletePrivateObject, privateObjectKey, putPrivateObject, validatePrivateFile } from "./storage";
 import { agentSchema, bookingSchema, cashSchema, expenseCategorySchema, fields, type ManagementActionState, paymentSchema, pilgrimSchema, stockMovementSchema } from "./validation";
 import { findMatchingReferralLead, latestLeadPerPilgrim } from "./referral-attribution";
+import { normalizeReceiptDescription } from "./invoice";
 
 function raw(formData: FormData) {
   return Object.fromEntries(formData.entries());
@@ -450,6 +451,11 @@ export async function recordPaymentAction(_state: ManagementActionState, formDat
   if (!parsed.success) return { ok: false, message: "Periksa nominal dan alokasi pembayaran.", errors: fields(parsed.error) };
   const allocatedTotal = parsed.data.allocations.reduce((total, item) => total + item.amount, 0);
   if (allocatedTotal !== parsed.data.amount) return { ok: false, message: "Total alokasi harus sama dengan nominal pembayaran.", errors: { allocations: ["Periksa kembali pembagian nominal per jamaah."] } };
+  let receiptDescription: string | undefined;
+  try { receiptDescription = normalizeReceiptDescription(formData.get("receiptDescription")); } catch (error) {
+    const message = error instanceof Error ? error.message : "Keterangan kwitansi tidak valid.";
+    return { ok: false, message, errors: { receiptDescription: [message] } };
+  }
   try {
     const session = await requireAdminSession();
     const paymentId = randomUUID();
@@ -506,7 +512,7 @@ export async function recordPaymentAction(_state: ManagementActionState, formDat
     let receipt: Awaited<ReturnType<typeof issueTransactionDocument>> | null = null;
     let receiptError = "";
     try {
-      receipt = await issueTransactionDocument({ kind: "receipt", bookingId: parsed.data.bookingId, paymentId, actorId: session.user.id });
+      receipt = await issueTransactionDocument({ kind: "receipt", bookingId: parsed.data.bookingId, paymentId, receiptDescription, actorId: session.user.id });
     } catch (error) {
       console.error("Automatic receipt issue failed:", error);
       receiptError = error instanceof Error ? error.message : "Kwitansi otomatis gagal dibuat.";

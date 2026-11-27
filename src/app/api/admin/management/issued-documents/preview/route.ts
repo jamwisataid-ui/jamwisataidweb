@@ -5,8 +5,8 @@ import { requireDatabase } from "@/db";
 import { accommodations, bookings, documentSequences, financialAccounts, issuedDocuments, managementSettings, paymentAllocations, payments, registrations } from "@/db/schema";
 import { adminSessionExpiredResponse, requireAdminSession } from "@/lib/admin-session";
 import { formatDocumentNumber } from "@/lib/management/domain";
-import { renderTransactionPdf, renderTransactionPng, type TransactionPdfSnapshot } from "@/lib/management/document-renderer";
-import { applyItemDescriptions, buildInvoiceItems, invoiceTotals, resolveInvoiceAmount } from "@/lib/management/invoice";
+import { receiptPaymentDescription, renderTransactionPdf, renderTransactionPng, type TransactionPdfSnapshot } from "@/lib/management/document-renderer";
+import { applyItemDescriptions, buildInvoiceItems, invoiceTotals, normalizeReceiptDescription, resolveInvoiceAmount } from "@/lib/management/invoice";
 import { resolveSettlementInvoice } from "@/lib/management/settlement-invoice";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   try {
     await requireAdminSession();
-    const body = await request.json() as { kind?: string; bookingId?: string; paymentId?: string; invoiceAmount?: number; parentInvoiceId?: string; itemDescriptions?: unknown };
+    const body = await request.json() as { kind?: string; bookingId?: string; paymentId?: string; invoiceAmount?: number; parentInvoiceId?: string; itemDescriptions?: unknown; receiptDescription?: unknown };
     const kind = body.kind === "receipt" ? "receipt" : body.kind === "invoice" ? "invoice" : null;
     if (!kind || !body.bookingId) return NextResponse.json({ error: "Jenis dokumen atau booking tidak valid." }, { status: 400 });
 
@@ -81,6 +81,7 @@ export async function POST(request: Request) {
       total,
       method: payment?.method,
       reference: payment?.reference,
+      paymentDescription: kind === "receipt" ? normalizeReceiptDescription(body.receiptDescription) : undefined,
       invoiceNumber: linkedInvoice?.number,
       program: {
         packageName: String(booking.packageSnapshot.name ?? "Paket umroh"),
@@ -107,6 +108,7 @@ export async function POST(request: Request) {
         "content-disposition": `inline; filename="preview-${kind}.${wantsPng ? "png" : "pdf"}"`,
         "cache-control": "no-store",
         "x-invoice-item-descriptions": encodeURIComponent(JSON.stringify(defaultDescriptions)),
+        "x-receipt-description": encodeURIComponent(kind === "receipt" ? receiptPaymentDescription(items, payment?.method) : ""),
       },
     });
   } catch (error) {

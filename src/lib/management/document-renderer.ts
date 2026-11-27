@@ -19,6 +19,8 @@ export type TransactionPdfSnapshot = {
   total: number;
   method?: string;
   reference?: string | null;
+  /** Admin-edited "Untuk pembayaran" line on a receipt; replaces the generated text verbatim. */
+  paymentDescription?: string;
   invoiceNumber?: string;
   program?: {
     packageName?: string | null;
@@ -39,6 +41,12 @@ function xml(value: string) {
 
 function dateLabel(value: string) {
   return new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Jakarta" }).format(new Date(value));
+}
+
+export function receiptPaymentDescription(items: TransactionPdfSnapshot["items"], methodValue?: string) {
+  const description = items.map((item) => item.description).join("; ");
+  const method = paymentMethod(methodValue);
+  return method === "-" ? description : `${description} (${method})`;
 }
 
 function paymentMethod(value?: string) {
@@ -253,9 +261,7 @@ async function pageFields(data: TransactionPdfSnapshot, pageItems: TransactionPd
     else output.push(fieldOverlay("Lanjut halaman berikutnya", fields.continuation));
     output.push(fieldOverlay(data.company.signerName || "Atie Supriati", fields.signerName));
   } else {
-    const description = pageItems.map((item) => item.description).join("; ");
-    const method = paymentMethod(data.method);
-    const paymentDescription = method === "-" ? description : `${description} (${method})`;
+    const paymentDescription = data.paymentDescription || receiptPaymentDescription(pageItems, data.method);
     output.push(fieldOverlay(templateCurrency(data.total), fields.numericAmount));
     output.push(fieldOverlay(paymentDescription, fields.description));
     if (showGrandTotal) {

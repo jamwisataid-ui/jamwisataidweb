@@ -7,17 +7,18 @@ import { accommodations, auditLogs, bookings, documentSequences, financialAccoun
 import { withManagementTransaction } from "@/db/transaction";
 import { formatDocumentNumber } from "./domain";
 import { renderTransactionPdf, type TransactionPdfSnapshot } from "./document-renderer";
-import { applyItemDescriptions, buildInvoiceItems, invoiceTotals, resolveInvoiceAmount } from "./invoice";
+import { applyItemDescriptions, buildInvoiceItems, invoiceTotals, normalizeReceiptDescription, resolveInvoiceAmount } from "./invoice";
 import { resolveSettlementInvoice } from "./settlement-invoice";
 import { deletePrivateObject, privateObjectKey, putPrivateObject } from "./storage";
 
-export async function issueTransactionDocument({ kind, bookingId, paymentId, invoiceAmount, parentInvoiceId, itemDescriptions, actorId }: {
+export async function issueTransactionDocument({ kind, bookingId, paymentId, invoiceAmount, parentInvoiceId, itemDescriptions, receiptDescription, actorId }: {
   kind: "invoice" | "receipt";
   bookingId: string;
   paymentId?: string;
   invoiceAmount?: number;
   parentInvoiceId?: string;
   itemDescriptions?: unknown;
+  receiptDescription?: unknown;
   actorId: string;
 }) {
   let uploadedObjectKey: string | undefined;
@@ -92,6 +93,7 @@ export async function issueTransactionDocument({ kind, bookingId, paymentId, inv
       total,
       method: payment?.method,
       reference: payment?.reference,
+      paymentDescription: kind === "receipt" ? normalizeReceiptDescription(receiptDescription) : undefined,
       invoiceNumber: linkedInvoice?.number,
       program: {
         packageName: String(booking.packageSnapshot.name ?? "Paket umroh"),

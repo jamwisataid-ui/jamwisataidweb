@@ -74,3 +74,14 @@ export function applyItemDescriptions(items: TransactionPdfSnapshot["items"], ov
     return { ...item, description };
   });
 }
+
+export const RECEIPT_DESCRIPTION_MAX_LENGTH = 160;
+
+/** Normalizes an admin-edited receipt line; blank input means "use the generated text". */
+export function normalizeReceiptDescription(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const description = value.replace(/\s+/g, " ").trim();
+  if (!description) return undefined;
+  if (description.length > RECEIPT_DESCRIPTION_MAX_LENGTH) throw new Error(`Keterangan kwitansi maksimal ${RECEIPT_DESCRIPTION_MAX_LENGTH} karakter.`);
+  return description;
+}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { applyItemDescriptions, buildInvoiceItems, invoiceTotals, resolveInvoiceAmount } from "../src/lib/management/invoice";
+import { applyItemDescriptions, buildInvoiceItems, invoiceTotals, normalizeReceiptDescription, resolveInvoiceAmount } from "../src/lib/management/invoice";
 
 const registrations = [
   { agreedPrice: 33_900_000, dpTarget: 5_000_000 },
@@ -51,5 +51,17 @@ describe("invoice line descriptions", () => {
 
   it("rejects descriptions that would overflow the template", () => {
     expect(() => applyItemDescriptions(items, ["x".repeat(141)])).toThrow("maksimal 140");
+  });
+});
+
+describe("receipt description", () => {
+  it("normalizes edited text and treats blank as automatic", () => {
+    expect(normalizeReceiptDescription("  Pelunasan   umroh Januari ")).toBe("Pelunasan umroh Januari");
+    expect(normalizeReceiptDescription("   ")).toBeUndefined();
+    expect(normalizeReceiptDescription(null)).toBeUndefined();
+  });
+
+  it("rejects text that would overflow the receipt line", () => {
+    expect(() => normalizeReceiptDescription("x".repeat(161))).toThrow("maksimal 160");
   });
 });

@@ -33,6 +33,7 @@ import {
   updatePilgrimAction,
 } from "@/lib/management/actions";
 import { DOCUMENT_NUMBER_PATTERN, formatDocumentNumber, generateDefaultRoomNumber, rupiah } from "@/lib/management/domain";
+import { RECEIPT_DESCRIPTION_MAX_LENGTH } from "@/lib/management/invoice";
 import type { ManagementActionState } from "@/lib/management/validation";
 
 const managementInitialState: ManagementActionState = { ok: false, message: "" };
@@ -306,6 +307,7 @@ export function PaymentForm({ bookings, accounts, initialBookingId, initialInvoi
     </div>
     <div className="management-payment-presets"><span><strong>Isi nominal lebih cepat</strong><small>Pembayaran maksimal mengikuti sisa invoice {rupiah(booking?.invoiceRemaining ?? 0)}.</small></span><div><button type="button" onClick={fillDp}>Sesuai target DP</button><button type="button" onClick={fillSettlement}>Bayar sisa invoice</button></div></div>
     <div className="management-allocation"><div><strong>Alokasi per jamaah</strong><button type="button" onClick={autoAllocate}>Alokasikan nominal custom</button></div>{booking?.registrations.map((registration) => <label key={registration.id}><span><strong>{registration.pilgrim?.fullName}</strong><small>{registration.payment.status} · target DP {rupiah(registration.dpTarget)} · sisa {rupiah(registration.payment.outstanding)}</small></span><input aria-label={`Alokasi ${registration.pilgrim?.fullName}`} inputMode="numeric" value={allocations[registration.id] ?? ""} onChange={(event) => setAllocations((current) => ({ ...current, [registration.id]: event.target.value.replace(/\D/g, "") }))} /></label>)}</div>
+    <label><span>Keterangan kwitansi <i>opsional</i></span><textarea name="receiptDescription" rows={2} maxLength={RECEIPT_DESCRIPTION_MAX_LENGTH} placeholder="Kosongkan untuk keterangan otomatis, mis. Pembayaran [nama paket] untuk 2 jamaah (Transfer)" /><small>Tercetak di baris &quot;Untuk pembayaran&quot; pada kwitansi. Maksimal {RECEIPT_DESCRIPTION_MAX_LENGTH} karakter.</small></label>
     <label><span>Catatan</span><textarea name="note" rows={2} /></label>
     <SubmitButton>{pending ? "Mencatat…" : "Simpan pembayaran & buat kwitansi"}</SubmitButton>
   </form>;
